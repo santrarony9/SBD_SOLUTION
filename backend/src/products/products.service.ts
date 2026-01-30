@@ -1,0 +1,123 @@
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { ApplyOn } from '@prisma/client';
+// DTOs would normally be defined in a separate file, defining inline for brevity or need to create them.
+
+@Injectable()
+export class ProductsService {
+    constructor(private prisma: PrismaService) { }
+
+    async createProduct(data: any) {
+        // Basic validation could go here, or use DTO pipes
+        return this.prisma.product.create({ data });
+    }
+
+    async findAll() {
+        const products = await this.prisma.product.findMany({ where: { isActive: true } });
+        // In list view, we might want to return calculated price too, or just basic info.
+        // For performance, maybe just basic info or simplified calc.
+        // Let's attach price for now.
+        return Promise.all(products.map(p => this.enrichWithPrice(p)));
+    }
+
+    async findOne(slugOrId: string) {
+        const product = await this.prisma.product.findFirst({
+            where: {
+                OR: [{ id: slugOrId }, { slug: slugOrId }],
+            },
+        });
+
+        if (!product) throw new NotFoundException('Product not found');
+
+        return this.enrichWithPrice(product);
+    }
+
+    // ------------------------------------------
+    // CORE PRICING LOGIC
+    // ------------------------------------------
+    private async enrichWithPrice(product: any) {
+        // 1. Fetch Rates
+        const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
+        const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
+        const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
+
+        // Defaults if rates missing (should not happen in prod ideally)
+        const goldPricePer10g = goldRate?.pricePer10g || 0;
+        const diamondPricePerCarat = diamondRate?.pricePerCarat || 0;
+
+        // 2. Calculate Components
+        const goldValue = (goldPricePer10g / 10) * product.goldWeight;
+        const diamondValue = diamondPricePerCarat * product.diamondCarat;
+
+        // 3. Calculate Charges
+        // ApplyOn: GOLD, DIAMOND, FINAL, etc.
+        // We need to handle each charge type.
+
+        let makingCharges = 0;
+        let otherCharges = 0;
+        let gst = 0;
+
+        // We'll accumulate "Subtotal" that is Taxable.
+        // Usually: Gold + Diamond + Making + Other = Taxable. Then GST on Taxable.
+
+        // First pass: Calculate Making/Other (non-tax usually)
+        for (const charge of charges) {
+            if (charge.name.toUpperCase().includes('GST')) continue; // Skip GST for now
+
+            let chargeAmount = 0;
+
+            // For simplicity assuming ApplyOn 'GOLD' means based on gold weight or value
+            // The prompt says: Charge Type: Flat, Per gram, Per carat, Percentage.
+            // Apply on: Gold, Diamond, Subtotal, Final amount.
+
+            if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) {
+                chargeAmount = charge.amount * product.goldWeight;
+            } else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) {
+                chargeAmount = charge.amount * product.diamondCarat;
+            } else if (charge.type === 'FLAT') {
+                chargeAmount = charge.amount;
+            } else if (charge.type === 'PERCENTAGE') {
+                // % of what? 
+                if (charge.applyOn === ApplyOn.GOLD_VALUE) chargeAmount = (goldValue * charge.amount) / 100;
+                if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
+            }
+
+            if (charge.name.toLowerCase().includes('making')) {
+                makingCharges += chargeAmount;
+            } else {
+                otherCharges += chargeAmount;
+            }
+        }
+
+        const subTotal = goldValue + diamondValue;
+        const taxableAmount = subTotal + makingCharges + otherCharges;
+
+        // Second pass: GST
+        const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
+        if (gstCharge) {
+            // usually percentage of taxable
+            if (gstCharge.type === 'PERCENTAGE') {
+                gst = (taxableAmount * gstCharge.amount) / 100;
+            }
+        }
+
+        const finalPrice = taxableAmount + gst;
+
+        return {
+            ...product,
+            pricing: {
+                validAsOf: new Date(),
+                goldRate: goldPricePer10g,
+                diamondRate: diamondPricePerCarat,
+                components: {
+                    goldValue,
+                    diamondValue,
+                    makingCharges,
+                    otherCharges,
+                    gst
+                },
+                finalPrice
+            }
+        };
+    }
+}
