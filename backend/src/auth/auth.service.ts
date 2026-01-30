@@ -31,4 +31,25 @@ export class AuthService {
             }
         };
     }
+
+    async register(data: any) {
+        // Check if user exists
+        const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
+        if (existing) {
+            throw new UnauthorizedException('User already exists');
+        }
+
+        const hashedPassword = await bcrypt.hash(data.password, 10);
+        const user = await this.prisma.user.create({
+            data: {
+                ...data,
+                password: hashedPassword,
+            },
+        });
+
+        // Auto login on register? Or just return success.
+        // Let's return the simplified user object.
+        const { password, ...result } = user;
+        return result;
+    }
 }
