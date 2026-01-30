@@ -2,16 +2,74 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { MOCK_PRODUCTS } from '@/data/mock';
 import { useParams } from 'next/navigation';
+import { fetchAPI } from '@/lib/api';
+
+interface Product {
+    id: string;
+    name: string;
+    slug: string;
+    description: string;
+    images: string[];
+    goldPurity: number;
+    diamondClarity: string;
+    pricing: {
+        finalPrice: number;
+        components: {
+            goldValue: number;
+            diamondValue: number;
+            makingCharges: number;
+            gst: number;
+        };
+    };
+}
 
 export default function ProductDetailPage({ params }: { params: { slug: string } }) {
-    // Mock finding product
-    // In real app we fetch from backend
-    const product = MOCK_PRODUCTS.find(p => p.slug === params.slug) || MOCK_PRODUCTS[0];
-
-    // State for pricing breakdown
+    const [product, setProduct] = useState<Product | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
     const [showBreakup, setShowBreakup] = useState(false);
+
+    // Note: in Next.js 15+ params are async, but checking current file it seems to be treated as sync props or we assume older nextjs/handling. 
+    // However, to be safe and strictly follow "use client", we can use useParams() which handles dynamic segments on client side 
+    // OR just use the prop. The current file uses `params` prop but also imports `useParams`. 
+    // Let's stick to the prop if it works, or fallback to useParams.
+
+    // Actually, `params` in page props is the standard way.
+
+    useEffect(() => {
+        async function loadProduct() {
+            try {
+                const data = await fetchAPI(`/products/${params.slug}`);
+                setProduct(data);
+            } catch (err) {
+                console.error("Failed to load product", err);
+                setError('Failed to load product details.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        if (params.slug) {
+            loadProduct();
+        }
+    }, [params.slug]);
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-navy"></div>
+            </div>
+        );
+    }
+
+    if (error || !product) {
+        return (
+            <div className="min-h-screen bg-gray-50 flex items-center justify-center text-red-500">
+                {error || 'Product not found'}
+            </div>
+        );
+    }
 
     return (
         <div className="bg-white min-h-screen pb-20">
@@ -25,8 +83,12 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
                 {/* Media Section */}
                 <div className="space-y-4">
-                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
-                        <span className="text-gray-400">Main Image</span>
+                    <div className="aspect-square bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200 overflow-hidden">
+                        {product.images && product.images.length > 0 ? (
+                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
+                        ) : (
+                            <span className="text-gray-400">Main Image</span>
+                        )}
                     </div>
                     <div className="grid grid-cols-4 gap-4">
                         {[1, 2, 3, 4].map(i => (
@@ -71,7 +133,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                     <div className="bg-brand-navy/5 p-6 rounded-lg border border-brand-navy/10">
                         <div className="flex items-baseline justify-between mb-2">
                             <span className="text-sm text-gray-500">Total Price</span>
-                            <span className="text-3xl font-serif font-bold text-brand-navy">₹{product.price.toLocaleString()}</span>
+                            <span className="text-3xl font-serif font-bold text-brand-navy">
+                                {product.pricing?.finalPrice ? `₹${product.pricing.finalPrice.toLocaleString()}` : 'Price on Request'}
+                            </span>
                         </div>
                         <p className="text-xs text-green-600 mb-4 flex items-center">
                             <span className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
@@ -85,27 +149,27 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                             {showBreakup ? 'Hide Price Breakup' : 'View Transparent Price Breakup'}
                         </button>
 
-                        {showBreakup && (
+                        {showBreakup && product.pricing?.components && (
                             <div className="bg-white p-4 rounded border border-gray-200 text-sm space-y-2 mb-4 animate-fade-in">
                                 <div className="flex justify-between text-gray-600">
-                                    <span>Gold Value (22K)</span>
-                                    <span>₹22,000</span>
+                                    <span>Gold Value</span>
+                                    <span>₹{product.pricing.components.goldValue.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Diamond Value ({product.diamondClarity})</span>
-                                    <span>₹18,000</span>
+                                    <span>₹{product.pricing.components.diamondValue.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>Making Charges</span>
-                                    <span>₹3,500</span>
+                                    <span>₹{product.pricing.components.makingCharges.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-600">
-                                    <span>GST (3%)</span>
-                                    <span>₹1,500</span>
+                                    <span>GST</span>
+                                    <span>₹{product.pricing.components.gst.toLocaleString()}</span>
                                 </div>
                                 <div className="flex justify-between font-bold border-t pt-2 mt-2">
                                     <span>Final Amount</span>
-                                    <span>₹45,000</span>
+                                    <span>₹{product.pricing.finalPrice.toLocaleString()}</span>
                                 </div>
                             </div>
                         )}
@@ -120,3 +184,4 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
         </div>
     );
 }
+
