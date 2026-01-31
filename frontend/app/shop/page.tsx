@@ -1,8 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from "next/link";
 import { fetchAPI } from '@/lib/api';
+import ProductCard from '@/components/ProductCard';
 
 // Define Interface for Product (matching backend response)
 interface Product {
@@ -12,9 +12,11 @@ interface Product {
     images: string[];
     goldPurity: number;
     diamondClarity: string;
-    pricing: {
+    price?: number; // fallback
+    pricing?: {     // backend structure
         finalPrice: number;
     };
+    category?: string;
 }
 
 export default function ShopPage() {
@@ -29,6 +31,7 @@ export default function ShopPage() {
                 setProducts(data);
             } catch (err) {
                 console.error("Failed to load products", err);
+                // Fallback to empty array or mock if needed, but showing error is better for dev
                 setError('Failed to load products. Please try again later.');
             } finally {
                 setLoading(false);
@@ -38,48 +41,60 @@ export default function ShopPage() {
         loadProducts();
     }, []);
 
+    // Helper to map backend product to ProductCard props
+    const mapToCardProps = (p: Product) => ({
+        id: p.id,
+        name: p.name,
+        slug: p.slug,
+        image: p.images && p.images.length > 0 ? p.images[0] : null,
+        price: p.pricing?.finalPrice || p.price || 0,
+        category: p.category || `${p.goldPurity}K Gold`
+    });
+
     return (
-        <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="min-h-screen bg-brand-cream pb-20 pt-24">
 
             {/* Header */}
-            <div className="bg-white shadow-sm py-8 mb-8">
-                <div className="max-w-7xl mx-auto px-4">
-                    <h1 className="text-3xl font-serif text-brand-navy">All Collections</h1>
-                    <p className="text-sm text-gray-400 mt-2">Home / Shop</p>
+            <div className="bg-white/50 backdrop-blur-sm border-b border-brand-gold/20 py-12 mb-12">
+                <div className="max-w-7xl mx-auto px-4 text-center">
+                    <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4">The Collection</h1>
+                    <p className="text-sm font-light text-gray-500 uppercase tracking-widest">
+                        Exquisite Jewellery for Every Occasion
+                    </p>
                 </div>
             </div>
 
             {/* Content Grid */}
-            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
 
-                {/* Sidebar Filters (Static for now) */}
+                {/* Sidebar Filters */}
                 <div className="hidden md:block col-span-1">
-                    <div className="bg-white p-6 rounded shadow-sm sticky top-24">
-                        <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Filters</h3>
-
-                        <div className="mb-6">
-                            <h4 className="text-sm font-semibold mb-2">Category</h4>
-                            <ul className="space-y-1 text-sm text-gray-600">
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> Rings</label></li>
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> Earrings</label></li>
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> Necklaces</label></li>
-                            </ul>
-                        </div>
-
-                        <div className="mb-6">
-                            <h4 className="text-sm font-semibold mb-2">Gold Purity</h4>
-                            <ul className="space-y-1 text-sm text-gray-600">
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> 18K</label></li>
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> 22K</label></li>
+                    <div className="sticky top-28 space-y-8">
+                        <div>
+                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Category</h3>
+                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Rings</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Earrings</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Necklaces</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Bracelets</label></li>
                             </ul>
                         </div>
 
                         <div>
-                            <h4 className="text-sm font-semibold mb-2">Diamond</h4>
-                            <ul className="space-y-1 text-sm text-gray-600">
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> VVS1</label></li>
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> VS1</label></li>
-                                <li><label className="flex items-center"><input type="checkbox" className="mr-2" /> SI1</label></li>
+                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Metal</h3>
+                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> 18K Gold</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> 22K Gold</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Platinum</label></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Diamond</h3>
+                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> VVS1 / VVS2</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> VS1 / VS2</label></li>
+                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> SI1 / SI2</label></li>
                             </ul>
                         </div>
                     </div>
@@ -89,39 +104,29 @@ export default function ShopPage() {
                 <div className="col-span-1 md:col-span-3">
                     {loading ? (
                         <div className="flex justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-navy"></div>
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-gold"></div>
                         </div>
                     ) : error ? (
-                        <div className="text-center py-20 text-red-500">
+                        <div className="text-center py-20 text-red-500 font-light">
                             {error}
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {products.map((product) => (
-                                <Link href={`/product/${product.slug}`} key={product.id} className="group bg-white rounded shadow-sm hover:shadow-md transition-all duration-300">
-                                    <div className="h-64 bg-gray-200 w-full relative overflow-hidden flex items-center justify-center">
-                                        {/* Fallback image logic or real image */}
-                                        {product.images && product.images.length > 0 ? (
-                                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover" />
-                                        ) : (
-                                            <span className="text-gray-400 text-sm">No Image</span>
-                                        )}
-                                        <div className="absolute inset-x-0 bottom-0 bg-brand-navy text-white text-xs py-1 text-center translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                                            View Details
-                                        </div>
-                                    </div>
-                                    <div className="p-4">
-                                        <h2 className="text-lg font-serif text-brand-navy mb-1 group-hover:text-brand-gold transition-colors">{product.name}</h2>
-                                        <p className="text-sm text-gray-500 mb-2">{product.goldPurity}K Gold · {product.diamondClarity} Diamond</p>
-                                        <div className="flex items-center justify-between">
-                                            <span className="font-bold text-gray-800">
-                                                {product.pricing?.finalPrice ? `₹${product.pricing.finalPrice.toLocaleString()}` : 'Price on Request'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
+                        <>
+                            <div className="flex justify-between items-center mb-6">
+                                <span className="text-xs text-gray-500 uppercase tracking-widest">{products.length} Products</span>
+                                <select className="bg-transparent border-b border-gray-300 text-sm py-1 focus:outline-none focus:border-brand-navy text-gray-600 cursor-pointer">
+                                    <option>Sort by: Featured</option>
+                                    <option>Price: Low to High</option>
+                                    <option>Price: High to Low</option>
+                                </select>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                {products.map((product) => (
+                                    <ProductCard key={product.id} product={mapToCardProps(product)} />
+                                ))}
+                            </div>
+                        </>
                     )}
                 </div>
 

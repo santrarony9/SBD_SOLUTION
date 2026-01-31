@@ -4,36 +4,62 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #1a1a1a;
 
-  /* Brand Colors Ref */
-  --brand-navy: #051b35;
-  --brand-gold: #D4AF37;
+  /* Brand Colors - Premium Palette */
+  --brand-navy: #0F172A;
+  /* Deep Navy */
+  --brand-gold: #C6A87C;
+  /* Muted Gold */
+  --brand-gold-light: #F0E6D2;
+  /* Champagne */
+  --brand-charcoal: #333333;
+  --brand-cream: #FAFAF9;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0F172A;
+    --foreground: #F0E6D2;
   }
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--brand-cream);
+  /* Soft background for premium feel */
+  font-family: var(--font-inter), sans-serif;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-playfair-display), serif;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; 
+  background: transparent;
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #D4AF37; 
+  background: var(--brand-gold);
+  border-radius: 3px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #b5922f; 
+  background: #A88B5D;
+}
+
+/* Utilities */
+.text-balance {
+  text-wrap: balance;
 }
