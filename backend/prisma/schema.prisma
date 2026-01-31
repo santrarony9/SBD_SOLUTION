@@ -3,11 +3,10 @@
 
 generator client {
   provider = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -21,7 +20,7 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
   email     String   @unique
   password  String
   name      String?
@@ -36,7 +35,7 @@ model User {
 
 // 16K, 18K, 22K, 24K
 model GoldPrice {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   purity      Int      @unique // e.g. 22
   pricePer10g Float
   isActive    Boolean  @default(true)
@@ -45,7 +44,7 @@ model GoldPrice {
 
 // VVS1, VS1, SI1, etc.
 model DiamondPrice {
-  id            String   @id @default(uuid())
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
   clarity       String   @unique // e.g. "VVS1"
   pricePerCarat Float
   isActive      Boolean  @default(true)
@@ -70,14 +69,6 @@ enum ApplyOn {
   FINAL_AMOUNT  // After other charges? Usually GST is on Subtotal + Making.
 }
 
-// Simplified logic: 
-// Final Price = (GoldValue + DiamondValue) + Sum(Charges)
-// Where each charge is calculated based on its Type and ApplyOn base.
-// Note: GST is typically applied on the Total Taxable Value. 
-// We will handle logic in service. 
-// For ApplyOn: "SUBTOTAL" implies Gold+Diamond+Making? Or just Gold+Diamond?
-// Let's refine ApplyOn to be explicitly: GOLD_VALUE, DIAMOND_VALUE, RAW_TOTAL (G+D), TAXABLE_VALUE (G+D+Making)
-
 enum ChargeBasis {
   GOLD_WEIGHT   // For Per Gram
   DIAMOND_CARAT // For Per Carat
@@ -89,14 +80,10 @@ enum ChargeBasis {
 }
 
 model Charge {
-  id          String      @id @default(uuid())
+  id          String      @id @default(auto()) @map("_id") @db.ObjectId
   name        String      // e.g. "Making Charges", "GST 3%"
   type        ChargeType  // FLAT, PER_GRAM, PER_CARAT, PERCENTAGE
   amount      Float       // The rate or fixed value
-  
-  // Who does this charge apply to?
-  // We can use a simplified approach or powerful approach.
-  // Let's stick to User Request: "Apply on: Gold, Diamond, Subtotal, Final amount"
   
   applyOn     ApplyOn
   
@@ -110,10 +97,10 @@ model Charge {
 // --------------------------------------
 
 model Product {
-  id          String   @id @default(uuid())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   slug        String   @unique
-  description String?  @db.Text
+  description String?
   
   // Core Specs
   goldPurity  Int      // 18, 22
@@ -136,3 +123,4 @@ model Product {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
+

@@ -55,23 +55,29 @@ async function main() {
   console.log('Diamond prices seeded');
 
   // 4. Charges
-  await prisma.charge.createMany({
-    skipDuplicates: true,
-    data: [
-      {
-        name: 'Making Charges',
-        type: ChargeType.PER_GRAM,
-        amount: 800, // 800rs per gram
-        applyOn: ApplyOn.GOLD_VALUE,
-      },
-      {
-        name: 'GST',
-        type: ChargeType.PERCENTAGE,
-        amount: 3, // 3%
-        applyOn: ApplyOn.FINAL_AMOUNT,
-      }
-    ],
-  });
+  // 4. Charges
+  const charges = [
+    {
+      name: 'Making Charges',
+      type: ChargeType.PER_GRAM,
+      amount: 800, // 800rs per gram
+      applyOn: ApplyOn.GOLD_VALUE,
+    },
+    {
+      name: 'GST',
+      type: ChargeType.PERCENTAGE,
+      amount: 3, // 3%
+      applyOn: ApplyOn.FINAL_AMOUNT,
+    }
+  ];
+
+  for (const charge of charges) {
+    // Check if exists by name (simplified check since name isn't unique in schema but good enough for seed)
+    const existing = await prisma.charge.findFirst({ where: { name: charge.name } });
+    if (!existing) {
+      await prisma.charge.create({ data: charge });
+    }
+  }
   console.log('Charges seeded');
 }
 
