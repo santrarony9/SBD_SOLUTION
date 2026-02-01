@@ -43,23 +43,55 @@ h6 {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+  background: var(--brand-navy);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--brand-gold);
-  border-radius: 3px;
+  background: linear-gradient(to bottom, #C6A87C, #F0E6D2);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #A88B5D;
 }
 
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(198, 168, 124, 0.1);
+}
+
+/* Text Selection */
+::selection {
+  background: var(--brand-gold);
+  color: var(--brand-navy);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
 /* Utilities */
 .text-balance {
   text-wrap: balance;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #C6A87C 0%, #F0E6D2 50%, #C6A87C 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
