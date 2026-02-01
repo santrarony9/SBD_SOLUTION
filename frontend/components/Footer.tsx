@@ -2,85 +2,91 @@ import Link from 'next/link';
 
 export default function Footer() {
     return (
-        <footer className="bg-brand-navy text-gray-300 pt-20 pb-10 border-t border-white/10">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-12">
+        <footer className="bg-[#0A1128] text-gray-300 border-t border-brand-gold/20 relative overflow-hidden">
+            {/* Background Decorative Glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-1 bg-gradient-to-r from-transparent via-brand-gold/50 to-transparent opacity-50"></div>
 
-                {/* Brand & Newsletter */}
-                <div className="col-span-1 md:col-span-1 space-y-6">
-                    <div>
-                        <h2 className="font-serif text-2xl text-white tracking-widest mb-2">SPARK BLUE</h2>
-                        <div className="h-0.5 w-12 bg-brand-gold"></div>
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-16">
+
+                    {/* Brand Column (4 cols) */}
+                    <div className="md:col-span-4 space-y-8">
+                        <div>
+                            <h2 className="font-serif text-3xl text-white tracking-widest mb-4">SPARK BLUE</h2>
+                            <p className="text-brand-gold text-xs uppercase tracking-[0.3em]">Diamond Architecture</p>
+                        </div>
+                        <p className="text-sm text-gray-400 leading-loose font-light">
+                            Crafting eternity in every facet. Our pieces are more than jewellery; they are heirlooms of the future, certified for purity and designed for distinction.
+                        </p>
+                        <div className="flex gap-4">
+                            {/* Social Placeholders with Gold Hover */}
+                            {['IG', 'FB', 'YT', 'PI'].map((social) => (
+                                <a key={social} href="#" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-xs text-white hover:border-brand-gold hover:text-brand-gold transition-all duration-300 hover:scale-110">
+                                    {social}
+                                </a>
+                            ))}
+                        </div>
                     </div>
-                    <p className="text-sm text-gray-400 leading-relaxed">
-                        Setting the standard for luxury and transparency. IGI Certified Diamonds and BIS Hallmarked Gold, crafted for eternity.
-                    </p>
 
-                    {/* Newsletter */}
-                    <div className="pt-4">
-                        <h4 className="text-xs uppercase tracking-widest text-brand-gold mb-3">Subscribe to our Newsletter</h4>
-                        <div className="flex border-b border-gray-600 pb-1">
+                    {/* Links Column 1 (2 cols) */}
+                    <div className="md:col-span-2 md:col-start-6">
+                        <h3 className="text-white font-serif text-lg mb-8 relative inline-block">
+                            Collections
+                            <span className="absolute -bottom-2 left-0 w-1/2 h-px bg-brand-gold"></span>
+                        </h3>
+                        <ul className="space-y-4 text-sm font-light tracking-wide">
+                            {['High Jewellery', 'Engagement', 'Watches', 'Gifting'].map((item) => (
+                                <li key={item}>
+                                    <Link href="/shop" className="hover:text-brand-gold hover:pl-2 transition-all duration-300 block">
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Links Column 2 (2 cols) */}
+                    <div className="md:col-span-2">
+                        <h3 className="text-white font-serif text-lg mb-8 relative inline-block">
+                            Concierge
+                            <span className="absolute -bottom-2 left-0 w-1/2 h-px bg-brand-gold"></span>
+                        </h3>
+                        <ul className="space-y-4 text-sm font-light tracking-wide">
+                            {['Contact Us', 'Shipping & Returns', 'Care Guide', 'Book Appointment'].map((item) => (
+                                <li key={item}>
+                                    <Link href="#" className="hover:text-brand-gold hover:pl-2 transition-all duration-300 block">
+                                        {item}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Newsletter (4 cols) */}
+                    <div className="md:col-span-4">
+                        <h3 className="text-white font-serif text-lg mb-6">The Royal Register</h3>
+                        <p className="text-xs text-gray-500 mb-6 uppercase tracking-wider">Join for exclusive previews</p>
+                        <form className="relative">
                             <input
                                 type="email"
-                                placeholder="Your email address"
-                                className="bg-transparent border-none outline-none text-sm w-full text-white placeholder-gray-500 focus:ring-0"
+                                placeholder="Email Address"
+                                className="w-full bg-white/5 border border-white/10 px-6 py-4 text-sm text-white focus:outline-none focus:border-brand-gold transition-colors placeholder-gray-600"
                             />
-                            <button className="text-xs uppercase tracking-widest text-white hover:text-brand-gold transition-colors">
+                            <button className="absolute right-2 top-2 bottom-2 px-6 bg-brand-gold text-brand-navy text-xs font-bold uppercase tracking-widest hover:bg-white transition-colors">
                                 Join
                             </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
 
-                {/* Explore */}
-                <div className="md:pl-10">
-                    <h3 className="text-white font-serif text-lg mb-6">Explore</h3>
-                    <ul className="space-y-3 text-sm font-light">
-                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">High Jewellery</Link></li>
-                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Engagement</Link></li>
-                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Watches</Link></li>
-                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Collections</Link></li>
-                    </ul>
-                </div>
-
-                {/* Customer Care */}
-                <div>
-                    <h3 className="text-white font-serif text-lg mb-6">Customer Care</h3>
-                    <ul className="space-y-3 text-sm font-light">
-                        <li><Link href="/contact" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Contact Us</Link></li>
-                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Shipping & Returns</Link></li>
-                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Warranty</Link></li>
-                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">FAQ</Link></li>
-                    </ul>
-                </div>
-
-                {/* Certifications & Social */}
-                <div>
-                    <h3 className="text-white font-serif text-lg mb-6">Certifications</h3>
-                    <div className="flex space-x-4 mb-8">
-                        <div className="border border-white/20 px-4 py-3 text-center min-w-[80px]">
-                            <span className="block text-brand-gold font-bold text-lg font-serif">IGI</span>
-                            <span className="text-[10px] uppercase tracking-wider text-gray-400">Certified</span>
-                        </div>
-                        <div className="border border-white/20 px-4 py-3 text-center min-w-[80px]">
-                            <span className="block text-brand-gold font-bold text-lg font-serif">BIS</span>
-                            <span className="text-[10px] uppercase tracking-wider text-gray-400">Hallmarked</span>
-                        </div>
-                    </div>
-                    <h3 className="text-white font-serif text-lg mb-4">Follow Us</h3>
-                    <div className="flex space-x-4">
-                        {/* Social Icons would go here */}
-                        <div className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-gold hover:text-brand-navy flex items-center justify-center transition-all cursor-pointer">
-                            <span className="text-xs">IG</span>
-                        </div>
-                        <div className="w-8 h-8 rounded-full bg-white/5 hover:bg-brand-gold hover:text-brand-navy flex items-center justify-center transition-all cursor-pointer">
-                            <span className="text-xs">FB</span>
-                        </div>
+                {/* Bottom Bar */}
+                <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 tracking-wider">
+                    <p>&copy; {new Date().getFullYear()} Spark Blue Diamond. All rights reserved.</p>
+                    <div className="flex gap-8 mt-4 md:mt-0">
+                        <a href="#" className="hover:text-brand-gold transition-colors">Privacy Policy</a>
+                        <a href="#" className="hover:text-brand-gold transition-colors">Terms of Service</a>
                     </div>
                 </div>
-            </div>
-
-            <div className="mt-16 pt-8 border-t border-white/5 text-center text-xs text-gray-500 tracking-wider uppercase">
-                &copy; {new Date().getFullYear()} Spark Blue Diamond. All rights reserved.
             </div>
         </footer>
     );

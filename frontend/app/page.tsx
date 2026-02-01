@@ -1,62 +1,191 @@
-import Hero from "@/components/Hero";
-import FeaturedCollections from "@/components/FeaturedCollections";
-import ProductCard from "@/components/ProductCard";
-import { MOCK_PRODUCTS } from "@/data/mock";
+import Link from 'next/link';
+import Image from 'next/image';
+import Navbar from '@/components/Navbar';
+import ProductCard from '@/components/ProductCard';
+import { fetchAPI } from '@/lib/api';
 
-export default function Home() {
+// Fetch Featured Products
+async function getFeaturedProducts() {
+  try {
+    return await fetchAPI('/products');
+  } catch (error) {
+    console.error("Failed to fetch products", error);
+    return [];
+  }
+}
+
+export default async function Home() {
+  const products = await getFeaturedProducts();
+  const featuredProducts = products.slice(0, 4); // Limit to 4 for the "Featured" section
+
   return (
-    <div className="bg-brand-cream">
-      <Hero />
+    <div className="bg-brand-cream font-sans">
+      {/* 1. Hero Section - Parallax Effect */}
+      <section className="relative h-screen w-full overflow-hidden">
+        {/* Background Image with Slow Parallax */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/hero-jewellery.png" // Ensure this image exists!
+            alt="Royal Diamond Collection"
+            fill
+            priority
+            className="object-cover animate-scale-in" // Add a subtle scale animation in globals
+            style={{ objectPosition: 'center 30%' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90" />
+        </div>
 
-      <FeaturedCollections />
+        {/* Hero Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
+          <h2 className="text-brand-gold font-serif italic text-xl md:text-2xl mb-4 tracking-widest animate-fade-in delay-100">
+            Est. 1995
+          </h2>
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in delay-200">
+            Elegance is <br /> <span className="text-brand-gold italic">Eternal</span>
+          </h1>
+          <p className="text-gray-200 max-w-xl text-lg mb-12 font-light tracking-wide animate-fade-in delay-300">
+            Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust.
+          </p>
 
-      {/* Trending Section */}
-      <section className="py-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-end mb-12">
-          <div>
-            <h4 className="text-brand-gold text-xs tracking-[0.3em] uppercase mb-2">Selected for You</h4>
-            <h2 className="text-3xl md:text-4xl font-serif text-brand-navy">Trending Now</h2>
+          <div className="flex flex-col md:flex-row gap-6 animate-slide-up delay-500">
+            <Link
+              href="/shop"
+              className="bg-brand-gold text-brand-navy px-10 py-4 uppercase tracking-[0.2em] font-bold text-xs hover:bg-white transition-colors duration-300 border border-brand-gold"
+            >
+              Shop Collection
+            </Link>
+            <Link
+              href="/about"
+              className="bg-transparent text-white px-10 py-4 uppercase tracking-[0.2em] font-bold text-xs hover:bg-white hover:text-brand-navy transition-colors duration-300 border border-white"
+            >
+              Our Legacy
+            </Link>
           </div>
-          <a href="/shop" className="hidden md:block text-xs font-bold tracking-widest uppercase border-b border-brand-charcoal pb-1 hover:text-brand-gold hover:border-brand-gold transition-colors">
-            View All Products
-          </a>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          {MOCK_PRODUCTS.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        <div className="mt-12 text-center md:hidden">
-          <a href="/shop" className="text-xs font-bold tracking-widest uppercase border-b border-brand-charcoal pb-1">
-            View All Products
-          </a>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
+          <span className="text-white text-xs tracking-widest uppercase opacity-70">Scroll</span>
         </div>
       </section>
 
-      {/* Brand Promise / Trust Section */}
-      <section className="py-20 bg-brand-navy text-white text-center">
-        <div className="max-w-4xl mx-auto px-4 space-y-8">
-          <h2 className="font-serif text-3xl md:text-5xl">The Spark Blue Promise</h2>
-          <p className="font-light text-gray-300 leading-relaxed text-lg">
-            Every diamond is hand-selected for its brilliance. Every piece is crafted with integrity.
-            We promise 100% transparency with IGI certification and hallmark purity.
-          </p>
-          <div className="pt-8 grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="space-y-2">
-              <div className="text-brand-gold font-serif text-xl">100% Certified</div>
-              <p className="text-xs text-gray-400 uppercase tracking-widest">Diamonds & Gold</p>
+      {/* 2. Trust Signals - Validated Excellence */}
+      <section className="py-16 bg-brand-navy border-b border-white/5">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-white/10">
+          {[
+            { title: 'IGI Certified', label: 'Global Standard', icon: '✦' },
+            { title: 'BIS Hallmarked', label: '100% Pure Gold', icon: '⚜' },
+            { title: 'Lifetime Exchange', label: 'Secure Value', icon: '∞' },
+            { title: 'Secure Shipping', label: 'Insured Delivery', icon: '🛡' }
+          ].map((trust, idx) => (
+            <div key={idx} className="pt-8 md:pt-0 px-4 group">
+              <span className="text-3xl text-brand-gold mb-4 block transition-transform group-hover:-translate-y-2">{trust.icon}</span>
+              <h3 className="text-white font-serif text-lg tracking-wider mb-2">{trust.title}</h3>
+              <p className="text-gray-400 text-xs uppercase tracking-widest">{trust.label}</p>
             </div>
-            <div className="space-y-2">
-              <div className="text-brand-gold font-serif text-xl">Lifetime Exchange</div>
-              <p className="text-xs text-gray-400 uppercase tracking-widest">On all jewellery</p>
+          ))}
+        </div>
+      </section>
+
+      {/* 3. Featured Categories - Grid Zoom */}
+      <section className="py-24 max-w-7xl mx-auto px-6">
+        <div className="text-center mb-16">
+          <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">The Collection</span>
+          <h2 className="text-4xl md:text-5xl font-serif text-brand-navy mt-4">Curated Excellence</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-8 auto-rows-[400px]">
+          {/* Ring Category - Large */}
+          <Link href="/shop?category=rings" className="group relative overflow-hidden md:col-span-2 bg-gray-100">
+            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" />
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+            <div className="absolute bottom-8 left-8 text-white">
+              <h3 className="text-3xl font-serif italic mb-2">Solitaire Rings</h3>
+              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1 group-hover:pl-2 transition-all">Explore</span>
             </div>
-            <div className="space-y-2">
-              <div className="text-brand-gold font-serif text-xl">Insured Shipping</div>
-              <p className="text-xs text-gray-400 uppercase tracking-widest">Secure Delivery</p>
+          </Link>
+
+          {/* Necklace Category */}
+          <Link href="/shop?category=necklaces" className="group relative overflow-hidden bg-gray-100">
+            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" /> {/* Placeholder Image reuse */}
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+            <div className="absolute bottom-8 left-8 text-white">
+              <h3 className="text-3xl font-serif italic mb-2">Necklaces</h3>
+              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1 group-hover:pl-2 transition-all">Explore</span>
             </div>
+          </Link>
+
+          {/* Earrings Category */}
+          <Link href="/shop?category=earrings" className="group relative overflow-hidden bg-gray-100">
+            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" /> {/* Placeholder Image reuse */}
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+            <div className="absolute bottom-8 left-8 text-white">
+              <h3 className="text-3xl font-serif italic mb-2">Earrings</h3>
+              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1 group-hover:pl-2 transition-all">Explore</span>
+            </div>
+          </Link>
+
+          {/* Bangles Category - Large */}
+          <Link href="/shop?category=bangles" className="group relative overflow-hidden md:col-span-2 bg-gray-100">
+            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" /> {/* Placeholder Image reuse */}
+            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+            <div className="absolute bottom-8 left-8 text-white">
+              <h3 className="text-3xl font-serif italic mb-2">Royal Bangles</h3>
+              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1 group-hover:pl-2 transition-all">Explore</span>
+            </div>
+          </Link>
+        </div>
+      </section>
+
+      {/* 4. New Arrivals via ProductCard */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex justify-between items-end mb-16">
+            <div>
+              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Latest Drops</span>
+              <h2 className="text-4xl font-serif text-brand-navy mt-4">New Arrivals</h2>
+            </div>
+            <Link href="/shop" className="text-brand-navy border-b border-brand-navy pb-1 text-sm font-bold uppercase tracking-widest hover:text-brand-gold hover:border-brand-gold transition-colors">
+              View All
+            </Link>
           </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {featuredProducts.map((product: any) => (
+              <ProductCard
+                key={product.id}
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  image: product.imageUrl,
+                  slug: product.id, // Using ID as slug for now if slug missing
+                  category: product.category,
+                  images: product.images
+                }}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Brand Story / Heritage Block */}
+      <section className="py-24 bg-brand-navy text-white relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <span className="block text-6xl text-brand-gold mb-6 font-serif">“</span>
+          <h2 className="text-3xl md:text-5xl font-serif leading-tight mb-8">
+            We believe that a diamond is not just a stone. It is a <span className="text-brand-gold italic">promise</span> kept forever.
+          </h2>
+          <p className="text-gray-400 font-light tracking-wide mb-10">
+            — The Spark Blue Family
+          </p>
+          <Link
+            href="/about"
+            className="inline-block border border-brand-gold text-brand-gold px-8 py-3 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold hover:text-brand-navy transition-colors"
+          >
+            Read Our Story
+          </Link>
         </div>
       </section>
     </div>

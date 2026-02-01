@@ -32,14 +32,14 @@ export default function Navbar() {
     // Determine navbar background
     // If scrolled or NOT on home page -> Glass Dark (Premium)
     // If on home page and NOT scrolled -> Transparent
-    const navBackground = (scrolled || !isHome) ? 'bg-white shadow-lg py-2' : 'bg-transparent py-6';
+    const navBackground = (scrolled || !isHome) ? 'bg-white/95 backdrop-blur-md shadow-lg border-b border-brand-gold/20 py-3' : 'bg-transparent py-6';
     const textColor = (scrolled || !isHome) ? 'text-brand-navy' : 'text-white';
     const logoColor = (scrolled || !isHome) ? 'text-brand-navy' : 'text-white';
 
     return (
         <div className="fixed w-full z-50 transition-all duration-300">
             {/* Gold Rate Ticker */}
-            <div className="bg-brand-navy text-white text-[10px] md:text-xs py-1 overflow-hidden relative border-b border-brand-gold/20">
+            <div className="bg-brand-navy text-white text-[10px] md:text-xs py-2 overflow-hidden relative border-b border-brand-gold/20">
                 <div className="animate-marquee whitespace-nowrap flex space-x-12">
                     <span>TODAY'S GOLD RATE (22K): <span className="text-brand-gold font-bold">₹7,250/g</span></span>
                     <span>TODAY'S GOLD RATE (24K): <span className="text-brand-gold font-bold">₹7,850/g</span></span>
@@ -73,21 +73,24 @@ export default function Navbar() {
                         <div className="hidden md:flex space-x-8 items-center">
                             <NavLink href="/" label="Home" textColor={textColor} />
                             <NavLink href="/shop" label="Collections" textColor={textColor} />
-                            <NavLink href="/about" label="Our Story" textColor={textColor} />
+                            <NavLink href="/about" label="Our Legacy" textColor={textColor} />
                         </div>
 
                         {/* Center: Logo */}
-                        <div className="flex-shrink-0 flex items-center justify-center absolute left-1/2 transform -translate-x-1/2 mt-2">
+                        <div className="flex-shrink-0 flex flex-col items-center justify-center absolute left-1/2 transform -translate-x-1/2 mt-2">
                             <Link href="/" className={`font-serif text-2xl md:text-3xl tracking-[0.25em] ${logoColor} font-bold transition-all duration-500 hover:text-brand-gold hover:scale-105`}>
                                 SPARK BLUE
                             </Link>
+                            <span className={`text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.4em] ${scrolled || !isHome ? 'text-brand-gold' : 'text-brand-gold-light opacity-80'}`}>
+                                Diamond
+                            </span>
                         </div>
 
                         {/* Right: Actions */}
                         <div className="hidden md:flex space-x-6 items-center">
-                            <NavLink href="/contact" label="Contact" textColor={textColor} />
+                            <NavLink href="/shop" label="Search" textColor={textColor} />
 
-                            <div className={`flex items-center space-x-4 ml-4 border-l ${scrolled || !isHome ? 'border-gray-200' : 'border-gray-600'} pl-6`}>
+                            <div className={`flex items-center space-x-4 ml-4 border-l ${scrolled || !isHome ? 'border-gray-200' : 'border-white/30'} pl-6`}>
                                 {isAuthenticated ? (
                                     <>
                                         <span className={`text-xs ${textColor} uppercase tracking-wider`}>
@@ -191,7 +194,7 @@ export default function Navbar() {
 
 function NavLink({ href, label, textColor }: { href: string, label: string, textColor: string }) {
     return (
-        <Link href={href} className={`${textColor} group relative text-xs tracking-[0.15em] uppercase font-medium hover:text-brand-gold transition-colors duration-300`}>
+        <Link href={href} className={`${textColor} group relative text-xs tracking-[0.15em] uppercase font-bold hover:text-brand-gold transition-colors duration-300`}>
             {label}
             <span className="absolute -bottom-1 left-0 w-0 h-[1px] bg-brand-gold transition-all duration-300 group-hover:w-full"></span>
         </Link>
