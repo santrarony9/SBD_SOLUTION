@@ -37,6 +37,7 @@ model User {
   orders    Order[]
   wishlist  Wishlist[]
   reviews   Review[]
+  addresses Address[] // Saved addresses for checkout
 }
 
 // --------------------------------------

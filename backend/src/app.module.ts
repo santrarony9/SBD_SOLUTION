@@ -12,9 +12,11 @@ import { ReviewsModule } from './reviews/reviews.module';
 
 import { SmsModule } from './sms/sms.module';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
+    ProfileModule,
     DashboardModule,
     SmsModule,
     AuthModule,

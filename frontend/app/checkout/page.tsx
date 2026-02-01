@@ -12,6 +12,7 @@ export default function CheckoutPage() {
     const { user } = useAuth();
     const router = useRouter();
 
+    const [selectedAddressIndex, setSelectedAddressIndex] = useState<number | 'new'>('new');
     const [shippingAddress, setShippingAddress] = useState({
         fullName: user?.name || '',
         street: '',
@@ -25,8 +26,28 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState('COD'); // COD or RAZORPAY
     const [isLoading, setIsLoading] = useState(false);
 
+    const handleAddressSelect = (index: number | 'new') => {
+        setSelectedAddressIndex(index);
+        if (index === 'new') {
+            setShippingAddress({
+                fullName: user?.name || '',
+                street: '',
+                city: '',
+                state: '',
+                zip: '',
+                country: 'India',
+                phone: '',
+            });
+        } else {
+            const addr = user?.addresses[index];
+            if (addr) {
+                setShippingAddress({ ...addr });
+            }
+        }
+    };
+
     if (items.length === 0) {
-        return <div className="p-12 text-center">Your cart is empty. Please add items to checkout.</div>;
+        return <div className="p-32 text-center font-serif text-2xl text-brand-navy italic">Your royal collection is empty.</div>;
     }
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,46 +103,82 @@ export default function CheckoutPage() {
 
                 {/* Left: Shipping Form */}
                 <div>
-                    <h2 className="text-2xl font-serif text-brand-navy mb-6">Shipping Details</h2>
-                    <form onSubmit={handlePlaceOrder} className="bg-white p-8 rounded shadow-sm space-y-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <header className="mb-8">
+                        <h2 className="text-3xl font-serif text-brand-navy">Checkout Flow</h2>
+                        <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold mt-1">Finalize your premium acquisition</p>
+                    </header>
+
+                    {user?.addresses && user.addresses.length > 0 && (
+                        <div className="mb-8 space-y-4">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-brand-navy">Select Saved Residency</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {user.addresses.map((addr: any, idx: number) => (
+                                    <div
+                                        key={idx}
+                                        onClick={() => handleAddressSelect(idx)}
+                                        className={`p-4 border cursor-pointer transition-all ${selectedAddressIndex === idx ? 'border-brand-gold bg-brand-gold/5 ring-1 ring-brand-gold' : 'border-gray-200 hover:border-brand-gold/50'}`}
+                                    >
+                                        <p className="font-bold text-xs uppercase tracking-tighter">{addr.fullName}</p>
+                                        <p className="text-[10px] text-gray-500 truncate">{addr.street}, {addr.city}</p>
+                                    </div>
+                                ))}
+                                <div
+                                    onClick={() => handleAddressSelect('new')}
+                                    className={`p-4 border border-dashed cursor-pointer flex items-center justify-center transition-all ${selectedAddressIndex === 'new' ? 'border-brand-navy bg-gray-50' : 'border-gray-200 hover:border-brand-navy/50'}`}
+                                >
+                                    <span className="text-[10px] font-bold uppercase tracking-widest">+ New Address</span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <form onSubmit={handlePlaceOrder} className="bg-white p-8 md:p-12 shadow-2xl border border-brand-gold/10 space-y-8 relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-brand-gold/5 rounded-full -mr-16 -mt-16"></div>
+
+                        <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                                <input required name="fullName" value={shippingAddress.fullName} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Full Name</label>
+                                <input required name="fullName" value={shippingAddress.fullName} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
-                                <input required name="street" value={shippingAddress.street} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Residency Address</label>
+                                <input required name="street" value={shippingAddress.street} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input required name="city" value={shippingAddress.city} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">City</label>
+                                <input required name="city" value={shippingAddress.city} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                                <input required name="state" value={shippingAddress.state} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">State</label>
+                                <input required name="state" value={shippingAddress.state} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Zip Code</label>
-                                <input required name="zip" value={shippingAddress.zip} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Postal Code</label>
+                                <input required name="zip" value={shippingAddress.zip} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
-                                <input required name="phone" value={shippingAddress.phone} onChange={handleInputChange} className="w-full border border-gray-300 rounded p-3 focus:border-brand-gold outline-none" />
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 tracking-widest mb-1">Phone Number</label>
+                                <input required name="phone" value={shippingAddress.phone} onChange={handleInputChange} className="w-full bg-transparent border-b border-gray-300 py-3 text-sm focus:border-brand-gold outline-none transition-colors" />
                             </div>
                         </div>
 
-                        <div className="mt-8">
-                            <h3 className="text-lg font-bold text-brand-navy mb-4">Payment Method</h3>
-                            <div className="space-y-3">
-                                <label className="flex items-center space-x-3 p-4 border rounded cursor-pointer hover:border-brand-gold transition-colors">
-                                    <input type="radio" name="payment" value="RAZORPAY" checked={paymentMethod === 'RAZORPAY'} onChange={(e) => setPaymentMethod(e.target.value)} className="text-brand-gold focus:ring-brand-gold" />
-                                    <span className="font-bold">Pay via Razorpay (Cards/UPI)</span>
-                                    <span className="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded ml-auto">Recommended</span>
+                        <div className="mt-12 relative z-10">
+                            <h3 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-6">Secured Acquisition Method</h3>
+                            <div className="space-y-4">
+                                <label className={`flex items-center space-x-4 p-5 border transition-all cursor-pointer ${paymentMethod === 'RAZORPAY' ? 'border-brand-gold bg-brand-gold/5' : 'border-gray-200 hover:border-brand-gold/50'}`}>
+                                    <input type="radio" name="payment" value="RAZORPAY" checked={paymentMethod === 'RAZORPAY'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-4 h-4 accent-brand-gold" />
+                                    <div>
+                                        <p className="font-bold text-xs uppercase tracking-widest">Digital Transfer</p>
+                                        <p className="text-[10px] text-gray-500 tracking-tighter">Debit, Credit Cards, or UPI Secure Portals</p>
+                                    </div>
+                                    <span className="bg-brand-gold text-brand-navy text-[8px] px-2 py-0.5 font-bold rounded-full ml-auto uppercase tracking-tighter">Recommended</span>
                                 </label>
-                                <label className="flex items-center space-x-3 p-4 border rounded cursor-pointer hover:border-brand-gold transition-colors">
-                                    <input type="radio" name="payment" value="COD" checked={paymentMethod === 'COD'} onChange={(e) => setPaymentMethod(e.target.value)} className="text-brand-gold focus:ring-brand-gold" />
-                                    <span className="font-bold">Pay on Request / COD</span>
+                                <label className={`flex items-center space-x-4 p-5 border transition-all cursor-pointer ${paymentMethod === 'COD' ? 'border-brand-gold bg-brand-gold/5' : 'border-gray-200 hover:border-brand-gold/50'}`}>
+                                    <input type="radio" name="payment" value="COD" checked={paymentMethod === 'COD'} onChange={(e) => setPaymentMethod(e.target.value)} className="w-4 h-4 accent-brand-gold" />
+                                    <div>
+                                        <p className="font-bold text-xs uppercase tracking-widest">Acquisition on Delivery</p>
+                                        <p className="text-[10px] text-gray-500 tracking-tighter">Pay at your residency upon receiving the piece</p>
+                                    </div>
                                 </label>
                             </div>
                         </div>
@@ -129,9 +186,9 @@ export default function CheckoutPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-brand-navy text-white text-lg font-bold py-4 mt-6 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 shadow-lg"
+                            className="w-full bg-brand-navy text-white py-5 mt-10 font-bold uppercase tracking-[0.3em] text-xs hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 shadow-2xl relative z-10"
                         >
-                            {isLoading ? 'Processing...' : `Pay ₹${cartTotal.toLocaleString()}`}
+                            {isLoading ? 'Securing Collection...' : `Confirm Acquisition — ₹${cartTotal.toLocaleString()}`}
                         </button>
                     </form>
                 </div>
