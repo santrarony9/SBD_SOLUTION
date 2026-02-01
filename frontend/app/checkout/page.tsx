@@ -39,7 +39,7 @@ export default function CheckoutPage() {
                 phone: '',
             });
         } else {
-            const addr = user?.addresses[index];
+            const addr = user?.addresses?.[index as number];
             if (addr) {
                 setShippingAddress({ ...addr });
             }
