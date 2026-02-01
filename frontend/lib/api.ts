@@ -1,5 +1,5 @@
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000').replace(/\/$/, '');
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const res = await fetch(`${API_URL}${endpoint}`, {

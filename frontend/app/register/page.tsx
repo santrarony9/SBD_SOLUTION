@@ -30,7 +30,7 @@ export default function RegisterPage() {
 
         } catch (err: any) {
             console.error('Registration failed', err);
-            setError('Registration failed. Please try again.');
+            setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);
         }
