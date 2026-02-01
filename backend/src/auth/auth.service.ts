@@ -16,7 +16,8 @@ export class AuthService {
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const normalizedEmail = email.toLowerCase();
+        const user = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
         if (user && (await bcrypt.compare(pass, user.password))) {
             const { password, ...result } = user;
             return result;
@@ -38,9 +39,8 @@ export class AuthService {
     }
 
     async register(data: any) {
-        // ... existing register logic ...
-        // Check if user exists
-        const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
+        const normalizedEmail = data.email.toLowerCase();
+        const existing = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
         if (existing) {
             throw new UnauthorizedException('User already exists');
         }
@@ -49,6 +49,7 @@ export class AuthService {
         const user = await this.prisma.user.create({
             data: {
                 ...data,
+                email: normalizedEmail,
                 password: hashedPassword,
             },
         });
@@ -67,7 +68,7 @@ export class AuthService {
         // Check if mobile exists first to decide create or update
         // Prisma upsert needs unique where, mobile is unique now.
 
-        let user = await this.prisma.user.findUnique({ where: { mobile } });
+        let user = await this.prisma.user.findFirst({ where: { mobile } });
 
         if (!user) {
             user = await this.prisma.user.create({
@@ -82,7 +83,7 @@ export class AuthService {
             });
         } else {
             await this.prisma.user.update({
-                where: { mobile },
+                where: { id: user.id },
                 data: { otp, otpExpiry }
             });
         }
@@ -93,7 +94,7 @@ export class AuthService {
     }
 
     async loginWithOtp(mobile: string, otp: string) {
-        const user = await this.prisma.user.findUnique({ where: { mobile } });
+        const user = await this.prisma.user.findFirst({ where: { mobile } });
 
         if (!user || user.otp !== otp || new Date() > user.otpExpiry) {
             throw new UnauthorizedException('Invalid or Expired OTP');
@@ -110,7 +111,8 @@ export class AuthService {
     }
 
     async forgotPassword(email: string) {
-        const user = await this.prisma.user.findUnique({ where: { email } });
+        const normalizedEmail = email.toLowerCase();
+        const user = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
         if (!user) {
             // Don't reveal if user exists or not for security
             return { message: 'If an account exists with this email, a reset link has been sent.' };
