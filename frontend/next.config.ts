@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://sbd-solution.vercel.app/:path*',
+      },
+    ];
+  },
 };
 
 export default nextConfig;
