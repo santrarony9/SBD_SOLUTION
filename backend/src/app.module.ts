@@ -14,6 +14,7 @@ import { SmsModule } from './sms/sms.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ProfileModule } from './profile/profile.module';
 import { MailModule } from './mail/mail.module';
+import { DiagnosticsModule } from './diagnostics/diagnostics.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { MailModule } from './mail/mail.module';
     CartModule,
     OrdersModule,
     WishlistModule,
-    ReviewsModule
+    ReviewsModule,
+    DiagnosticsModule
   ],
   controllers: [AppController],
   providers: [AppService],
