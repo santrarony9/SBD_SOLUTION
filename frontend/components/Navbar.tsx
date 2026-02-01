@@ -93,9 +93,9 @@ export default function Navbar() {
                             <div className={`flex items-center space-x-4 ml-4 border-l ${scrolled || !isHome ? 'border-gray-200' : 'border-white/30'} pl-6`}>
                                 {isAuthenticated ? (
                                     <>
-                                        <span className={`text-xs ${textColor} uppercase tracking-wider`}>
+                                        <Link href="/account" className={`text-xs ${textColor} uppercase tracking-wider hover:text-brand-gold transition-colors`} title="Account Dashboard">
                                             Hi, {user?.name?.split(' ')[0]}
-                                        </span>
+                                        </Link>
                                         {user?.role === 'ADMIN' && (
                                             <Link href="/admin" className={`${textColor} hover:text-brand-gold transition-colors`} title="Admin Panel">
                                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,6 +168,7 @@ export default function Navbar() {
 
                             {isAuthenticated ? (
                                 <>
+                                    <MobileNavLink href="/account" label="Account Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
                                     {user?.role === 'ADMIN' && (
                                         <MobileNavLink href="/admin" label="Admin Panel" onClick={() => setIsMobileMenuOpen(false)} />
                                     )}
