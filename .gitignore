@@ -10,4 +10,3 @@ yarn-error.log*
 # Backend
 backend/dist
 backend/test-login.js
-backend/src/generated

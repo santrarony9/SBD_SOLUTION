@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ApplyOn } from '../generated/client';
+import { ApplyOn } from '@prisma/client';
 // DTOs would normally be defined in a separate file, defining inline for brevity or need to create them.
 
 @Injectable()
