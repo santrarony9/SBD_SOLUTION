@@ -9,10 +9,36 @@ export default function RegisterPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [mobile, setMobile] = useState('');
+    const [otp, setOtp] = useState('');
+    const [isOtpSent, setIsOtpSent] = useState(false);
+
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
     const router = useRouter();
+
+    const handleSendOtp = async () => {
+        if (!mobile || mobile.length < 10) {
+            setError('Please enter a valid mobile number');
+            return;
+        }
+        setIsSendingOtp(true);
+        setError('');
+        try {
+            await fetchAPI('/auth/send-otp', {
+                method: 'POST',
+                body: JSON.stringify({ mobile })
+            });
+            setIsOtpSent(true);
+            alert('OTP sent to ' + mobile);
+        } catch (err: any) {
+            setError(err.message || 'Failed to send OTP');
+        } finally {
+            setIsSendingOtp(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -22,7 +48,7 @@ export default function RegisterPage() {
         try {
             await fetchAPI('/auth/register', {
                 method: 'POST',
-                body: JSON.stringify({ name, email, password }),
+                body: JSON.stringify({ name, email, password, mobile, otp }),
             });
 
             // On success, redirect to login
@@ -84,6 +110,51 @@ export default function RegisterPage() {
                                     onChange={(e) => setName(e.target.value)}
                                 />
                                 <label htmlFor="name" className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-brand-gold peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Full Name</label>
+                            </div>
+
+                            {/* Mobile & OTP Section */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="relative z-0 w-full mb-6 group">
+                                    <input
+                                        type="tel"
+                                        name="mobile"
+                                        id="mobile"
+                                        disabled={isOtpSent}
+                                        className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer disabled:text-gray-400"
+                                        placeholder=" "
+                                        required
+                                        value={mobile}
+                                        onChange={(e) => setMobile(e.target.value)}
+                                    />
+                                    <label htmlFor="mobile" className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-brand-gold peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Mobile Number</label>
+
+                                    {!isOtpSent && mobile.length >= 10 && (
+                                        <button
+                                            type="button"
+                                            onClick={handleSendOtp}
+                                            disabled={isSendingOtp}
+                                            className="absolute right-0 top-2 text-xs font-bold text-brand-gold hover:text-brand-navy uppercase tracking-widest"
+                                        >
+                                            {isSendingOtp ? 'Sending...' : 'Send OTP'}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {isOtpSent && (
+                                    <div className="relative z-0 w-full mb-6 group animate-fade-in">
+                                        <input
+                                            type="text"
+                                            name="otp"
+                                            id="otp"
+                                            className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer"
+                                            placeholder=" "
+                                            required
+                                            value={otp}
+                                            onChange={(e) => setOtp(e.target.value)}
+                                        />
+                                        <label htmlFor="otp" className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-brand-gold peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Enter OTP</label>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="relative z-0 w-full mb-6 group">

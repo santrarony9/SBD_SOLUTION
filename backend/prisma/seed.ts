@@ -79,6 +79,32 @@ async function main() {
     }
   }
   console.log('Charges seeded');
+
+  // 5. Offers
+  const offers = [
+    {
+      title: 'First Purchase',
+      description: 'Begin your royal journey with a special welcome. Enjoy a flat ₹5,000 Off on your first diamond jewellery purchase over ₹50,000.',
+      tag: 'Limited Time',
+      code: 'ROYALFIRST',
+      isActive: true
+    },
+    {
+      title: 'Old Gold Exchange',
+      description: 'Upgrade your legacy. Get 0% Deduction on current market value when you exchange your old gold for our diamond studded jewellery.',
+      tag: 'Exchange Program',
+      code: null,
+      isActive: true
+    }
+  ];
+
+  for (const offer of offers) {
+    const existing = await prisma.offer.findFirst({ where: { title: offer.title } });
+    if (!existing) {
+      await prisma.offer.create({ data: offer });
+    }
+  }
+  console.log('Offers seeded');
 }
 
 main()

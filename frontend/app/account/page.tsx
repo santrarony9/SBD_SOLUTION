@@ -2,9 +2,37 @@
 
 import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { fetchAPI } from '@/lib/api';
 
 export default function DashboardOverview() {
     const { user } = useAuth();
+    const [portfolio, setPortfolio] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const loadPortfolio = async () => {
+            try {
+                const data = await fetchAPI('/crm/portfolio');
+                setPortfolio(data);
+            } catch (err) {
+                console.error("Failed to load portfolio", err);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        loadPortfolio();
+    }, []);
+
+    const getTierNextLimit = (tier: string) => {
+        if (tier === 'BRONZE') return 100000;
+        if (tier === 'SILVER') return 500000;
+        if (tier === 'GOLD') return 1500000;
+        return 0;
+    };
+
+    const nextLimit = getTierNextLimit(portfolio?.tier || 'BRONZE');
+    const progress = nextLimit > 0 ? (portfolio?.lifetimeSpend / nextLimit) * 100 : 100;
 
     return (
         <div className="space-y-12">
@@ -15,25 +43,29 @@ export default function DashboardOverview() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-brand-navy text-white p-8 border border-brand-gold/20 shadow-xl group hover:border-brand-gold transition-all duration-500">
-                        <p className="text-[10px] uppercase tracking-widest text-brand-gold font-bold mb-2">Tier Level</p>
-                        <h3 className="text-3xl font-serif mb-4">Royal Elite</h3>
+                    <div className="bg-brand-navy text-white p-8 border border-brand-gold/20 shadow-xl group hover:border-brand-gold transition-all duration-500 rounded-sm">
+                        <p className="text-[10px] uppercase tracking-widest text-brand-gold font-bold mb-2">Royal Circle Member</p>
+                        <h3 className="text-3xl font-serif mb-4 flex items-baseline gap-2">
+                            {portfolio?.tier || 'BRONZE'}
+                        </h3>
                         <div className="h-1 bg-white/10 relative overflow-hidden">
-                            <div className="absolute inset-0 bg-gold-gradient w-[70%]"></div>
+                            <div className="absolute inset-0 bg-gold-gradient transition-all duration-1000" style={{ width: `${Math.min(progress, 100)}%` }}></div>
                         </div>
-                        <p className="text-[10px] mt-4 opacity-70 uppercase tracking-titer">30% more to reach "Crown" Status</p>
+                        <p className="text-[10px] mt-4 opacity-70 uppercase tracking-widest">
+                            {nextLimit > 0 ? `₹${(nextLimit - portfolio?.lifetimeSpend).toLocaleString()} more to reach next tier` : 'You have reached the pinnacle'}
+                        </p>
                     </div>
 
-                    <div className="bg-white p-8 border border-gray-100 shadow-lg text-center flex flex-col justify-center">
+                    <div className="bg-white p-8 border border-gray-100 shadow-lg text-center flex flex-col justify-center rounded-sm">
                         <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Spark Rewards</p>
-                        <h3 className="text-4xl font-serif text-brand-navy">1,250</h3>
-                        <p className="text-[10px] mt-2 text-brand-gold font-bold uppercase tracking-widest cursor-pointer hover:underline">Redeem Now</p>
+                        <h3 className="text-4xl font-serif text-brand-navy">{portfolio?.loyaltyPoints?.toLocaleString() || '0'}</h3>
+                        <p className="text-[10px] mt-2 text-brand-gold font-bold uppercase tracking-widest cursor-pointer hover:underline">View History</p>
                     </div>
 
-                    <div className="bg-white p-8 border border-gray-100 shadow-lg text-center flex flex-col justify-center">
+                    <div className="bg-white p-8 border border-gray-100 shadow-lg text-center flex flex-col justify-center rounded-sm">
                         <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-2">Total Collections</p>
-                        <h3 className="text-4xl font-serif text-brand-navy">04</h3>
-                        <p className="text-[10px] mt-2 text-brand-gold font-bold uppercase tracking-widest">Pieces owned</p>
+                        <h3 className="text-4xl font-serif text-brand-navy">₹{portfolio?.lifetimeSpend?.toLocaleString() || '0'}</h3>
+                        <p className="text-[10px] mt-2 text-brand-gold font-bold uppercase tracking-widest">Lifetime Value</p>
                     </div>
                 </div>
             </section>

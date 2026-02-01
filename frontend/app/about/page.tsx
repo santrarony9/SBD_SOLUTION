@@ -22,7 +22,7 @@ export default function AboutPage() {
             </section>
 
             {/* Main Content */}
-            <section className="max-w-6xl mx-auto px-4 py-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+            <section id="vision" className="max-w-6xl mx-auto px-4 py-20 grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                 <div className="space-y-6">
                     <div className="inline-block border-b border-brand-gold pb-1 mb-2">
                         <span className="text-brand-gold text-xs font-bold tracking-[0.3em] uppercase">The Vision</span>
@@ -54,7 +54,7 @@ export default function AboutPage() {
             {/* Values */}
             <section className="bg-white py-24 relative">
                 <div className="max-w-7xl mx-auto px-4">
-                    <div className="text-center mb-16">
+                    <div id="values" className="text-center mb-16">
                         <h2 className="text-3xl md:text-4xl font-serif text-brand-navy">Why Choose Spark Blue?</h2>
                     </div>
 

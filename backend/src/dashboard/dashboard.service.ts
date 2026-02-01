@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { Role } from '@prisma/client';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class DashboardService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private whatsappService: WhatsappService
+    ) { }
 
     async getStats() {
         const totalRevenueResult = await this.prisma.order.aggregate({
@@ -45,5 +49,37 @@ export class DashboardService {
             recentOrders,
             monthlySales
         };
+    }
+    async getActiveCarts() {
+        return this.prisma.cart.findMany({
+            where: {
+                items: { some: {} }, // Has items
+            },
+            include: {
+                user: { select: { name: true, email: true, mobile: true, role: true } },
+                items: { include: { product: true } }
+            },
+            orderBy: { updatedAt: 'desc' },
+            take: 50
+        });
+    }
+
+    async nudgeCart(cartId: string) {
+        const cart = await this.prisma.cart.findUnique({
+            where: { id: cartId },
+            include: { user: true, items: { include: { product: true } } }
+        });
+
+        if (!cart || !cart.user || !cart.user.mobile || cart.items.length === 0) {
+            throw new Error('Cart not found or invalid for nudge');
+        }
+
+        // Send WhatsApp
+        return this.whatsappService.sendAbandonedCartReminder(
+            cart.user.mobile,
+            cart.items[0].product.images[0],
+            cart.items[0].product.name,
+            'VIPNUDGE'
+        );
     }
 }

@@ -52,22 +52,50 @@ export class AuthService {
     }
 
     async register(data: any) {
-        const normalizedEmail = data.email.toLowerCase();
-        const existing = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
-        if (existing) {
-            throw new UnauthorizedException('User already exists');
+        const { mobile, otp, name, password, email } = data;
+
+        if (!mobile || !otp) {
+            throw new UnauthorizedException('Mobile and OTP are required');
         }
 
-        const hashedPassword = await bcrypt.hash(data.password, 10);
-        const user = await this.prisma.user.create({
+        const normalizedEmail = email.toLowerCase();
+
+        // 1. Check for valid OTP on the mobile record
+        const userByMobile = await this.prisma.user.findFirst({ where: { mobile } });
+        if (!userByMobile) {
+            throw new UnauthorizedException('Please request OTP first');
+        }
+
+        if (userByMobile.otp !== otp || !userByMobile.otpExpiry || new Date() > userByMobile.otpExpiry) {
+            throw new UnauthorizedException('Invalid or Expired OTP');
+        }
+
+        // 2. Prevent overwriting existing full accounts
+        if (userByMobile.email && userByMobile.password) {
+            throw new UnauthorizedException('User already registered. Please login.');
+        }
+
+        // 3. Check if email is taken by ANOTHER user (should theoretically not happen if mobile is key, but safety first)
+        const existingEmail = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
+        if (existingEmail && existingEmail.id !== userByMobile.id) {
+            throw new UnauthorizedException('Email already in use');
+        }
+
+        // 4. Update the placeholder user to Full User
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const updatedUser = await this.prisma.user.update({
+            where: { id: userByMobile.id },
             data: {
-                ...data,
+                name,
                 email: normalizedEmail,
                 password: hashedPassword,
+                otp: null, // Clear OTP after usage
+                otpExpiry: null,
+                role: 'USER' // Ensure role is set
             },
         });
 
-        const { password, ...result } = user;
+        const { password: _, ...result } = updatedUser;
         return result;
     }
 

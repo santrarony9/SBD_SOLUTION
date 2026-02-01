@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { fetchAPI } from '@/lib/api';
 import ProductCard from '@/components/ProductCard';
 
@@ -20,9 +21,14 @@ interface Product {
 }
 
 export default function ShopPage() {
+    const searchParams = useSearchParams();
+    const initialCategory = searchParams.get('category');
+
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
+    const [sortBy, setSortBy] = useState('featured');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
 
     useEffect(() => {
         async function loadProducts() {
@@ -31,7 +37,6 @@ export default function ShopPage() {
                 setProducts(data);
             } catch (err) {
                 console.error("Failed to load products", err);
-                // Fallback to empty array or mock if needed, but showing error is better for dev
                 setError('Failed to load products. Please try again later.');
             } finally {
                 setLoading(false);
@@ -40,6 +45,14 @@ export default function ShopPage() {
 
         loadProducts();
     }, []);
+
+    // Update selected categories if URL param changes (e.g. from Home page link)
+    useEffect(() => {
+        const cat = searchParams.get('category');
+        if (cat) {
+            setSelectedCategories([cat]);
+        }
+    }, [searchParams]);
 
     // Helper to map backend product to ProductCard props
     const mapToCardProps = (p: Product) => ({
@@ -50,6 +63,43 @@ export default function ShopPage() {
         price: p.pricing?.finalPrice || p.price || 0,
         category: p.category || `${p.goldPurity}K Gold`
     });
+
+    const toggleCategory = (category: string) => {
+        setSelectedCategories(prev =>
+            prev.includes(category)
+                ? prev.filter(c => c !== category)
+                : [...prev, category]
+        );
+    };
+
+    // Filter and Sort Logic combined
+    const filteredAndSortedProducts = useMemo(() => {
+        let result = [...products];
+
+        // Filter by Category
+        if (selectedCategories.length > 0) {
+            result = result.filter(p =>
+                p.category && selectedCategories.some(cat =>
+                    p.category?.toLowerCase().includes(cat.toLowerCase())
+                )
+            );
+        }
+
+        // Sort
+        result.sort((a, b) => {
+            const priceA = a.pricing?.finalPrice || a.price || 0;
+            const priceB = b.pricing?.finalPrice || b.price || 0;
+
+            if (sortBy === 'price-low') {
+                return priceA - priceB;
+            } else if (sortBy === 'price-high') {
+                return priceB - priceA;
+            }
+            return 0; // Default: Featured (Original Order)
+        });
+
+        return result;
+    }, [products, selectedCategories, sortBy]);
 
     return (
         <div className="min-h-screen bg-brand-cream pb-20 pt-24">
@@ -74,10 +124,19 @@ export default function ShopPage() {
                         <div>
                             <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Category</h3>
                             <ul className="space-y-3 text-sm font-light text-brand-charcoal">
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Rings</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Earrings</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Necklaces</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Bracelets</label></li>
+                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets'].map(cat => (
+                                    <li key={cat}>
+                                        <label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                className="mr-3 accent-brand-navy"
+                                                checked={selectedCategories.includes(cat.toLowerCase())}
+                                                onChange={() => toggleCategory(cat.toLowerCase())}
+                                            />
+                                            {cat}
+                                        </label>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
 
@@ -114,19 +173,29 @@ export default function ShopPage() {
                     ) : (
                         <>
                             <div className="flex justify-between items-center mb-6">
-                                <span className="text-xs text-gray-500 uppercase tracking-widest">{products.length} Products</span>
-                                <select className="bg-transparent border-b border-gray-300 text-sm py-1 focus:outline-none focus:border-brand-navy text-gray-600 cursor-pointer">
-                                    <option>Sort by: Featured</option>
-                                    <option>Price: Low to High</option>
-                                    <option>Price: High to Low</option>
+                                <span className="text-xs text-gray-500 uppercase tracking-widest">{filteredAndSortedProducts.length} Products</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-transparent border-b border-gray-300 text-sm py-1 focus:outline-none focus:border-brand-navy text-gray-600 cursor-pointer"
+                                >
+                                    <option value="featured">Sort by: Featured</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
                                 </select>
                             </div>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                {products.map((product) => (
-                                    <ProductCard key={product.id} product={mapToCardProps(product)} />
-                                ))}
-                            </div>
+                            {filteredAndSortedProducts.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+                                    {filteredAndSortedProducts.map((product) => (
+                                        <ProductCard key={product.id} product={mapToCardProps(product)} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-20 text-gray-500 font-light italic">
+                                    No products found matching your selection.
+                                </div>
+                            )}
                         </>
                     )}
                 </div>

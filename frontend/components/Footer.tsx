@@ -53,10 +53,10 @@ export default function Footer() {
                         </h3>
                         <ul className="space-y-4 text-sm font-light tracking-wide">
                             {[
-                                { label: 'Contact Us', href: '/about' },
-                                { label: 'Shipping & Returns', href: '/about' },
-                                { label: 'Care Guide', href: '/about' },
-                                { label: 'Book Appointment', href: '/about' }
+                                { label: 'Contact Us', href: '/about#vision' },
+                                { label: 'Shipping & Returns', href: '/about#values' },
+                                { label: 'Care Guide', href: '/about#values' },
+                                { label: 'Book Appointment', href: '/about#vision' }
                             ].map((item) => (
                                 <li key={item.label}>
                                     <Link href={item.href} className="hover:text-brand-gold hover:pl-2 transition-all duration-300 block">
@@ -88,8 +88,8 @@ export default function Footer() {
                 <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 tracking-wider">
                     <p>&copy; {new Date().getFullYear()} Spark Blue Diamond. All rights reserved.</p>
                     <div className="flex gap-8 mt-4 md:mt-0">
-                        <Link href="/about" className="hover:text-brand-gold transition-colors">Privacy Policy</Link>
-                        <Link href="/about" className="hover:text-brand-gold transition-colors">Terms of Service</Link>
+                        <Link href="/about#values" className="hover:text-brand-gold transition-colors">Privacy Policy</Link>
+                        <Link href="/about#values" className="hover:text-brand-gold transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>

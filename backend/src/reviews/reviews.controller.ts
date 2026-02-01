@@ -12,6 +12,11 @@ export class ReviewsController {
         return this.reviewsService.create(req.user.userId, body);
     }
 
+    @Get('featured')
+    findFeatured() {
+        return this.reviewsService.findFeatured();
+    }
+
     @Get('product/:id')
     findByProduct(@Param('id') id: string) {
         return this.reviewsService.findByProduct(id);

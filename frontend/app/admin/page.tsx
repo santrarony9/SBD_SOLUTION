@@ -81,6 +81,21 @@ export default function AdminDashboard() {
                         >
                             Order Management
                         </li>
+                        <hr className="border-brand-gold/20 my-4" />
+                        <li className="cursor-pointer hover:text-brand-gold">
+                            <a href="/admin/marketing" className="block w-full h-full">Affiliate Marketing</a>
+                        </li>
+                        <li className="cursor-pointer hover:text-brand-gold">
+                            <a href="/admin/inventory" className="block w-full h-full">Inventory & Supply Chain</a>
+                        </li>
+                        <li className="cursor-pointer hover:text-brand-gold">
+                            <a href="/admin/crm" className="block w-full h-full">CRM & Royal Circles</a>
+                        </li>
+                        <li className="cursor-pointer hover:text-brand-gold">
+                            <a href="/admin/carts" className="block w-full h-full flex items-center">
+                                Live Pulse <span className="ml-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                            </a>
+                        </li>
                     </ul>
                 </div>
 

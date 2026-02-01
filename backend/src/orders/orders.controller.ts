@@ -8,8 +8,25 @@ export class OrdersController {
 
     @UseGuards(JwtAuthGuard)
     @Post()
-    async createOrder(@Request() req, @Body() body: { shippingAddress: any; paymentMethod: string }) {
-        return this.ordersService.createOrder(req.user.userId, body.shippingAddress, body.paymentMethod);
+    async createOrder(@Request() req, @Body() body: {
+        shippingAddress: any;
+        paymentMethod: string;
+        billingAddress?: any;
+        isB2B?: boolean;
+        customerGSTIN?: string;
+        businessName?: string;
+        placeOfSupply?: string;
+    }) {
+        return this.ordersService.createOrder(
+            req.user.userId,
+            body.shippingAddress,
+            body.paymentMethod,
+            body.billingAddress,
+            body.isB2B,
+            body.customerGSTIN,
+            body.businessName,
+            body.placeOfSupply
+        );
     }
 
     @UseGuards(JwtAuthGuard)

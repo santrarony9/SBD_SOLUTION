@@ -1,15 +1,28 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
+import { CrmService } from '../crm/crm.service';
+import { InventoryService } from '../inventory/inventory.service';
 
 @Injectable()
 export class OrdersService {
     constructor(
         private prisma: PrismaService,
         private cartService: CartService,
+        private crmService: CrmService,
+        private inventoryService: InventoryService,
     ) { }
 
-    async createOrder(userId: string, shippingAddress: any, paymentMethod: string) {
+    async createOrder(
+        userId: string,
+        shippingAddress: any,
+        paymentMethod: string,
+        billingAddress?: any,
+        isB2B?: boolean,
+        customerGSTIN?: string,
+        businessName?: string,
+        placeOfSupply?: string
+    ) {
         // 1. Get Cart
         const cart = await this.cartService.getCart(userId);
         if (!cart || cart.items.length === 0) {
@@ -17,26 +30,34 @@ export class OrdersService {
         }
 
         // 2. Calculate Totals (Re-verify)
-        const totalAmount = cart.cartTotal; // Trusted from Service logic
+        const totalAmount = cart.cartTotal;
+        const taxRate = 0.03;
+        const taxAmount = totalAmount * taxRate;
 
         // 3. Create Order
         const order = await this.prisma.order.create({
             data: {
                 userId,
                 totalAmount,
+                taxAmount,
                 currency: 'INR',
-                shippingAddress, // Stores as embedded document
+                shippingAddress,
+                billingAddress: billingAddress || shippingAddress,
+                isB2B: isB2B || false,
+                customerGSTIN: customerGSTIN || null,
+                businessName: businessName || null,
+                placeOfSupply: placeOfSupply || shippingAddress.state,
                 status: 'PENDING',
                 paymentStatus: 'PENDING',
                 items: {
                     create: cart.items.map((item) => ({
                         productId: item.productId,
                         quantity: item.quantity,
-                        price: item.calculatedPrice || 0, // Fallback
+                        price: item.calculatedPrice || 0,
                         name: item.product.name,
                     })),
                 },
-            },
+            } as any,
         });
 
         // 4. Razorpay Logic (Stub)
@@ -84,9 +105,34 @@ export class OrdersService {
 
     // Admin: Update Status
     async updateOrderStatus(id: string, status: string) {
-        return this.prisma.order.update({
+        let updateData: any = { status: status as any };
+
+        if (status === 'CANCELLED') {
+            updateData.cancelledAt = new Date();
+            updateData.creditNoteNumber = `SBD/CN/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
+        }
+
+        const order = await (this.prisma as any).order.update({
             where: { id },
-            data: { status: status as any },
+            data: updateData,
         });
+
+        // Trigger CRM Logic if order is CONFIRMED (Treating it as successful payment for now)
+        if (status === 'CONFIRMED' && order.userId) {
+            await this.crmService.onOrderComplete(order.userId, order.id, order.totalAmount);
+        }
+
+        // Trigger Reversal Logic if order is CANCELLED
+        if (status === 'CANCELLED') {
+            // 1. Restock Inventory
+            await this.inventoryService.onOrderCancel(order.id);
+
+            // 2. Reverse CRM Points
+            if (order.userId) {
+                await this.crmService.onOrderCancel(order.userId, order.id, order.totalAmount);
+            }
+        }
+
+        return order;
     }
 }

@@ -4,16 +4,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
+import { PiCrownSimple, PiShoppingBag, PiHeart, PiMapPin, PiGear, PiSignOut } from "react-icons/pi";
+
 export default function AccountLayout({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
     const { logout, user } = useAuth();
 
     const links = [
-        { href: '/account', label: 'Dashboard Overview', icon: '🏰' },
-        { href: '/account/orders', label: 'My Orders', icon: '🛍️' },
-        { href: '/account/wishlist', label: 'Wishlist', icon: '💎' },
-        { href: '/account/addresses', label: 'Address Book', icon: '📍' },
-        { href: '/account/settings', label: 'Account Settings', icon: '⚙️' },
+        { href: '/account', label: 'Dashboard Overview', icon: <PiCrownSimple className="w-6 h-6" /> },
+        { href: '/account/orders', label: 'My Orders', icon: <PiShoppingBag className="w-6 h-6" /> },
+        { href: '/account/wishlist', label: 'Wishlist', icon: <PiHeart className="w-6 h-6" /> },
+        { href: '/account/addresses', label: 'Address Book', icon: <PiMapPin className="w-6 h-6" /> },
+        { href: '/account/settings', label: 'Account Settings', icon: <PiGear className="w-6 h-6" /> },
     ];
 
     return (
@@ -47,7 +49,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                                                 : 'text-gray-500 hover:text-brand-gold hover:bg-gray-50'
                                                 }`}
                                         >
-                                            <span className="text-lg group-hover:scale-110 transition-transform">{link.icon}</span>
+                                            <span className={`text-xl transition-transform group-hover:scale-110 ${isActive ? 'text-brand-gold' : 'text-gray-400 group-hover:text-brand-gold'}`}>{link.icon}</span>
                                             <span className="tracking-wide uppercase text-[11px] font-bold">{link.label}</span>
                                         </Link>
                                     );
@@ -55,9 +57,9 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
                                 <div className="px-8 mt-6 pt-6 border-t border-gray-100 mb-6">
                                     <button
                                         onClick={logout}
-                                        className="w-full text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 flex items-center space-x-2 transition-colors"
+                                        className="w-full text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 flex items-center space-x-2 transition-colors group"
                                     >
-                                        <span>🔚</span>
+                                        <span className="text-lg group-hover:-translate-x-1 transition-transform"><PiSignOut /></span>
                                         <span>Sign Out</span>
                                     </button>
                                 </div>

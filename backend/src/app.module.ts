@@ -15,9 +15,25 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { ProfileModule } from './profile/profile.module';
 import { MailModule } from './mail/mail.module';
 import { DiagnosticsModule } from './diagnostics/diagnostics.module';
+import { OffersModule } from './offers/offers.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { CartCleanupService } from './scheduler/cart-cleanup.service';
+import { PromosModule } from './promos/promos.module';
+import { StoreModule } from './store/store.module';
+import { BannerModule } from './banner/banner.module';
+import { MarketingModule } from './marketing/marketing.module';
+import { InventoryModule } from './inventory/inventory.module';
+import { CrmModule } from './crm/crm.module';
+import { InvoiceModule } from './invoice/invoice.module';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
+    WhatsappModule,
+    StoreModule,
+    BannerModule,
+    MarketingModule,
     MailModule,
     ProfileModule,
     DashboardModule,
@@ -30,9 +46,14 @@ import { DiagnosticsModule } from './diagnostics/diagnostics.module';
     OrdersModule,
     WishlistModule,
     ReviewsModule,
-    DiagnosticsModule
+    DiagnosticsModule,
+    OffersModule,
+    PromosModule,
+    InventoryModule,
+    CrmModule,
+    InvoiceModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, CartCleanupService],
 })
 export class AppModule { }

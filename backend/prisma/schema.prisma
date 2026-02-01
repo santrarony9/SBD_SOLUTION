@@ -21,6 +21,13 @@ enum Role {
   USER
 }
 
+enum Tier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
 model User {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String?   @unique
@@ -39,7 +46,44 @@ model User {
   orders    Order[]
   wishlist  Wishlist[]
   reviews   Review[]
-  addresses Address[] // Saved addresses for checkout
+  addresses Address[] // Saved addresses
+  // --------------------------------------
+  // Shipping Labels (Zebra/Thermal Ready)
+  // --------------------------------------
+  // Geometry: 4x6 inch (288pt x 432pt) layout.
+  // Content:
+  // - High-contrast text for thermal printers.
+  // - Simplified Address & Order ID.
+  // - Weight & SKU details.
+  // - Barcode/QR code for tracking sync.
+
+  // --------------------------------------
+  // Admin Print & Bulk UI
+  // --------------------------------------
+  // Bulk Selection: Ability to select multiple orders across the list.
+  // Bulk Actions: 
+  // - "Print Invoices": Generates a single PDF with all selected invoices (one per page).
+  // - "Print Labels": Generates a single PDF with all selected labels (one per page).
+  // Icons & UX: Professional Phosphor icons for Print/Label actions.
+
+  // --------------------------------------
+  // Verification Plan
+  // --------------------------------------
+  // 1. Label Layout: Verify the PDF dimensions are exactly 4x6 inches.
+  // 2. Bulk Generation: Test selecting 5+ orders and generating the merged PDF.
+  // 3. QR Code: Ensure the QR code on the label is readable and contains the order ID.
+  // 4. Thermal Compatibility: Ensure all lines and text are high contrast (black on white).
+
+  // CRM & Loyalty (Phase 24)
+  tier           Tier      @default(BRONZE)
+  loyaltyPoints  Int       @default(0)
+  lifetimeSpend  Float     @default(0.0)
+  
+  birthday       DateTime?
+  anniversaryDate DateTime?
+  
+  crmNotes       String?   // Internal staff notes
+  loyaltyLogs    LoyaltyLog[]
 }
 
 // --------------------------------------
@@ -132,17 +176,55 @@ model Product {
   category    String   // Rings, Necklaces, etc.
   
   // Media
-  images      String[] // Start with 2-5 images
-  video       String?
-  
-  isActive    Boolean  @default(true)
+  images      String[] // Support gallery
+  videoUrl    String?  // Support product videos
+  hsnCode     String?  @default("7113") // Default HSN for Gold Jewellery
+  gstRate     Float?   @default(3.0)    // Default 3% for Precious items
+  realWeight  Float?   // Actual weight in grams
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  
+  isActive    Boolean  @default(true)
+
+  // Inventory & Logistics
+  sku         String?  @unique
+  stockCount  Int      @default(0)
+  isBespoke   Boolean  @default(false)
+  
+  vaultId     String?  @db.ObjectId
+  vault       Vault?   @relation(fields: [vaultId], references: [id])
   
   cartItems   CartItem[]
   orderItems  OrderItem[]
   wishlistedBy Wishlist[]
   reviews      Review[]
+}
+
+model Offer {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String
+  tag         String?   // e.g. "Limited Time"
+  code        String?   // e.g. "ROYALFIRST"
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PromoCode {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  code        String   @unique
+  discountType String  // "FLAT", "PERCENTAGE"
+  discountValue Float
+  
+  // Affiliate / Creator Ops
+  creatorName String?
+  usageCount  Int      @default(0)
+  totalSales  Float    @default(0.0)
+  
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 // --------------------------------------
@@ -154,6 +236,7 @@ model Cart {
   userId    String?    @unique @db.ObjectId 
   user      User?      @relation(fields: [userId], references: [id])
   items     CartItem[]
+  lastNotifiedAt DateTime?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
 }
@@ -181,7 +264,38 @@ model Review {
   product   Product  @relation(fields: [productId], references: [id])
   rating    Int
   comment   String?
+  isFeatured Boolean @default(false)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // Added for consistency
+}
+
+model StoreSetting {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  key       String   @unique
+  value     String
+  isActive  Boolean  @default(true)
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl  String
+  link      String?
+  title     String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model PricingRule {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  name            String
+  minCartValue    Float
+  discountPercent Float
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model CartItem {
@@ -210,8 +324,24 @@ model Order {
   paymentStatus   PaymentStatus @default(PENDING)
   
   // Payment Details (Razorpay)
-  razorpayOrderId String?
+  razorpayOrderId   String?
   razorpayPaymentId String?
+  
+  // GST & B2B
+  invoiceNumber     String?
+  isB2B             Boolean?    @default(false)
+  customerGSTIN     String?
+  businessName      String?
+  placeOfSupply     String?
+  taxAmount         Float?
+  cgstAmount        Float?
+  sgstAmount        Float?
+  igstAmount        Float?
+  billingAddress    Json?
+
+  // Reversal
+  creditNoteNumber  String?
+  cancelledAt       DateTime?
   
   // Shipping
   shippingAddress Address
@@ -255,5 +385,58 @@ enum PaymentStatus {
   PENDING
   PAID
   FAILED
+}
+
+// --------------------------------------
+// INVENTORY & SUPPLY CHAIN
+// --------------------------------------
+
+model MaterialStock {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  type      String   // "GOLD_18K", "GOLD_22K", "DIAMOND_VVS1", etc.
+  quantity  Float    // grams or carats
+  unit      String   // "g" or "ct"
+  lastRestockedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vault {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String    // "Main Warehouse", "Showroom", "Exhibition"
+  location  String?
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model InventoryLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  productId   String?  @db.ObjectId
+  materialId  String?  @db.ObjectId
+  action      String   // "STOCK_ADD", "STOCK_REMOVE", "MATERIAL_DEDUCT", "TRANSFER"
+  quantity    Float
+  reason      String?  // "Sale", "Restock", "Damage"
+  performedBy String?  @db.ObjectId // User ID
+  createdAt   DateTime @default(now())
+}
+
+model SerialRecord {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  serialNumber String  @unique // RFID / Barcode ID
+  productId   String   @db.ObjectId
+  status      String   @default("AVAILABLE") // "AVAILABLE", "SOLD", "RESERVED"
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model LoyaltyLog {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+  user        User     @relation(fields: [userId], references: [id])
+  action      String   // "EARNED", "REDEEMED", "EXPIRED", "ADJUSTED"
+  points      Int
+  orderId     String?  @db.ObjectId // Optional link to an order
+  description String?
+  createdAt   DateTime @default(now())
 }
 

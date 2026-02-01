@@ -31,12 +31,16 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showBreakup, setShowBreakup] = useState(false);
+    const [activeMedia, setActiveMedia] = useState<{ type: 'image' | 'video', src: string | undefined }>({ type: 'image', src: undefined });
 
     useEffect(() => {
         async function loadProduct() {
             try {
                 const data = await fetchAPI(`/products/${params.slug}`);
                 setProduct(data);
+                if (data.images && data.images.length > 0) {
+                    setActiveMedia({ type: 'image', src: data.images[0] });
+                }
             } catch (err) {
                 console.error("Failed to load product", err);
                 setError('Failed to load product details.');
@@ -78,26 +82,72 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
                 {/* Media Section */}
                 <div className="space-y-6">
+                    {/* Main Active Media Viewer */}
                     <div className="aspect-[4/5] bg-white rounded-sm flex items-center justify-center border border-gray-100 overflow-hidden shadow-sm relative group">
-                        {product.images && product.images.length > 0 ? (
-                            <Image src={product.images[0]} alt={product.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-105" />
+                        {activeMedia.type === 'video' ? (
+                            <div className="w-full h-full bg-gray-900 relative">
+                                <video
+                                    src={activeMedia.src}
+                                    className="w-full h-full object-cover"
+                                    controls
+                                    autoPlay
+                                    muted
+                                    loop
+                                    playsInline
+                                />
+                                <div className="absolute top-4 left-4 bg-brand-gold text-brand-navy text-[10px] font-bold uppercase px-3 py-1 tracking-widest z-10">
+                                    CAD View
+                                </div>
+                            </div>
+                        ) : activeMedia.src ? (
+                            <Image
+                                src={activeMedia.src}
+                                alt={product.name}
+                                fill
+                                className="object-cover transition-transform duration-1000 group-hover:scale-105"
+                            />
                         ) : (
                             <span className="text-gray-300 font-serif text-2xl uppercase tracking-widest">Spark Blue</span>
                         )}
 
-                        {/* Zoom Hint */}
-                        <div className="absolute top-4 right-4">
-                            <span className="bg-white/80 backdrop-blur text-[10px] uppercase font-bold px-2 py-1 tracking-widest">Zoom</span>
-                        </div>
+                        {/* Zoom Hint (Only for images) */}
+                        {activeMedia.type === 'image' && (
+                            <div className="absolute top-4 right-4">
+                                <span className="bg-white/80 backdrop-blur text-[10px] uppercase font-bold px-2 py-1 tracking-widest">Zoom</span>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Thumbnails (Mock for layout) */}
-                    <div className="grid grid-cols-4 gap-4">
-                        {[product.images?.[0], null, null, null].map((img, i) => (
-                            <div key={i} className={`aspect-square bg-white rounded-sm cursor-pointer border ${i === 0 ? 'border-brand-gold' : 'border-gray-200'} hover:border-brand-gold transition-colors flex items-center justify-center overflow-hidden`}>
-                                {img ? <Image src={img} alt="Thumbnail" width={100} height={100} className="object-cover w-full h-full" /> : <div className="w-full h-full bg-gray-50"></div>}
-                            </div>
+                    {/* Thumbnail Grid (4 Images + 1 Video) */}
+                    <div className="grid grid-cols-5 gap-3">
+                        {/* Image Thumbnails */}
+                        {product.images?.slice(0, 4).map((img, i) => (
+                            <button
+                                key={`img-${i}`}
+                                onClick={() => setActiveMedia({ type: 'image', src: img })}
+                                className={`aspect-square bg-white rounded-sm cursor-pointer border overflow-hidden relative transition-all duration-300 ${activeMedia.src === img ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
+                            >
+                                <Image src={img} alt={`View ${i + 1}`} width={100} height={100} className="object-cover w-full h-full" />
+                            </button>
                         ))}
+
+                        {/* Video Thumbnail (Always present as 5th item for demo) */}
+                        <button
+                            onClick={() => setActiveMedia({ type: 'video', src: 'https://cdn.pixabay.com/video/2022/11/02/137535-766725227_large.mp4' })} // Placeholder Luxury Gold Video
+                            className={`aspect-square bg-gray-100 rounded-sm cursor-pointer border overflow-hidden relative group transition-all duration-300 ${activeMedia.type === 'video' ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
+                        >
+                            <div className="absolute inset-0 flex items-center justify-center z-10">
+                                <div className="w-8 h-8 rounded-full bg-brand-gold/80 flex items-center justify-center text-brand-navy pl-1 transition-transform group-hover:scale-110">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                        <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+                                    </svg>
+                                </div>
+                            </div>
+                            {/* Video Thumbnail Preview (using first image with overlay if no specific thumb) */}
+                            {product.images?.[0] && (
+                                <Image src={product.images[0]} alt="Video View" width={100} height={100} className="object-cover w-full h-full opacity-60 grayscale group-hover:grayscale-0 transition-all" />
+                            )}
+                        </button>
                     </div>
                 </div>
 

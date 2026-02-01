@@ -33,7 +33,31 @@ export class CartService {
 
         const total = enrichedItems.reduce((sum, item) => sum + item.total, 0);
 
-        return { ...cart, items: enrichedItems, cartTotal: total };
+        // Apply Dynamic Pricing Rules
+        let finalTotal = total;
+        let appliedRule = null;
+
+        const rules = await this.prisma.pricingRule.findMany({
+            where: { isActive: true },
+            orderBy: { minCartValue: 'desc' } // Check higher value rules first
+        });
+
+        for (const rule of rules) {
+            if (total >= rule.minCartValue) {
+                const discount = total * (rule.discountPercent / 100);
+                finalTotal = total - discount;
+                appliedRule = rule;
+                break; // Apply only the best matching rule
+            }
+        }
+
+        return {
+            ...cart,
+            items: enrichedItems,
+            originalTotal: total,
+            cartTotal: finalTotal,
+            appliedRule
+        };
     }
 
     async addToCart(userId: string, productId: string, quantity: number) {
