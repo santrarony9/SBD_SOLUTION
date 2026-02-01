@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { CartProvider } from "@/context/CartContext";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair-display",
@@ -32,11 +33,13 @@ export default function RootLayout({
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
       >
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-screen">
-            {children}
-          </main>
-          <Footer />
+          <CartProvider>
+            <Navbar />
+            <main className="min-h-screen">
+              {children}
+            </main>
+            <Footer />
+          </CartProvider>
         </AuthProvider>
       </body>
     </html>

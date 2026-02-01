@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
@@ -145,7 +146,7 @@ export default function CheckoutPage() {
                                     <div className="flex items-center space-x-3">
                                         <div className="w-12 h-12 bg-gray-200 rounded overflow-hidden">
                                             {item.product.images[0] && (
-                                                <img src={item.product.images[0]} className="w-full h-full object-cover" />
+                                                <Image src={item.product.images[0]} alt={item.product.name} width={50} height={50} className="w-full h-full object-cover" />
                                             )}
                                         </div>
                                         <div>

@@ -15,7 +15,17 @@ export class AuthController {
     }
 
     @Post('register')
-    async register(@Body() createUserDto: any) {
-        return this.authService.register(createUserDto);
+    async register(@Body() body: any) {
+        return this.authService.register(body);
+    }
+
+    @Post('send-otp')
+    async sendOtp(@Body() body: { mobile: string }) {
+        return this.authService.sendOtp(body.mobile);
+    }
+
+    @Post('login-otp')
+    async loginOtp(@Body() body: { mobile: string; otp: string }) {
+        return this.authService.loginWithOtp(body.mobile, body.otp);
     }
 }

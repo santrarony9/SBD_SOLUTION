@@ -1,12 +1,17 @@
 'use client';
 
 import AdminGuard from '@/components/AdminGuard';
+import AdminProductList from '@/components/AdminProductList';
+import AdminOrderList from '@/components/AdminOrderList';
 import ProductForm from '@/components/ProductForm';
 import { fetchAPI } from '@/lib/api';
 import { useEffect, useState } from 'react';
 
+import AdminDashboardOverview from '@/components/AdminDashboardOverview';
+
 export default function AdminDashboard() {
-    const [activeTab, setActiveTab] = useState('masters');
+    const [activeTab, setActiveTab] = useState('overview');
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     // Masters State
     const [goldRates, setGoldRates] = useState<any[]>([]);
@@ -53,6 +58,12 @@ export default function AdminDashboard() {
                     <h2 className="text-xl font-bold font-serif mb-8 text-brand-gold">Admin Panel</h2>
                     <ul className="space-y-4 text-sm">
                         <li
+                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'overview' ? 'text-brand-gold font-bold' : ''}`}
+                            onClick={() => setActiveTab('overview')}
+                        >
+                            Dashboard Overview
+                        </li>
+                        <li
                             className={`cursor-pointer hover:text-brand-gold ${activeTab === 'masters' ? 'text-brand-gold font-bold' : ''}`}
                             onClick={() => setActiveTab('masters')}
                         >
@@ -64,6 +75,12 @@ export default function AdminDashboard() {
                         >
                             Product Management
                         </li>
+                        <li
+                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'orders' ? 'text-brand-gold font-bold' : ''}`}
+                            onClick={() => setActiveTab('orders')}
+                        >
+                            Order Management
+                        </li>
                     </ul>
                 </div>
 
@@ -71,12 +88,16 @@ export default function AdminDashboard() {
                 <div className="flex-1 p-8 md:p-12 overflow-y-auto">
                     <header className="mb-10 flex justify-between items-end">
                         <h1 className="text-4xl font-serif text-brand-navy">
-                            {activeTab === 'masters' ? 'Configuration' : 'Product Management'}
+                            {activeTab === 'overview' ? 'Dashboard Overview' :
+                                activeTab === 'masters' ? 'Configuration' :
+                                    activeTab === 'products' ? 'Product Management' : 'Order Management'}
                         </h1>
                         <span className="text-xs text-brand-gold tracking-[0.2em] uppercase font-bold border-b border-brand-gold pb-1">
                             Spark Blue Admin
                         </span>
                     </header>
+
+                    {activeTab === 'overview' && <AdminDashboardOverview />}
 
                     {activeTab === 'masters' && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -108,9 +129,25 @@ export default function AdminDashboard() {
                     )}
 
                     {activeTab === 'products' && (
-                        <div className="max-w-4xl">
-                            <h3 className="font-serif text-2xl text-brand-navy mb-6">Create New Product</h3>
-                            <ProductForm onSuccess={() => alert('Product Added!')} />
+                        <div className="max-w-5xl">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-serif text-2xl text-brand-navy">Product Management</h3>
+                                <button className="text-sm text-brand-gold hover:underline" onClick={() => document.getElementById('product-form')?.scrollIntoView({ behavior: 'smooth' })}>
+                                    + Add New
+                                </button>
+                            </div>
+
+                            <div id="product-form" className="mb-12">
+                                <ProductForm onSuccess={() => setRefreshTrigger(prev => prev + 1)} />
+                            </div>
+
+                            <AdminProductList refreshTrigger={refreshTrigger} />
+                        </div>
+                    )}
+
+                    {activeTab === 'orders' && (
+                        <div className="max-w-6xl">
+                            <AdminOrderList refreshTrigger={refreshTrigger} />
                         </div>
                     )}
                 </div>

@@ -55,8 +55,9 @@ export default function ShopPage() {
         <div className="min-h-screen bg-brand-cream pb-20 pt-24">
 
             {/* Header */}
-            <div className="bg-white/50 backdrop-blur-sm border-b border-brand-gold/20 py-12 mb-12">
-                <div className="max-w-7xl mx-auto px-4 text-center">
+            <div className="glass border-b border-brand-gold/20 py-12 mb-12 relative overflow-hidden">
+                <div className="absolute inset-0 bg-white/40"></div> {/* Tint */}
+                <div className="relative max-w-7xl mx-auto px-4 text-center">
                     <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4">The Collection</h1>
                     <p className="text-sm font-light text-gray-500 uppercase tracking-widest">
                         Exquisite Jewellery for Every Occasion

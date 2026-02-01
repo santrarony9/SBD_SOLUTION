@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -16,5 +16,18 @@ export class OrdersController {
     @Get()
     async getMyOrders(@Request() req) {
         return this.ordersService.getMyOrders(req.user.userId);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get('all')
+    async getAllOrders() {
+        // In a real app, check for ADMIN role in guard
+        return this.ordersService.getAllOrders();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/status')
+    async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
+        return this.ordersService.updateOrderStatus(id, body.status);
     }
 }

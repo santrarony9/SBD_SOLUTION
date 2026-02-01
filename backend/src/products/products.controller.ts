@@ -19,4 +19,14 @@ export class ProductsController {
     findOne(@Param('id') id: string) {
         return this.productsService.findOne(id);
     }
+
+    @Put(':id')
+    update(@Param('id') id: string, @Body() updateProductDto: any) {
+        return this.productsService.updateProduct(id, updateProductDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.productsService.deleteProduct(id);
+    }
 }

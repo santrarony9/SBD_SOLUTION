@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Footer() {
     return (
         <footer className="bg-brand-navy text-gray-300 pt-20 pb-10 border-t border-white/10">
@@ -33,10 +35,10 @@ export default function Footer() {
                 <div className="md:pl-10">
                     <h3 className="text-white font-serif text-lg mb-6">Explore</h3>
                     <ul className="space-y-3 text-sm font-light">
-                        <li><a href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">High Jewellery</a></li>
-                        <li><a href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Engagement</a></li>
-                        <li><a href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Watches</a></li>
-                        <li><a href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Collections</a></li>
+                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">High Jewellery</Link></li>
+                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Engagement</Link></li>
+                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Watches</Link></li>
+                        <li><Link href="/shop" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Collections</Link></li>
                     </ul>
                 </div>
 
@@ -44,10 +46,10 @@ export default function Footer() {
                 <div>
                     <h3 className="text-white font-serif text-lg mb-6">Customer Care</h3>
                     <ul className="space-y-3 text-sm font-light">
-                        <li><a href="/contact" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Contact Us</a></li>
-                        <li><a href="#" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Shipping & Returns</a></li>
-                        <li><a href="#" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Warranty</a></li>
-                        <li><a href="/faq" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">FAQ</a></li>
+                        <li><Link href="/contact" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Contact Us</Link></li>
+                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Shipping & Returns</Link></li>
+                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">Warranty</Link></li>
+                        <li><Link href="/about" className="hover:text-brand-gold transition-colors block transform hover:translate-x-1 duration-300">FAQ</Link></li>
                     </ul>
                 </div>
 

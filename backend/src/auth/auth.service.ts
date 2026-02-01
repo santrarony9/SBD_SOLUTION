@@ -2,12 +2,14 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
+import { SmsService } from '../sms/sms.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
         private jwtService: JwtService,
+        private smsService: SmsService,
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
@@ -33,6 +35,7 @@ export class AuthService {
     }
 
     async register(data: any) {
+        // ... existing register logic ...
         // Check if user exists
         const existing = await this.prisma.user.findUnique({ where: { email: data.email } });
         if (existing) {
@@ -47,9 +50,59 @@ export class AuthService {
             },
         });
 
-        // Auto login on register? Or just return success.
-        // Let's return the simplified user object.
         const { password, ...result } = user;
         return result;
+    }
+
+    // OTP LOGIC
+    async sendOtp(mobile: string) {
+        // Simple 6 digit random number
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 mins
+
+        // Upsert user (create placeholder if not exists)
+        // Check if mobile exists first to decide create or update
+        // Prisma upsert needs unique where, mobile is unique now.
+
+        let user = await this.prisma.user.findUnique({ where: { mobile } });
+
+        if (!user) {
+            user = await this.prisma.user.create({
+                data: {
+                    mobile,
+                    otp,
+                    otpExpiry,
+                    name: 'Guest User', // Placeholder
+                    role: 'USER',
+                    email: undefined // Allow null
+                }
+            });
+        } else {
+            await this.prisma.user.update({
+                where: { mobile },
+                data: { otp, otpExpiry }
+            });
+        }
+
+        // Send SMS
+        await this.smsService.sendOtp(mobile, otp);
+        return { message: 'OTP Sent successfully' };
+    }
+
+    async loginWithOtp(mobile: string, otp: string) {
+        const user = await this.prisma.user.findUnique({ where: { mobile } });
+
+        if (!user || user.otp !== otp || new Date() > user.otpExpiry) {
+            throw new UnauthorizedException('Invalid or Expired OTP');
+        }
+
+        // Clear OTP
+        await this.prisma.user.update({
+            where: { id: user.id },
+            data: { otp: null, otpExpiry: null }
+        });
+
+        // Generate Token
+        return this.login(user);
     }
 }

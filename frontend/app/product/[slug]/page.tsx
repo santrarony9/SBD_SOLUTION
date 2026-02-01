@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
+import { useCart } from "@/context/CartContext";
+import ProductReviews from "@/components/ProductReviews";
 import { fetchAPI } from '@/lib/api';
 
 interface Product {
@@ -77,7 +80,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 <div className="space-y-6">
                     <div className="aspect-[4/5] bg-white rounded-sm flex items-center justify-center border border-gray-100 overflow-hidden shadow-sm relative group">
                         {product.images && product.images.length > 0 ? (
-                            <img src={product.images[0]} alt={product.name} className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-105" />
+                            <Image src={product.images[0]} alt={product.name} fill className="object-cover transition-transform duration-1000 group-hover:scale-105" />
                         ) : (
                             <span className="text-gray-300 font-serif text-2xl uppercase tracking-widest">Spark Blue</span>
                         )}
@@ -92,7 +95,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                     <div className="grid grid-cols-4 gap-4">
                         {[product.images?.[0], null, null, null].map((img, i) => (
                             <div key={i} className={`aspect-square bg-white rounded-sm cursor-pointer border ${i === 0 ? 'border-brand-gold' : 'border-gray-200'} hover:border-brand-gold transition-colors flex items-center justify-center overflow-hidden`}>
-                                {img ? <img src={img} alt="Thumbnail" className="object-cover w-full h-full" /> : <div className="w-full h-full bg-gray-50"></div>}
+                                {img ? <Image src={img} alt="Thumbnail" width={100} height={100} className="object-cover w-full h-full" /> : <div className="w-full h-full bg-gray-50"></div>}
                             </div>
                         ))}
                     </div>
@@ -178,7 +181,7 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                         )}
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button className="w-full bg-brand-navy text-white h-14 font-bold hover:bg-brand-gold hover:text-brand-navy transition-all duration-300 uppercase tracking-widest text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
+                            <button className="w-full bg-brand-navy text-white h-14 font-bold hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 uppercase tracking-widest text-sm shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
                                 Add to Cart
                             </button>
                             <button className="w-full border border-brand-navy text-brand-navy h-14 font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-widest text-sm">
@@ -195,6 +198,9 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
                 </div>
             </div>
+
+            {/* Reviews Section */}
+            <ProductReviews productId={product.id} />
         </div>
     );
 }

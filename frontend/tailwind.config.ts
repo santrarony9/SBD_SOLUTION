@@ -32,6 +32,7 @@ export default {
                 'slide-up': 'slideUp 0.8s ease-out forwards',
                 'scale-in': 'scaleIn 0.5s ease-out forwards',
                 'shimmer': 'shimmer 2s infinite linear',
+                'marquee': 'marquee 25s linear infinite',
             },
             keyframes: {
                 fadeIn: {

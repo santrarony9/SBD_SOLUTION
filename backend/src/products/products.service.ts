@@ -12,6 +12,21 @@ export class ProductsService {
         return this.prisma.product.create({ data });
     }
 
+    async updateProduct(id: string, data: any) {
+        // Ensure product exists
+        await this.findOne(id);
+        return this.prisma.product.update({
+            where: { id },
+            data,
+        });
+    }
+
+    async deleteProduct(id: string) {
+        await this.findOne(id); // Ensure existence
+        // Soft delete could be better, but hard delete for now as per mvp
+        return this.prisma.product.delete({ where: { id } });
+    }
+
     async findAll() {
         const products = await this.prisma.product.findMany({ where: { isActive: true } });
         // In list view, we might want to return calculated price too, or just basic info.

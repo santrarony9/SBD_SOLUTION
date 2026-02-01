@@ -68,4 +68,25 @@ export class OrdersService {
             include: { items: true },
         });
     }
+
+    // Admin: Get all orders
+    async getAllOrders() {
+        return this.prisma.order.findMany({
+            orderBy: { createdAt: 'desc' },
+            include: {
+                items: true,
+                user: {
+                    select: { name: true, email: true }
+                }
+            },
+        });
+    }
+
+    // Admin: Update Status
+    async updateOrderStatus(id: string, status: string) {
+        return this.prisma.order.update({
+            where: { id },
+            data: { status: status as any },
+        });
+    }
 }
