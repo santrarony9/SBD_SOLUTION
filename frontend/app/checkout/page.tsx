@@ -112,7 +112,7 @@ export default function CheckoutPage() {
                         <div className="mb-8 space-y-4">
                             <h3 className="text-sm font-bold uppercase tracking-widest text-brand-navy">Select Saved Residency</h3>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                {user.addresses.map((addr: any, idx: number) => (
+                                {user?.addresses?.map((addr: any, idx: number) => (
                                     <div
                                         key={idx}
                                         onClick={() => handleAddressSelect(idx)}
