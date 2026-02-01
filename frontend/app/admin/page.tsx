@@ -68,42 +68,49 @@ export default function AdminDashboard() {
                 </div>
 
                 {/* Main Content */}
-                <div className="flex-1 p-8">
-                    <h1 className="text-2xl font-serif text-brand-navy mb-8">
-                        {activeTab === 'masters' ? 'Master Configuration' : 'Product Management'}
-                    </h1>
+                <div className="flex-1 p-8 md:p-12 overflow-y-auto">
+                    <header className="mb-10 flex justify-between items-end">
+                        <h1 className="text-4xl font-serif text-brand-navy">
+                            {activeTab === 'masters' ? 'Configuration' : 'Product Management'}
+                        </h1>
+                        <span className="text-xs text-brand-gold tracking-[0.2em] uppercase font-bold border-b border-brand-gold pb-1">
+                            Spark Blue Admin
+                        </span>
+                    </header>
 
                     {activeTab === 'masters' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
                             {/* Gold Master */}
-                            <div className="bg-white p-6 rounded shadow-sm">
-                                <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Gold Prices (Per 10g)</h3>
-                                <div className="space-y-4">
-                                    {isLoading ? <p>Loading...</p> : goldRates.map((rate: any) => (
-                                        <div key={rate.purity} className="flex items-center justify-between">
-                                            <label className="text-sm">{rate.purity}K Gold</label>
-                                            <div className="flex gap-2">
-                                                <input
-                                                    type="number"
-                                                    className="border p-2 rounded w-32"
-                                                    defaultValue={rate.pricePer10g}
-                                                    onBlur={(e) => updateGoldRate(rate.purity, Number(e.target.value))}
-                                                />
+                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
+                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Gold Rates</h3>
+                                <div className="space-y-6">
+                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> : goldRates.map((rate: any) => (
+                                        <div key={rate.purity} className="flex items-center justify-between border-b border-gray-100 pb-4">
+                                            <span className="font-bold text-brand-navy text-lg">{rate.purity}K</span>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-gray-400 text-xs uppercase tracking-wider">Per 10g</span>
+                                                <div className="relative">
+                                                    <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                                                    <input
+                                                        type="number"
+                                                        className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
+                                                        defaultValue={rate.pricePer10g}
+                                                        onBlur={(e) => updateGoldRate(rate.purity, Number(e.target.value))}
+                                                    />
+                                                </div>
                                             </div>
                                         </div>
                                     ))}
-                                    <p className="text-xs text-gray-500 mt-2">* Click outside input to save</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {activeTab === 'products' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div>
-                                <h3 className="font-bold text-gray-700 mb-4 border-b pb-2">Add New Product</h3>
-                                <ProductForm onSuccess={() => alert('Product Added!')} />
-                            </div>
+                        <div className="max-w-4xl">
+                            <h3 className="font-serif text-2xl text-brand-navy mb-6">Create New Product</h3>
+                            <ProductForm onSuccess={() => alert('Product Added!')} />
                         </div>
                     )}
                 </div>
