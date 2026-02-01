@@ -14,10 +14,11 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://sbd-solution.vercel.app';
     return [
       {
         source: '/api/:path*',
-        destination: 'https://sbd-solution.vercel.app/:path*',
+        destination: `${apiUrl}/:path*`,
       },
     ];
   },
