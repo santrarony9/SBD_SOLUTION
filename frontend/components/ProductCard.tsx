@@ -31,21 +31,22 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 </div>
 
                 {/* Quick Action Overlay */}
-                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out bg-gradient-to-t from-black/50 to-transparent">
-                    <button className="w-full bg-white text-brand-navy font-bold text-xs uppercase tracking-widest py-3 hover:bg-brand-gold transition-colors">
+                {/* Quick Action Overlay */}
+                <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out bg-gradient-to-t from-black/80 via-black/40 to-transparent">
+                    <button className="w-full bg-white/10 backdrop-blur-md border border-white/30 text-white font-bold text-xs uppercase tracking-[0.2em] py-3 hover:bg-brand-gold hover:border-brand-gold hover:text-brand-navy transition-all duration-300">
                         Quick View
                     </button>
                 </div>
             </div>
 
-            <div className="mt-4 text-center space-y-1">
-                <p className="text-[10px] text-gray-500 uppercase tracking-widest">{product.category || 'Jewellery'}</p>
+            <div className="mt-4 text-center space-y-2">
+                <p className="text-[10px] text-brand-gold uppercase tracking-[0.2em]">{product.category || 'Fine Jewellery'}</p>
                 <h3 className="text-brand-navy font-serif text-lg group-hover:text-brand-gold transition-colors duration-300">
                     <Link href={`/product/${product.slug}`}>
                         {product.name}
                     </Link>
                 </h3>
-                <p className="text-brand-charcoal font-medium">
+                <p className="text-gray-900 font-light tracking-wide">
                     ${product.price.toLocaleString()}
                 </p>
             </div>
