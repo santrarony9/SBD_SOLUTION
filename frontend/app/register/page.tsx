@@ -41,6 +41,12 @@ export default function RegisterPage() {
             <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
                 <h2 className="text-2xl font-serif text-brand-navy mb-6 text-center">Create Account</h2>
 
+                {/* Debug Info */}
+                <div className="text-xs text-gray-400 text-center mb-4">
+                    API: {(process.env.NEXT_PUBLIC_API_URL || 'undefined').replace(/\/$/, '')}
+                </div>
+
+
                 {error && (
                     <div className="bg-red-50 text-red-500 p-3 rounded text-sm mb-4">
                         {error}
