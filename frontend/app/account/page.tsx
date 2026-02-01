@@ -11,7 +11,7 @@ export default function DashboardOverview() {
             <section>
                 <div className="flex justify-between items-end mb-8 border-b border-gray-100 pb-4">
                     <h2 className="text-2xl font-serif text-brand-navy">Elite Membership Status</h2>
-                    <span className="text-[10px] uppercase font-bold tracking-widest text-brand-gold">Member since {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}</span>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-brand-gold">Member since {user?.createdAt ? new Date(user.createdAt as string).getFullYear() : '2024'}</span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -68,10 +68,10 @@ export default function DashboardOverview() {
                     <div className="text-sm bg-gray-50 p-6 border border-gray-100 min-h-[140px] flex flex-col justify-center">
                         {user?.addresses && user.addresses.length > 0 ? (
                             <div className="space-y-1">
-                                <p className="font-bold text-brand-navy">{user.addresses[0].fullName}</p>
-                                <p className="text-gray-500">{user.addresses[0].street}</p>
-                                <p className="text-gray-500">{user.addresses[0].city}, {user.addresses[0].state} {user.addresses[0].zip}</p>
-                                <p className="text-gray-500 font-bold">{user.addresses[0].country}</p>
+                                <p className="font-bold text-brand-navy">{user?.addresses?.[0]?.fullName}</p>
+                                <p className="text-gray-500">{user?.addresses?.[0]?.street}</p>
+                                <p className="text-gray-500">{user?.addresses?.[0]?.city}, {user?.addresses?.[0]?.state} {user?.addresses?.[0]?.zip}</p>
+                                <p className="text-gray-500 font-bold">{user?.addresses?.[0]?.country}</p>
                             </div>
                         ) : (
                             <div className="text-center">
