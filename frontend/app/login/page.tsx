@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 
 export default function LoginPage() {
-    const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password');
+    const [loginMethod, setLoginMethod] = useState<'password' | 'otp' | 'admin'>('password');
 
     // Password Login State
     const [email, setEmail] = useState('');
@@ -114,6 +114,12 @@ export default function LoginPage() {
                         >
                             Mobile OTP
                         </button>
+                        <button
+                            className={`pb-2 px-4 text-sm font-bold uppercase tracking-wider transition-colors ${loginMethod === 'admin' ? 'text-brand-navy border-b-2 border-brand-navy' : 'text-gray-400 hover:text-brand-navy'}`}
+                            onClick={() => setLoginMethod('admin')}
+                        >
+                            Admin Access
+                        </button>
                     </div>
 
                     {error && (
@@ -122,9 +128,15 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    {loginMethod === 'password' ? (
+                    {loginMethod === 'password' || loginMethod === 'admin' ? (
                         <form onSubmit={handlePasswordLogin} className="space-y-8">
                             <div className="space-y-6">
+                                {/* Admin Badge */}
+                                {loginMethod === 'admin' && (
+                                    <div className="bg-brand-gold/10 text-brand-gold border border-brand-gold p-3 text-center text-xs font-bold uppercase tracking-widest mb-4">
+                                        Administrative Access
+                                    </div>
+                                )}
                                 <div className="relative z-0 w-full mb-6 group">
                                     <input
                                         type="email"
@@ -166,9 +178,9 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full bg-brand-navy text-white py-4 rounded-none hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 font-bold uppercase tracking-widest text-sm shadow-md disabled:opacity-70 disabled:cursor-not-allowed"
+                                className={`w-full text-white py-4 rounded-none transition-all duration-300 font-bold uppercase tracking-widest text-sm shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${loginMethod === 'admin' ? 'bg-brand-gold hover:bg-brand-navy' : 'bg-brand-navy hover:bg-gold-gradient hover:text-brand-navy'}`}
                             >
-                                {isLoading ? 'Authenticating...' : 'Sign In'}
+                                {isLoading ? 'Authenticating...' : (loginMethod === 'admin' ? 'Access Dashboard' : 'Sign In')}
                             </button>
                         </form>
                     ) : (
