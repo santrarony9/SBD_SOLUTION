@@ -60,21 +60,21 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             </Link>
 
             {/* Product Details */}
-            <div className="p-6 text-center bg-white relative z-10 transition-colors duration-300">
+            <div className="p-4 md:p-6 text-center bg-white relative z-10 transition-colors duration-300">
                 <Link href={`/product/${product.slug}`}>
-                    <h3 className="text-lg font-serif font-medium text-brand-navy mb-3 group-hover:text-brand-gold transition-colors line-clamp-1">
+                    <h3 className="text-sm md:text-lg font-serif font-medium text-brand-navy mb-2 md:mb-3 group-hover:text-brand-gold transition-colors line-clamp-2 min-h-[2.5em]">
                         {product.name}
                     </h3>
                 </Link>
 
                 {/* Decorative Divider */}
-                <div className="flex justify-center items-center gap-3 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                <div className="flex justify-center items-center gap-3 mb-2 md:mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
                     <span className="h-px w-6 bg-brand-gold/40"></span>
                     <span className="text-[10px] text-brand-gold uppercase tracking-widest">◇</span>
                     <span className="h-px w-6 bg-brand-gold/40"></span>
                 </div>
 
-                <p className="text-xl font-serif text-brand-charcoal group-hover:text-brand-navy transition-colors">
+                <p className="text-base md:text-xl font-serif text-brand-charcoal group-hover:text-brand-navy transition-colors">
                     ₹{product.price.toLocaleString()}
                 </p>
             </div>

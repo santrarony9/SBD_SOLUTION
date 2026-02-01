@@ -21,9 +21,9 @@ export default async function Home() {
   return (
     <div className="bg-brand-cream font-sans">
       {/* 1. Hero Section - Parallax Effect */}
-      <section className="relative h-screen w-full overflow-hidden bg-brand-navy">
+      <section className="relative min-h-[100dvh] w-full overflow-hidden bg-brand-navy flex flex-col justify-center">
         {/* Background Image with Slow Parallax */}
-        <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 z-0 h-full w-full">
           <Image
             src="/hero-jewellery.png" // Ensure this image exists!
             alt="Royal Diamond Collection"
@@ -36,11 +36,11 @@ export default async function Home() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full text-center px-4">
-          <h2 className="text-brand-gold font-serif italic text-xl md:text-2xl mb-4 tracking-widest animate-fade-in delay-100">
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-5xl mx-auto">
+          <h2 className="text-brand-gold font-serif italic text-lg md:text-2xl mb-4 tracking-widest animate-fade-in delay-100">
             Est. 1995
           </h2>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in delay-200">
+          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in delay-200">
             Elegance is <br /> <span className="text-brand-gold italic">Eternal</span>
           </h1>
           <p className="text-gray-200 max-w-xl text-lg mb-12 font-light tracking-wide animate-fade-in delay-300">
@@ -69,21 +69,43 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 2. Trust Signals - Validated Excellence */}
-      <section className="py-16 bg-brand-navy border-b border-white/5">
-        <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-8 text-center divide-y md:divide-y-0 md:divide-x divide-white/10">
-          {[
-            { title: 'IGI Certified', label: 'Global Standard', icon: '✦' },
-            { title: 'BIS Hallmarked', label: '100% Pure Gold', icon: '⚜' },
-            { title: 'Lifetime Exchange', label: 'Secure Value', icon: '∞' },
-            { title: 'Secure Shipping', label: 'Insured Delivery', icon: '🛡' }
-          ].map((trust, idx) => (
-            <div key={idx} className="pt-8 md:pt-0 px-4 group">
-              <span className="text-3xl text-brand-gold mb-4 block transition-transform group-hover:-translate-y-2">{trust.icon}</span>
-              <h3 className="text-white font-serif text-lg tracking-wider mb-2">{trust.title}</h3>
-              <p className="text-gray-400 text-xs uppercase tracking-widest">{trust.label}</p>
+      {/* 2. Royal Standards - The Science of Luxury */}
+      <section className="py-20 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-gold/30 to-transparent"></div>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Our Promise</span>
+            <h2 className="text-3xl md:text-4xl font-serif text-white mt-4">The Royal Standard</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
+            {/* Standard 1 */}
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+              <span className="text-4xl text-brand-gold mb-6 block font-serif">01.</span>
+              <h3 className="text-xl text-white font-serif mb-4">Certified Purity</h3>
+              <p className="text-gray-400 text-sm leading-relaxed font-light">
+                Every nanogram of gold is BIS Hallmarked. Our diamonds come with IGI certification, ensuring you own not just jewellery, but a verifiable asset of global standard.
+              </p>
             </div>
-          ))}
+
+            {/* Standard 2 */}
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+              <span className="text-4xl text-brand-gold mb-6 block font-serif">02.</span>
+              <h3 className="text-xl text-white font-serif mb-4">Skin-Safe Alchemy</h3>
+              <p className="text-gray-400 text-sm leading-relaxed font-light">
+                Crafted with hypoallergenic alloys and free from nickel. Our 18K and 22K blends are scientifically balanced to respect even the most sensitive skin, allowing daily wear without compromise.
+              </p>
+            </div>
+
+            {/* Standard 3 */}
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+              <span className="text-4xl text-brand-gold mb-6 block font-serif">03.</span>
+              <h3 className="text-xl text-white font-serif mb-4">Conflict-Free Legacy</h3>
+              <p className="text-gray-400 text-sm leading-relaxed font-light">
+                We source ethically. Our diamonds are conflict-free, and our gold is responsibly mined. Your luxury supports a sustainable future for the artisans and the earth.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -169,7 +191,45 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. Brand Story / Heritage Block */}
+      {/* 5. Voices of Royalty (Testimonials) */}
+      <section className="py-24 bg-brand-cream border-t border-brand-charcoal/5">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <span className="text-brand-navy/60 text-xs font-bold uppercase tracking-[0.3em] flex items-center justify-center gap-4">
+              <span className="h-px w-8 bg-brand-navy/20"></span>
+              Social Proof
+              <span className="h-px w-8 bg-brand-navy/20"></span>
+            </span>
+            <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4">Voices of Royalty</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { name: "Priya S.", role: "Mumbai", text: "I always wished for such designs in real gold. Spark Blue made it possible. The finish is indistinguishable from my heritage pieces." },
+              { name: "Anjali K.", role: "Bangalore", text: "The unboxing experience felt like receiving a royal decree. The heavy gold plating is exactly what I needed for daily office wear." },
+              { name: "Meera R.", role: "Delhi", text: "Customer service treated me like a queen. They customized the ring size perfectly. My go-to for wedding season gifting now." }
+            ].map((review, idx) => (
+              <div key={idx} className="bg-white p-8 shadow-sm hover:shadow-xl transition-shadow duration-300 relative group">
+                <span className="absolute top-4 right-6 text-6xl text-brand-gold/20 font-serif leading-none group-hover:text-brand-gold/40 transition-colors">”</span>
+                <p className="text-brand-charcoal text-sm leading-loose font-light mb-6 relative z-10 italic">
+                  {review.text}
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-brand-navy rounded-full flex items-center justify-center text-brand-gold font-serif text-lg">
+                    {review.name[0]}
+                  </div>
+                  <div>
+                    <h4 className="text-brand-navy font-bold text-xs uppercase tracking-wider">{review.name}</h4>
+                    <span className="text-brand-gold text-[10px] uppercase tracking-widest">{review.role}</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Brand Story / Heritage Block */}
       <section className="py-24 bg-brand-navy text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/10 rounded-full blur-3xl translate-x-1/2 -translate-y-1/2"></div>
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">

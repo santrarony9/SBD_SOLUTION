@@ -156,7 +156,7 @@ export default function Navbar() {
 
                 {/* Mobile Menu Overlay */}
                 {isMobileMenuOpen && (
-                    <div className="md:hidden bg-white absolute w-full left-0 top-full shadow-xl border-t border-gray-100">
+                    <div className="md:hidden bg-white absolute w-full left-0 top-full shadow-xl border-t border-gray-100 max-h-[80vh] overflow-y-auto">
                         <div className="px-4 pt-2 pb-6 space-y-2 flex flex-col items-center">
                             <MobileNavLink href="/" label="Home" onClick={() => setIsMobileMenuOpen(false)} />
                             <MobileNavLink href="/shop" label="Collections" onClick={() => setIsMobileMenuOpen(false)} />
