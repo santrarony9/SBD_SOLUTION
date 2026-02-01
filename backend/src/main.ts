@@ -5,7 +5,13 @@ const appPromise = NestFactory.create(AppModule);
 
 async function bootstrap() {
   const app = await appPromise;
-  app.enableCors(); // Vercel might need CORS
+  app.enableCors({
+    origin: [
+      'https://sbd-solutionfrontend.vercel.app',
+      'http://localhost:3000',
+    ],
+    credentials: true,
+  });
   await app.listen(process.env.PORT || 3001);
 }
 
