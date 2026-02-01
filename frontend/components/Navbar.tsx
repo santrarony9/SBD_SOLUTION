@@ -28,13 +28,13 @@ export default function Navbar() {
     }, []);
 
     // Determine navbar background
-    // If scrolled or NOT on home page -> Solid Navy
+    // If scrolled or NOT on home page -> Glass Dark (Premium)
     // If on home page and NOT scrolled -> Transparent
-    const navBackground = (scrolled || !isHome) ? 'bg-brand-navy shadow-md py-4' : 'bg-transparent py-6';
-    const textColor = (scrolled || !isHome) ? 'text-white' : 'text-white'; // Keep white for contrast on hero
+    const navBackground = (scrolled || !isHome) ? 'glass-dark py-4 shadow-lg' : 'bg-transparent py-6';
+    const textColor = 'text-white'; // Always white for consistency
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-300 ${navBackground}`}>
+        <nav className={`fixed w-full z-50 transition-all duration-500 ${navBackground}`}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between items-center">
 
@@ -63,7 +63,7 @@ export default function Navbar() {
 
                     {/* Center: Logo */}
                     <div className="flex-shrink-0 flex items-center justify-center absolute left-1/2 transform -translate-x-1/2">
-                        <Link href="/" className="font-serif text-2xl md:text-3xl tracking-[0.2em] text-white font-bold hover:text-brand-gold transition-colors duration-300">
+                        <Link href="/" className="font-serif text-2xl md:text-3xl tracking-[0.25em] text-white font-bold transition-all duration-500 hover:text-transparent hover:bg-clip-text hover:bg-gold-gradient hover:scale-105">
                             SPARK BLUE
                         </Link>
                     </div>
