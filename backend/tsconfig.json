@@ -1,4 +1,7 @@
-{
+  "include": [
+    "src",
+    "src/generated"
+  ],
   "compilerOptions": {
     "module": "commonjs",
     "declaration": true,
