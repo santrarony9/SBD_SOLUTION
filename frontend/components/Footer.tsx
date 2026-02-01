@@ -52,10 +52,15 @@ export default function Footer() {
                             <span className="absolute -bottom-2 left-0 w-1/2 h-px bg-brand-gold"></span>
                         </h3>
                         <ul className="space-y-4 text-sm font-light tracking-wide">
-                            {['Contact Us', 'Shipping & Returns', 'Care Guide', 'Book Appointment'].map((item) => (
-                                <li key={item}>
-                                    <Link href="#" className="hover:text-brand-gold hover:pl-2 transition-all duration-300 block">
-                                        {item}
+                            {[
+                                { label: 'Contact Us', href: '/about' },
+                                { label: 'Shipping & Returns', href: '/about' },
+                                { label: 'Care Guide', href: '/about' },
+                                { label: 'Book Appointment', href: '/about' }
+                            ].map((item) => (
+                                <li key={item.label}>
+                                    <Link href={item.href} className="hover:text-brand-gold hover:pl-2 transition-all duration-300 block">
+                                        {item.label}
                                     </Link>
                                 </li>
                             ))}
@@ -83,8 +88,8 @@ export default function Footer() {
                 <div className="mt-20 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center text-xs text-gray-600 tracking-wider">
                     <p>&copy; {new Date().getFullYear()} Spark Blue Diamond. All rights reserved.</p>
                     <div className="flex gap-8 mt-4 md:mt-0">
-                        <a href="#" className="hover:text-brand-gold transition-colors">Privacy Policy</a>
-                        <a href="#" className="hover:text-brand-gold transition-colors">Terms of Service</a>
+                        <Link href="/about" className="hover:text-brand-gold transition-colors">Privacy Policy</Link>
+                        <Link href="/about" className="hover:text-brand-gold transition-colors">Terms of Service</Link>
                     </div>
                 </div>
             </div>
