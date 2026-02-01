@@ -25,7 +25,7 @@ model User {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String?   @unique
   password  String?
-  mobile    String?   @unique
+  mobile    String?   // Removed @unique to fix legacy data issues
   otp       String?
   otpExpiry DateTime?
   name      String
@@ -124,6 +124,9 @@ model Product {
   // Certificate
   igiCertificateNumber String? 
   certificatePdf       String? // URL
+  
+  // Products
+  category    String   // Rings, Necklaces, etc.
   
   // Media
   images      String[] // Start with 2-5 images

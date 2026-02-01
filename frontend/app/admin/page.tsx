@@ -3,7 +3,7 @@
 import AdminGuard from '@/components/AdminGuard';
 import AdminProductList from '@/components/AdminProductList';
 import AdminOrderList from '@/components/AdminOrderList';
-import ProductForm from '@/components/ProductForm';
+import AdminAddProduct from '@/components/AdminAddProduct';
 import { fetchAPI } from '@/lib/api';
 import { useEffect, useState } from 'react';
 
@@ -138,7 +138,7 @@ export default function AdminDashboard() {
                             </div>
 
                             <div id="product-form" className="mb-12">
-                                <ProductForm onSuccess={() => setRefreshTrigger(prev => prev + 1)} />
+                                <AdminAddProduct onSuccess={() => setRefreshTrigger(prev => prev + 1)} />
                             </div>
 
                             <AdminProductList refreshTrigger={refreshTrigger} />

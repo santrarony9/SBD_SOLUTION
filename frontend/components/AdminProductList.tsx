@@ -15,6 +15,7 @@ interface Product {
     pricing?: {
         finalPrice: number;
     };
+    category?: string;
 }
 
 export default function AdminProductList({ refreshTrigger }: { refreshTrigger: number }) {
@@ -57,6 +58,7 @@ export default function AdminProductList({ refreshTrigger }: { refreshTrigger: n
                         <tr>
                             <th className="px-6 py-4">Product</th>
                             <th className="px-6 py-4">Price</th>
+                            <th className="px-6 py-4">Category</th>
                             <th className="px-6 py-4">Specs</th>
                             <th className="px-6 py-4 text-right">Actions</th>
                         </tr>
@@ -76,6 +78,9 @@ export default function AdminProductList({ refreshTrigger }: { refreshTrigger: n
                                 </td>
                                 <td className="px-6 py-4 font-bold text-brand-gold">
                                     ₹{product.pricing?.finalPrice?.toLocaleString() ?? 'N/A'}
+                                </td>
+                                <td className="px-6 py-4 text-xs font-medium text-gray-500 uppercase">
+                                    {product.category || '-'}
                                 </td>
                                 <td className="px-6 py-4 text-xs">
                                     <span className="block">{product.goldPurity}K Gold ({product.goldWeight}g)</span>
