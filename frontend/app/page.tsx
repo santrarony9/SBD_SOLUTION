@@ -21,7 +21,7 @@ export default async function Home() {
   return (
     <div className="bg-brand-cream font-sans">
       {/* 1. Hero Section - Parallax Effect */}
-      <section className="relative h-screen w-full overflow-hidden">
+      <section className="relative h-screen w-full overflow-hidden bg-brand-navy">
         {/* Background Image with Slow Parallax */}
         <div className="absolute inset-0 z-0">
           <Image
