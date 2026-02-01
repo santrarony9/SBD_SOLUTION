@@ -28,4 +28,14 @@ export class AuthController {
     async loginOtp(@Body() body: { mobile: string; otp: string }) {
         return this.authService.loginWithOtp(body.mobile, body.otp);
     }
+
+    @Post('forgot-password')
+    async forgotPassword(@Body() body: { email: string }) {
+        return this.authService.forgotPassword(body.email);
+    }
+
+    @Post('reset-password')
+    async resetPassword(@Body() body: { token: string; newPass: string }) {
+        return this.authService.resetPassword(body.token, body.newPass);
+    }
 }

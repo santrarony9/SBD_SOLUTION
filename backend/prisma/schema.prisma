@@ -30,6 +30,8 @@ model User {
   otpExpiry DateTime?
   name      String
   role      Role      @default(USER)
+  resetToken       String?
+  resetTokenExpiry DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   

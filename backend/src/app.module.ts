@@ -13,9 +13,11 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { SmsModule } from './sms/sms.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { ProfileModule } from './profile/profile.module';
+import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
+    MailModule,
     ProfileModule,
     DashboardModule,
     SmsModule,

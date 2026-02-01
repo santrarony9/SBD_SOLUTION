@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { fetchAPI } from '@/lib/api';
 
 export default function ForgotPasswordPage() {
     const [email, setEmail] = useState('');
@@ -11,12 +12,17 @@ export default function ForgotPasswordPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            await fetchAPI('/auth/forgot-password', {
+                method: 'POST',
+                body: JSON.stringify({ email }),
+            });
             setSubmitted(true);
+        } catch (error) {
+            console.error('Failed to send reset link', error);
+        } finally {
             setIsLoading(false);
-        }, 1000);
+        }
     };
 
     return (
