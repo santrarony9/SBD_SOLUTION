@@ -13,7 +13,7 @@ import { SmsModule } from '../sms/sms.module';
     PassportModule,
     SmsModule,
     JwtModule.register({
-      secret: 'SECRET_KEY_Should_Be_Env_Var', // In prod use env
+      secret: process.env.JWT_SECRET || 'fallback_for_dev_only',
       signOptions: { expiresIn: '60m' },
     }),
   ],
