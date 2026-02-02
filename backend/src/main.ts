@@ -24,8 +24,8 @@ if (require.main === module) {
 // Export for Vercel (Serverless Function)
 export default async (req: any, res: any) => {
   const app = await appPromise;
-  await app.init();
   app.setGlobalPrefix('api');
+  await app.init();
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp(req, res);
 };

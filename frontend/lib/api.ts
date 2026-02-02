@@ -19,6 +19,10 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         headers,
     });
 
+    if (typeof window !== 'undefined' && API_URL.includes('localhost')) {
+        console.warn(`[API DEBUG] Hitting local API: ${API_URL}${endpoint}. If you are on Vercel, this is likely wrong!`);
+    }
+
     if (!res.ok) {
         throw new Error(`API Error: ${res.status} ${res.statusText}`);
     }
