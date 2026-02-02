@@ -34,7 +34,25 @@ export default function LoginPage() {
             login(data.access_token, data.user);
         } catch (err: any) {
             console.error('Login failed', err);
-            setError('Invalid email or password');
+            // Show more specific error if available
+            if (err.message.includes('401')) {
+                setError('Invalid email or password');
+            } else {
+                setError(`Connection Error: ${err.message}. Please ensure the backend is running.`);
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSuperReset = async () => {
+        setError('');
+        setIsLoading(true);
+        try {
+            await fetchAPI('/diagnostics/reset-admin', { method: 'POST' });
+            setError('Admin account reset successfully! Try logging in with Admin@123');
+        } catch (err: any) {
+            setError(`Reset failed: ${err.message}`);
         } finally {
             setIsLoading(false);
         }
@@ -241,11 +259,21 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    <div className="text-center text-sm text-gray-500">
+                    <div className="text-center text-sm text-gray-500 pb-4">
                         Don't have an account?{' '}
                         <Link href="/register" className="font-bold text-brand-navy hover:text-brand-gold transition-colors">
                             Create Account
                         </Link>
+                    </div>
+
+                    {/* Diagnostics/Emergency Reset */}
+                    <div className="pt-6 border-t border-gray-100 flex justify-center">
+                        <button
+                            onClick={handleSuperReset}
+                            className="text-[10px] uppercase tracking-widest text-gray-300 hover:text-brand-gold transition-colors"
+                        >
+                            Emergency Admin Reset
+                        </button>
                     </div>
                 </div>
             </div>
