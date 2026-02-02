@@ -5,6 +5,7 @@ const appPromise = NestFactory.create(AppModule);
 
 async function bootstrap() {
   const app = await appPromise;
+  app.setGlobalPrefix('api');
   app.enableCors({
     origin: [
       'https://sbd-solutionfrontend.vercel.app',
@@ -24,6 +25,7 @@ if (require.main === module) {
 export default async (req: any, res: any) => {
   const app = await appPromise;
   await app.init();
+  app.setGlobalPrefix('api');
   const expressApp = app.getHttpAdapter().getInstance();
   expressApp(req, res);
 };

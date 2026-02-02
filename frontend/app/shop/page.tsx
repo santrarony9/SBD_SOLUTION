@@ -20,7 +20,9 @@ interface Product {
     category?: string;
 }
 
-export default function ShopPage() {
+import { Suspense } from 'react';
+
+function ShopContent() {
     const searchParams = useSearchParams();
     const initialCategory = searchParams.get('category');
 
@@ -202,5 +204,17 @@ export default function ShopPage() {
 
             </div>
         </div>
+    );
+}
+
+export default function ShopPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen bg-brand-cream flex items-center justify-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-gold"></div>
+            </div>
+        }>
+            <ShopContent />
+        </Suspense>
     );
 }
