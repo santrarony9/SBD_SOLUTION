@@ -43,31 +43,33 @@ export class DiagnosticsController {
                 timestamp: new Date().toISOString(),
             };
         }
-        @Post('reset-admin')
-        async resetAdmin() {
-            try {
-                const email = 'admin@sparkblue.com';
-                const password = 'Admin@123';
-                const hashedPassword = await bcrypt.hash(password, 10);
+    }
 
-                await this.prisma.user.upsert({
-                    where: { email },
-                    update: {
-                        password: hashedPassword,
-                        role: Role.ADMIN,
-                        name: 'Super Admin',
-                    },
-                    create: {
-                        email,
-                        password: hashedPassword,
-                        name: 'Super Admin',
-                        role: Role.ADMIN,
-                    },
-                });
+    @Post('reset-admin')
+    async resetAdmin() {
+        try {
+            const email = 'admin@sparkblue.com';
+            const password = 'Admin@123';
+            const hashedPassword = await bcrypt.hash(password, 10);
 
-                return { status: 'SUCCESS', message: 'Admin account reset to Admin@123' };
-            } catch (error: any) {
-                return { status: 'ERROR', message: error.message };
-            }
+            await this.prisma.user.upsert({
+                where: { email },
+                update: {
+                    password: hashedPassword,
+                    role: Role.ADMIN,
+                    name: 'Super Admin',
+                },
+                create: {
+                    email,
+                    password: hashedPassword,
+                    name: 'Super Admin',
+                    role: Role.ADMIN,
+                },
+            });
+
+            return { status: 'SUCCESS', message: 'Admin account reset to Admin@123' };
+        } catch (error: any) {
+            return { status: 'ERROR', message: error.message };
         }
     }
+}
