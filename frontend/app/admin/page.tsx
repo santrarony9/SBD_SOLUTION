@@ -355,7 +355,6 @@ export default function AdminDashboard() {
                             }}
                         />
                     </div>
-                    )}
 
                     {activeTab === 'orders' && (
                         <div className="max-w-6xl">
