@@ -111,6 +111,14 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         e.preventDefault();
         setLoading(true);
 
+        // Validation: Min 3 Images
+        const validImages = tempImages.filter(img => img);
+        if (validImages.length < 3) {
+            alert('Please upload at least 3 product images.');
+            setLoading(false);
+            return;
+        }
+
         try {
             const payload = {
                 name: formData.name,
@@ -121,7 +129,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 goldWeight: parseFloat(formData.goldWeight) || 0,
                 diamondCarat: parseFloat(formData.diamondCarat) || 0,
                 diamondClarity: formData.diamondClarity,
-                images: tempImages.filter(img => img),
+                images: validImages,
                 videoUrl: formData.videoUrl,
                 certificatePdf: formData.certificatePdf
             };
@@ -194,7 +202,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Primary Video */}
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] uppercase font-bold text-gray-500">Primary Product Video (Plays First)</label>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-500">Primary Product Video (Optional)</label>
                                     <div className="relative group">
                                         <input
                                             type="file"
@@ -263,7 +271,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
                             {/* Image Gallery */}
                             <div className="space-y-4">
-                                <label className="block text-[10px] uppercase font-bold text-gray-500">Product Images (Up to 4)</label>
+                                <label className="block text-[10px] uppercase font-bold text-gray-500">Product Images (Min 3, Max 4)</label>
                                 <div className="grid grid-cols-4 gap-4">
                                     {[0, 1, 2, 3].map((index) => (
                                         <div key={index} className="relative aspect-square group">
