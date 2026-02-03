@@ -189,35 +189,37 @@ export default function AdminDashboard() {
                             )}
 
                             {/* Precious Metals & Stones Masters */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                    <h3 className="font-serif text-xl text-brand-navy">Precious Metal & Stone Value</h3>
-                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Live Inventory Rates</span>
+                            <div className="bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
+                                <div className="p-6 bg-brand-navy flex justify-between items-center text-white">
+                                    <h3 className="font-serif text-xl">Precious Metal & Stone Value</h3>
+                                    <span className="text-[10px] bg-brand-gold text-brand-navy px-3 py-1 rounded-full uppercase tracking-widest font-bold">Live Rates</span>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-x divide-gray-100">
                                     {/* Gold Sub-table */}
-                                    <div className="p-4">
+                                    <div className="p-0">
                                         <table className="w-full text-sm">
                                             <thead>
-                                                <tr className="text-left text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-gray-50">
-                                                    <th className="pb-2">Gold Purity</th>
-                                                    <th className="pb-2 text-right">Price per 10g</th>
+                                                <tr className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-bold border-b border-gray-200 bg-gray-50">
+                                                    <th className="px-6 py-3">Gold Purity</th>
+                                                    <th className="px-6 py-3 text-right">Price per 10g</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
                                                 {[14, 16, 18, 22, 24].map((purity) => {
                                                     const rate = goldRates.find(r => r.purity === purity);
                                                     return (
-                                                        <tr key={purity} className="group hover:bg-gray-50/50 transition-colors">
-                                                            <td className="py-3 font-bold text-brand-navy">{purity}K Gold</td>
-                                                            <td className="py-3 items-center justify-end flex gap-2">
-                                                                <span className="text-gray-400 text-xs">₹</span>
-                                                                <input
-                                                                    type="number"
-                                                                    className="w-32 bg-transparent border-b border-transparent group-hover:border-brand-gold/30 focus:border-brand-gold text-right outline-none transition-all font-mono"
-                                                                    defaultValue={rate?.pricePer10g || 0}
-                                                                    onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
-                                                                />
+                                                        <tr key={purity} className="group hover:bg-brand-cream/30 transition-colors">
+                                                            <td className="px-6 py-4 font-bold text-brand-navy bg-white">{purity}K Gold</td>
+                                                            <td className="px-6 py-4 text-right bg-white">
+                                                                <div className="flex items-center justify-end gap-2 group-hover:scale-105 transition-transform origin-right">
+                                                                    <span className="text-gray-400 text-xs font-light">₹</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal"
+                                                                        defaultValue={rate?.pricePer10g || 0}
+                                                                        onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
+                                                                    />
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     );
@@ -226,28 +228,30 @@ export default function AdminDashboard() {
                                         </table>
                                     </div>
                                     {/* Diamond Sub-table */}
-                                    <div className="p-4">
+                                    <div className="p-0">
                                         <table className="w-full text-sm">
                                             <thead>
-                                                <tr className="text-left text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-gray-50">
-                                                    <th className="pb-2">Diamond Clarity</th>
-                                                    <th className="pb-2 text-right">Price per Carat</th>
+                                                <tr className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-bold border-b border-gray-200 bg-gray-50">
+                                                    <th className="px-6 py-3">Diamond Clarity</th>
+                                                    <th className="px-6 py-3 text-right">Price per Carat</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
                                                 {['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'].map((clarity) => {
                                                     const rate = diamondRates.find(r => r.clarity === clarity);
                                                     return (
-                                                        <tr key={clarity} className="group hover:bg-gray-50/50 transition-colors">
-                                                            <td className="py-3 font-bold text-brand-navy">{clarity}</td>
-                                                            <td className="py-3 items-center justify-end flex gap-2">
-                                                                <span className="text-gray-400 text-xs">₹</span>
-                                                                <input
-                                                                    type="number"
-                                                                    className="w-32 bg-transparent border-b border-transparent group-hover:border-brand-gold/30 focus:border-brand-gold text-right outline-none transition-all font-mono"
-                                                                    defaultValue={rate?.pricePerCarat || 0}
-                                                                    onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
-                                                                />
+                                                        <tr key={clarity} className="group hover:bg-brand-cream/30 transition-colors">
+                                                            <td className="px-6 py-4 font-bold text-brand-navy bg-white">{clarity}</td>
+                                                            <td className="px-6 py-4 text-right bg-white">
+                                                                <div className="flex items-center justify-end gap-2 group-hover:scale-105 transition-transform origin-right">
+                                                                    <span className="text-gray-400 text-xs font-light">₹</span>
+                                                                    <input
+                                                                        type="number"
+                                                                        className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal"
+                                                                        defaultValue={rate?.pricePerCarat || 0}
+                                                                        onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
+                                                                    />
+                                                                </div>
                                                             </td>
                                                         </tr>
                                                     );
@@ -259,37 +263,37 @@ export default function AdminDashboard() {
                             </div>
 
                             {/* Operational Charges Master */}
-                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-                                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-                                    <h3 className="font-serif text-xl text-brand-navy">Operational Master</h3>
-                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Business Calculations</span>
+                            <div className="bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
+                                <div className="p-6 bg-brand-navy flex justify-between items-center text-white">
+                                    <h3 className="font-serif text-xl">Operational Master</h3>
+                                    <span className="text-[10px] bg-white/20 px-3 py-1 rounded-full uppercase tracking-widest font-bold">Business Calculations</span>
                                 </div>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-sm">
                                         <thead>
-                                            <tr className="bg-gray-50/30 text-[10px] text-gray-400 uppercase tracking-wider font-bold">
-                                                <th className="px-6 py-4 text-left">Charge Component</th>
-                                                <th className="px-6 py-4 text-left">Type</th>
-                                                <th className="px-6 py-4 text-left">Frequency / Application</th>
-                                                <th className="px-6 py-4 text-right">Value (₹/%)</th>
-                                                <th className="px-6 py-4 text-center">Status</th>
+                                            <tr className="bg-gray-50 text-[10px] text-gray-500 uppercase tracking-wider font-bold border-b border-gray-200">
+                                                <th className="px-6 py-4 text-left whitespace-nowrap">Charge Component</th>
+                                                <th className="px-6 py-4 text-left whitespace-nowrap">Type</th>
+                                                <th className="px-6 py-4 text-left whitespace-nowrap">Frequency / Application</th>
+                                                <th className="px-6 py-4 text-right whitespace-nowrap">Value (₹/%)</th>
+                                                <th className="px-6 py-4 text-center whitespace-nowrap">Status</th>
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
                                             {['Making Charge', 'Other Charge'].map((chargeName) => {
                                                 const charge = charges.find(c => c.name === chargeName);
                                                 return (
-                                                    <tr key={chargeName} className="hover:bg-gray-50/50 transition-colors">
+                                                    <tr key={chargeName} className="hover:bg-brand-cream/30 transition-colors">
                                                         <td className="px-6 py-4">
-                                                            <span className="font-bold text-brand-navy">{chargeName}</span>
-                                                            <p className="text-[10px] text-gray-400 mt-0.5">{chargeName === 'Other Charge' ? 'Hidden from public breakdown' : 'Visible in public invoice'}</p>
+                                                            <span className="font-bold text-brand-navy text-base">{chargeName}</span>
+                                                            <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">{chargeName === 'Other Charge' ? 'Hidden from public breakdown' : 'Visible in public invoice'}</p>
                                                         </td>
-                                                        <td className="px-6 py-4 text-xs font-mono uppercase text-brand-gold">
+                                                        <td className="px-6 py-4 text-xs font-mono uppercase text-brand-gold font-bold">
                                                             {charge?.type || 'PER_GRAM'}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <select
-                                                                className="bg-transparent border-b border-transparent hover:border-brand-gold focus:border-brand-gold outline-none text-xs py-1 transition-all"
+                                                                className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-gray-600"
                                                                 defaultValue={charge?.type || 'PER_GRAM'}
                                                                 onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
                                                             >
@@ -299,10 +303,10 @@ export default function AdminDashboard() {
                                                             </select>
                                                         </td>
                                                         <td className="px-6 py-4 text-right">
-                                                            <div className="inline-flex items-center gap-1 border-b border-transparent hover:border-brand-gold transition-all">
+                                                            <div className="inline-flex items-center gap-2">
                                                                 <input
                                                                     type="number"
-                                                                    className="w-24 bg-transparent text-right outline-none font-mono"
+                                                                    className="w-24 bg-white border border-gray-200 rounded px-3 py-1.5 text-right outline-none font-mono font-bold text-brand-charcoal focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all"
                                                                     defaultValue={charge?.amount || 0}
                                                                     onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
                                                                 />
@@ -311,9 +315,9 @@ export default function AdminDashboard() {
                                                         <td className="px-6 py-4 text-center">
                                                             <button
                                                                 onClick={() => updateCharge(chargeName, { isActive: !charge?.isActive })}
-                                                                className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tighter transition-all ${charge?.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                                                                className={`px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all border ${charge?.isActive ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
                                                             >
-                                                                {charge?.isActive ? 'ENABLED' : 'DISABLED'}
+                                                                {charge?.isActive ? 'Active' : 'Disabled'}
                                                             </button>
                                                         </td>
                                                     </tr>
