@@ -56,6 +56,19 @@ export default function AdminDashboard() {
         }
     };
 
+    const updateDiamondPrice = async (clarity: string, price: number) => {
+        try {
+            await fetchAPI(`/masters/diamond/${clarity}`, {
+                method: 'PUT',
+                body: JSON.stringify({ price })
+            });
+            alert('Diamond Rate Updated!');
+            loadMasters();
+        } catch (error) {
+            alert('Failed to update rate');
+        }
+    };
+
     const updateCharge = async (name: string, data: any) => {
         try {
             await fetchAPI(`/masters/charges/${name}`, {
