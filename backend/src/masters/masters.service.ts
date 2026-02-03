@@ -14,9 +14,10 @@ export class MastersService {
     }
 
     async updateGoldPrice(purity: number, pricePer10g: number) {
-        return this.prisma.goldPrice.update({
+        return this.prisma.goldPrice.upsert({
             where: { purity },
-            data: { pricePer10g },
+            update: { pricePer10g },
+            create: { purity, pricePer10g }
         });
     }
 
@@ -24,13 +25,14 @@ export class MastersService {
     // DIAMOND PRICE
     // -----------------------
     async getDiamondPrices() {
-        return this.prisma.diamondPrice.findMany({ orderBy: { pricePerCarat: 'desc' } });
+        return this.prisma.diamondPrice.findMany({ orderBy: { clarity: 'asc' } });
     }
 
     async updateDiamondPrice(clarity: string, pricePerCarat: number) {
-        return this.prisma.diamondPrice.update({
+        return this.prisma.diamondPrice.upsert({
             where: { clarity },
-            data: { pricePerCarat },
+            update: { pricePerCarat },
+            create: { clarity, pricePerCarat }
         });
     }
 

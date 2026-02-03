@@ -13,7 +13,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
         goldPurity: '18',
         goldWeight: '',
         diamondCarat: '',
-        diamondClarity: 'SI',
+        diamondClarity: 'SI1',
         description: ''
     });
     const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
             setIsOpen(false);
             setFormData({
                 name: '', category: 'Rings', price: '', images: '',
-                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI', description: ''
+                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', description: ''
             });
             onSuccess();
         } catch (error) {
@@ -128,6 +128,8 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                 value={formData.goldPurity}
                                 onChange={e => setFormData({ ...formData, goldPurity: e.target.value })}
                             >
+                                <option value="14">14K</option>
+                                <option value="16">16K</option>
                                 <option value="18">18K</option>
                                 <option value="22">22K</option>
                                 <option value="24">24K</option>
@@ -158,9 +160,13 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                 value={formData.diamondClarity}
                                 onChange={e => setFormData({ ...formData, diamondClarity: e.target.value })}
                             >
-                                <option value="SI">SI</option>
-                                <option value="VS">VS</option>
-                                <option value="VVS">VVS</option>
+                                <option value="VVS1">VVS1</option>
+                                <option value="VVS2">VVS2</option>
+                                <option value="VS1">VS1</option>
+                                <option value="VS2">VS2</option>
+                                <option value="SI1">SI1</option>
+                                <option value="SI2">SI2</option>
+                                <option value="I1">I1</option>
                             </select>
                         </div>
                     </div>

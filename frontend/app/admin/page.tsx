@@ -163,6 +163,35 @@ export default function AdminDashboard() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Diamond Master */}
+                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
+                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Diamond Clarities</h3>
+                                <div className="space-y-6">
+                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> :
+                                        ['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'].map((clarity) => {
+                                            const rate = diamondRates.find(r => r.clarity === clarity);
+                                            return (
+                                                <div key={clarity} className="flex items-center justify-between border-b border-gray-100 pb-4">
+                                                    <span className="font-bold text-brand-navy text-lg">{clarity}</span>
+                                                    <div className="flex items-center gap-4">
+                                                        <span className="text-gray-400 text-xs uppercase tracking-wider">Per Carat</span>
+                                                        <div className="relative">
+                                                            <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                                                            <input
+                                                                type="number"
+                                                                className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
+                                                                defaultValue={rate?.pricePerCarat || 0}
+                                                                onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                </div>
+                            </div>
                         </div>
                     )}
 
