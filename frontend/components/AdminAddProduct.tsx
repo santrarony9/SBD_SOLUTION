@@ -346,47 +346,48 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 </div>
                             </div>
                         </div>
-                        <option value="VVS2">VVS2</option>
-                        <option value="VS1">VS1</option>
-                        <option value="VS2">VS2</option>
-                        <option value="SI1">SI1</option>
-                        <option value="SI2">SI2</option>
-                        <option value="I1">I1</option>
-                    </select>
+                        {/* Description & AI */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-end">
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 font-bold">Description</label>
+                                <button
+                                    type="button"
+                                    onClick={handleAIGenerate}
+                                    disabled={isGeneratingAI}
+                                    className="text-[10px] font-bold bg-brand-gold text-brand-navy px-3 py-1.5 rounded-full hover:bg-brand-navy hover:text-brand-gold transition-colors flex items-center gap-2 shadow-sm"
+                                >
+                                    {isGeneratingAI ? '✨ Writing...' : '✨ Magic Write'}
+                                </button>
+                            </div>
+                            <textarea
+                                className="w-full border border-gray-200 bg-gray-50 p-4 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white min-h-[100px]"
+                                value={formData.description}
+                                onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                placeholder="Detailed product description..."
+                            />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="pt-4 flex justify-end gap-4 border-t border-gray-100">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-6 py-3 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-brand-navy transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                type="submit"
+                                disabled={loading || isUploading}
+                                className={`bg-brand-navy text-white px-8 py-3 rounded uppercase text-xs font-bold tracking-widest hover:bg-brand-gold hover:text-brand-navy transition-colors shadow-lg ${loading || isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            >
+                                {loading ? (initialData ? 'Updating...' : 'Adding...') : isUploading ? 'Uploading Media...' : (initialData ? 'Update Product' : 'Save Product')}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-
-            <div>
-                <div className="flex justify-between items-end mb-1">
-                    <label className="block text-xs uppercase tracking-wider text-gray-500">Description</label>
-                    <button
-                        type="button"
-                        onClick={handleAIGenerate}
-                        disabled={isGeneratingAI}
-                        className="text-[10px] font-bold bg-brand-gold/10 text-brand-gold px-2 py-1 rounded hover:bg-brand-gold hover:text-white transition-colors flex items-center gap-1"
-                    >
-                        {isGeneratingAI ? '✨ Writing...' : '✨ AI Generate'}
-                    </button>
-                </div>
-                <textarea
-                    className="w-full border border-gray-200 p-2 text-sm h-24"
-                    value={formData.description}
-                    onChange={e => setFormData({ ...formData, description: e.target.value })}
-                    placeholder="Describe the product..."
-                />
-            </div>
-
-            <div className="pt-4 flex justify-end">
-                <button
-                    type="submit"
-                    disabled={loading || isUploading}
-                    className={`bg-brand-navy text-white px-8 py-3 uppercase text-xs font-bold tracking-widest transition-colors ${loading || isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-brand-gold'}`}
-                >
-                    {loading ? (initialData ? 'Updating...' : 'Adding...') : isUploading ? 'Uploading Media...' : (initialData ? 'Update Product' : 'Save Product')}
-                </button>
-            </div>
-        </form>
-            </div >
-        </div >
+        </div>
     );
 }
+
