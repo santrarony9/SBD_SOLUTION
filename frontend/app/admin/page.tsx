@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart } from "react-icons/pi";
