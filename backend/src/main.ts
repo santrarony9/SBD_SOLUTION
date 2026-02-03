@@ -10,6 +10,8 @@ async function bootstrap() {
     app.enableCors({
       origin: [
         'https://sbd-solutionfrontend.vercel.app',
+        'https://sbd-solution.vercel.app',
+        'https://sbd-solution-frontend.vercel.app',
         'http://localhost:3000',
       ],
       credentials: true,
