@@ -43,10 +43,17 @@ export class MastersService {
         return this.prisma.charge.findMany();
     }
 
-    async updateCharge(id: string, data: { amount?: number; isActive?: boolean }) {
-        return this.prisma.charge.update({
-            where: { id },
-            data,
+    async updateCharge(name: string, data: { amount?: number; isActive?: boolean; type?: ChargeType, applyOn?: ApplyOn }) {
+        return this.prisma.charge.upsert({
+            where: { name },
+            update: data,
+            create: {
+                name,
+                amount: data.amount || 0,
+                type: data.type || ChargeType.FLAT,
+                applyOn: data.applyOn || ApplyOn.SUBTOTAL,
+                isActive: data.isActive !== undefined ? data.isActive : true
+            }
         });
     }
 }

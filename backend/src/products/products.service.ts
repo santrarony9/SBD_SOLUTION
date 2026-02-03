@@ -99,7 +99,10 @@ export class ProductsService {
 
             if (charge.name.toLowerCase().includes('making')) {
                 makingCharges += chargeAmount;
+            } else if (charge.name.toLowerCase().includes('other')) {
+                otherCharges += chargeAmount;
             } else {
+                // Default to other if not making or tax
                 otherCharges += chargeAmount;
             }
         }

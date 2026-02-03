@@ -19,16 +19,19 @@ export default function AdminDashboard() {
     // Masters State
     const [goldRates, setGoldRates] = useState<any[]>([]);
     const [diamondRates, setDiamondRates] = useState<any[]>([]);
+    const [charges, setCharges] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     const loadMasters = async () => {
         try {
-            const [gold, diamond] = await Promise.all([
+            const [gold, diamond, allCharges] = await Promise.all([
                 fetchAPI('/masters/gold'),
-                fetchAPI('/masters/diamond')
+                fetchAPI('/masters/diamond'),
+                fetchAPI('/masters/charges')
             ]);
             setGoldRates(gold || []);
             setDiamondRates(diamond || []);
+            setCharges(allCharges || []);
         } catch (error) {
             console.error("Failed to load masters", error);
         } finally {
@@ -53,16 +56,16 @@ export default function AdminDashboard() {
         }
     };
 
-    const updateDiamondPrice = async (clarity: string, price: number) => {
+    const updateCharge = async (name: string, data: any) => {
         try {
-            await fetchAPI(`/masters/diamond/${clarity}`, {
+            await fetchAPI(`/masters/charges/${name}`, {
                 method: 'PUT',
-                body: JSON.stringify({ price })
+                body: JSON.stringify(data)
             });
-            alert('Diamond Rate Updated!');
+            alert(`${name} Updated!`);
             loadMasters();
         } catch (error) {
-            alert('Failed to update rate');
+            alert(`Failed to update ${name}`);
         }
     };
 
@@ -206,6 +209,58 @@ export default function AdminDashboard() {
                                                 </div>
                                             );
                                         })}
+                                </div>
+                            </div>
+
+                            {/* Operational Charges */}
+                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group lg:col-span-2">
+                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
+                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Operational Charges</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    {['Making Charge', 'Other Charge'].map((chargeName) => {
+                                        const charge = charges.find(c => c.name === chargeName);
+                                        return (
+                                            <div key={chargeName} className="space-y-4 p-4 bg-gray-50 rounded border border-gray-100">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="font-bold text-brand-navy">{chargeName}</span>
+                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${charge?.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                                                        {charge?.isActive ? 'ACTIVE' : 'INACTIVE'}
+                                                    </span>
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div>
+                                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Type</label>
+                                                        <select
+                                                            className="w-full border p-2 text-xs"
+                                                            defaultValue={charge?.type || 'PER_GRAM'}
+                                                            onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
+                                                        >
+                                                            <option value="FLAT">Flat Amount</option>
+                                                            <option value="PER_GRAM">Per Gram (Gold)</option>
+                                                            <option value="PERCENTAGE">Percentage (%)</option>
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Value (₹/%)</label>
+                                                        <input
+                                                            type="number"
+                                                            className="w-full border p-2 text-xs font-mono"
+                                                            defaultValue={charge?.amount || 0}
+                                                            onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={charge?.isActive !== false}
+                                                        onChange={(e) => updateCharge(chargeName, { isActive: e.target.checked })}
+                                                    />
+                                                    <span className="text-[10px] text-gray-500 uppercase font-bold">Enabled in Calculation</span>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>

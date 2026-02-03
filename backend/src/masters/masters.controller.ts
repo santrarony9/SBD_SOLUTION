@@ -1,5 +1,6 @@
 import { Controller, Get, Body, Put, Param } from '@nestjs/common';
 import { MastersService } from './masters.service';
+import { ChargeType, ApplyOn } from '@prisma/client';
 
 @Controller('masters')
 export class MastersController {
@@ -30,8 +31,8 @@ export class MastersController {
         return this.mastersService.getCharges();
     }
 
-    @Put('charges/:id')
-    updateCharge(@Param('id') id: string, @Body() data: { amount?: number; isActive?: boolean }) {
-        return this.mastersService.updateCharge(id, data);
+    @Put('charges/:name')
+    updateCharge(@Param('name') name: string, @Body() data: { amount?: number; isActive?: boolean; type?: ChargeType; applyOn?: ApplyOn }) {
+        return this.mastersService.updateCharge(name, data);
     }
 }
