@@ -3,10 +3,40 @@ import { PrismaService } from '../prisma/prisma.service';
 import PDFDocument from 'pdfkit';
 import axios from 'axios';
 import * as QRCode from 'qrcode';
+import { MediaService } from '../media/media.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class InvoiceService {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private mediaService: MediaService,
+        private whatsappService: WhatsappService
+    ) { }
+
+    async sendInvoiceViaWhatsapp(orderId: string) {
+        // 1. Generate PDF Buffer
+        const pdfBuffer = await this.generateInvoice(orderId);
+
+        // 2. Upload to Cloudinary
+        const uploadResult = await this.mediaService.uploadBuffer(pdfBuffer, 'invoices');
+
+        // 3. Fetch Order for details
+        const order = await this.fetchOrder(orderId);
+        const mobile = order.user.mobile || order.shippingAddress['mobile']; // Fallback to shipping mobile
+
+        if (!mobile) {
+            throw new Error('Customer mobile number not found');
+        }
+
+        // 4. Send via WhatsApp
+        return this.whatsappService.sendInvoice(
+            mobile,
+            uploadResult.secure_url,
+            order.user.name || 'Customer',
+            orderId
+        );
+    }
 
     async generateInvoice(orderId: string): Promise<Buffer> {
         const order = await this.fetchOrder(orderId);

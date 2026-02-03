@@ -35,6 +35,13 @@ export class InvoiceController {
         this.sendPDF(res, buffer, `Bulk-${body.type}s.pdf`);
     }
 
+    @Post('send/:orderId')
+    @UseGuards(JwtAuthGuard)
+    async sendInvoice(@Param('orderId') orderId: string) {
+        const result = await this.invoiceService.sendInvoiceViaWhatsapp(orderId);
+        return { success: true, message: 'Invoice Sent via WhatsApp', result };
+    }
+
     private sendPDF(res: Response, buffer: Buffer, filename: string) {
         res.set({
             'Content-Type': 'application/pdf',

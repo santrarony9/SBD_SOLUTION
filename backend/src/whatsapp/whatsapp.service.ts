@@ -54,4 +54,18 @@ export class WhatsappService {
             { url: imageUrl, filename: 'product.png' }
         );
     }
+
+    async sendInvoice(mobile: string, pdfUrl: string, customerName: string, orderId: string) {
+        // Template: "new_invoice"
+        // Params: {{1}} = Customer Name, {{2}} = Order ID
+        // Header: PDF Document
+        const campaignName = process.env.AISENSY_INVOICE_CAMPAIGN || 'new_invoice';
+
+        return this.sendTemplateMessage(
+            mobile,
+            campaignName,
+            [customerName, orderId.slice(-8).toUpperCase()],
+            { url: pdfUrl, filename: `Invoice-${orderId.slice(-8)}.pdf` }
+        );
+    }
 }

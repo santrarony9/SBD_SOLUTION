@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
+import { PiBasket } from 'react-icons/pi';
 
 interface ProductProps {
     id: string;
@@ -23,58 +24,49 @@ export default function ProductCard({ product }: { product: ProductProps }) {
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         addToCart(product.id, 1);
-        alert('Added to Cart'); // Replace with toast later
+        // Toast notification would go here
     };
 
     return (
-        <div className="group relative bg-white border border-transparent hover:border-brand-gold/30 transition-all duration-500 ease-out-expo hover:shadow-2xl hover:shadow-brand-navy/10">
-            {/* Image Container with Zoom Effect */}
-            <Link href={`/product/${product.slug}`} className="block relative aspect-[4/5] overflow-hidden bg-gray-50">
+        <div className="group relative transition-all duration-700 hover:-translate-y-1">
+            {/* Image Container */}
+            <Link href={`/product/${product.slug}`} className="block relative aspect-[3/4] overflow-hidden bg-brand-cream/20">
                 <Image
                     src={displayImage}
                     alt={product.name}
                     fill
-                    className="object-cover transition-transform duration-1000 ease-in-out group-hover:scale-110"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover transition-transform duration-1000 ease-in-out group-hover:scale-105"
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
 
-                {/* Overlay Gradient on Hover */}
-                <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                {/* Overlay (Subtle Darken) */}
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500" />
 
-                {/* Quick Add Button - Slides Up */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out">
-                    <button
-                        onClick={handleAddToCart}
-                        className="w-full bg-white/95 backdrop-blur-md text-brand-navy py-3 px-4 uppercase tracking-[0.2em] text-xs font-bold border border-brand-gold hover:bg-brand-navy hover:text-brand-gold transition-colors shadow-lg"
-                    >
-                        Add to Bag
-                    </button>
-                </div>
-
-                {/* Badge */}
-                <div className="absolute top-4 left-4 z-10">
-                    <span className="bg-white/90 backdrop-blur text-[10px] font-bold tracking-[0.2em] uppercase px-3 py-1 text-brand-navy border border-gray-100">
-                        {product.category || 'Luxury'}
-                    </span>
-                </div>
+                {/* Add to Cart Button (Minimalist, Fad-in) */}
+                <button
+                    onClick={handleAddToCart}
+                    className="absolute bottom-4 right-4 bg-white text-brand-navy p-3 rounded-full shadow-lg opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 hover:bg-brand-navy hover:text-brand-gold"
+                    title="Add to Cart"
+                >
+                    <PiBasket className="w-5 h-5" />
+                </button>
             </Link>
 
-            {/* Product Details */}
-            <div className="p-4 md:p-6 text-center bg-white relative z-10 transition-colors duration-300">
+            {/* Product Details - Clean & Centered */}
+            <div className="pt-6 pb-2 text-center">
+
+                {/* Category kicker */}
+                <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-100">
+                    {product.category || 'Fine Jewellery'}
+                </p>
+
                 <Link href={`/product/${product.slug}`}>
-                    <h3 className="text-sm md:text-lg font-serif font-medium text-brand-navy mb-2 md:mb-3 group-hover:text-brand-gold transition-colors line-clamp-2 min-h-[2.5em]">
+                    <h3 className="text-lg font-serif text-brand-navy mb-2 group-hover:text-brand-gold transition-colors duration-300">
                         {product.name}
                     </h3>
                 </Link>
 
-                {/* Decorative Divider */}
-                <div className="flex justify-center items-center gap-3 mb-2 md:mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                    <span className="h-px w-6 bg-brand-gold/40"></span>
-                    <span className="text-[10px] text-brand-gold uppercase tracking-widest">◇</span>
-                    <span className="h-px w-6 bg-brand-gold/40"></span>
-                </div>
-
-                <p className="text-base md:text-xl font-serif text-brand-charcoal group-hover:text-brand-navy transition-colors">
+                <p className="text-sm font-medium text-brand-charcoal/80">
                     ₹{(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString()}
                 </p>
             </div>

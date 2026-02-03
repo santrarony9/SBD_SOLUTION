@@ -68,51 +68,55 @@ export default async function Home() {
     <div className="bg-brand-cream font-sans overflow-x-hidden">
 
       {/* 1. Hero Section */}
-      <section className="relative h-[90vh] flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image with Slow Parallax */}
-        <div className="absolute inset-0 z-0 h-full w-full">
+        <div className="absolute inset-0 z-0 h-full w-full select-none">
           <Image
             src={activeBanner.imageUrl}
             alt={activeBanner.title || "Royal Diamond Collection"}
             fill
             priority
-            className="object-cover animate-scale-in"
+            className="object-cover animate-scale-slow"
             style={{ objectPosition: 'center 30%' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90" />
+          {/* Sophisticated Gradient - Darker at bottom for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/10 to-brand-navy/80 mix-blend-multiply" />
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-5xl mx-auto">
-          <h2 className="text-brand-gold font-serif italic text-lg md:text-2xl mb-4 tracking-widest animate-fade-in delay-100 uppercase">
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
+
+          <h2 className="text-brand-gold/90 font-serif italic text-lg md:text-2xl mb-6 tracking-[0.3em] animate-fade-in-up delay-200 uppercase font-medium">
             {activeBanner.title}
           </h2>
-          <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight animate-fade-in delay-200">
-            Elegance is <br /> <span className="text-brand-gold italic">Eternal</span>
+
+          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-[0.9] tracking-tight animate-fade-in-up delay-300 drop-shadow-lg">
+            Elegance is <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-light italic pr-2">Eternal</span>
           </h1>
-          <p className="text-gray-200 max-w-xl text-lg mb-12 font-light tracking-wide animate-fade-in delay-300">
-            Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust.
+
+          <p className="text-gray-200 max-w-2xl text-lg md:text-xl mb-12 font-light tracking-wide leading-relaxed animate-fade-in-up delay-500 drop-shadow-md">
+            Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.
           </p>
 
-          <div className="flex flex-col md:flex-row gap-6 animate-slide-up delay-500">
+          <div className="flex flex-col md:flex-row gap-8 animate-fade-in-up delay-700">
             <Link
               href={activeBanner.link || "/shop"}
-              className="bg-brand-gold text-brand-navy px-10 py-4 uppercase tracking-[0.2em] font-bold text-xs hover:bg-white transition-colors duration-300 border border-brand-gold"
+              className="bg-white text-brand-navy px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20"
             >
               Shop Collection
             </Link>
             <Link
               href="/about"
-              className="bg-transparent text-white px-10 py-4 uppercase tracking-[0.2em] font-bold text-xs hover:bg-white hover:text-brand-navy transition-colors duration-300 border border-white"
+              className="bg-transparent text-white px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white"
             >
-              Our Legacy
+              Our Heritage
             </Link>
           </div>
         </div>
 
         {/* Scroll Indicator */}
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce">
-          <span className="text-white text-xs tracking-widest uppercase opacity-70">Scroll</span>
+        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce-slow opacity-0 animate-fade-in delay-1000">
+          <span className="text-white/60 text-[10px] tracking-[0.4em] uppercase">Explore</span>
         </div>
       </section>
 
