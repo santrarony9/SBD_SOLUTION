@@ -43,9 +43,11 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                 const newImages = [...tempImages];
                 newImages[index] = result.url;
                 setTempImages(newImages);
+                newImages[index] = result.url;
+                setTempImages(newImages);
             }
         } catch (error) {
-            alert('Upload failed');
+            alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
             setIsUploading(false);
         }
@@ -60,24 +62,32 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
             const payload = {
                 name: formData.name,
                 slug: formData.name.toLowerCase().replace(/ /g, '-') + '-' + Date.now(),
-                category: formData.category, // Capture Category
+                category: formData.category,
                 description: formData.description,
-                goldPurity: parseInt(formData.goldPurity),
-                goldWeight: parseFloat(formData.goldWeight),
-                diamondCarat: parseFloat(formData.diamondCarat || '0'),
+                goldPurity: parseInt(formData.goldPurity) || 0,
+                goldWeight: parseFloat(formData.goldWeight) || 0,
+                diamondCarat: parseFloat(formData.diamondCarat) || 0,
                 diamondClarity: formData.diamondClarity,
-                images: tempImages.filter(img => img), // Filter empty slots
+                images: tempImages.filter(img => img),
                 videoUrl: formData.videoUrl,
-                certificatePdf: formData.certificatePdf,
-                price: parseFloat(formData.price || '0')
+                certificatePdf: formData.certificatePdf
             };
 
-            await fetchAPI('/products', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
                 method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
                 body: JSON.stringify(payload)
             });
 
-            alert('Product Added Successfully');
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Failed to create product');
+            }
+
+            alert('Product Added Successfully! 💎');
             setIsOpen(false);
             setFormData({
                 name: '', category: 'Rings', price: '', images: '',
@@ -88,7 +98,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
             onSuccess();
         } catch (error) {
             console.error(error);
-            alert('Failed to add product');
+            alert(error instanceof Error ? error.message : 'Failed to add product');
         } finally {
             setLoading(false);
         }
@@ -157,9 +167,15 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                         />
                                         <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center group-hover:border-brand-gold transition-colors">
                                             {formData.videoUrl ? (
-                                                <div className="relative aspect-video bg-black rounded overflow-hidden">
+                                                <div className="relative aspect-video bg-black rounded overflow-hidden group/preview">
                                                     <video src={formData.videoUrl} className="w-full h-full object-cover" controls />
-                                                    <button onClick={() => setFormData({ ...formData, videoUrl: '' })} className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full text-[8px]">CHANGE</button>
+                                                    <div className="absolute top-2 left-2 bg-green-500 text-white text-[9px] font-bold px-2 py-1 rounded-full flex items-center shadow-lg">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                        UPLOADED
+                                                    </div>
+                                                    <button onClick={() => setFormData({ ...formData, videoUrl: '' })} className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full transition-colors shadow-lg">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
+                                                    </button>
                                                 </div>
                                             ) : (
                                                 <div className="py-4">
@@ -185,7 +201,11 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                         />
                                         <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center group-hover:border-brand-navy transition-colors">
                                             {formData.certificatePdf ? (
-                                                <div className="py-4 bg-brand-navy/5 rounded border border-brand-navy/10">
+                                                <div className="py-4 bg-brand-navy/5 rounded border border-brand-navy/10 relative group/preview">
+                                                    <div className="absolute top-2 left-2 bg-green-500 text-white text-[9px] font-bold px-2 py-1 rounded-full flex items-center shadow-sm">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                                        UPLOADED
+                                                    </div>
                                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mx-auto text-brand-navy mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                                     </svg>
