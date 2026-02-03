@@ -10,6 +10,12 @@ export class ProductsController {
         return this.productsService.createProduct(createProductDto);
     }
 
+    @Post('ai-description')
+    async generateDescription(@Body() body: any) {
+        const description = await this.productsService.generateDescription(body);
+        return { description };
+    }
+
     @Get()
     findAll() {
         return this.productsService.findAll();

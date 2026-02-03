@@ -3,13 +3,19 @@
 import { useState } from 'react';
 import { fetchAPI } from '@/lib/api';
 
-export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }) {
-    const [isOpen, setIsOpen] = useState(false);
+interface ProductFormProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+    initialData?: any;
+}
+
+export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialData }: ProductFormProps) {
     const [formData, setFormData] = useState({
         name: '',
-        category: 'Rings', // Default
-        price: '',
-        images: '', // Comma separated for MVP
+        category: 'Rings',
+        price: '', // Not used in backend but kept for UI if needed or removed
+        images: '',
         goldPurity: '18',
         goldWeight: '',
         diamondCarat: '',
@@ -20,6 +26,35 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
     });
     const [tempImages, setTempImages] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isGeneratingAI, setIsGeneratingAI] = useState(false);
+
+    useEffect(() => {
+        if (initialData) {
+            setFormData({
+                name: initialData.name || '',
+                category: initialData.category || 'Rings',
+                price: '',
+                images: '',
+                goldPurity: initialData.goldPurity?.toString() || '18',
+                goldWeight: initialData.goldWeight?.toString() || '',
+                diamondCarat: initialData.diamondCarat?.toString() || '',
+                diamondClarity: initialData.diamondClarity || 'SI1',
+                description: initialData.description || '',
+                videoUrl: initialData.videoUrl || '',
+                certificatePdf: initialData.certificatePdf || ''
+            });
+            setTempImages(initialData.images || []);
+        } else {
+            // Reset if opening in Add mode
+            setFormData({
+                name: '', category: 'Rings', price: '', images: '',
+                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', description: '',
+                videoUrl: '', certificatePdf: ''
+            });
+            setTempImages([]);
+        }
+    }, [initialData, isOpen]);
 
     const handleMediaUpload = async (file: File | undefined, type: string) => {
         if (!file) return;
@@ -43,8 +78,6 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                 const newImages = [...tempImages];
                 newImages[index] = result.url;
                 setTempImages(newImages);
-                newImages[index] = result.url;
-                setTempImages(newImages);
             }
         } catch (error) {
             alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
@@ -52,7 +85,27 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
             setIsUploading(false);
         }
     };
-    const [loading, setLoading] = useState(false);
+
+    const handleAIGenerate = async () => {
+        if (!formData.name || !formData.goldWeight) {
+            alert('Please enter Name, Category and Weight first to generate a description.');
+            return;
+        }
+        setIsGeneratingAI(true);
+        try {
+            const response = await fetchAPI('/products/ai-description', {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+            if (response.description) {
+                setFormData(prev => ({ ...prev, description: response.description }));
+            }
+        } catch (error) {
+            alert('Failed to generate description. Check if API Key is set.');
+        } finally {
+            setIsGeneratingAI(false);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -61,7 +114,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
         try {
             const payload = {
                 name: formData.name,
-                slug: formData.name.toLowerCase().replace(/ /g, '-') + '-' + Date.now(),
+                slug: initialData ? initialData.slug : (formData.name.toLowerCase().replace(/ /g, '-') + '-' + Date.now()),
                 category: formData.category,
                 description: formData.description,
                 goldPurity: parseInt(formData.goldPurity) || 0,
@@ -73,54 +126,38 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                 certificatePdf: formData.certificatePdf
             };
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
+            const url = initialData
+                ? `/products/${initialData.id}`
+                : '/products';
+
+            const method = initialData ? 'PUT' : 'POST';
+
+            await fetchAPI(url, {
+                method,
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || 'Failed to create product');
-            }
-
-            alert('Product Added Successfully! 💎');
-            setIsOpen(false);
-            setFormData({
-                name: '', category: 'Rings', price: '', images: '',
-                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', description: '',
-                videoUrl: '', certificatePdf: ''
-            });
-            setTempImages([]);
+            alert(`Product ${initialData ? 'Updated' : 'Added'} Successfully! 💎`);
+            onClose();
             onSuccess();
         } catch (error) {
             console.error(error);
-            alert(error instanceof Error ? error.message : 'Failed to add product');
+            alert(error instanceof Error ? error.message : 'Failed to save product');
         } finally {
             setLoading(false);
         }
     };
 
-    if (!isOpen) {
-        return (
-            <button
-                onClick={() => setIsOpen(true)}
-                className="bg-brand-gold text-brand-navy px-6 py-3 font-bold uppercase tracking-wider text-xs hover:bg-white hover:text-brand-gold border border-brand-gold transition-colors"
-            >
-                + Add New Product
-            </button>
-        );
-    }
+    if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-            <div className="bg-white p-8 max-w-2xl w-full shadow-2xl border border-brand-gold/20 max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-fade-in">
+            <div className="bg-white p-8 max-w-2xl w-full shadow-2xl border border-brand-gold/20 max-h-[90vh] overflow-y-auto rounded-lg">
                 <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-serif text-brand-navy">Add New Product</h2>
-                    <button onClick={() => setIsOpen(false)} className="text-gray-400 hover:text-red-500">✕</button>
+                    <h2 className="text-2xl font-serif text-brand-navy">
+                        {initialData ? 'Edit Product' : 'Add New Product'}
+                    </h2>
+                    <button onClick={onClose} className="text-gray-400 hover:text-red-500">✕</button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
@@ -148,7 +185,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                 <option value="Pendants">Pendants</option>
                             </select>
                         </div>
-                        <div className="space-y-6 bg-gray-50/50 p-6 rounded-lg border border-gray-100">
+                        <div className="space-y-6 bg-gray-50/50 p-6 rounded-lg border border-gray-100 md:col-span-2">
                             <div className="flex justify-between items-center">
                                 <h3 className="text-xs uppercase font-bold text-gray-400 tracking-widest">Media Hub</h3>
                                 <span className="text-[10px] text-brand-gold font-bold">Upload from computer</span>
@@ -173,7 +210,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
                                                         UPLOADED
                                                     </div>
-                                                    <button onClick={() => setFormData({ ...formData, videoUrl: '' })} className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full transition-colors shadow-lg">
+                                                    <button type="button" onClick={(e) => { e.preventDefault(); setFormData({ ...formData, videoUrl: '' }) }} className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white p-1.5 rounded-full transition-colors shadow-lg z-20">
                                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-3 w-3" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" /></svg>
                                                     </button>
                                                 </div>
@@ -302,11 +339,22 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                     </div>
 
                     <div>
-                        <label className="block text-xs uppercase tracking-wider text-gray-500 mb-1">Description</label>
+                        <div className="flex justify-between items-end mb-1">
+                            <label className="block text-xs uppercase tracking-wider text-gray-500">Description</label>
+                            <button
+                                type="button"
+                                onClick={handleAIGenerate}
+                                disabled={isGeneratingAI}
+                                className="text-[10px] font-bold bg-brand-gold/10 text-brand-gold px-2 py-1 rounded hover:bg-brand-gold hover:text-white transition-colors flex items-center gap-1"
+                            >
+                                {isGeneratingAI ? '✨ Writing...' : '✨ AI Generate'}
+                            </button>
+                        </div>
                         <textarea
                             className="w-full border border-gray-200 p-2 text-sm h-24"
                             value={formData.description}
                             onChange={e => setFormData({ ...formData, description: e.target.value })}
+                            placeholder="Describe the product..."
                         />
                     </div>
 
@@ -316,7 +364,7 @@ export default function AdminAddProduct({ onSuccess }: { onSuccess: () => void }
                             disabled={loading || isUploading}
                             className={`bg-brand-navy text-white px-8 py-3 uppercase text-xs font-bold tracking-widest transition-colors ${loading || isUploading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-brand-gold'}`}
                         >
-                            {loading ? 'Adding...' : isUploading ? 'Uploading Media...' : 'Save Product'}
+                            {loading ? (initialData ? 'Updating...' : 'Adding...') : isUploading ? 'Uploading Media...' : (initialData ? 'Update Product' : 'Save Product')}
                         </button>
                     </div>
                 </form>

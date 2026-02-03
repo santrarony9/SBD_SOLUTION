@@ -18,7 +18,7 @@ interface Product {
     category?: string;
 }
 
-export default function AdminProductList({ refreshTrigger }: { refreshTrigger: number }) {
+export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
     const [products, setProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -87,12 +87,20 @@ export default function AdminProductList({ refreshTrigger }: { refreshTrigger: n
                                     <span className="block text-gray-400">{product.diamondCarat}ct Diamonds</span>
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <button
-                                        onClick={() => deleteProduct(product.id)}
-                                        className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider transition-colors"
-                                    >
-                                        Delete
-                                    </button>
+                                    <div className="flex justify-end gap-3">
+                                        <button
+                                            onClick={() => onEdit && onEdit(product)}
+                                            className="text-brand-gold hover:text-brand-navy text-xs font-bold uppercase tracking-wider transition-colors"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => deleteProduct(product.id)}
+                                            className="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider transition-colors"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         ))}

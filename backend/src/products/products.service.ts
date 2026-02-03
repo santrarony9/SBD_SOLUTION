@@ -3,9 +3,40 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ApplyOn } from '@prisma/client';
 // DTOs would normally be defined in a separate file, defining inline for brevity or need to create them.
 
+import { GoogleGenerativeAI } from '@google/generative-ai';
+
 @Injectable()
 export class ProductsService {
-    constructor(private prisma: PrismaService) { }
+    private genAI: GoogleGenerativeAI;
+
+    constructor(private prisma: PrismaService) {
+        if (process.env.GEMINI_API_KEY) {
+            this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        }
+    }
+
+    async generateDescription(promptData: any) {
+        if (!this.genAI) {
+            return "AI Description unavailable: Missing API Key.";
+        }
+        try {
+            const model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
+            Name: ${promptData.name}
+            Category: ${promptData.category}
+            Gold: ${promptData.goldPurity}K, ${promptData.goldWeight}g
+            Diamonds: ${promptData.diamondCarat}ct, ${promptData.diamondClarity} clarity
+            Style: Elegant, Premium, Timeless.
+            Keep it under 60 words. Emphasize craftsmanship and eternal value.`;
+
+            const result = await model.generateContent(prompt);
+            const response = await result.response;
+            return response.text();
+        } catch (error) {
+            console.error("AI Generation Failed:", error);
+            return "Failed to generate description automatically.";
+        }
+    }
 
     async createProduct(data: any) {
         try {
