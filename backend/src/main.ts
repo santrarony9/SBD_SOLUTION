@@ -7,12 +7,8 @@ async function bootstrap() {
   try {
     const app = await appPromise;
     app.setGlobalPrefix('api');
-    app.enableCors({
-      origin: '*',
-      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
-      credentials: false,
-    });
+    // CORS handled by Vercel Configuration (vercel.json) to avoid cold-start issues
+    // app.enableCors({ ... });
     await app.listen(process.env.PORT || 3001);
     console.log(`Application is running on: ${await app.getUrl()}`);
   } catch (error) {
