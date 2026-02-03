@@ -8,12 +8,9 @@ async function bootstrap() {
     const app = await appPromise;
     app.setGlobalPrefix('api');
     app.enableCors({
-      origin: [
-        'https://sbd-solutionfrontend.vercel.app',
-        'https://sbd-solution.vercel.app',
-        'https://sbd-solution-frontend.vercel.app',
-        'http://localhost:3000',
-      ],
+      origin: true,
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      allowedHeaders: 'Content-Type, Accept, Authorization',
       credentials: true,
     });
     await app.listen(process.env.PORT || 3001);
