@@ -14,7 +14,11 @@ interface Product {
     description: string;
     images: string[];
     goldPurity: number;
+    goldWeight: number;
+    diamondCarat: number;
     diamondClarity: string;
+    videoUrl?: string;
+    certificatePdf?: string;
     pricing: {
         finalPrice: number;
         components: {
@@ -38,7 +42,10 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             try {
                 const data = await fetchAPI(`/products/${params.slug}`);
                 setProduct(data);
-                if (data.images && data.images.length > 0) {
+                // Prioritize video first
+                if (data.videoUrl) {
+                    setActiveMedia({ type: 'video', src: data.videoUrl });
+                } else if (data.images && data.images.length > 0) {
                     setActiveMedia({ type: 'image', src: data.images[0] });
                 }
             } catch (err) {
@@ -118,36 +125,37 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                         )}
                     </div>
 
-                    {/* Thumbnail Grid (4 Images + 1 Video) */}
+                    {/* Thumbnail Grid (Media) */}
                     <div className="grid grid-cols-5 gap-3">
+                        {/* Video Thumbnail (Prioritize) */}
+                        {product.videoUrl && (
+                            <button
+                                onClick={() => setActiveMedia({ type: 'video', src: product.videoUrl })}
+                                className={`aspect-square bg-gray-100 rounded-sm cursor-pointer border overflow-hidden relative group transition-all duration-300 ${activeMedia.type === 'video' ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
+                            >
+                                <div className="absolute inset-0 flex items-center justify-center z-10">
+                                    <div className="w-8 h-8 rounded-full bg-brand-gold/80 flex items-center justify-center text-brand-navy pl-1 transition-transform group-hover:scale-110">
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                                            <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
+                                        </svg>
+                                    </div>
+                                </div>
+                                {product.images?.[0] && (
+                                    <img src={product.images[0]} alt="Video View" className="object-cover w-full h-full opacity-60 grayscale group-hover:grayscale-0 transition-all" />
+                                )}
+                            </button>
+                        )}
+
                         {/* Image Thumbnails */}
-                        {product.images?.slice(0, 4).map((img, i) => (
+                        {product.images?.map((img, i) => (
                             <button
                                 key={`img-${i}`}
                                 onClick={() => setActiveMedia({ type: 'image', src: img })}
                                 className={`aspect-square bg-white rounded-sm cursor-pointer border overflow-hidden relative transition-all duration-300 ${activeMedia.src === img ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
                             >
-                                <Image src={img} alt={`View ${i + 1}`} width={100} height={100} className="object-cover w-full h-full" />
+                                <img src={img} alt={`View ${i + 1}`} className="object-cover w-full h-full" />
                             </button>
                         ))}
-
-                        {/* Video Thumbnail (Always present as 5th item for demo) */}
-                        <button
-                            onClick={() => setActiveMedia({ type: 'video', src: 'https://cdn.pixabay.com/video/2022/11/02/137535-766725227_large.mp4' })} // Placeholder Luxury Gold Video
-                            className={`aspect-square bg-gray-100 rounded-sm cursor-pointer border overflow-hidden relative group transition-all duration-300 ${activeMedia.type === 'video' ? 'border-brand-gold ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
-                        >
-                            <div className="absolute inset-0 flex items-center justify-center z-10">
-                                <div className="w-8 h-8 rounded-full bg-brand-gold/80 flex items-center justify-center text-brand-navy pl-1 transition-transform group-hover:scale-110">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                        <path fillRule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z" clipRule="evenodd" />
-                                    </svg>
-                                </div>
-                            </div>
-                            {/* Video Thumbnail Preview (using first image with overlay if no specific thumb) */}
-                            {product.images?.[0] && (
-                                <Image src={product.images[0]} alt="Video View" width={100} height={100} className="object-cover w-full h-full opacity-60 grayscale group-hover:grayscale-0 transition-all" />
-                            )}
-                        </button>
                     </div>
                 </div>
 
@@ -155,9 +163,20 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
                 <div>
                     <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4 leading-tight">{product.name}</h1>
 
-                    <div className="flex items-center space-x-6 mb-8 text-xs font-semibold tracking-widest uppercase text-gray-500">
-                        <span className="flex items-center"><span className="w-1.5 h-1.5 bg-brand-gold rounded-full mr-2"></span>IGI Certified</span>
-                        <span className="flex items-center"><span className="w-1.5 h-1.5 bg-brand-gold rounded-full mr-2"></span>BIS Hallmarked</span>
+                    <div className="flex items-center gap-6 mb-8 text-[10px] font-bold tracking-widest uppercase">
+                        {product.certificatePdf ? (
+                            <a
+                                href={product.certificatePdf}
+                                target="_blank"
+                                className="flex items-center text-brand-gold border-b border-brand-gold pb-0.5 hover:text-brand-navy hover:border-brand-navy transition-all"
+                            >
+                                <span className="w-2 h-2 bg-brand-gold rounded-full mr-2"></span>
+                                View IGI Certificate
+                            </a>
+                        ) : (
+                            <span className="flex items-center text-gray-500"><span className="w-2 h-2 bg-brand-gold rounded-full mr-2"></span>IGI Certified</span>
+                        )}
+                        <span className="flex items-center text-gray-500"><span className="w-2 h-2 bg-brand-gold rounded-full mr-2"></span>BIS Hallmarked</span>
                     </div>
 
                     <p className="text-gray-600 font-light leading-relaxed mb-10 border-b border-brand-charcoal/10 pb-10 text-sm md:text-base">
