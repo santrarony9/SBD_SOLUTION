@@ -75,7 +75,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 </div>
 
                 <p className="text-base md:text-xl font-serif text-brand-charcoal group-hover:text-brand-navy transition-colors">
-                    ₹{product.price.toLocaleString()}
+                    ₹{(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString()}
                 </p>
             </div>
         </div>
