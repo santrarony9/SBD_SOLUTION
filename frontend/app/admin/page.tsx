@@ -144,23 +144,26 @@ export default function AdminDashboard() {
                                 <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
                                 <h3 className="font-serif text-2xl text-brand-navy mb-6">Gold Rates</h3>
                                 <div className="space-y-6">
-                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> : goldRates.map((rate: any) => (
-                                        <div key={rate.purity} className="flex items-center justify-between border-b border-gray-100 pb-4">
-                                            <span className="font-bold text-brand-navy text-lg">{rate.purity}K</span>
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-gray-400 text-xs uppercase tracking-wider">Per 10g</span>
-                                                <div className="relative">
-                                                    <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                                                    <input
-                                                        type="number"
-                                                        className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
-                                                        defaultValue={rate.pricePer10g}
-                                                        onBlur={(e) => updateGoldRate(rate.purity, Number(e.target.value))}
-                                                    />
+                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> : [14, 16, 18, 22, 24].map((purity) => {
+                                        const rate = goldRates.find((r: any) => r.purity === purity);
+                                        return (
+                                            <div key={purity} className="flex items-center justify-between border-b border-gray-100 pb-4">
+                                                <span className="font-bold text-brand-navy text-lg">{purity}K</span>
+                                                <div className="flex items-center gap-4">
+                                                    <span className="text-gray-400 text-xs uppercase tracking-wider">Per 10g</span>
+                                                    <div className="relative">
+                                                        <span className="absolute left-3 top-2 text-gray-500">₹</span>
+                                                        <input
+                                                            type="number"
+                                                            className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
+                                                            defaultValue={rate?.pricePer10g || 0}
+                                                            onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
+                                                        />
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        );
+                                    })}
                                 </div>
                             </div>
 
