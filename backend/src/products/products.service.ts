@@ -8,8 +8,12 @@ export class ProductsService {
     constructor(private prisma: PrismaService) { }
 
     async createProduct(data: any) {
-        // Basic validation could go here, or use DTO pipes
-        return this.prisma.product.create({ data });
+        try {
+            return await this.prisma.product.create({ data });
+        } catch (error) {
+            console.error('Failed to create product:', error);
+            throw error; // Re-throw to let global filter handle it, but log first
+        }
     }
 
     async updateProduct(id: string, data: any) {
@@ -51,89 +55,95 @@ export class ProductsService {
     // CORE PRICING LOGIC
     // ------------------------------------------
     private async enrichWithPrice(product: any) {
-        // 1. Fetch Rates
-        const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
-        const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
-        const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
+        try {
+            // 1. Fetch Rates
+            const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
+            const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
+            const charges = await this.prisma.charge.findMany({ where: { isActive: true } }) || [];
 
-        // Defaults if rates missing (should not happen in prod ideally)
-        const goldPricePer10g = goldRate?.pricePer10g || 0;
-        const diamondPricePerCarat = diamondRate?.pricePerCarat || 0;
+            // Defaults if rates missing (should not happen in prod ideally)
+            const goldPricePer10g = goldRate?.pricePer10g || 0;
+            const diamondPricePerCarat = diamondRate?.pricePerCarat || 0;
 
-        // 2. Calculate Components
-        const goldValue = (goldPricePer10g / 10) * product.goldWeight;
-        const diamondValue = diamondPricePerCarat * product.diamondCarat;
+            // 2. Calculate Components
+            const goldValue = (goldPricePer10g / 10) * product.goldWeight;
+            const diamondValue = diamondPricePerCarat * product.diamondCarat;
 
-        // 3. Calculate Charges
-        // ApplyOn: GOLD, DIAMOND, FINAL, etc.
-        // We need to handle each charge type.
+            // 3. Calculate Charges
+            // ApplyOn: GOLD, DIAMOND, FINAL, etc.
+            // We need to handle each charge type.
 
-        const subTotal = goldValue + diamondValue;
-        let makingCharges = 0;
-        let otherCharges = 0;
+            const subTotal = goldValue + diamondValue;
+            let makingCharges = 0;
+            let otherCharges = 0;
 
-        // First pass: Calculate Making/Other (non-tax usually)
-        for (const charge of charges) {
-            if (charge.name.toUpperCase().includes('GST')) continue; // Skip GST for now
+            // First pass: Calculate Making/Other (non-tax usually)
+            for (const charge of charges) {
+                if (charge.name.toUpperCase().includes('GST')) continue; // Skip GST for now
 
-            let chargeAmount = 0;
+                let chargeAmount = 0;
 
-            // For simplicity assuming ApplyOn 'GOLD' means based on gold weight or value
-            // The prompt says: Charge Type: Flat, Per gram, Per carat, Percentage.
-            // Apply on: Gold, Diamond, Subtotal, Final amount.
+                // For simplicity assuming ApplyOn 'GOLD' means based on gold weight or value
+                // The prompt says: Charge Type: Flat, Per gram, Per carat, Percentage.
+                // Apply on: Gold, Diamond, Subtotal, Final amount.
 
-            if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) {
-                chargeAmount = charge.amount * product.goldWeight;
-            } else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) {
-                chargeAmount = charge.amount * product.diamondCarat;
-            } else if (charge.type === 'FLAT') {
-                chargeAmount = charge.amount;
-            } else if (charge.type === 'PERCENTAGE') {
-                // % of what? 
-                if (charge.applyOn === ApplyOn.GOLD_VALUE) chargeAmount = (goldValue * charge.amount) / 100;
-                else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
-                else if (charge.applyOn === ApplyOn.SUBTOTAL) chargeAmount = (subTotal * charge.amount) / 100;
+                if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) {
+                    chargeAmount = charge.amount * product.goldWeight;
+                } else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) {
+                    chargeAmount = charge.amount * product.diamondCarat;
+                } else if (charge.type === 'FLAT') {
+                    chargeAmount = charge.amount;
+                } else if (charge.type === 'PERCENTAGE') {
+                    // % of what? 
+                    if (charge.applyOn === ApplyOn.GOLD_VALUE) chargeAmount = (goldValue * charge.amount) / 100;
+                    else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
+                    else if (charge.applyOn === ApplyOn.SUBTOTAL) chargeAmount = (subTotal * charge.amount) / 100;
+                }
+
+                if (charge.name.toLowerCase().includes('making')) {
+                    makingCharges += chargeAmount;
+                } else if (charge.name.toLowerCase().includes('other')) {
+                    otherCharges += chargeAmount;
+                } else {
+                    // Default to other if not making or tax
+                    otherCharges += chargeAmount;
+                }
             }
 
-            if (charge.name.toLowerCase().includes('making')) {
-                makingCharges += chargeAmount;
-            } else if (charge.name.toLowerCase().includes('other')) {
-                otherCharges += chargeAmount;
-            } else {
-                // Default to other if not making or tax
-                otherCharges += chargeAmount;
+            let gst = 0;
+            const taxableAmount = subTotal + makingCharges + otherCharges;
+
+            // Second pass: GST
+            const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
+            if (gstCharge) {
+                // usually percentage of taxable
+                if (gstCharge.type === 'PERCENTAGE') {
+                    gst = (taxableAmount * gstCharge.amount) / 100;
+                }
             }
+
+            const finalPrice = taxableAmount + gst;
+
+            return {
+                ...product,
+                pricing: {
+                    validAsOf: new Date(),
+                    goldRate: goldPricePer10g,
+                    diamondRate: diamondPricePerCarat,
+                    components: {
+                        goldValue,
+                        diamondValue,
+                        makingCharges,
+                        otherCharges,
+                        gst
+                    },
+                    finalPrice
+                }
+            };
+        } catch (error) {
+            console.error('Error calculating price for product:', product.id, error);
+            // Return product without pricing info rather than crashing
+            return { ...product, pricing: null };
         }
-
-        let gst = 0;
-        const taxableAmount = subTotal + makingCharges + otherCharges;
-
-        // Second pass: GST
-        const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
-        if (gstCharge) {
-            // usually percentage of taxable
-            if (gstCharge.type === 'PERCENTAGE') {
-                gst = (taxableAmount * gstCharge.amount) / 100;
-            }
-        }
-
-        const finalPrice = taxableAmount + gst;
-
-        return {
-            ...product,
-            pricing: {
-                validAsOf: new Date(),
-                goldRate: goldPricePer10g,
-                diamondRate: diamondPricePerCarat,
-                components: {
-                    goldValue,
-                    diamondValue,
-                    makingCharges,
-                    otherCharges,
-                    gst
-                },
-                finalPrice
-            }
-        };
     }
 }
