@@ -38,7 +38,7 @@ export default function LoginPage() {
             if (err.message.includes('401')) {
                 setError('Invalid email or password');
             } else {
-                setError(`Connection Error to [${process.env.NEXT_PUBLIC_API_URL}]: ${err.message}. Please check Vercel Env Vars.`);
+                setError('Connection Error: Failed to fetch. Please ensure the backend is running.');
             }
         } finally {
             setIsLoading(false);
