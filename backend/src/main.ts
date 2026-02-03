@@ -8,9 +8,16 @@ async function bootstrap() {
     const app = await appPromise;
     app.setGlobalPrefix('api');
     app.enableCors({
-      origin: true,
+      origin: (origin, callback) => {
+        const allowed = !origin || origin.includes('vercel.app') || origin.includes('localhost');
+        if (allowed) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      allowedHeaders: 'Content-Type, Accept, Authorization',
+      allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
       credentials: true,
     });
     await app.listen(process.env.PORT || 3001);
