@@ -53,6 +53,19 @@ export default function AdminDashboard() {
         }
     };
 
+    const updateDiamondPrice = async (clarity: string, price: number) => {
+        try {
+            await fetchAPI(`/masters/diamond/${clarity}`, {
+                method: 'PUT',
+                body: JSON.stringify({ price })
+            });
+            alert('Diamond Rate Updated!');
+            loadMasters();
+        } catch (error) {
+            alert('Failed to update rate');
+        }
+    };
+
     return (
         <AdminGuard>
             <div className="min-h-screen bg-gray-50 flex">
