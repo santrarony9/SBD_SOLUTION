@@ -1,10 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
-import AnnouncementBar from "@/components/AnnouncementBar";
-import ExitIntentPopup from "@/components/ExitIntentPopup";
+import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import { fetchAPI } from "@/lib/api";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
@@ -52,13 +49,9 @@ export default function RootLayout({
       >
         <AuthProvider>
           <CartProvider>
-            <ExitIntentPopup />
-            <AnnouncementBar />
-            <Navbar />
-            <main className="min-h-screen">
+            <ClientLayoutWrapper>
               {children}
-            </main>
-            <Footer />
+            </ClientLayoutWrapper>
           </CartProvider>
         </AuthProvider>
       </body>

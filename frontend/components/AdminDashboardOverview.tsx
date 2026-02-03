@@ -67,7 +67,7 @@ export default function AdminDashboardOverview() {
                                     formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, 'Sales']}
                                     cursor={{ fill: 'transparent' }}
                                 />
-                                <Bar dataKey="value" fill="#D4AF37" radius={[4, 4, 0, 0]} barSize={40} />
+                                <Bar dataKey="value" fill="#C6A87C" radius={[2, 2, 0, 0]} barSize={40} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

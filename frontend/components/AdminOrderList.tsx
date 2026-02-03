@@ -41,7 +41,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
     const handleDownloadInvoice = async (orderId: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/invoice/${orderId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/${orderId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -84,7 +84,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
         if (selectedOrders.length === 0) return;
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/invoice/bulk`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/bulk`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -108,7 +108,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
     const handleDownloadCreditNote = async (orderId: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/invoice/credit-note/${orderId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/credit-note/${orderId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const blob = await response.blob();
@@ -127,7 +127,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
     const handleDownloadLabel = async (orderId: string) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/invoice/label/${orderId}`, {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/label/${orderId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const blob = await response.blob();

@@ -1,17 +1,18 @@
-'use client';
-
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart } from "react-icons/pi";
+import { useAuth } from '@/context/AuthContext';
+import { fetchAPI } from '@/lib/api';
 import AdminGuard from '@/components/AdminGuard';
 import AdminProductList from '@/components/AdminProductList';
 import AdminOrderList from '@/components/AdminOrderList';
 import AdminAddProduct from '@/components/AdminAddProduct';
-import { fetchAPI } from '@/lib/api';
-import { useEffect, useState } from 'react';
-
 import AdminDashboardOverview from '@/components/AdminDashboardOverview';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
+    const { logout } = useAuth();
 
     // Masters State
     const [goldRates, setGoldRates] = useState<any[]>([]);
@@ -52,64 +53,84 @@ export default function AdminDashboard() {
 
     return (
         <AdminGuard>
-            <div className="min-h-screen bg-gray-100 flex pb-20">
+            <div className="min-h-screen bg-gray-50 flex">
                 {/* Sidebar */}
-                <div className="w-64 bg-brand-navy text-white min-h-screen p-4 hidden md:block">
-                    <h2 className="text-xl font-bold font-serif mb-8 text-brand-gold">Admin Panel</h2>
-                    <ul className="space-y-4 text-sm">
-                        <li
-                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'overview' ? 'text-brand-gold font-bold' : ''}`}
-                            onClick={() => setActiveTab('overview')}
+                <aside className="w-72 bg-brand-navy text-white h-screen sticky top-0 left-0 p-8 hidden md:flex flex-col border-r border-brand-gold/10">
+                    <div className="mb-12">
+                        <h2 className="text-2xl font-bold font-serif tracking-widest text-white">SPARK BLUE</h2>
+                        <span className="text-[0.6rem] uppercase tracking-[0.4em] text-brand-gold ml-1">Administration</span>
+                    </div>
+
+                    <nav className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                        <ul className="space-y-2 text-sm">
+                            <SidebarLink
+                                active={activeTab === 'overview'}
+                                onClick={() => setActiveTab('overview')}
+                                icon={<PiPresentationChart className="w-5 h-5" />}
+                                label="Pulse Overview"
+                            />
+                            <SidebarLink
+                                active={activeTab === 'masters'}
+                                onClick={() => setActiveTab('masters')}
+                                icon={<PiGear className="w-5 h-5" />}
+                                label="Rates & Masters"
+                            />
+                            <SidebarLink
+                                active={activeTab === 'products'}
+                                onClick={() => setActiveTab('products')}
+                                icon={<PiCube className="w-5 h-5" />}
+                                label="Inventory"
+                            />
+                            <SidebarLink
+                                active={activeTab === 'orders'}
+                                onClick={() => setActiveTab('orders')}
+                                icon={<PiScroll className="w-5 h-5" />}
+                                label="Order Console"
+                            />
+
+                            <div className="pt-6 pb-2">
+                                <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Extended Modules</span>
+                            </div>
+
+                            <SidebarLink icon={<PiArrowLeft className="w-5 h-5" />} label="Affiliate Center" href="/admin/marketing" />
+                            <SidebarLink icon={<PiChartLineUp className="w-5 h-5" />} label="Supply Chain" href="/admin/inventory" />
+                            <SidebarLink icon={<PiAddressBook className="w-5 h-5" />} label="CRM Circles" href="/admin/crm" />
+                            <SidebarLink
+                                icon={<PiShoppingCart className="w-5 h-5" />}
+                                label="Live Pulse"
+                                href="/admin/carts"
+                                suffix={<span className="ml-2 w-1.5 h-1.5 bg-red-500 rounded-full animate-pulse"></span>}
+                            />
+                        </ul>
+                    </nav>
+
+                    {/* Bottom Actions */}
+                    <div className="pt-8 border-t border-white/5 space-y-4">
+                        <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest">
+                            <PiArrowLeft className="w-4 h-4" />
+                            Return to Site
+                        </Link>
+                        <button
+                            onClick={logout}
+                            className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
                         >
-                            Dashboard Overview
-                        </li>
-                        <li
-                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'masters' ? 'text-brand-gold font-bold' : ''}`}
-                            onClick={() => setActiveTab('masters')}
-                        >
-                            Master Configuration
-                        </li>
-                        <li
-                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'products' ? 'text-brand-gold font-bold' : ''}`}
-                            onClick={() => setActiveTab('products')}
-                        >
-                            Product Management
-                        </li>
-                        <li
-                            className={`cursor-pointer hover:text-brand-gold ${activeTab === 'orders' ? 'text-brand-gold font-bold' : ''}`}
-                            onClick={() => setActiveTab('orders')}
-                        >
-                            Order Management
-                        </li>
-                        <hr className="border-brand-gold/20 my-4" />
-                        <li className="cursor-pointer hover:text-brand-gold">
-                            <a href="/admin/marketing" className="block w-full h-full">Affiliate Marketing</a>
-                        </li>
-                        <li className="cursor-pointer hover:text-brand-gold">
-                            <a href="/admin/inventory" className="block w-full h-full">Inventory & Supply Chain</a>
-                        </li>
-                        <li className="cursor-pointer hover:text-brand-gold">
-                            <a href="/admin/crm" className="block w-full h-full">CRM & Royal Circles</a>
-                        </li>
-                        <li className="cursor-pointer hover:text-brand-gold">
-                            <a href="/admin/carts" className="block w-full h-full flex items-center">
-                                Live Pulse <span className="ml-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                            <PiSignOut className="w-4 h-4" />
+                            Logout Security
+                        </button>
+                    </div>
+                </aside>
 
                 {/* Main Content */}
-                <div className="flex-1 p-8 md:p-12 overflow-y-auto">
-                    <header className="mb-10 flex justify-between items-end">
-                        <h1 className="text-4xl font-serif text-brand-navy">
-                            {activeTab === 'overview' ? 'Dashboard Overview' :
-                                activeTab === 'masters' ? 'Configuration' :
-                                    activeTab === 'products' ? 'Product Management' : 'Order Management'}
-                        </h1>
-                        <span className="text-xs text-brand-gold tracking-[0.2em] uppercase font-bold border-b border-brand-gold pb-1">
-                            Spark Blue Admin
-                        </span>
+                <main className="flex-1 p-8 md:p-16 overflow-y-auto">
+                    <header className="mb-12 flex justify-between items-start">
+                        <div>
+                            <span className="text-[10px] text-brand-gold tracking-[0.3em] uppercase font-bold mb-2 block">Control Center</span>
+                            <h1 className="text-5xl font-serif text-brand-navy">
+                                {activeTab === 'overview' ? 'Business Pulse' :
+                                    activeTab === 'masters' ? 'Master Config' :
+                                        activeTab === 'products' ? 'Collection' : 'Order Console'}
+                            </h1>
+                        </div>
                     </header>
 
                     {activeTab === 'overview' && <AdminDashboardOverview />}
@@ -165,8 +186,39 @@ export default function AdminDashboard() {
                             <AdminOrderList refreshTrigger={refreshTrigger} />
                         </div>
                     )}
-                </div>
+                </main>
             </div>
         </AdminGuard>
     );
 }
+
+function SidebarLink({ active, onClick, icon, label, href, suffix }: { active?: boolean, onClick?: () => void, icon: React.ReactNode, label: string, href?: string, suffix?: React.ReactNode }) {
+    const content = (
+        <>
+            <span className={`${active ? 'text-brand-navy bg-brand-gold p-1 rounded-sm' : 'text-brand-gold'}`}>
+                {icon}
+            </span>
+            <span className="flex-1">{label}</span>
+            {suffix}
+        </>
+    );
+
+    const baseClass = `flex items-center gap-3 px-4 py-3 rounded transition-all duration-300 cursor-pointer ${active ? 'bg-white/10 text-brand-gold font-bold border-l-2 border-brand-gold' : 'text-gray-400 hover:text-white hover:bg-white/5'}`;
+
+    if (href) {
+        return (
+            <li>
+                <Link href={href} className={baseClass}>
+                    {content}
+                </Link>
+            </li>
+        );
+    }
+
+    return (
+        <li onClick={onClick} className={baseClass}>
+            {content}
+        </li>
+    );
+}
+
