@@ -8,17 +8,10 @@ async function bootstrap() {
     const app = await appPromise;
     app.setGlobalPrefix('api');
     app.enableCors({
-      origin: (origin, callback) => {
-        const allowed = !origin || origin.includes('vercel.app') || origin.includes('localhost');
-        if (allowed) {
-          callback(null, true);
-        } else {
-          callback(new Error('Not allowed by CORS'));
-        }
-      },
+      origin: '*',
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
       allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
-      credentials: true,
+      credentials: false,
     });
     await app.listen(process.env.PORT || 3001);
     console.log(`Application is running on: ${await app.getUrl()}`);
