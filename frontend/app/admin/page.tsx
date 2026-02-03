@@ -21,6 +21,14 @@ export default function AdminDashboard() {
     const [diamondRates, setDiamondRates] = useState<any[]>([]);
     const [charges, setCharges] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+
+    useEffect(() => {
+        if (status) {
+            const timer = setTimeout(() => setStatus(null), 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [status]);
 
     const loadMasters = async () => {
         try {
@@ -49,10 +57,10 @@ export default function AdminDashboard() {
                 method: 'PUT',
                 body: JSON.stringify({ price })
             });
-            alert('Gold Rate Updated!');
+            setStatus({ message: `Gold ${purity}K Updated!`, type: 'success' });
             loadMasters();
         } catch (error) {
-            alert('Failed to update rate');
+            setStatus({ message: 'Update Failed', type: 'error' });
         }
     };
 
@@ -62,10 +70,10 @@ export default function AdminDashboard() {
                 method: 'PUT',
                 body: JSON.stringify({ price })
             });
-            alert('Diamond Rate Updated!');
+            setStatus({ message: `Diamond ${clarity} Updated!`, type: 'success' });
             loadMasters();
         } catch (error) {
-            alert('Failed to update rate');
+            setStatus({ message: 'Update Failed', type: 'error' });
         }
     };
 
@@ -75,10 +83,10 @@ export default function AdminDashboard() {
                 method: 'PUT',
                 body: JSON.stringify(data)
             });
-            alert(`${name} Updated!`);
+            setStatus({ message: `${name} Updated!`, type: 'success' });
             loadMasters();
         } catch (error) {
-            alert(`Failed to update ${name}`);
+            setStatus({ message: 'Update Failed', type: 'error' });
         }
     };
 
@@ -167,113 +175,148 @@ export default function AdminDashboard() {
                     {activeTab === 'overview' && <AdminDashboardOverview />}
 
                     {activeTab === 'masters' && (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                            {/* Gold Master */}
-                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
-                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Gold Rates</h3>
-                                <div className="space-y-6">
-                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> : [14, 16, 18, 22, 24].map((purity) => {
-                                        const rate = goldRates.find((r: any) => r.purity === purity);
-                                        return (
-                                            <div key={purity} className="flex items-center justify-between border-b border-gray-100 pb-4">
-                                                <span className="font-bold text-brand-navy text-lg">{purity}K</span>
-                                                <div className="flex items-center gap-4">
-                                                    <span className="text-gray-400 text-xs uppercase tracking-wider">Per 10g</span>
-                                                    <div className="relative">
-                                                        <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                                                        <input
-                                                            type="number"
-                                                            className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
-                                                            defaultValue={rate?.pricePer10g || 0}
-                                                            onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
-                                                        />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                        <div className="space-y-12 max-w-6xl animate-fade-in relative">
+                            {/* Status Notification */}
+                            {status && (
+                                <div className={`fixed top-8 right-8 z-[100] px-6 py-4 rounded shadow-2xl border flex items-center gap-3 transition-all transform animate-slide-up ${status.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
+                                    <div className={`w-2 h-2 rounded-full ${status.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
+                                    <span className="text-sm font-bold tracking-wide">{status.message}</span>
+                                </div>
+                            )}
+
+                            {/* Precious Metals & Stones Masters */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                                    <h3 className="font-serif text-xl text-brand-navy">Precious Metal & Stone Value</h3>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Live Inventory Rates</span>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-x divide-gray-100">
+                                    {/* Gold Sub-table */}
+                                    <div className="p-4">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="text-left text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-gray-50">
+                                                    <th className="pb-2">Gold Purity</th>
+                                                    <th className="pb-2 text-right">Price per 10g</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-50">
+                                                {[14, 16, 18, 22, 24].map((purity) => {
+                                                    const rate = goldRates.find(r => r.purity === purity);
+                                                    return (
+                                                        <tr key={purity} className="group hover:bg-gray-50/50 transition-colors">
+                                                            <td className="py-3 font-bold text-brand-navy">{purity}K Gold</td>
+                                                            <td className="py-3 items-center justify-end flex gap-2">
+                                                                <span className="text-gray-400 text-xs">₹</span>
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-32 bg-transparent border-b border-transparent group-hover:border-brand-gold/30 focus:border-brand-gold text-right outline-none transition-all font-mono"
+                                                                    defaultValue={rate?.pricePer10g || 0}
+                                                                    onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {/* Diamond Sub-table */}
+                                    <div className="p-4">
+                                        <table className="w-full text-sm">
+                                            <thead>
+                                                <tr className="text-left text-[10px] text-gray-400 uppercase tracking-wider font-bold border-b border-gray-50">
+                                                    <th className="pb-2">Diamond Clarity</th>
+                                                    <th className="pb-2 text-right">Price per Carat</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-50">
+                                                {['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'].map((clarity) => {
+                                                    const rate = diamondRates.find(r => r.clarity === clarity);
+                                                    return (
+                                                        <tr key={clarity} className="group hover:bg-gray-50/50 transition-colors">
+                                                            <td className="py-3 font-bold text-brand-navy">{clarity}</td>
+                                                            <td className="py-3 items-center justify-end flex gap-2">
+                                                                <span className="text-gray-400 text-xs">₹</span>
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-32 bg-transparent border-b border-transparent group-hover:border-brand-gold/30 focus:border-brand-gold text-right outline-none transition-all font-mono"
+                                                                    defaultValue={rate?.pricePerCarat || 0}
+                                                                    onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
 
-                            {/* Diamond Master */}
-                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
-                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Diamond Clarities</h3>
-                                <div className="space-y-6">
-                                    {isLoading ? <p className="text-gray-400 italic">Fetching live rates...</p> :
-                                        ['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'].map((clarity) => {
-                                            const rate = diamondRates.find(r => r.clarity === clarity);
-                                            return (
-                                                <div key={clarity} className="flex items-center justify-between border-b border-gray-100 pb-4">
-                                                    <span className="font-bold text-brand-navy text-lg">{clarity}</span>
-                                                    <div className="flex items-center gap-4">
-                                                        <span className="text-gray-400 text-xs uppercase tracking-wider">Per Carat</span>
-                                                        <div className="relative">
-                                                            <span className="absolute left-3 top-2 text-gray-500">₹</span>
-                                                            <input
-                                                                type="number"
-                                                                className="pl-8 pr-4 py-2 border border-gray-200 rounded text-right font-mono text-brand-navy focus:border-brand-gold focus:outline-none transition-colors"
-                                                                defaultValue={rate?.pricePerCarat || 0}
-                                                                onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                            {/* Operational Charges Master */}
+                            <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+                                    <h3 className="font-serif text-xl text-brand-navy">Operational Master</h3>
+                                    <span className="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Business Calculations</span>
                                 </div>
-                            </div>
-
-                            {/* Operational Charges */}
-                            <div className="bg-white p-8 rounded shadow-lg border border-brand-gold/10 relative overflow-hidden group lg:col-span-2">
-                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold"></div>
-                                <h3 className="font-serif text-2xl text-brand-navy mb-6">Operational Charges</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                                    {['Making Charge', 'Other Charge'].map((chargeName) => {
-                                        const charge = charges.find(c => c.name === chargeName);
-                                        return (
-                                            <div key={chargeName} className="space-y-4 p-4 bg-gray-50 rounded border border-gray-100">
-                                                <div className="flex justify-between items-center">
-                                                    <span className="font-bold text-brand-navy">{chargeName}</span>
-                                                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${charge?.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                                        {charge?.isActive ? 'ACTIVE' : 'INACTIVE'}
-                                                    </span>
-                                                </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div>
-                                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Type</label>
-                                                        <select
-                                                            className="w-full border p-2 text-xs"
-                                                            defaultValue={charge?.type || 'PER_GRAM'}
-                                                            onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
-                                                        >
-                                                            <option value="FLAT">Flat Amount</option>
-                                                            <option value="PER_GRAM">Per Gram (Gold)</option>
-                                                            <option value="PERCENTAGE">Percentage (%)</option>
-                                                        </select>
-                                                    </div>
-                                                    <div>
-                                                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Value (₹/%)</label>
-                                                        <input
-                                                            type="number"
-                                                            className="w-full border p-2 text-xs font-mono"
-                                                            defaultValue={charge?.amount || 0}
-                                                            onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
-                                                        />
-                                                    </div>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={charge?.isActive !== false}
-                                                        onChange={(e) => updateCharge(chargeName, { isActive: e.target.checked })}
-                                                    />
-                                                    <span className="text-[10px] text-gray-500 uppercase font-bold">Enabled in Calculation</span>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-gray-50/30 text-[10px] text-gray-400 uppercase tracking-wider font-bold">
+                                                <th className="px-6 py-4 text-left">Charge Component</th>
+                                                <th className="px-6 py-4 text-left">Type</th>
+                                                <th className="px-6 py-4 text-left">Frequency / Application</th>
+                                                <th className="px-6 py-4 text-right">Value (₹/%)</th>
+                                                <th className="px-6 py-4 text-center">Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {['Making Charge', 'Other Charge'].map((chargeName) => {
+                                                const charge = charges.find(c => c.name === chargeName);
+                                                return (
+                                                    <tr key={chargeName} className="hover:bg-gray-50/50 transition-colors">
+                                                        <td className="px-6 py-4">
+                                                            <span className="font-bold text-brand-navy">{chargeName}</span>
+                                                            <p className="text-[10px] text-gray-400 mt-0.5">{chargeName === 'Other Charge' ? 'Hidden from public breakdown' : 'Visible in public invoice'}</p>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-xs font-mono uppercase text-brand-gold">
+                                                            {charge?.type || 'PER_GRAM'}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <select
+                                                                className="bg-transparent border-b border-transparent hover:border-brand-gold focus:border-brand-gold outline-none text-xs py-1 transition-all"
+                                                                defaultValue={charge?.type || 'PER_GRAM'}
+                                                                onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
+                                                            >
+                                                                <option value="FLAT">Flat Amount</option>
+                                                                <option value="PER_GRAM">Per Gram (Gold)</option>
+                                                                <option value="PERCENTAGE">Percentage (%)</option>
+                                                            </select>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            <div className="inline-flex items-center gap-1 border-b border-transparent hover:border-brand-gold transition-all">
+                                                                <input
+                                                                    type="number"
+                                                                    className="w-24 bg-transparent text-right outline-none font-mono"
+                                                                    defaultValue={charge?.amount || 0}
+                                                                    onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
+                                                                />
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-center">
+                                                            <button
+                                                                onClick={() => updateCharge(chargeName, { isActive: !charge?.isActive })}
+                                                                className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-tighter transition-all ${charge?.isActive ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}`}
+                                                            >
+                                                                {charge?.isActive ? 'ENABLED' : 'DISABLED'}
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>

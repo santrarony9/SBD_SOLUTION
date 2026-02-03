@@ -68,12 +68,9 @@ export class ProductsService {
         // ApplyOn: GOLD, DIAMOND, FINAL, etc.
         // We need to handle each charge type.
 
+        const subTotal = goldValue + diamondValue;
         let makingCharges = 0;
         let otherCharges = 0;
-        let gst = 0;
-
-        // We'll accumulate "Subtotal" that is Taxable.
-        // Usually: Gold + Diamond + Making + Other = Taxable. Then GST on Taxable.
 
         // First pass: Calculate Making/Other (non-tax usually)
         for (const charge of charges) {
@@ -94,7 +91,8 @@ export class ProductsService {
             } else if (charge.type === 'PERCENTAGE') {
                 // % of what? 
                 if (charge.applyOn === ApplyOn.GOLD_VALUE) chargeAmount = (goldValue * charge.amount) / 100;
-                if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
+                else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
+                else if (charge.applyOn === ApplyOn.SUBTOTAL) chargeAmount = (subTotal * charge.amount) / 100;
             }
 
             if (charge.name.toLowerCase().includes('making')) {
@@ -107,7 +105,7 @@ export class ProductsService {
             }
         }
 
-        const subTotal = goldValue + diamondValue;
+        let gst = 0;
         const taxableAmount = subTotal + makingCharges + otherCharges;
 
         // Second pass: GST
