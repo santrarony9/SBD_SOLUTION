@@ -31,6 +31,12 @@ export default async (req: any, res: any) => {
   try {
     const app = await appPromise;
     app.setGlobalPrefix('api');
+    app.enableCors({
+      origin: '*',
+      methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+      allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+      credentials: false,
+    });
     await app.init();
     const expressApp = app.getHttpAdapter().getInstance();
     expressApp(req, res);
