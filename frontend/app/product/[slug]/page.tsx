@@ -30,7 +30,13 @@ interface Product {
     };
 }
 
-export default function ProductDetailPage({ params }: { params: { slug: string } }) {
+import { useParams } from 'next/navigation';
+
+export default function ProductDetailPage() {
+    const params = useParams();
+    const slug = params?.slug as string;
+
+    // State
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
@@ -39,8 +45,10 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
 
     useEffect(() => {
         async function loadProduct() {
+            if (!slug) return;
+
             try {
-                const data = await fetchAPI(`/products/${params.slug}`);
+                const data = await fetchAPI(`/products/${slug}`);
                 setProduct(data);
                 // Prioritize video first
                 if (data.videoUrl) {
@@ -56,10 +64,8 @@ export default function ProductDetailPage({ params }: { params: { slug: string }
             }
         }
 
-        if (params.slug) {
-            loadProduct();
-        }
-    }, [params.slug]);
+        loadProduct();
+    }, [slug]);
 
     if (loading) {
         return (
