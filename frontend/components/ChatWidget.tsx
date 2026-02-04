@@ -58,8 +58,8 @@ export default function ChatWidget() {
             <div className={`flex w-full ${isBot ? "justify-start" : "justify-end"} mb-4`}>
                 <div
                     className={`max-w-[85%] rounded-2xl px-5 py-3 text-sm leading-relaxed shadow-sm relative ${isBot
-                            ? "bg-[#FAFAF9] text-[#0F172A] border border-[#C6A87C]/20 rounded-tl-sm"
-                            : "bg-[#0F172A] text-[#F0E6D2] rounded-tr-sm border border-[#0F172A]"
+                        ? "bg-[#FAFAF9] text-[#0F172A] border border-[#C6A87C]/20 rounded-tl-sm"
+                        : "bg-[#0F172A] text-[#F0E6D2] rounded-tr-sm border border-[#0F172A]"
                         }`}
                 >
                     {message.content}
@@ -136,8 +136,8 @@ export default function ChatWidget() {
                             onClick={handleSend}
                             disabled={!input.trim() || isLoading}
                             className={`p-2 rounded-full transition-all duration-300 ${input.trim()
-                                    ? "text-[#0F172A] bg-[#C6A87C] hover:bg-[#d4b991] shadow-md transform hover:-translate-y-0.5"
-                                    : "text-gray-300 cursor-not-allowed"
+                                ? "text-[#0F172A] bg-[#C6A87C] hover:bg-[#d4b991] shadow-md transform hover:-translate-y-0.5"
+                                : "text-gray-300 cursor-not-allowed"
                                 }`}
                         >
                             <FaPaperPlane size={14} className={input.trim() ? "translate-x-0.5 translate-y-0.5" : ""} />
@@ -162,7 +162,7 @@ export default function ChatWidget() {
             {/* Close Button Placeholder (Swap effect) */}
             <button
                 onClick={toggleChat}
-                className={`pointer-events-auto w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 bg-[#ef4444] text-white transform hover:scale-105 active:scale-95 ring-4 ring-white/30 ${isOpen ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-0 -rotate-90 absolute"
+                className={`pointer-events-auto w-16 h-16 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 bg-[#0F172A] text-[#C6A87C] border border-[#C6A87C]/30 transform hover:scale-105 active:scale-95 ring-4 ring-white/30 ${isOpen ? "opacity-100 scale-100 rotate-0" : "opacity-0 scale-0 -rotate-90 absolute"
                     }`}
             >
                 <FaTimes size={24} />
