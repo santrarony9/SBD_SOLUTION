@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
+import ChatWidget from "@/components/ChatWidget";
 
 export default function ClientLayoutWrapper({
     children,
@@ -26,6 +27,7 @@ export default function ClientLayoutWrapper({
             <main className="min-h-screen">
                 {children}
             </main>
+            <ChatWidget />
             <Footer />
         </>
     );
