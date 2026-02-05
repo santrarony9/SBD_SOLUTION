@@ -24,7 +24,20 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     }
 
     if (!res.ok) {
-        throw new Error(`API Error: ${res.status} ${res.statusText}`);
+        let errorMessage = `API Error: ${res.status} ${res.statusText}`;
+        try {
+            const errorData = await res.json();
+            // NestJS usually sends { message: '...', statusCode: ... }
+            if (errorData.message) {
+                errorMessage = Array.isArray(errorData.message)
+                    ? errorData.message.join(', ')
+                    : errorData.message;
+            }
+        } catch (e) {
+            // Failure to parse JSON means it's likely a raw server error (e.g. timeout)
+            console.error('Could not parse API error response', e);
+        }
+        throw new Error(errorMessage);
     }
 
     return res.json();
