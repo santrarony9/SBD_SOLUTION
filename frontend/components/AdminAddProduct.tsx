@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+
 interface ProductFormProps {
     isOpen: boolean;
     onClose: () => void;
@@ -68,12 +70,23 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             const data = new FormData();
             data.append('file', file);
 
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/media/upload`, {
+            const response = await fetch(`${API_URL}/media/upload`, {
                 method: 'POST',
                 headers: { 'Authorization': `Bearer ${token}` },
                 body: data
             });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Upload Failed (${response.status}): ${errorText}`);
+            }
+
             const result = await response.json();
+            console.log('Upload Result:', result);
+
+            if (!result.url) {
+                throw new Error('Server returned success but no URL. Check Cloudinary config.');
+            }
 
             if (type === 'video') setFormData({ ...formData, videoUrl: result.url });
             else if (type === 'certificate') setFormData({ ...formData, certificatePdf: result.url });
@@ -82,6 +95,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 const newImages = [...tempImages];
                 newImages[index] = result.url;
                 setTempImages(newImages);
+            } else {
+                console.warn('Unknown upload type:', type);
             }
         } catch (error) {
             console.error('Upload Error:', error);
