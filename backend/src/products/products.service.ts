@@ -32,9 +32,10 @@ export class ProductsService {
             const result = await model.generateContent(prompt);
             const response = await result.response;
             return response.text();
-        } catch (error) {
+        } catch (error: any) {
             console.error("AI Generation Failed:", error);
-            return "Failed to generate description automatically.";
+            // Return actual error for debugging
+            return `AI Error: ${error.message || JSON.stringify(error)}`;
         }
     }
 
