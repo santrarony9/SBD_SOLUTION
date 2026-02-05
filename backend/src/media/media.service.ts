@@ -7,18 +7,30 @@ import * as streamifier from 'streamifier';
 export class MediaService {
     uploadFile(file: Express.Multer.File, folder: string = 'products'): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
-            const uploadStream = cloudinary.uploader.upload_stream(
-                {
-                    folder: folder,
-                    resource_type: 'auto', // Important for videos/pdfs
-                },
-                (error, result) => {
-                    if (error) return reject(error);
-                    resolve(result);
-                },
-            );
+            if (!file || !file.buffer) {
+                return reject(new Error('Invalid file provided to uploadFile'));
+            }
 
-            streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            try {
+                const uploadStream = cloudinary.uploader.upload_stream(
+                    {
+                        folder: folder,
+                        resource_type: 'auto', // Important for videos/pdfs
+                    },
+                    (error, result) => {
+                        if (error) {
+                            console.error('Cloudinary Upload Error:', error);
+                            return reject(error);
+                        }
+                        resolve(result);
+                    },
+                );
+
+                streamifier.createReadStream(file.buffer).pipe(uploadStream);
+            } catch (err) {
+                console.error('Stream/Config Error:', err);
+                reject(err);
+            }
         });
     }
 
