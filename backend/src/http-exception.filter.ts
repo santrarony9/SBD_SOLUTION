@@ -25,7 +25,7 @@ export class GlobalExceptionsFilter implements ExceptionFilter {
         const message =
             exception instanceof HttpException
                 ? exception.getResponse()
-                : 'Internal server error';
+                : (exception instanceof Error ? exception.message : 'Internal server error'); // TEMPORARY DEBUG: Expose raw error
 
         this.logger.error(
             `Http Status: ${status} Error Message: ${JSON.stringify(message)}`,
