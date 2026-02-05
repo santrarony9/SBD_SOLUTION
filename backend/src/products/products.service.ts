@@ -40,6 +40,14 @@ export class ProductsService {
 
     async createProduct(data: any) {
         try {
+            // Auto-generate SKU if not provided to avoid Unique Constraint errors
+            if (!data.sku) {
+                const prefix = data.category ? data.category.substring(0, 3).toUpperCase() : 'GEN';
+                const timestamp = Date.now().toString().substring(6); // shorter timestamp
+                const random = Math.floor(Math.random() * 1000);
+                data.sku = `SBD-${prefix}-${timestamp}-${random}`;
+            }
+
             return await this.prisma.product.create({ data });
         } catch (error) {
             console.error('Failed to create product:', error);
