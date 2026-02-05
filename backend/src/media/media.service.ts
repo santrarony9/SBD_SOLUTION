@@ -7,6 +7,10 @@ import * as streamifier from 'streamifier';
 export class MediaService {
     uploadFile(file: Express.Multer.File, folder: string = 'products'): Promise<CloudinaryResponse> {
         return new Promise<CloudinaryResponse>((resolve, reject) => {
+            if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+                return reject(new Error('MISSING_CLOUDINARY_KEYS: Check Backend Environment Variables!'));
+            }
+
             if (!file || !file.buffer) {
                 return reject(new Error('Invalid file provided to uploadFile'));
             }

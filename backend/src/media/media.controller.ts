@@ -17,12 +17,18 @@ export class MediaController {
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(@UploadedFile() file: Express.Multer.File) {
-        // Basic validation: Max 10MB for now, support images, videos, and pdf
-        const result = await this.mediaService.uploadFile(file);
-        return {
-            url: result.secure_url,
-            public_id: result.public_id,
-            resource_type: result.resource_type
-        };
+        try {
+            // Basic validation: Max 10MB for now, support images, videos, and pdf
+            const result = await this.mediaService.uploadFile(file);
+            return {
+                url: result.secure_url,
+                public_id: result.public_id,
+                resource_type: result.resource_type
+            };
+        } catch (error) {
+            console.error('Upload Controller Error:', error);
+            const message = error instanceof Error ? error.message : 'Unknown upload error';
+            throw new Error(`Upload Failed: ${message}`);
+        }
     }
 }
