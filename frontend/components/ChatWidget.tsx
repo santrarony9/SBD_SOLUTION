@@ -49,25 +49,25 @@ export default function ChatWidget() {
     // Create container if not exists (though createChat usually handles it, explicit styling helps)
     const style = document.createElement('style');
     style.innerHTML = `
-      .n8n - chat - widget {
-      --chat--color - primary: #B8860B!important; /* Brand Gold */
-      --chat--color - secondary: #0A192F!important; /* Brand Navy */
-      z - index: 10000!important;
-      bottom: 24px!important;
-      right: 24px!important;
-      max - width: 400px!important;
-      max - height: 80vh!important;
-      box - shadow: 0 10px 30px rgba(0, 0, 0, 0.15)!important;
-    }
-    /* Override for mobile */
-    @media(max - width: 640px) {
-                .n8n - chat - widget {
-        width: 100 % !important;
-        right: 0!important;
-        bottom: 0!important;
-        border - radius: 16px 16px 0 0!important;
+      .n8n-chat-widget {
+        --chat--color-primary: #B8860B!important; /* Brand Gold */
+        --chat--color-secondary: #0A192F!important; /* Brand Navy */
+        z-index: 10000!important;
+        bottom: 24px!important;
+        right: 24px!important;
+        max-width: 400px!important;
+        max-height: 80vh!important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15)!important;
       }
-    }
+      /* Override for mobile */
+      @media(max-width: 640px) {
+        .n8n-chat-widget {
+          width: 100%!important;
+          right: 0!important;
+          bottom: 0!important;
+          border-radius: 16px 16px 0 0!important;
+        }
+      }
     `;
     document.head.appendChild(style);
 

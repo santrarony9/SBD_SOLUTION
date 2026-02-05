@@ -28,6 +28,7 @@ export default function ClientLayoutWrapper({
                 {children}
             </main>
             <ChatWidget />
+            <div id="n8n-chat"></div>
             <Footer />
         </>
     );
