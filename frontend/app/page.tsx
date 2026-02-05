@@ -5,6 +5,8 @@ import ProductCard from '@/components/ProductCard';
 import { fetchAPI } from '@/lib/api';
 import FlashSale from '@/components/FlashSale';
 
+export const dynamic = 'force-dynamic';
+
 // Fetch Featured Products
 async function getFeaturedProducts() {
   try {
