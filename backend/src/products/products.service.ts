@@ -20,7 +20,7 @@ export class ProductsService {
             return "AI Description unavailable: Missing API Key.";
         }
         try {
-            const model = this.genAI.getGenerativeModel({ model: "gemini-pro" });
+            const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
             const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
