@@ -20,6 +20,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         goldWeight: '',
         diamondCarat: '',
         diamondClarity: 'SI1',
+        diamondColor: 'EF', // Added Diamond Color w/ default
         description: '',
         videoUrl: '',
         certificatePdf: ''
@@ -40,6 +41,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 goldWeight: initialData.goldWeight?.toString() || '',
                 diamondCarat: initialData.diamondCarat?.toString() || '',
                 diamondClarity: initialData.diamondClarity || 'SI1',
+                diamondColor: initialData.diamondColor || 'EF', // Hydrate Edit
                 description: initialData.description || '',
                 videoUrl: initialData.videoUrl || '',
                 certificatePdf: initialData.certificatePdf || ''
@@ -49,8 +51,10 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             // Reset if opening in Add mode
             setFormData({
                 name: '', category: 'Rings', price: '', images: '',
-                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', description: '',
-                videoUrl: '', certificatePdf: ''
+                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', diamondColor: 'EF', // Reset
+                description: '',
+                videoUrl: '',
+                certificatePdf: ''
             });
             setTempImages([]);
         }
@@ -80,6 +84,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 setTempImages(newImages);
             }
         } catch (error) {
+            console.error('Upload Error:', error);
             alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
         } finally {
             setIsUploading(false);
@@ -129,6 +134,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 goldWeight: parseFloat(formData.goldWeight) || 0,
                 diamondCarat: parseFloat(formData.diamondCarat) || 0,
                 diamondClarity: formData.diamondClarity,
+                diamondColor: formData.diamondColor,
                 images: validImages,
                 videoUrl: formData.videoUrl,
                 certificatePdf: formData.certificatePdf
@@ -252,6 +258,20 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         <option value="SI1">SI1</option>
                                         <option value="SI2">SI2</option>
                                         <option value="I1">I1</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Color</label>
+                                    <select
+                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white focus:border-brand-gold outline-none"
+                                        value={formData.diamondColor}
+                                        onChange={e => setFormData({ ...formData, diamondColor: e.target.value })}
+                                    >
+                                        <option value="EF">EF</option>
+                                        <option value="FG">FG</option>
+                                        <option value="GH">GH</option>
+                                        <option value="HI">HI</option>
+                                        <option value="IJ">IJ</option>
                                     </select>
                                 </div>
                             </div>
@@ -386,8 +406,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                         </div>
                     </form>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 }
 
