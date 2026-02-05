@@ -27,7 +27,9 @@ export class MediaController {
             };
         } catch (error) {
             console.error('Upload Controller Error:', error);
-            const message = error instanceof Error ? error.message : 'Unknown upload error';
+            const message = error instanceof Error
+                ? error.message
+                : JSON.stringify(error); // Capture Cloudinary object errors
             throw new Error(`Upload Failed: ${message}`);
         }
     }
