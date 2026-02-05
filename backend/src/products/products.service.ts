@@ -34,8 +34,22 @@ export class ProductsService {
             return response.text();
         } catch (error: any) {
             console.error("AI Generation Failed:", error);
-            // Return actual error for debugging
-            return `AI Error: ${error.message || JSON.stringify(error)}`;
+
+            // Try to list available models to help debug
+            let availableModels = "";
+            try {
+                if (process.env.GEMINI_API_KEY) {
+                    const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
+                    const listData = await listRes.json();
+                    if (listData.models) {
+                        availableModels = listData.models.map((m: any) => m.name).join(', ');
+                    }
+                }
+            } catch (e) {
+                availableModels = "Could not list models";
+            }
+
+            return `AI Error: ${error.message}. Available Models: ${availableModels}`;
         }
     }
 
