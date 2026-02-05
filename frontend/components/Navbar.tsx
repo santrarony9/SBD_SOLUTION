@@ -26,7 +26,7 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = scrolled
-        ? 'glass shadow-sm py-3 border-b border-brand-gold/10'
+        ? 'bg-white/95 backdrop-blur-md shadow-sm py-3 border-b border-brand-gold/10'
         : isHome
             ? 'bg-transparent py-6'
             : 'bg-brand-navy py-4 shadow-md';

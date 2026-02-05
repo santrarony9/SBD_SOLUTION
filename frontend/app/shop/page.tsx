@@ -57,14 +57,17 @@ function ShopContent() {
         }
     }, [searchParams]);
 
-    // Helper to map backend product to ProductCard props
     const mapToCardProps = (p: Product) => ({
         id: p.id,
         name: p.name,
         slug: p.slug,
         image: p.images && p.images.length > 0 ? p.images[0] : null,
         price: p.pricing?.finalPrice || p.price || 0,
-        category: p.category || `${p.goldPurity}K Gold`
+        category: p.category || `${p.goldPurity}K Gold`,
+        goldPurity: p.goldPurity,
+        goldWeight: (p as any).goldWeight, // Backend field name might differ slightly, cast to be safe
+        diamondCarat: (p as any).diamondCarat,
+        diamondClarity: p.diamondClarity
     });
 
     const toggleCategory = (category: string) => {

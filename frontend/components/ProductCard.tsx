@@ -13,6 +13,10 @@ interface ProductProps {
     image: string | null;
     category?: string;
     images?: string[];
+    goldPurity?: number;
+    goldWeight?: number;
+    diamondCarat?: number;
+    diamondClarity?: string;
 }
 
 export default function ProductCard({ product }: { product: ProductProps }) {
@@ -66,8 +70,14 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     </h3>
                 </Link>
 
+                <div className="flex justify-center gap-2 text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+                    {product.goldPurity && <span>{product.goldPurity}K Gold</span>}
+                    {product.goldWeight && <span>• {product.goldWeight}g</span>}
+                    {product.diamondCarat && <span>• {product.diamondCarat.toFixed(2)}ct Dia</span>}
+                </div>
+
                 <p className="text-sm font-medium text-brand-charcoal/80">
-                    ₹{(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString()}
+                    ₹{Math.round(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString('en-IN')}
                 </p>
             </div>
         </div>
