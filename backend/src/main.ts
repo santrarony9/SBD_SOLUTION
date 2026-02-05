@@ -1,11 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { GlobalExceptionsFilter } from './http-exception.filter';
 
 let cachedApp: any;
 
 async function bootstrap() {
   if (!cachedApp) {
     const app = await NestFactory.create(AppModule);
+    app.useGlobalFilters(new GlobalExceptionsFilter());
     app.setGlobalPrefix('api');
     app.enableCors({
       origin: '*',
