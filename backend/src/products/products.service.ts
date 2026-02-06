@@ -21,7 +21,7 @@ export class ProductsService {
         }
         try {
             console.log("Generative AI Model: gemini-2.0-flash");
-            const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-001" });
             const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
