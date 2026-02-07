@@ -4,6 +4,8 @@ import { CartService } from '../cart/cart.service';
 import { CrmService } from '../crm/crm.service';
 import { InventoryService } from '../inventory/inventory.service';
 
+import { ShiprocketService } from '../shiprocket/shiprocket.service';
+
 @Injectable()
 export class OrdersService {
     constructor(
@@ -11,6 +13,7 @@ export class OrdersService {
         private cartService: CartService,
         private crmService: CrmService,
         private inventoryService: InventoryService,
+        private shiprocketService: ShiprocketService,
     ) { }
 
     async createOrder(
@@ -76,11 +79,51 @@ export class OrdersService {
             });
         }
 
-        // 5. Clear Cart
+        // 5. Shiprocket Integration
+        // Non-blocking call
+        this.pushToShiprocket(order.id).catch(e => console.error("Shiprocket Auto-Push Failed:", e.message));
+
+        // 6. Clear Cart
         await this.cartService.clearCart(userId);
 
         return { ...order, razorpayOrderId };
     }
+
+    async pushToShiprocket(orderId: string) {
+        const order = await (this.prisma as any).order.findUnique({
+            where: { id: orderId },
+            include: { items: { include: { product: true } }, user: true }
+        });
+
+        if (!order) throw new Error("Order not found");
+
+        try {
+            const shiprocketOrder = await this.shiprocketService.createOrder({
+                ...order,
+                items: order.items.map((item) => ({
+                    ...item,
+                    product: item.product
+                }))
+            });
+
+            if (shiprocketOrder) {
+                await (this.prisma as any).order.update({
+                    where: { id: order.id },
+                    data: {
+                        shiprocketOrderId: String(shiprocketOrder.order_id),
+                        shipmentId: String(shiprocketOrder.shipment_id),
+                        awbCode: shiprocketOrder.awb_code || null
+                    }
+                });
+                return { success: true, shiprocketOrder };
+            }
+            return { success: false, message: "Shiprocket returned no data" };
+        } catch (e) {
+            console.error("Shiprocket Service Error:", e.message);
+            throw new BadRequestException("Failed to push to Shiprocket: " + e.message);
+        }
+    }
+
 
     async getMyOrders(userId: string) {
         return this.prisma.order.findMany({

@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { PiRocket, PiCheckCircle } from "react-icons/pi";
 
 interface Order {
     id: string;
     totalAmount: number;
     status: string;
     createdAt: string;
+    shiprocketOrderId?: string; // Added field
     user: {
         name: string;
         email: string;
@@ -22,6 +24,7 @@ interface Order {
 export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: number }) {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [pushingId, setPushingId] = useState<string | null>(null);
 
     const loadOrders = async () => {
         try {
@@ -69,6 +72,21 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             loadOrders(); // Refresh
         } catch (error) {
             alert('Failed to update status');
+        }
+    };
+
+    const handleShiprocketPush = async (id: string) => {
+        setPushingId(id);
+        try {
+            await fetchAPI(`/orders/${id}/shiprocket`, { method: 'POST' });
+            // Ideally check response for success, but refresh will show updated state if successful
+            await loadOrders();
+            alert("Order pushed to Shiprocket!");
+        } catch (error) {
+            console.error("Shiprocket push failed", error);
+            alert("Failed to push to Shiprocket. Check console/logs.");
+        } finally {
+            setPushingId(null);
         }
     };
 
@@ -179,6 +197,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                             <th className="px-6 py-4">Customer</th>
                             <th className="px-6 py-4">Total</th>
                             <th className="px-6 py-4">Status</th>
+                            <th className="px-6 py-4">Logistics</th>
                             <th className="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -205,6 +224,25 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                     <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>
                                         {order.status}
                                     </span>
+                                </td>
+                                <td className="px-6 py-4">
+                                    {order.shiprocketOrderId ? (
+                                        <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
+                                            <PiCheckCircle className="w-4 h-4" />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Synced</span>
+                                        </div>
+                                    ) : (
+                                        <button
+                                            onClick={() => handleShiprocketPush(order.id)}
+                                            disabled={pushingId === order.id}
+                                            className="flex items-center gap-1.5 text-brand-navy bg-gray-100 hover:bg-brand-gold hover:text-white px-2 py-1 rounded-md transition-all disabled:opacity-50"
+                                        >
+                                            <PiRocket className={`w-3.5 h-3.5 ${pushingId === order.id ? 'animate-bounce' : ''}`} />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">
+                                                {pushingId === order.id ? 'Pushing...' : 'Push to SR'}
+                                            </span>
+                                        </button>
+                                    )}
                                 </td>
                                 <td className="px-6 py-4 text-right flex items-center justify-end gap-2">
                                     <button

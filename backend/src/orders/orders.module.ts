@@ -6,8 +6,10 @@ import { CartModule } from '../cart/cart.module';
 import { CrmModule } from '../crm/crm.module';
 import { InventoryModule } from '../inventory/inventory.module';
 
+import { ShiprocketModule } from '../shiprocket/shiprocket.module';
+
 @Module({
-    imports: [PrismaModule, CartModule, CrmModule, InventoryModule],
+    imports: [PrismaModule, CartModule, CrmModule, InventoryModule, ShiprocketModule],
     controllers: [OrdersController],
     providers: [OrdersService],
 })

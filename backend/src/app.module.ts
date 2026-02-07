@@ -27,6 +27,7 @@ import { InventoryModule } from './inventory/inventory.module';
 import { CrmModule } from './crm/crm.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { MediaModule } from './media/media.module';
+import { ShiprocketModule } from './shiprocket/shiprocket.module';
 
 @Module({
   imports: [
@@ -53,7 +54,8 @@ import { MediaModule } from './media/media.module';
     InventoryModule,
     CrmModule,
     InvoiceModule,
-    MediaModule
+    MediaModule,
+    ShiprocketModule
   ],
   controllers: [AppController],
   providers: [AppService, CartCleanupService],

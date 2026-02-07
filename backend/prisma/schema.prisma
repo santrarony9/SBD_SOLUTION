@@ -345,6 +345,11 @@ model Order {
   
   // Shipping
   shippingAddress Address
+
+  // Shiprocket Integration
+  shiprocketOrderId String?
+  shipmentId        String?
+  awbCode           String?
   
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt

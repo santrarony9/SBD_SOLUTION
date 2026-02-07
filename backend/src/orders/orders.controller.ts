@@ -47,4 +47,10 @@ export class OrdersController {
     async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
         return this.ordersService.updateOrderStatus(id, body.status);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':id/shiprocket')
+    async pushToShiprocket(@Param('id') id: string) {
+        return this.ordersService.pushToShiprocket(id);
+    }
 }
