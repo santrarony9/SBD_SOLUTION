@@ -58,7 +58,7 @@ export default function ProductDetailPage() {
                 }
             } catch (err) {
                 console.error("Failed to load product", err);
-                setError('Failed to load product details.');
+                setError(`Failed to load product details. ${(err as Error).message}`);
             } finally {
                 setLoading(false);
             }
