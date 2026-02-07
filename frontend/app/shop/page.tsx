@@ -110,69 +110,88 @@ function ShopContent() {
     }, [products, selectedCategories, sortBy]);
 
     return (
-        <div className="min-h-screen bg-brand-cream pb-20 pt-24">
+        <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">
 
-            {/* Header */}
-            <div className="glass border-b border-brand-gold/20 py-12 mb-12 relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/40"></div> {/* Tint */}
-                <div className="relative max-w-7xl mx-auto px-4 text-center">
-                    <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4">The Collection</h1>
-                    <p className="text-sm font-light text-gray-500 uppercase tracking-widest">
-                        Exquisite Jewellery for Every Occasion
+            {/* Premium Hero Section - Full Width */}
+            <div className="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden mb-16 bg-brand-navy">
+                {/* Abstract Background Elements */}
+                <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand-gold/30 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2"></div>
+                    <div className="absolute bottom-0 right-0 w-[600px] h-[600px] bg-brand-gold/20 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3"></div>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 text-center max-w-2xl px-6">
+                    <span className="block text-brand-gold text-xs font-bold uppercase tracking-[0.3em] mb-4 animate-fade-in-up">
+                        Discover Excellence
+                    </span>
+                    <h1 className="text-5xl md:text-6xl font-serif text-white mb-6 leading-tight animate-fade-in-up delay-100">
+                        The Collection
+                    </h1>
+                    <p className="text-brand-cream/80 font-light text-sm md:text-base tracking-wide leading-relaxed animate-fade-in-up delay-200">
+                        Curated masterpieces featuring the finest diamonds and precious metals, designed to transcend time.
                     </p>
                 </div>
             </div>
 
-            {/* Content Grid */}
-            <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-12">
+            {/* Content Container */}
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-12">
 
-                {/* Sidebar Filters */}
-                <div className="hidden md:block col-span-1">
-                    <div className="sticky top-28 space-y-8">
-                        <div>
-                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Category</h3>
-                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
-                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets'].map(cat => (
+                {/* Sidebar Filters - Elegant & Sticky */}
+                <div className="hidden md:block col-span-3">
+                    <div className="sticky top-32 space-y-12 pr-8 border-r border-brand-charcoal/5">
+
+                        {/* Filter Group */}
+                        <div className="animate-fade-in delay-300">
+                            <h3 className="font-serif text-lg text-brand-navy mb-6 flex items-center gap-3">
+                                <span className="w-8 h-[1px] bg-brand-gold"></span>
+                                Category
+                            </h3>
+                            <ul className="space-y-4">
+                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
                                     <li key={cat}>
-                                        <label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                className="mr-3 accent-brand-navy"
-                                                checked={selectedCategories.includes(cat.toLowerCase())}
-                                                onChange={() => toggleCategory(cat.toLowerCase())}
-                                            />
-                                            {cat}
+                                        <label className="group flex items-center cursor-pointer">
+                                            <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedCategories.includes(cat.toLowerCase()) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
+                                                {selectedCategories.includes(cat.toLowerCase()) && (
+                                                    <svg className="w-2.5 h-2.5 text-brand-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <span className={`text-xs uppercase tracking-widest transition-colors duration-300 ${selectedCategories.includes(cat.toLowerCase()) ? 'text-brand-navy font-bold' : 'text-gray-500 group-hover:text-brand-navy'}`}>
+                                                {cat}
+                                            </span>
                                         </label>
                                     </li>
                                 ))}
                             </ul>
                         </div>
 
-                        <div>
-                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Metal</h3>
-                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> 18K Gold</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> 22K Gold</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> Platinum</label></li>
-                            </ul>
-                        </div>
-
-                        <div>
-                            <h3 className="font-serif text-lg text-brand-navy mb-4 border-b border-brand-charcoal/20 pb-2">Diamond</h3>
-                            <ul className="space-y-3 text-sm font-light text-brand-charcoal">
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> VVS1 / VVS2</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> VS1 / VS2</label></li>
-                                <li><label className="flex items-center cursor-pointer hover:text-brand-gold transition-colors"><input type="checkbox" className="mr-3 accent-brand-navy" /> SI1 / SI2</label></li>
+                        <div className="animate-fade-in delay-400">
+                            <h3 className="font-serif text-lg text-brand-navy mb-6 flex items-center gap-3">
+                                <span className="w-8 h-[1px] bg-brand-gold"></span>
+                                Metal
+                            </h3>
+                            <ul className="space-y-4">
+                                {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                    <li key={metal}>
+                                        <label className="group flex items-center cursor-pointer">
+                                            <div className="w-4 h-4 border border-gray-300 mr-3 group-hover:border-brand-gold transition-colors"></div>
+                                            <span className="text-xs uppercase tracking-widest text-gray-500 group-hover:text-brand-navy transition-colors">{metal}</span>
+                                        </label>
+                                    </li>
+                                ))}
                             </ul>
                         </div>
                     </div>
                 </div>
 
                 {/* Product Grid */}
-                <div className="col-span-1 md:col-span-3">
+                <div className="col-span-1 md:col-span-9">
                     {loading ? (
-                        <div className="flex justify-center py-20">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-gold"></div>
+                        <div className="flex flex-col items-center justify-center py-32 space-y-4">
+                            <div className="w-16 h-16 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-brand-navy animate-pulse">Loading Collections</p>
                         </div>
                     ) : error ? (
                         <div className="text-center py-20 text-red-500 font-light">
@@ -180,28 +199,47 @@ function ShopContent() {
                         </div>
                     ) : (
                         <>
-                            <div className="flex justify-between items-center mb-6">
-                                <span className="text-xs text-gray-500 uppercase tracking-widest">{filteredAndSortedProducts.length} Products</span>
-                                <select
-                                    value={sortBy}
-                                    onChange={(e) => setSortBy(e.target.value)}
-                                    className="bg-transparent border-b border-gray-300 text-sm py-1 focus:outline-none focus:border-brand-navy text-gray-600 cursor-pointer"
-                                >
-                                    <option value="featured">Sort by: Featured</option>
-                                    <option value="price-low">Price: Low to High</option>
-                                    <option value="price-high">Price: High to Low</option>
-                                </select>
+                            {/* Toolbar */}
+                            <div className="flex flex-col sm:flex-row justify-between items-center mb-10 pb-6 border-b border-brand-charcoal/5">
+                                <span className="text-xs font-serif italic text-gray-500 mb-4 sm:mb-0">
+                                    Showing {filteredAndSortedProducts.length} masterpieces
+                                </span>
+
+                                <div className="flex items-center gap-4">
+                                    <span className="text-[10px] uppercase font-bold text-brand-navy tracking-widest">Sort By:</span>
+                                    <div className="relative">
+                                        <select
+                                            value={sortBy}
+                                            onChange={(e) => setSortBy(e.target.value)}
+                                            className="appearance-none bg-white border border-gray-200 px-4 py-2 pr-8 text-xs uppercase tracking-wider text-gray-600 focus:outline-none focus:border-brand-gold cursor-pointer min-w-[150px]"
+                                        >
+                                            <option value="featured">Featured</option>
+                                            <option value="price-low">Price: Low to High</option>
+                                            <option value="price-high">Price: High to Low</option>
+                                        </select>
+                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                                            <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
+                            {/* Grid */}
                             {filteredAndSortedProducts.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                                    {filteredAndSortedProducts.map((product) => (
-                                        <ProductCard key={product.id} product={mapToCardProps(product)} />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                                    {filteredAndSortedProducts.map((product, index) => (
+                                        <div key={product.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                                            <ProductCard product={mapToCardProps(product)} />
+                                        </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-20 text-gray-500 font-light italic">
-                                    No products found matching your selection.
+                                <div className="flex flex-col items-center justify-center py-32 text-center">
+                                    <div className="text-6xl mb-4 text-gray-200 font-serif">?</div>
+                                    <h3 className="text-xl font-serif text-brand-navy mb-2">No collections found</h3>
+                                    <p className="text-sm text-gray-500 font-light">Try adjusting your filters to see more results.</p>
                                 </div>
                             )}
                         </>
