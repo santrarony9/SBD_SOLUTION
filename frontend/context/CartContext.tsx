@@ -14,6 +14,7 @@ interface CartItem {
         price: number; // Snapshot or calculated
         images: string[];
         slug: string;
+        category?: string;
     };
     calculatedPrice?: number;
 }
