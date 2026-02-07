@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
-import { PiPackage, PiVault, PiGraph, PiWarning, PiPlus, PiArrowsLeftRight } from 'react-icons/pi';
+import { PiPackage, PiVault, PiGraph, PiWarning, PiPlus, PiArrowsLeftRight, PiPencilSimple } from 'react-icons/pi';
+import AdminAddProduct from '@/components/AdminAddProduct';
 
 export default function InventoryDashboard() {
     const [products, setProducts] = useState<any[]>([]);
@@ -10,6 +11,10 @@ export default function InventoryDashboard() {
     const [vaults, setVaults] = useState<any[]>([]);
     const [materials, setMaterials] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // Modal State
+    const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+    const [editingProduct, setEditingProduct] = useState<any>(null);
 
     const [activeTab, setActiveTab] = useState('stock'); // stock | materials | vaults
 
@@ -47,6 +52,16 @@ export default function InventoryDashboard() {
         }
     };
 
+    const handleAddProduct = () => {
+        setEditingProduct(null);
+        setIsProductModalOpen(true);
+    };
+
+    const handleEditProduct = (product: any) => {
+        setEditingProduct(product);
+        setIsProductModalOpen(true);
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans text-brand-navy">
             <header className="mb-8 flex justify-between items-end">
@@ -55,6 +70,13 @@ export default function InventoryDashboard() {
                     <p className="text-gray-500 text-sm">Real-time tracking of precious materials, vaults, and finished pieces.</p>
                 </div>
                 <div className="flex gap-4">
+                    <button
+                        onClick={handleAddProduct}
+                        className="bg-brand-navy text-white px-6 py-3 rounded-lg shadow-lg hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center gap-2 font-bold uppercase text-xs tracking-widest"
+                    >
+                        <PiPlus className="text-lg" />
+                        Add Product
+                    </button>
                     <div className="bg-white px-6 py-3 rounded-lg shadow-sm border-l-4 border-brand-gold">
                         <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Portfolio Value</span>
                         <span className="text-xl font-serif text-brand-navy">
@@ -132,6 +154,13 @@ export default function InventoryDashboard() {
                                     <td className="px-6 py-4">
                                         <div className="flex justify-center gap-2">
                                             <button
+                                                onClick={() => handleEditProduct(product)}
+                                                className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-colors"
+                                            >
+                                                <PiPencilSimple />
+                                            </button>
+                                            <div className="w-px h-8 bg-gray-200 mx-1"></div>
+                                            <button
                                                 onClick={() => handleAdjustStock(product.id, -1, 'STOCK_REMOVE')}
                                                 className="w-8 h-8 flex items-center justify-center rounded border border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500 transition-colors"
                                             >
@@ -193,6 +222,17 @@ export default function InventoryDashboard() {
                     </button>
                 </div>
             )}
+
+            {/* Product Modal */}
+            <AdminAddProduct
+                isOpen={isProductModalOpen}
+                onClose={() => setIsProductModalOpen(false)}
+                onSuccess={() => {
+                    setIsProductModalOpen(false);
+                    loadData();
+                }}
+                initialData={editingProduct}
+            />
         </div>
     );
 }

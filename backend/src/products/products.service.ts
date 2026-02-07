@@ -17,11 +17,13 @@ export class ProductsService {
 
     async generateDescription(promptData: any) {
         if (!this.genAI) {
-            return "AI Description unavailable: Missing API Key.";
+            return "AI Description unavailable: Missing GEMINI_API_KEY.";
         }
+
         try {
-            console.log("Generative AI Model: gemini-2.0-flash");
+            console.log("Attempting AI Generation with: gemini-2.0-flash-lite-001");
             const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-001" });
+
             const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
@@ -34,23 +36,26 @@ export class ProductsService {
             const response = await result.response;
             return response.text();
         } catch (error: any) {
-            console.error("AI Generation Failed:", error);
+            console.error("Gemini 2.0 Lite failed, attempting fallback to 1.5 Flash. Error:", error.message);
 
-            // Try to list available models to help debug
-            let availableModels = "";
             try {
-                if (process.env.GEMINI_API_KEY) {
-                    const listRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${process.env.GEMINI_API_KEY}`);
-                    const listData = await listRes.json();
-                    if (listData.models) {
-                        availableModels = listData.models.map((m: any) => m.name).join(', ');
-                    }
-                }
-            } catch (e) {
-                availableModels = "Could not list models";
-            }
+                const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-            return `AI Error: ${error.message}. Available Models: ${availableModels}`;
+                const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
+                Name: ${promptData.name}
+                Category: ${promptData.category}
+                Gold: ${promptData.goldPurity}K, ${promptData.goldWeight}g
+                Diamonds: ${promptData.diamondCarat}ct, ${promptData.diamondClarity} clarity
+                Style: Elegant, Premium, Timeless.
+                Keep it under 60 words. Emphasize craftsmanship and eternal value.`;
+
+                const result = await fallbackModel.generateContent(prompt);
+                const response = await result.response;
+                return response.text();
+            } catch (fallbackError: any) {
+                console.error("AI Generation Failed (Fallback also failed):", fallbackError);
+                return `AI Error: ${fallbackError.message}`;
+            }
         }
     }
 
