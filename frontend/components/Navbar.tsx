@@ -31,7 +31,7 @@ export default function Navbar() {
             ? 'bg-transparent py-6'
             : 'bg-brand-navy py-4 shadow-md';
 
-    const textColor = scrolled || !isHome ? 'text-brand-navy' : 'text-white';
+    const textColor = scrolled ? 'text-brand-navy' : 'text-white';
 
     // Logo should be gold on dark backgrounds (unscrolled home or mobile menu), navy otherwise
     const logoColor = scrolled ? 'text-brand-navy' : 'text-white';
