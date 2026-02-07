@@ -102,11 +102,21 @@ export class ProductsService {
     }
 
     async findOne(slugOrId: string) {
-        const product = await this.prisma.product.findFirst({
-            where: {
-                OR: [{ id: slugOrId }, { slug: slugOrId }],
-            },
-        });
+        let product;
+
+        // Check if valid MongoDB ObjectId (24 hex characters)
+        if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
+            product = await this.prisma.product.findUnique({
+                where: { id: slugOrId },
+            });
+        }
+
+        // If not valid ID or not found by ID, search by slug
+        if (!product) {
+            product = await this.prisma.product.findFirst({
+                where: { slug: slugOrId },
+            });
+        }
 
         if (!product) throw new NotFoundException('Product not found');
 
