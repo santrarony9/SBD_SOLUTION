@@ -21,8 +21,9 @@ export class ProductsService {
         }
 
         try {
-            console.log("Attempting AI Generation with: gemini-2.0-flash-lite-001");
-            const model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-001" });
+            // Primary Model: Gemini 2.5 Flash (General Availability)
+            console.log("Attempting AI Generation with: gemini-2.5-flash");
+            const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
             const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
@@ -36,10 +37,11 @@ export class ProductsService {
             const response = await result.response;
             return response.text();
         } catch (error: any) {
-            console.error("Gemini 2.0 Lite failed, attempting fallback to 1.5 Flash. Error:", error.message);
+            console.error("Gemini 2.5 Flash failed, attempting fallback to 2.0 Flash Lite. Error:", error.message);
 
             try {
-                const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+                // Fallback Model: Gemini 2.0 Flash Lite (Cost effective, fast)
+                const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
                 const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
                 Name: ${promptData.name}
