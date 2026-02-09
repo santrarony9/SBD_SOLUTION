@@ -55,8 +55,8 @@ export class OrdersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':id/label')
-    async getShipmentLabel(@Param('id') id: string) {
-        return this.ordersService.generateShipmentLabel(id);
+    @Get('shiprocket/test')
+    async testShiprocket() {
+        return this.ordersService.testShiprocketAuth();
     }
 }

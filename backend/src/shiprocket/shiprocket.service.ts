@@ -12,6 +12,15 @@ export class ShiprocketService {
 
     constructor() { }
 
+    async testAuth() {
+        try {
+            await this.login();
+            return { success: true, message: "Connection Successful" };
+        } catch (error) {
+            return { success: false, message: "Connection Failed: " + (error.message || "Unknown Error") };
+        }
+    }
+
     private async login() {
         if (this.token && this.tokenExpiry && Date.now() < this.tokenExpiry) {
             return this.token;

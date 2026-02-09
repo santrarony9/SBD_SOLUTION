@@ -16,6 +16,10 @@ export class OrdersService {
         private shiprocketService: ShiprocketService,
     ) { }
 
+    async testShiprocketAuth() {
+        return this.shiprocketService.testAuth();
+    }
+
     async createOrder(
         userId: string,
         shippingAddress: any,

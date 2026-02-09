@@ -177,7 +177,26 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
     return (
         <div className="mt-8 bg-white rounded-lg shadow border border-gray-100 overflow-hidden">
             <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex flex-wrap justify-between items-center gap-4">
-                <h3 className="font-serif text-xl text-brand-navy">Order Intelligence</h3>
+                <div className="flex items-center gap-4">
+                    <h3 className="font-serif text-xl text-brand-navy">Order Intelligence</h3>
+                    <button
+                        onClick={async () => {
+                            try {
+                                const token = localStorage.getItem('token');
+                                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/shiprocket/test`, {
+                                    headers: { 'Authorization': `Bearer ${token}` }
+                                });
+                                const data = await res.json();
+                                alert(data.message);
+                            } catch (e) {
+                                alert('Connection Test Failed');
+                            }
+                        }}
+                        className="text-[10px] font-bold uppercase tracking-widest text-brand-navy border border-brand-navy/20 px-2 py-1 rounded hover:bg-brand-navy hover:text-white transition-all"
+                    >
+                        Test Shiprocket
+                    </button>
+                </div>
 
                 {selectedOrders.length > 0 && (
                     <div className="flex items-center gap-3 animate-fadeIn">
