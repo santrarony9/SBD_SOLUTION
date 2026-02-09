@@ -131,9 +131,7 @@ export default function CheckoutPage() {
                 } else {
                     // 2b. COD Flow
                     await clearCart();
-                    router.push(`/orders/success?id=${order.id}`); // Ideal: Success Page
-                    alert('Order Placed Successfully! Order ID: ' + order.id);
-                    router.push('/shop'); // Fallback
+                    router.push(`/orders/success?id=${order.id}`); // Success Page
                 }
             }
         } catch (error) {
@@ -146,9 +144,9 @@ export default function CheckoutPage() {
 
     const simulateRazorpaySuccess = async (orderId: string) => {
         // Mocking the payment verification call
-        alert(`Razorpay Payment Simulated! \nOrder ID: ${orderId} \nPayment ID: pay_mock_${Date.now()}`);
+        // alert(`Razorpay Payment Simulated! \nOrder ID: ${orderId} \nPayment ID: pay_mock_${Date.now()}`);
         await clearCart();
-        router.push('/shop');
+        router.push(`/orders/success?id=${orderId}`);
     };
 
     return (
