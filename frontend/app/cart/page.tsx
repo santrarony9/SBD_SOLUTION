@@ -104,7 +104,7 @@ export default function CartPage() {
 
                                 {/* Total & Remove Actions */}
                                 <div className="col-span-2 text-right w-full md:w-auto flex flex-col items-end justify-between h-full">
-                                    <p className="text-lg font-serif text-brand-navy">
+                                    <p className="text-lg font-sans text-brand-navy">
                                         ₹{item.calculatedPrice ? item.calculatedPrice.toLocaleString() : 'N/A'}
                                     </p>
                                     <button
@@ -139,7 +139,7 @@ export default function CartPage() {
                                 <div className="space-y-4 mb-8 relative z-10">
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Subtotal</span>
-                                        <span className="font-mono">₹{cartTotal.toLocaleString()}</span>
+                                        <span className="font-mono font-sans">₹{cartTotal.toLocaleString()}</span>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Shipping</span>
@@ -152,7 +152,7 @@ export default function CartPage() {
 
                                     <div className="border-t border-brand-charcoal/10 pt-6 mt-6 flex justify-between items-baseline">
                                         <span className="text-sm font-bold uppercase tracking-widest text-brand-navy">Total</span>
-                                        <span className="text-3xl font-serif text-brand-navy">₹{cartTotal.toLocaleString()}</span>
+                                        <span className="text-3xl font-sans text-brand-navy">₹{cartTotal.toLocaleString()}</span>
                                     </div>
                                 </div>
 

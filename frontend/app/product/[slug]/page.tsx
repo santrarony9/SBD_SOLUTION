@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
                     {/* Price Block */}
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-serif text-brand-gold">
+                            <span className="text-3xl font-sans font-light text-brand-gold">
                                 {product.pricing?.finalPrice ? `₹${product.pricing.finalPrice.toLocaleString()}` : 'Price on Request'}
                             </span>
                             <span className="text-[9px] text-brand-navy/60 uppercase tracking-widest font-bold">Inc. taxes</span>
@@ -212,19 +212,19 @@ export default function ProductDetailPage() {
                     <div className="grid grid-cols-4 gap-2 mb-6">
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
                             <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Gold</p>
-                            <p className="text-brand-navy font-serif text-sm">{product.goldPurity}K</p>
+                            <p className="text-brand-navy font-sans text-sm">{product.goldPurity}K</p>
                         </div>
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
                             <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Clarity</p>
-                            <p className="text-brand-navy font-serif text-sm">{product.diamondClarity}</p>
+                            <p className="text-brand-navy font-sans text-sm">{product.diamondClarity}</p>
                         </div>
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
                             <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Carat</p>
-                            <p className="text-brand-navy font-serif text-sm">{product.diamondCarat}</p>
+                            <p className="text-brand-navy font-sans text-sm">{product.diamondCarat}</p>
                         </div>
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
                             <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Weight</p>
-                            <p className="text-brand-navy font-serif text-sm">{product.goldWeight}g</p>
+                            <p className="text-brand-navy font-sans text-sm">{product.goldWeight}g</p>
                         </div>
                     </div>
 

@@ -74,7 +74,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     </Link>
 
                     {/* Specs Divider */}
-                    <div className="flex justify-center items-center gap-3 text-[10px] uppercase tracking-widest text-gray-500 mb-3 opacity-60 group-hover:opacity-100 transition-opacity">
+                    <div className="flex justify-center items-center gap-3 text-[10px] uppercase tracking-widest text-gray-500 mb-3 opacity-60 group-hover:opacity-100 transition-opacity font-sans">
                         {product.goldPurity && <span>{product.goldPurity}K</span>}
                         {product.diamondCarat && (
                             <>
@@ -86,7 +86,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 </div>
 
                 <div className="mt-2 relative">
-                    <span className="text-lg font-serif font-medium text-brand-charcoal relative z-10 group-hover:text-brand-gold transition-colors">
+                    <span className="text-lg font-sans font-medium text-brand-charcoal relative z-10 group-hover:text-brand-gold transition-colors">
                         ₹{Math.round(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString('en-IN')}
                     </span>
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-brand-gold scale-0 group-hover:scale-100 transition-transform duration-500 origin-center"></div>
