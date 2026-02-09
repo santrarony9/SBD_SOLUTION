@@ -16,6 +16,7 @@ interface Product {
         finalPrice: number;
     };
     category?: string;
+    sku?: string;
 }
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
@@ -62,6 +63,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                     <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500 border-b border-gray-200">
                         <tr>
                             <th className="px-6 py-5 whitespace-nowrap">Product</th>
+                            <th className="px-6 py-5 whitespace-nowrap">SKU / ID</th>
                             <th className="px-6 py-5 whitespace-nowrap">Price</th>
                             <th className="px-6 py-5 whitespace-nowrap">Category</th>
                             <th className="px-6 py-5 whitespace-nowrap">Specs</th>
@@ -82,6 +84,9 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                         </div>
                                         <span className="font-medium text-brand-navy line-clamp-2 max-w-[200px]">{product.name}</span>
                                     </div>
+                                </td>
+                                <td className="px-6 py-4 font-mono text-xs text-gray-500 whitespace-nowrap">
+                                    {product.sku || '-'}
                                 </td>
                                 <td className="px-6 py-4 font-serif text-brand-navy whitespace-nowrap">
                                     ₹{product.pricing?.finalPrice?.toLocaleString() ?? 'N/A'}

@@ -16,6 +16,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
     const [formData, setFormData] = useState({
         name: '',
         category: 'Rings',
+        sku: '', // Internal use
         price: '', // Not used in backend but kept for UI if needed or removed
         images: '',
         goldPurity: '18',
@@ -37,6 +38,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             setFormData({
                 name: initialData.name || '',
                 category: initialData.category || 'Rings',
+                sku: initialData.sku || '', // Hydrate SKU
                 price: '',
                 images: '',
                 goldPurity: initialData.goldPurity?.toString() || '18',
@@ -53,6 +55,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             // Reset if opening in Add mode
             setFormData({
                 name: '', category: 'Rings', price: '', images: '',
+                sku: '', // Reset SKU
                 goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', diamondColor: 'EF', // Reset
                 description: '',
                 videoUrl: '',
@@ -144,6 +147,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 name: formData.name,
                 slug: initialData ? initialData.slug : (formData.name.toLowerCase().replace(/ /g, '-') + '-' + Date.now()),
                 category: formData.category,
+                sku: formData.sku, // Pass SKU to backend
                 description: formData.description,
                 goldPurity: parseInt(formData.goldPurity) || 0,
                 goldWeight: parseFloat(formData.goldWeight) || 0,
@@ -220,6 +224,19 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     </select>
                                     <div className="absolute right-3 top-3.5 pointer-events-none text-gray-400">▼</div>
                                 </div>
+                            </div>
+
+                            {/* Internal ID / SKU */}
+                            <div className="space-y-1 md:col-span-2">
+                                <label className="block text-xs uppercase tracking-widest text-gray-500 font-bold">
+                                    Product ID / SKU <span className="text-gray-300 font-normal normal-case">(Internal Use Only)</span>
+                                </label>
+                                <input
+                                    className="w-full border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white font-mono placeholder:text-gray-300"
+                                    value={formData.sku || ''}
+                                    placeholder="e.g. RING-SAP-001 (Auto-generated if left blank)"
+                                    onChange={e => setFormData({ ...formData, sku: e.target.value })}
+                                />
                             </div>
                         </div>
 
