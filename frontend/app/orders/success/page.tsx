@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { PiCheckCircle, PiShoppingBag } from 'react-icons/pi';
 
-export default function OrderSuccessPage() {
+function OrderSuccessContent() {
     const searchParams = useSearchParams();
     const orderId = searchParams.get('id');
     const [showConfetti, setShowConfetti] = useState(false);
@@ -79,4 +79,10 @@ export default function OrderSuccessPage() {
     );
 }
 
-// Add keyframes for confetti in global.css if needed, or simple inline style
+export default function OrderSuccessPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center text-brand-navy">Loading celebration...</div>}>
+            <OrderSuccessContent />
+        </Suspense>
+    );
+}
