@@ -364,10 +364,11 @@ export default function CheckoutPage() {
                                     <span>Subtotal</span>
                                     <span className="font-mono">₹{cartTotal.toLocaleString()}</span>
                                 </div>
-                                <div className="flex justify-between items-center text-green-600 text-sm font-medium">
-                                    <span>Discount</span>
-                                    <span className="font-mono">- ₹{discount.toLocaleString()}</span>
-                                </div>
+                                {discount > 0 && (
+                                    <div className="flex justify-between items-center text-green-600 text-sm font-medium">
+                                        <span>Discount</span>
+                                        <span className="font-mono">- ₹{discount.toLocaleString()}</span>
+                                    </div>
                                 )}
 
                                 <div className="border-t border-dashed border-gray-200 pt-4 mt-4 flex justify-between items-baseline text-brand-navy">
