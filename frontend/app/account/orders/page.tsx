@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface Order {
     id: string;
@@ -15,6 +16,10 @@ interface Order {
         name: string;
         quantity: number;
         price: number;
+        product?: {
+            images: string[];
+            slug: string;
+        };
     }[];
 }
 
@@ -25,7 +30,6 @@ export default function OrderHistoryPage() {
     useEffect(() => {
         const loadOrders = async () => {
             try {
-                // Ensure auth token is attached in api.ts
                 const data = await fetchAPI('/orders');
                 if (data) {
                     setOrders(data);
@@ -39,80 +43,109 @@ export default function OrderHistoryPage() {
         loadOrders();
     }, []);
 
-    if (isLoading) return <div className="p-8 text-center text-gray-500">Loading your legacy...</div>;
+    if (isLoading) return (
+        <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
+            <div className="w-12 h-12 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
+            <p className="text-[10px] uppercase tracking-widest text-brand-navy">Retrieving your collection...</p>
+        </div>
+    );
 
     if (orders.length === 0) {
         return (
-            <div className="bg-white p-12 rounded-lg shadow-sm text-center border border-gray-100">
-                <div className="text-4xl mb-4">💎</div>
-                <h3 className="text-xl font-serif text-brand-navy mb-2">No Past Orders</h3>
-                <p className="text-gray-500 mb-6">Your collection is waiting to be started.</p>
-                <Link href="/shop" className="inline-block px-8 py-3 bg-brand-navy text-white text-sm font-bold uppercase tracking-widest hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300">
-                    Discover Issues
+            <div className="flex flex-col items-center justify-center min-h-[400px] text-center border border-brand-charcoal/5 bg-white p-12">
+                <div className="w-20 h-20 bg-brand-navy/5 rounded-full flex items-center justify-center mb-6">
+                    <span className="text-4xl">💎</span>
+                </div>
+                <h3 className="text-2xl font-serif text-brand-navy mb-2">No Past Orders</h3>
+                <p className="text-gray-500 mb-8 max-w-md font-light">Your legacy collection is waiting to be started. Explore our finest pieces.</p>
+                <Link href="/shop" className="px-8 py-4 bg-brand-navy text-white text-xs font-bold uppercase tracking-[0.2em] hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 shadow-lg hover:shadow-brand-gold/20">
+                    Explore Collection
                 </Link>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            <h2 className="text-xl font-serif text-brand-navy mb-4">Order History</h2>
+        <div className="space-y-8">
+            <div className="flex justify-between items-end border-b border-brand-charcoal/10 pb-4">
+                <h2 className="text-3xl font-serif text-brand-navy">Order History</h2>
+                <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold">{orders.length} Orders</p>
+            </div>
 
-            {orders.map((order) => (
-                <div key={order.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:border-brand-gold/30 transition-all duration-300">
-                    {/* Header */}
-                    <div className="bg-gray-50 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-gray-100">
-                        <div className="space-y-1">
-                            <p className="text-xs text-gray-500 uppercase tracking-widest">Order Placed</p>
-                            <p className="text-sm font-medium text-brand-navy">{new Date(order.createdAt).toLocaleDateString()}</p>
-                        </div>
-                        <div className="space-y-1 mt-2 sm:mt-0">
-                            <p className="text-xs text-gray-500 uppercase tracking-widest">Total Amount</p>
-                            <p className="text-sm font-bold text-brand-navy">₹{order.totalAmount.toLocaleString()}</p>
-                        </div>
-                        <div className="space-y-1 mt-2 sm:mt-0">
-                            <p className="text-xs text-gray-500 uppercase tracking-widest">Order #</p>
-                            <p className="text-sm font-mono text-gray-600">{order.id.slice(-8).toUpperCase()}</p>
-                        </div>
-                    </div>
+            <div className="grid gap-8">
+                {orders.map((order) => (
+                    <div key={order.id} className="group bg-white border border-brand-charcoal/5 hover:border-brand-gold/30 hover:shadow-xl hover:shadow-brand-gold/5 transition-all duration-500 overflow-hidden relative">
+                        {/* Decorative BG */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-brand-gold/5 rounded-full -mr-32 -mt-32 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
 
-                    {/* Items */}
-                    <div className="p-6">
-                        <div className="space-y-4">
-                            {order.items.map((item) => (
-                                <div key={item.id} className="flex justify-between items-center">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="w-12 h-12 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">
-                                            Img
-                                        </div>
-                                        <div>
-                                            <p className="font-serif text-brand-navy">{item.name}</p>
-                                            <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
-                                        </div>
-                                    </div>
-                                    <p className="text-sm font-medium text-gray-900">₹{item.price.toLocaleString()}</p>
+                        {/* Header */}
+                        <div className="bg-brand-cream/30 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-brand-charcoal/5 relative z-10">
+                            <div className="flex flex-col sm:flex-row gap-6 sm:gap-12">
+                                <div className="space-y-1">
+                                    <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Placed On</p>
+                                    <p className="text-sm font-sans text-brand-navy">{new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                                 </div>
-                            ))}
+                                <div className="space-y-1">
+                                    <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold">Order ID</p>
+                                    <p className="text-sm font-mono text-brand-navy tracking-wide">#{order.id.slice(-8).toUpperCase()}</p>
+                                </div>
+                            </div>
+                            <div className="mt-4 sm:mt-0 flex flex-col items-end">
+                                <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Amount</p>
+                                <p className="text-xl font-sans font-light text-brand-navy">₹{order.totalAmount.toLocaleString()}</p>
+                            </div>
                         </div>
 
-                        <div className="mt-6 pt-4 border-t border-gray-100 flex justify-between items-center">
-                            <div className="flex space-x-2">
-                                <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full ${order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                                    }`}>
-                                    {order.status}
-                                </span>
-                                <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-full ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                                    }`}>
-                                    {order.paymentStatus}
-                                </span>
+                        {/* Items */}
+                        <div className="p-6 relative z-10">
+                            <div className="space-y-6">
+                                {order.items.map((item) => (
+                                    <div key={item.id} className="flex gap-6 items-center group/item hover:bg-brand-cream/20 p-2 rounded-lg transition-colors -mx-2">
+                                        <div className="w-16 h-20 bg-brand-cream relative overflow-hidden flex-shrink-0 border border-brand-charcoal/5">
+                                            {item.product?.images?.[0] ? (
+                                                <Image
+                                                    src={item.product.images[0]}
+                                                    alt={item.name}
+                                                    fill
+                                                    className="object-cover transition-transform duration-700 group-hover/item:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-[8px] text-gray-300 uppercase">img</div>
+                                            )}
+                                        </div>
+                                        <div className="flex-grow">
+                                            <p className="font-serif text-lg text-brand-navy mb-1 group-hover/item:text-brand-gold transition-colors">{item.name}</p>
+                                            <div className="flex items-center gap-4 text-xs text-gray-400">
+                                                <span className="uppercase tracking-wider font-bold text-[9px]">Qty: {item.quantity}</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-brand-navy font-sans text-right">₹{item.price.toLocaleString()}</p>
+                                    </div>
+                                ))}
                             </div>
-                            <button className="text-brand-navy text-sm font-bold hover:text-brand-gold transition-colors">
-                                View Invoice
-                            </button>
+
+                            {/* Footer / Actions */}
+                            <div className="mt-8 pt-6 border-t border-brand-charcoal/5 flex flex-wrap justify-between items-center gap-4">
+                                <div className="flex gap-3">
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${order.status === 'DELIVERED' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-brand-navy/5 text-brand-navy border border-brand-navy/10'
+                                        }`}>
+                                        <span className={`w-1.5 h-1.5 rounded-full ${order.status === 'DELIVERED' ? 'bg-green-500' : 'bg-brand-navy'}`}></span>
+                                        {order.status.replace('_', ' ')}
+                                    </span>
+                                    <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[9px] font-bold uppercase tracking-widest rounded-sm ${order.paymentStatus === 'PAID' ? 'bg-brand-gold/10 text-brand-navy border border-brand-gold/20' : 'bg-yellow-50 text-yellow-700 border border-yellow-200'
+                                        }`}>
+                                        {order.paymentStatus}
+                                    </span>
+                                </div>
+
+                                <button className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all">
+                                    Download Invoice
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
         </div>
     );
 }
