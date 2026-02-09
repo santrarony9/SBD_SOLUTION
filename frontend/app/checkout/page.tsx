@@ -364,13 +364,18 @@ export default function CheckoutPage() {
                                     <span>Subtotal</span>
                                     <span className="font-mono">₹{cartTotal.toLocaleString()}</span>
                                 </div>
-                                {discount > 0 && (
-                                    <div className="flex justify-between items-center text-green-600 text-sm font-medium">
-                                        <span>Discount</span>
-                                        <span className="font-mono">- ₹{discount.toLocaleString()}</span>
-                                    </div>
+                                <div className="flex justify-between items-center text-green-600 text-sm font-medium">
+                                    <span>Discount</span>
+                                    <span className="font-mono">- ₹{discount.toLocaleString()}</span>
+                                </div>
                                 )}
-                                <span>₹{(cartTotal - discount).toLocaleString()}</span>
+
+                                <div className="border-t border-dashed border-gray-200 pt-4 mt-4 flex justify-between items-baseline text-brand-navy">
+                                    <span className="text-sm font-bold uppercase tracking-widest">Total</span>
+                                    <span className="text-3xl font-sans">
+                                        ₹{((cartTotal - (discount || 0)) * 1.03).toLocaleString()}
+                                    </span>
+                                </div>
                             </div>
                         </div>
 
