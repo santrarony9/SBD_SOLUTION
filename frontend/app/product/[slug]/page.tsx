@@ -35,6 +35,7 @@ import { useParams } from 'next/navigation';
 export default function ProductDetailPage() {
     const params = useParams();
     const slug = params?.slug as string;
+    const { addToCart } = useCart();
 
     // State
     const [product, setProduct] = useState<Product | null>(null);
@@ -255,7 +256,9 @@ export default function ProductDetailPage() {
 
                     {/* Actions - Sticky if needed within container */}
                     <div className="space-y-3 mt-auto pt-4 border-t border-gray-100">
-                        <button className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                        <button
+                            onClick={() => product && addToCart(product.id, 1)}
+                            className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
                             <span className="relative z-10">Add to Cart</span>
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                         </button>
