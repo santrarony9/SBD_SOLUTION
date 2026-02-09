@@ -43,6 +43,23 @@ export default function ProductDetailPage() {
     const [showBreakup, setShowBreakup] = useState(false);
     const [activeMedia, setActiveMedia] = useState<{ type: 'image' | 'video', src: string | undefined }>({ type: 'image', src: undefined });
 
+    // PDP Enhancements State
+    const [pincode, setPincode] = useState('');
+    const [isCheckingPincode, setIsCheckingPincode] = useState(false);
+    const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+    const [showCertificate, setShowCertificate] = useState(false);
+
+    const checkDelivery = () => {
+        setIsCheckingPincode(true);
+        // Simulate API call
+        setTimeout(() => {
+            const date = new Date();
+            date.setDate(date.getDate() + 4); // 4 days from now
+            setDeliveryDate(date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }));
+            setIsCheckingPincode(false);
+        }, 1500);
+    };
+
     useEffect(() => {
         async function loadProduct() {
             if (!slug) return;
@@ -193,18 +210,18 @@ export default function ProductDetailPage() {
                             <span className="text-[9px] text-brand-navy/60 uppercase tracking-widest font-bold">Inc. taxes</span>
                         </div>
 
-                        {/* Trust Badges - Compact */}
+                        {/* Trust Badges - Clickable for Certificate */}
                         <div className="flex gap-2">
                             {product.certificatePdf && (
-                                <a href={product.certificatePdf} target="_blank" className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
+                                <button onClick={() => setShowCertificate(true)} className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                                     IGI
-                                </a>
+                                </button>
                             )}
-                            <div className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy">
+                            <button onClick={() => setShowCertificate(true)} className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                                 BIS
-                            </div>
+                            </button>
                         </div>
                     </div>
 
@@ -299,13 +316,95 @@ export default function ProductDetailPage() {
                             <span>100% Certified</span>
                         </div>
                         <div className="flex flex-col items-center gap-2">
-                            <span className="text-xl">↺</span>
-                            <span>Lifetime Exchange</span>
+                            <span className="text-xl">↩️</span>
+                            <span>15 Day Returns</span>
                         </div>
                     </div>
 
+                    {/* Delivery Estimator */}
+                    <div className="mt-8 bg-brand-cream/20 p-5 rounded-sm border border-brand-gold/10">
+                        <p className="text-[10px] uppercase tracking-widest text-brand-navy font-bold mb-3 flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-brand-gold">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-2.25 4.5v3.375m-9-3.375v3.375m9-3.375v3.375m-9-3.375v3.375m0-13.5v3.375m9-3.375v3.375M9 7.5h6" />
+                            </svg>
+                            Delivery Estimator
+                        </p>
+                        <div className="flex gap-2">
+                            <input
+                                type="text"
+                                placeholder="Enter Pincode"
+                                maxLength={6}
+                                className="w-full bg-white border border-gray-200 px-3 py-2 text-xs focus:border-brand-gold outline-none tracking-widest font-mono text-brand-navy"
+                                value={pincode}
+                                onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                            />
+                            <button
+                                onClick={checkDelivery}
+                                disabled={pincode.length !== 6 || isCheckingPincode}
+                                className="px-4 bg-brand-navy text-white text-[10px] uppercase font-bold tracking-widest hover:bg-gold-gradient hover:text-brand-navy transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isCheckingPincode ? 'Checking...' : 'Check'}
+                            </button>
+                        </div>
+                        {deliveryDate && (
+                            <div className="mt-3 text-xs text-brand-navy flex items-start gap-2 animate-fade-in-up">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-green-600 shrink-0 mt-0.5">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                </svg>
+                                <span>
+                                    Order within <span className="font-bold text-red-400">4 hrs 12 mins</span> to get it by <span className="font-bold border-b border-brand-gold">{deliveryDate}</span>.
+                                </span>
+                            </div>
+                        )}
+                    </div>
                 </div>
+
             </div>
+
+            {/* Certificate Modal */}
+            {showCertificate && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-sm relative shadow-2xl">
+                        <button
+                            onClick={() => setShowCertificate(false)}
+                            className="absolute top-4 right-4 z-10 bg-white/50 backdrop-blur rounded-full p-2 hover:bg-white transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-brand-navy">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                        <div className="p-8 text-center">
+                            <h3 className="text-2xl font-serif text-brand-navy mb-2">Certificate of Authenticity</h3>
+                            <p className="text-xs text-gray-400 uppercase tracking-widest mb-6">Guaranteed by IGI / GIA</p>
+
+                            <div className="relative aspect-[1/1.4] w-full bg-gray-50 border-8 border-double border-brand-gold/20 mx-auto shadow-inner flex items-center justify-center overflow-hidden">
+                                {product.certificatePdf ? (
+                                    <iframe src={product.certificatePdf} className="w-full h-full" title="Certificate"></iframe>
+                                ) : (
+                                    <div className="text-center p-10 opacity-50">
+                                        <div className="w-24 h-24 border-4 border-brand-navy/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <span className="font-serif text-4xl text-brand-navy/20">IGI</span>
+                                        </div>
+                                        <p className="font-serif text-brand-navy text-lg">Official Certificate Preview</p>
+                                        <p className="text-xs text-gray-400 mt-2">A digital copy of the authentic certificate will be emailed to you upon purchase.</p>
+                                    </div>
+                                )}
+                                {/* Watermark overlay */}
+                                <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-5 -rotate-45">
+                                    <span className="text-9xl font-serif font-bold text-black uppercase">Specimen</span>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={() => setShowCertificate(false)}
+                                className="mt-8 px-8 py-3 bg-brand-navy text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-gold-gradient hover:text-brand-navy transition-all"
+                            >
+                                Close Viewer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Reviews Section - Kept Separate */}
             <div className="max-w-7xl mx-auto px-6 mt-24">
@@ -314,4 +413,3 @@ export default function ProductDetailPage() {
         </div>
     );
 }
-
