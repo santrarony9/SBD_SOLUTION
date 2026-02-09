@@ -101,4 +101,21 @@ export class ShiprocketService {
             return null;
         }
     }
+
+    async cancelOrder(shiprocketOrderId: string) {
+        try {
+            const token = await this.login();
+            const response = await axios.post('https://apiv2.shiprocket.in/v1/external/orders/cancel', {
+                ids: [shiprocketOrderId]
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            this.logger.error('Failed to cancel order in Shiprocket', error.response?.data || error.message);
+            throw error; // Throw to let OrdersService handle the error
+        }
+    }
 }

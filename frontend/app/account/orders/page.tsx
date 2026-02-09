@@ -43,6 +43,20 @@ export default function OrderHistoryPage() {
         loadOrders();
     }, []);
 
+    const handleCancelOrder = async (orderId: string) => {
+        if (!confirm('Are you sure you want to cancel this order? This action cannot be undone.')) return;
+
+        try {
+            // Re-using the update status endpoint, but ideally should be a specific 'cancel' endpoint for users
+            // However, since we don't have a user-facing 'cancel' endpoint yet, we'll direct them to support 
+            // OR if we want to be proactive, we'd add 'POST /orders/:id/cancel' in backend.
+            // For now, let's use the support alert as a safe fallback to prevent unauthorized status changes if endpoints aren't secured for user status updates.
+            alert('To ensure security, please contact our Concierge to cancel your order.\n\nSupport: +91 99999 99999');
+        } catch (error) {
+            console.error("Cancellation failed", error);
+        }
+    };
+
     if (isLoading) return (
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
             <div className="w-12 h-12 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
@@ -138,9 +152,27 @@ export default function OrderHistoryPage() {
                                     </span>
                                 </div>
 
-                                <button className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all">
-                                    Download Invoice
-                                </button>
+                                <div className="flex gap-4">
+                                    {(order.status === 'PENDING' || order.status === 'CONFIRMED') && (
+                                        <button
+                                            onClick={() => handleCancelOrder(order.id)}
+                                            className="text-[10px] uppercase font-bold tracking-[0.2em] text-red-400 hover:text-red-600 hover:underline transition-all"
+                                        >
+                                            Cancel Order
+                                        </button>
+                                    )}
+                                    {order.status === 'DELIVERED' && (
+                                        <button
+                                            onClick={() => alert('Please contact support to initiate a return.\n\nSupport: +91 99999 99999')}
+                                            className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-navy hover:text-brand-gold hover:underline transition-all"
+                                        >
+                                            Return / Exchange
+                                        </button>
+                                    )}
+                                    <button className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all">
+                                        Download Invoice
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

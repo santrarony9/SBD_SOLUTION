@@ -169,9 +169,28 @@ export class OrdersService {
     async updateOrderStatus(id: string, status: string) {
         let updateData: any = { status: status as any };
 
+        // 1. Handle Cancellation
         if (status === 'CANCELLED') {
             updateData.cancelledAt = new Date();
             updateData.creditNoteNumber = `SBD/CN/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
+
+            // Sync with Shiprocket
+            const order = await (this.prisma as any).order.findUnique({ where: { id } });
+            if (order && order.shiprocketOrderId) {
+                try {
+                    await this.shiprocketService.cancelOrder(order.shiprocketOrderId);
+                    console.log(`Shiprocket Order ${order.shiprocketOrderId} cancelled successfully.`);
+                } catch (e) {
+                    console.error("Failed to sync cancellation with Shiprocket:", e.message);
+                    // We log but don't block the local cancellation to ensure data consistency
+                }
+            }
+        }
+
+        // 2. Handle Return Initiation
+        if (status === 'RETURN_INITIATED') {
+            // For MVP: We just mark it locally. 
+            // Future: Call Shiprocket Return API here.
         }
 
         const order = await (this.prisma as any).order.update({
