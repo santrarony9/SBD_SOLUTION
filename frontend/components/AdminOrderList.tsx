@@ -163,25 +163,6 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
         }
     };
 
-    const handleDownloadLabel = async (orderId: string) => {
-        try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/label/${orderId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Label-${orderId}.pdf`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-        } catch (error) {
-            console.error("Label download failed", error);
-        }
-    };
-
     if (isLoading) return <div className="text-gray-500 text-sm">Loading orders...</div>;
 
     const getStatusColor = (status: string) => {
