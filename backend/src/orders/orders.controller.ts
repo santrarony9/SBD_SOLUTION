@@ -53,4 +53,10 @@ export class OrdersController {
     async pushToShiprocket(@Param('id') id: string) {
         return this.ordersService.pushToShiprocket(id);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':id/label')
+    async getShipmentLabel(@Param('id') id: string) {
+        return this.ordersService.generateShipmentLabel(id);
+    }
 }

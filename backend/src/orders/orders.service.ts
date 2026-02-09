@@ -98,6 +98,11 @@ export class OrdersService {
         if (!order) throw new Error("Order not found");
 
         try {
+            // Check if already pushed
+            if (order.shiprocketOrderId) {
+                return { success: true, message: "Order already pushed", shiprocketOrderId: order.shiprocketOrderId };
+            }
+
             const shiprocketOrder = await this.shiprocketService.createOrder({
                 ...order,
                 items: order.items.map((item) => ({
@@ -122,6 +127,20 @@ export class OrdersService {
             console.error("Shiprocket Service Error:", e.message);
             throw new BadRequestException("Failed to push to Shiprocket: " + e.message);
         }
+    }
+
+    async generateShipmentLabel(orderId: string) {
+        const order = await (this.prisma as any).order.findUnique({ where: { id: orderId } });
+        if (!order || !order.shipmentId) {
+            throw new BadRequestException("Order not found or not pushed to Shiprocket yet.");
+        }
+
+        const labelData = await this.shiprocketService.generateLabel(order.shipmentId);
+        if (!labelData || !labelData.label_url) {
+            throw new BadRequestException("Failed to generate label from Shiprocket.");
+        }
+
+        return { labelUrl: labelData.label_url };
     }
 
 

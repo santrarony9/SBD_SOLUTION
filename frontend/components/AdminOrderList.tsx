@@ -9,7 +9,9 @@ interface Order {
     totalAmount: number;
     status: string;
     createdAt: string;
-    shiprocketOrderId?: string; // Added field
+    shiprocketOrderId?: string;
+    shipmentId?: string;
+    awbCode?: string;
     user: {
         name: string;
         email: string;
@@ -87,6 +89,25 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             alert("Failed to push to Shiprocket. Check console/logs.");
         } finally {
             setPushingId(null);
+        }
+    };
+
+    const handleDownloadLabel = async (orderId: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/label`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+
+            if (data.labelUrl) {
+                window.open(data.labelUrl, '_blank');
+            } else {
+                alert('Label not available yet.');
+            }
+        } catch (error) {
+            console.error("Failed to get label", error);
+            alert("Failed to fetch label.");
         }
     };
 
@@ -227,9 +248,18 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                 </td>
                                 <td className="px-6 py-4">
                                     {order.shiprocketOrderId ? (
-                                        <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
-                                            <PiCheckCircle className="w-4 h-4" />
-                                            <span className="text-[10px] font-bold uppercase tracking-widest">Synced</span>
+                                        <div className="flex flex-col gap-1 items-start">
+                                            <div className="flex items-center gap-1.5 text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
+                                                <PiCheckCircle className="w-4 h-4" />
+                                                <span className="text-[10px] font-bold uppercase tracking-widest">Synced</span>
+                                            </div>
+                                            <button
+                                                onClick={() => handleDownloadLabel(order.id)}
+                                                className="text-[9px] font-bold uppercase tracking-widest text-brand-gold hover:underline pl-1"
+                                            >
+                                                Get Label
+                                            </button>
+                                            {order.awbCode && <span className="text-[9px] font-mono text-gray-400 pl-1">AWB: {order.awbCode}</span>}
                                         </div>
                                     ) : (
                                         <button
