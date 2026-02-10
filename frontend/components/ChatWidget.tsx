@@ -42,11 +42,13 @@ export default function ChatWidget() {
         content: m.content
       }));
 
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(user?.token && { 'Authorization': `Bearer ${user.token}` })
+          ...(token && { 'Authorization': `Bearer ${token}` })
         },
         body: JSON.stringify({
           message: userMessage,
