@@ -57,11 +57,19 @@ export class ChatService {
             `;
 
             // 3. Chat Session
+            // Gemini requires history to start with 'user'. 
+            // We filter out any initial 'model' messages (like the welcome greeting).
+            let cleanHistory = history.map(h => ({
+                role: h.role === 'user' ? 'user' : 'model',
+                parts: [{ text: h.content }],
+            }));
+
+            if (cleanHistory.length > 0 && cleanHistory[0].role === 'model') {
+                cleanHistory = cleanHistory.slice(1);
+            }
+
             const chat = model.startChat({
-                history: history.map(h => ({
-                    role: h.role === 'user' ? 'user' : 'model',
-                    parts: [{ text: h.content }],
-                })),
+                history: cleanHistory,
                 generationConfig: {
                     maxOutputTokens: 500,
                 },
