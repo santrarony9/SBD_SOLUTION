@@ -96,7 +96,7 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-2xl hover:scale-105 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 flex items-center justify-center group border border-brand-gold/20"
+        className="fixed bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-2xl hover:scale-105 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 flex items-center justify-center group border border-brand-gold/20"
       >
         <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-brand-navy/10 animate-pulse-slow"></div>
         <PiChatCircleText className="w-7 h-7" />
@@ -107,7 +107,7 @@ export default function ChatWidget() {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Chat Window */}
       <div className="w-[350px] sm:w-[380px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-brand-charcoal/10 flex flex-col h-[500px]">
         {/* Header */}

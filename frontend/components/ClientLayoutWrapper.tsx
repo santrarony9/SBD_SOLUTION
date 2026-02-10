@@ -27,8 +27,7 @@ export default function ClientLayoutWrapper({
             <main className="min-h-screen">
                 {children}
             </main>
-            {/* <ChatWidget /> */}
-            {/* <div id="n8n-chat"></div> */}
+            <ChatWidget />
             <Footer />
         </>
     );
