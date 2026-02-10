@@ -18,10 +18,12 @@ export class ChatService {
     }
 
     async generateResponse(message: string, userId?: string, history: any[] = []) {
-        try {
-            if (!this.model) {
-                return { text: "I'm currently offline. Please try again later." };
-            }
+        if (!this.genAI) {
+            return { text: "System Error: GEMINI_API_KEY is missing in backend environment variables." };
+        }
+
+        const runChat = async (modelName: string) => {
+            const model = this.genAI.getGenerativeModel({ model: modelName });
 
             // 1. Gather Context
             const [userContext, productContext, orderContext] = await Promise.all([
