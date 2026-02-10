@@ -6,7 +6,6 @@ import { PrismaService } from '../prisma/prisma.service';
 export class ChatService {
     private readonly logger = new Logger(ChatService.name);
     private genAI: GoogleGenerativeAI;
-    private model: any;
 
     constructor(private prisma: PrismaService) {
         const apiKey = process.env.GEMINI_API_KEY;
@@ -58,7 +57,7 @@ export class ChatService {
             `;
 
             // 3. Chat Session
-            const chat = this.model.startChat({
+            const chat = model.startChat({
                 history: history.map(h => ({
                     role: h.role === 'user' ? 'user' : 'model',
                     parts: [{ text: h.content }],
@@ -73,12 +72,23 @@ export class ChatService {
 
             const result = await chat.sendMessage(fullPrompt);
             const response = await result.response;
-            const text = response.text();
+            return response.text();
+        };
 
+        try {
+            // Try Primary Model (Gemini 2.5 Flash)
+            const text = await runChat("gemini-2.5-flash");
             return { text };
         } catch (error) {
-            this.logger.error('Gemini Chat Error', error);
-            return { text: `System Error: ${error.message || error}` };
+            this.logger.warn(`Gemini 2.5 failed, switching to fallback. Error: ${error.message}`);
+            try {
+                // Try Fallback Model (Gemini 2.0 Flash Lite)
+                const text = await runChat("gemini-2.0-flash-lite");
+                return { text };
+            } catch (fallbackError) {
+                this.logger.error('Gemini Chat Error (Primary & Fallback)', fallbackError);
+                return { text: `System Error: ${fallbackError.message || fallbackError}` };
+            }
         }
     }
 
@@ -89,7 +99,6 @@ export class ChatService {
     }
 
     private async getProductContext(query: string): Promise<string> {
-        // Extract keywords (simplistic approach)
         const keywords = query.split(' ').filter(w => w.length > 3);
         if (keywords.length === 0) return "No specific products found.";
 
