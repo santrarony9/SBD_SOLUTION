@@ -12,4 +12,11 @@ export class OffersService {
             orderBy: { createdAt: 'desc' },
         });
     }
+    async create(data: any): Promise<Offer> {
+        return this.prisma.offer.create({ data });
+    }
+
+    async delete(id: string): Promise<Offer> {
+        return this.prisma.offer.delete({ where: { id } });
+    }
 }

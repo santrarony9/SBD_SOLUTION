@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { OffersService } from './offers.service';
 import { Offer } from '@prisma/client';
 
@@ -9,5 +9,15 @@ export class OffersController {
     @Get()
     async getOffers(): Promise<Offer[]> {
         return this.offersService.findAll();
+    }
+
+    @Post()
+    async createOffer(@Body() data: any): Promise<Offer> {
+        return this.offersService.create(data);
+    }
+
+    @Delete(':id')
+    async deleteOffer(@Param('id') id: string): Promise<Offer> {
+        return this.offersService.delete(id);
     }
 }

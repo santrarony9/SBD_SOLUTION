@@ -29,9 +29,18 @@ async function getOffers() {
 
 async function getBanners() {
   try {
-    return await fetchAPI('/banner');
+    return await fetchAPI('/banners');
   } catch (e) {
     return [];
+  }
+}
+
+async function getHeroText() {
+  try {
+    const setting = await fetchAPI('/store/settings/homepage_hero_text');
+    return setting?.value ? JSON.parse(setting.value) : null;
+  } catch (e) {
+    return null;
   }
 }
 
@@ -57,14 +66,18 @@ export default async function Home() {
   const banners = await getBanners();
   const featuredReviews = await getFeaturedReviews();
   const spotlightSetting = await getSpotlight();
+  const heroText = await getHeroText();
 
   const featuredProducts = allProducts.slice(0, 4);
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
-  const activeBanner = banners.find((b: any) => b.isActive) || {
+  const activeBanner = banners.find((b: any) => b.isActive) || banners[0] || {
     imageUrl: '/hero-jewellery.png',
     title: 'Est. 1995',
     link: '/shop'
   };
+
+  const heroTitle = heroText?.title || "Elegance is Eternal";
+  const heroSubtitle = heroText?.subtitle || "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
 
   return (
     <div className="bg-brand-cream font-sans overflow-x-hidden">
@@ -92,12 +105,11 @@ export default async function Home() {
             {activeBanner.title}
           </h2>
 
-          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-[0.9] tracking-tight animate-fade-in-up delay-300 drop-shadow-lg">
-            Elegance is <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-light italic pr-2">Eternal</span>
+          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-[0.9] tracking-tight animate-fade-in-up delay-300 drop-shadow-lg" dangerouslySetInnerHTML={{ __html: heroTitle.replace('Eternal', '<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-light italic pr-2">Eternal</span>') }}>
           </h1>
 
           <p className="text-gray-200 max-w-2xl text-lg md:text-xl mb-12 font-light tracking-wide leading-relaxed animate-fade-in-up delay-500 drop-shadow-md">
-            Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.
+            {heroSubtitle}
           </p>
 
           <div className="flex flex-col md:flex-row gap-8 animate-fade-in-up delay-700">

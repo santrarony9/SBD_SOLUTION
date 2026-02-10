@@ -10,6 +10,7 @@ import AdminProductList from '@/components/AdminProductList';
 import AdminOrderList from '@/components/AdminOrderList';
 import AdminAddProduct from '@/components/AdminAddProduct';
 import AdminDashboardOverview from '@/components/AdminDashboardOverview';
+import AdminCMS from '@/components/AdminCMS';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -113,6 +114,12 @@ export default function AdminDashboard() {
                                 label="Pulse Overview"
                             />
                             <SidebarLink
+                                active={activeTab === 'cms'}
+                                onClick={() => setActiveTab('cms')}
+                                icon={<PiLayout className="w-5 h-5" />}
+                                label="Content Manager"
+                            />
+                            <SidebarLink
                                 active={activeTab === 'masters'}
                                 onClick={() => setActiveTab('masters')}
                                 icon={<PiGear className="w-5 h-5" />}
@@ -170,13 +177,15 @@ export default function AdminDashboard() {
                             <span className="text-[10px] text-brand-gold tracking-[0.3em] uppercase font-bold mb-2 block">Control Center</span>
                             <h1 className="text-5xl font-serif text-brand-navy">
                                 {activeTab === 'overview' ? 'Business Pulse' :
-                                    activeTab === 'masters' ? 'Master Config' :
-                                        activeTab === 'products' ? 'Collection' : 'Order Console'}
+                                    activeTab === 'cms' ? 'Content Manager' :
+                                        activeTab === 'masters' ? 'Master Config' :
+                                            activeTab === 'products' ? 'Collection' : 'Order Console'}
                             </h1>
                         </div>
                     </header>
 
                     {activeTab === 'overview' && <AdminDashboardOverview />}
+                    {activeTab === 'cms' && <AdminCMS />}
 
                     {activeTab === 'masters' && (
                         <div className="space-y-12 max-w-6xl animate-fade-in relative">
