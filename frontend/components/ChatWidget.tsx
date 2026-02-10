@@ -57,13 +57,16 @@ export default function ChatWidget() {
         })
       });
 
-      if (!response.ok) throw new Error('Failed to connect');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server Error: ${response.status}`);
+      }
 
       const data = await response.json();
       setMessages(prev => [...prev, { role: 'model', content: data.text }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat Error:", error);
-      setMessages(prev => [...prev, { role: 'model', content: "I apologize, but I'm having trouble connecting to my knowledge base right now." }]);
+      setMessages(prev => [...prev, { role: 'model', content: `Connection Error: ${error.message || "Unknown error"}` }]);
     } finally {
       setIsLoading(false);
     }
