@@ -77,7 +77,7 @@ export class ChatService {
             return { text };
         } catch (error) {
             this.logger.error('Gemini Chat Error', error);
-            return { text: "I apologize, but I'm having trouble connecting to my knowledge base right now." };
+            return { text: `System Error: ${error.message || error}` };
         }
     }
 
