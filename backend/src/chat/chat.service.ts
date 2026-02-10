@@ -14,7 +14,6 @@ export class ChatService {
             this.logger.error('GEMINI_API_KEY is not set');
         } else {
             this.genAI = new GoogleGenerativeAI(apiKey);
-            this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
         }
     }
 
