@@ -28,10 +28,12 @@ import { CrmModule } from './crm/crm.module';
 import { InvoiceModule } from './invoice/invoice.module';
 import { MediaModule } from './media/media.module';
 import { ShiprocketModule } from './shiprocket/shiprocket.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    ChatModule,
     WhatsappModule,
     StoreModule,
     BannerModule,

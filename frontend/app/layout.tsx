@@ -5,6 +5,7 @@ import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import { fetchAPI } from "@/lib/api";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import ChatWidget from "@/components/ChatWidget";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair-display",
