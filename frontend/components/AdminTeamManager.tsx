@@ -5,7 +5,7 @@ import { PiUserPlus, PiShieldCheck, PiEnvelope, PiLockKey } from "react-icons/pi
 import { fetchAPI } from '@/lib/api';
 
 export default function AdminTeamManager() {
-    const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '' });
+    const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '', role: 'ADMIN' });
     const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -27,7 +27,7 @@ export default function AdminTeamManager() {
                 body: JSON.stringify(newAdmin)
             });
             showStatus('New Admin Created Successfully', 'success');
-            setNewAdmin({ name: '', email: '', password: '' });
+            setNewAdmin({ name: '', email: '', password: '', role: 'ADMIN' });
         } catch (error: any) {
             console.error("Failed to create admin", error);
             showStatus(error.message || 'Failed to create admin', 'error');
@@ -83,6 +83,22 @@ export default function AdminTeamManager() {
                                 onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
                                 className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors"
                             />
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-bold uppercase text-gray-400 tracking-widest mb-2">Access Role</label>
+                        <div className="relative">
+                            <PiShieldCheck className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                            <select
+                                value={newAdmin.role}
+                                onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
+                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors appearance-none"
+                            >
+                                <option value="ADMIN">Super Admin (Full Access)</option>
+                                <option value="PRICE_MANAGER">Price Manager (Rates Only)</option>
+                                <option value="STAFF">Staff (Read Only)</option>
+                            </select>
                         </div>
                     </div>
 

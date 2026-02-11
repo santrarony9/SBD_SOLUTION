@@ -1,13 +1,19 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, HttpAdapterHost } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { GlobalExceptionsFilter } from './http-exception.filter';
+import { ValidationPipe } from '@nestjs/common';
+import { AllExceptionsFilter } from './common/filters/http-exception.filter';
+import { LogBufferService } from './diagnostics/log-buffer.service';
 
 const PORT = process.env.PORT || 3001;
 let cachedApp: any;
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  app.useGlobalFilters(new GlobalExceptionsFilter());
+
+  const logBufferService = app.get(LogBufferService);
+  const httpAdapterHost = app.get(HttpAdapterHost);
+
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
   app.setGlobalPrefix('api');
   app.enableCors({
     origin: '*',

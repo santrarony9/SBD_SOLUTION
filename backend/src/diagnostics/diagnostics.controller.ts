@@ -3,9 +3,22 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { Role } from '@prisma/client';
 
+import { LogBufferService } from './log-buffer.service';
+
 @Controller('diagnostics')
 export class DiagnosticsController {
-    constructor(private prisma: PrismaService) { }
+    constructor(
+        private prisma: PrismaService,
+        private logBuffer: LogBufferService
+    ) { }
+
+    @Get('logs')
+    async getLogs() {
+        return {
+            logs: this.logBuffer.getLogs(),
+            timestamp: new Date().toISOString()
+        };
+    }
 
     @Get()
     async checkHealth() {

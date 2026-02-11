@@ -1,4 +1,4 @@
-import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
 import { RazorpayService } from '../razorpay/razorpay.service';
@@ -9,6 +9,8 @@ import { ShiprocketService } from '../shiprocket/shiprocket.service';
 
 @Injectable()
 export class OrdersService {
+    private readonly logger = new Logger(OrdersService.name);
+
     constructor(
         private prisma: PrismaService,
         private cartService: CartService,

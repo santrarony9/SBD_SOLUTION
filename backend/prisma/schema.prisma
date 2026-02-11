@@ -19,6 +19,7 @@ enum Role {
   ADMIN
   STAFF
   USER
+  PRICE_MANAGER
 }
 
 enum Tier {

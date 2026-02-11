@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart } from "react-icons/pi";
+import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart, PiTerminalWindow } from "react-icons/pi";
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 import AdminGuard from '@/components/AdminGuard';
@@ -12,11 +12,13 @@ import AdminAddProduct from '@/components/AdminAddProduct';
 import AdminDashboardOverview from '@/components/AdminDashboardOverview';
 import AdminCMS from '@/components/AdminCMS';
 import AdminTeamManager from '@/components/AdminTeamManager';
+import LogViewer from '@/components/LogViewer';
+
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
     const [refreshTrigger, setRefreshTrigger] = useState(0);
-    const { logout } = useAuth();
+    const { user, logout } = useAuth();
 
     // Masters State
     const [goldRates, setGoldRates] = useState<any[]>([]);
@@ -28,6 +30,7 @@ export default function AdminDashboard() {
     // Product Modal State
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<any>(null);
+    const [showLogs, setShowLogs] = useState(false);
 
     useEffect(() => {
         if (status) {
@@ -98,6 +101,7 @@ export default function AdminDashboard() {
 
     return (
         <AdminGuard>
+            {showLogs && <LogViewer onClose={() => setShowLogs(false)} />}
             <div className="min-h-screen bg-gray-50 flex">
                 {/* Sidebar */}
                 <aside className="w-72 bg-brand-navy text-white h-screen sticky top-0 left-0 p-8 hidden md:flex flex-col border-r border-brand-gold/10">
@@ -145,12 +149,14 @@ export default function AdminDashboard() {
 
                             <SidebarLink icon={<PiArrowLeft className="w-5 h-5" />} label="Affiliate Center" href="/admin/marketing" />
                             <SidebarLink icon={<PiChartLineUp className="w-5 h-5" />} label="Supply Chain" href="/admin/inventory" />
-                            <SidebarLink
-                                active={activeTab === 'team'}
-                                onClick={() => setActiveTab('team')}
-                                icon={<PiAddressBook className="w-5 h-5" />}
-                                label="Team Access"
-                            />
+                            {user?.role === 'ADMIN' && (
+                                <SidebarLink
+                                    active={activeTab === 'team'}
+                                    onClick={() => setActiveTab('team')}
+                                    icon={<PiAddressBook className="w-5 h-5" />}
+                                    label="Team Access"
+                                />
+                            )}
 
                             <SidebarLink
                                 icon={<PiShoppingCart className="w-5 h-5" />}
@@ -163,6 +169,13 @@ export default function AdminDashboard() {
 
                     {/* Bottom Actions */}
                     <div className="pt-8 border-t border-white/5 space-y-4">
+                        <button
+                            onClick={() => setShowLogs(true)}
+                            className="flex items-center gap-3 text-gray-400 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
+                        >
+                            <PiTerminalWindow className="w-4 h-4" />
+                            System Diagnostics
+                        </button>
                         <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest">
                             <PiArrowLeft className="w-4 h-4" />
                             Return to Site
@@ -233,8 +246,10 @@ export default function AdminDashboard() {
                                                                     <span className="text-gray-400 text-xs font-light">₹</span>
                                                                     <input
                                                                         type="number"
-                                                                        className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal"
+                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
+                                                                            }`}
                                                                         defaultValue={rate?.pricePer10g || 0}
+                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                         onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
                                                                     />
                                                                 </div>
@@ -265,8 +280,10 @@ export default function AdminDashboard() {
                                                                     <span className="text-gray-400 text-xs font-light">₹</span>
                                                                     <input
                                                                         type="number"
-                                                                        className="w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal"
+                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
+                                                                            }`}
                                                                         defaultValue={rate?.pricePerCarat || 0}
+                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                         onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
                                                                     />
                                                                 </div>
@@ -311,9 +328,10 @@ export default function AdminDashboard() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <select
-                                                                className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-gray-600"
+                                                                className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-gray-600 disabled:opacity-50"
                                                                 defaultValue={charge?.type || 'PER_GRAM'}
                                                                 onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
+                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                             >
                                                                 <option value="FLAT">Flat Amount</option>
                                                                 <option value="PER_GRAM">Per Gram (Gold)</option>
@@ -324,8 +342,9 @@ export default function AdminDashboard() {
                                                             <div className="inline-flex items-center gap-2">
                                                                 <input
                                                                     type="number"
-                                                                    className="w-24 bg-white border border-gray-200 rounded px-3 py-1.5 text-right outline-none font-mono font-bold text-brand-charcoal focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all"
+                                                                    className="w-24 bg-white border border-gray-200 rounded px-3 py-1.5 text-right outline-none font-mono font-bold text-brand-charcoal focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all disabled:opacity-50"
                                                                     defaultValue={charge?.amount || 0}
+                                                                    disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                     onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
                                                                 />
                                                             </div>
@@ -333,7 +352,8 @@ export default function AdminDashboard() {
                                                         <td className="px-6 py-4 text-center">
                                                             <button
                                                                 onClick={() => updateCharge(chargeName, { isActive: !charge?.isActive })}
-                                                                className={`px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all border ${charge?.isActive ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'}`}
+                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                className={`px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all border ${charge?.isActive ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'} disabled:opacity-50 disabled:cursor-not-allowed`}
                                                             >
                                                                 {charge?.isActive ? 'Active' : 'Disabled'}
                                                             </button>

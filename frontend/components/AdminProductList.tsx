@@ -21,12 +21,17 @@ interface Product {
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
     const [products, setProducts] = useState<Product[]>([]);
+    const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const loadProducts = async () => {
         try {
             const data = await fetchAPI('/products');
-            if (Array.isArray(data)) setProducts(data);
+            if (Array.isArray(data)) {
+                setProducts(data);
+                setFilteredProducts(data);
+            }
         } catch (error) {
             console.error("Failed to load products");
         } finally {
@@ -37,6 +42,15 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
     useEffect(() => {
         loadProducts();
     }, [refreshTrigger]);
+
+    useEffect(() => {
+        const lowerTerm = searchTerm.toLowerCase();
+        const filtered = products.filter(p =>
+            p.name.toLowerCase().includes(lowerTerm) ||
+            (p.sku && p.sku.toLowerCase().includes(lowerTerm))
+        );
+        setFilteredProducts(filtered);
+    }, [searchTerm, products]);
 
     const deleteProduct = async (id: string) => {
         if (!confirm('Are you sure you want to delete this product?')) return;
@@ -52,11 +66,20 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
 
     return (
         <div className="mt-12 bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
-            <h3 className="font-serif text-xl text-white bg-brand-navy p-6 flex justify-between items-center">
-                <span>Current Inventory</span>
-                <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full uppercase tracking-widest border border-brand-gold/30">
-                    {products.length} Items
-                </span>
+            <h3 className="font-serif text-xl text-white bg-brand-navy p-6 flex justify-between items-center flex-wrap gap-4">
+                <div className="flex items-center gap-4">
+                    <span>Current Inventory</span>
+                    <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full uppercase tracking-widest border border-brand-gold/30">
+                        {filteredProducts.length} Items
+                    </span>
+                </div>
+                <input
+                    type="text"
+                    placeholder="Search by Name or SKU..."
+                    className="px-4 py-2 rounded bg-brand-navy-light border border-brand-gold/20 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-gold w-64"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </h3>
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-gray-600">
@@ -71,7 +94,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                         </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                        {products.map((product) => (
+                        {filteredProducts.map((product) => (
                             <tr key={product.id} className="hover:bg-brand-cream/30 transition-colors group">
                                 <td className="px-6 py-4">
                                     <div className="flex items-center space-x-4">
@@ -116,7 +139,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                 </td>
                             </tr>
                         ))}
-                        {products.length === 0 && (
+                        {filteredProducts.length === 0 && (
                             <tr>
                                 <td colSpan={5} className="py-12 text-center text-gray-400 font-serif italic">
                                     No products found in inventory.

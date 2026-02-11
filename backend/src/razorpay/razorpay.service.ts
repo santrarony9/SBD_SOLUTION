@@ -1,9 +1,10 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import Razorpay from 'razorpay';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class RazorpayService {
+    private readonly logger = new Logger(RazorpayService.name);
     private instance: any;
 
     constructor() {
@@ -21,6 +22,7 @@ export class RazorpayService {
                 receipt,
             };
             const order = await this.instance.orders.create(options);
+            this.logger.log(`Razorpay Order Created: ${order.id} for amount: ${amount}`);
             return order;
         } catch (error) {
             console.error('Razorpay Create Order Error:', error);

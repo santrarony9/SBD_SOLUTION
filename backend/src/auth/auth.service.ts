@@ -100,7 +100,7 @@ export class AuthService {
     }
 
     async createAdmin(data: any) {
-        const { name, email, password } = data;
+        const { name, email, password, role } = data;
         const normalizedEmail = email.toLowerCase();
 
         // Check if email already exists
@@ -116,7 +116,7 @@ export class AuthService {
                 name,
                 email: normalizedEmail,
                 password: hashedPassword,
-                role: 'ADMIN',
+                role: role || 'ADMIN', // Default to ADMIN if not provided
                 mobile: null, // Admin created via email doesn't need mobile immediately
             }
         });
