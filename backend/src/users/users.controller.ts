@@ -17,12 +17,8 @@ export class UsersController {
 
     @Get()
     findAll(@Request() req: any) {
-        console.log('[UsersController DEBUG] findAll requested by:', req.user);
-        const role = req.user?.role || 'NONE';
-
-        if (role.toUpperCase() !== 'ADMIN') {
-            console.error('[UsersController ERROR] Unauthorized access attempt by:', req.user);
-            throw new UnauthorizedException(`Insufficient permissions. Required: ADMIN, Got: ${role}`);
+        if (req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Only Admins can view users');
         }
         return this.usersService.findAll();
     }
