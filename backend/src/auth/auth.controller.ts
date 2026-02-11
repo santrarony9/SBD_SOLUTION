@@ -40,57 +40,8 @@ export class AuthController {
         return this.authService.resetPassword(body.token, body.newPass);
     }
 
-    @UseGuards(JwtAuthGuard)
-    @Post('admin/create')
-    async createAdmin(@Body() body: any, @Request() req: any) {
-        console.log('[Auth Debug] createAdmin called by:', req.user);
-        console.log('[Auth Debug] Body:', body);
-
-        // Simple role check
-        if (req.user.role !== 'ADMIN') {
-            console.log('[Auth Debug] Access Denied. User role:', req.user.role);
-            throw new UnauthorizedException('Only Admins can create new Admins');
-        }
-        return this.authService.createAdmin(body);
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Post('admin/team')
-    // Note: Using POST purely for consistency if needed, but GET is more appropriate. 
-    // However, looking at previous patterns, let's use GET as planned.
-    @Get('admin/team')
-    async getTeam(@Request() req: any) {
-        if (req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException('Only Admins can view team members');
-        }
-        return this.authService.getTeamMembers();
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Get('admin/staff')
-    async getStaff(@Request() req: any) {
-        return this.getTeam(req);
-    }
-
     @Get('ping')
     async ping() {
         return { message: 'pong', version: '2.1' };
-    }
-
-    @UseGuards(JwtAuthGuard)
-    @Delete('admin/delete/:id')
-    async deleteUser(@Request() req: any, @Param('id') id: string) {
-        if (req.user.role !== 'ADMIN') {
-            throw new UnauthorizedException('Only Admins can delete users');
-        }
-        // req.user.userId might be req.user.sub or req.user.id depending on jwt strategy.
-        // Let's check both or log it if unsure. In AuthService.login payload has sub: user.id.
-        // So req.user.sub should be the id.
-        const currentUserId = req.user.sub || req.user.id || req.user.userId;
-
-        if (currentUserId === id) {
-            throw new UnauthorizedException('You cannot delete your own account');
-        }
-        return this.authService.deleteUser(id);
     }
 }
