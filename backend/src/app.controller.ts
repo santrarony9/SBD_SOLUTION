@@ -12,6 +12,6 @@ export class AppController {
 
   @Get('version')
   getVersion() {
-    return { version: '2.3', deployedAt: new Date().toISOString() };
+    return { version: '2.4', deployedAt: new Date().toISOString() };
   }
 }
