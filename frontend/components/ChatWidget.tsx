@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { PiChatCircleText, PiX, PiPaperPlaneRight, PiSparkle } from "react-icons/pi";
 import { useAuth } from '@/context/AuthContext';
+import { fetchAPI } from '@/lib/api';
 
 interface Message {
   role: 'user' | 'model';
@@ -42,28 +43,17 @@ export default function ChatWidget() {
         content: m.content
       }));
 
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+      const response = await fetchAPI('/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` })
-        },
+        headers: {},
         body: JSON.stringify({
           message: userMessage,
-          history: history, // Pass full history for context
+          history: history,
           userId: user?.id
         })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Server Error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setMessages(prev => [...prev, { role: 'model', content: data.text }]);
+      setMessages(prev => [...prev, { role: 'model', content: response.text }]);
     } catch (error: any) {
       console.error("Chat Error:", error);
       setMessages(prev => [...prev, { role: 'model', content: `Connection Error: ${error.message || "Unknown error"}` }]);
@@ -191,13 +181,9 @@ export default function ChatWidget() {
                         // Add the new user message to history effectively
                         history.push({ role: 'user', content: q });
 
-                        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+                        const response = await fetchAPI('/chat', {
                           method: 'POST',
-                          headers: {
-                            'Content-Type': 'application/json',
-                            ...(token && { 'Authorization': `Bearer ${token}` })
-                          },
+                          headers: {},
                           body: JSON.stringify({
                             message: q,
                             history: history,
@@ -205,9 +191,7 @@ export default function ChatWidget() {
                           })
                         });
 
-                        if (!response.ok) throw new Error('Network response was not ok');
-                        const data = await response.json();
-                        setMessages(prev => [...prev, { role: 'model', content: data.text }]);
+                        setMessages(prev => [...prev, { role: 'model', content: response.text }]);
                       } catch (error) {
                         console.error("Chat Error:", error);
                         setMessages(prev => [...prev, { role: 'model', content: "I'm having trouble connecting. Please try again." }]);

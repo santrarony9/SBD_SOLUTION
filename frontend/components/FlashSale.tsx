@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { fetchAPI } from '@/lib/api';
 
 export default function FlashSale() {
     const [setting, setSetting] = useState<any>(null);
@@ -9,10 +10,9 @@ export default function FlashSale() {
     useEffect(() => {
         const fetchSetting = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/store/settings/flash_sale`);
-                if (res.ok) {
-                    const data = await res.json();
-                    setSetting(data.value);
+                const setting = await fetchAPI('/store/settings/flash_sale');
+                if (setting && setting.value) {
+                    setSetting(setting.value);
                 }
             } catch (e) {
                 console.error("FlashSale fetch failed", e);
