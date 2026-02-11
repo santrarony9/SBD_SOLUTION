@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX } from "react-icons/pi";
+import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
-    const [heroText, setHeroText] = useState({ title: '', subtitle: '' });
+    const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
     const [isLoading, setIsLoading] = useState(true);
     const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
@@ -114,6 +114,9 @@ export default function AdminCMS() {
                 </button>
                 <button onClick={() => setActiveSection('text')} className={`pb-3 px-4 text-sm font-bold uppercase tracking-widest transition-colors ${activeSection === 'text' ? 'text-brand-navy border-b-2 border-brand-navy' : 'text-gray-400 hover:text-brand-navy'}`}>
                     <PiTextT className="inline-block mb-1 mr-2" /> Hero Text
+                </button>
+                <button onClick={() => setActiveSection('spotlight')} className={`pb-3 px-4 text-sm font-bold uppercase tracking-widest transition-colors ${activeSection === 'spotlight' ? 'text-brand-navy border-b-2 border-brand-navy' : 'text-gray-400 hover:text-brand-navy'}`}>
+                    <PiSparkle className="inline-block mb-1 mr-2" /> Spotlight
                 </button>
             </div>
 
@@ -271,6 +274,41 @@ export default function AdminCMS() {
                 </div>
             )}
 
+            {/* SPOTLIGHT SECTION */}
+            {activeSection === 'spotlight' && (
+                <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 max-w-2xl">
+                    <h3 className="text-lg font-serif text-brand-navy mb-6">Product Spotlight Configuration</h3>
+                    <p className="text-sm text-gray-400 mb-6">Select a product to feature prominently on the homepage.</p>
+
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-xs font-bold uppercase text-gray-400 tracking-widest mb-2">Spotlight Product ID / SKU</label>
+                            <input
+                                type="text"
+                                value={heroText.spotlightId || ''}
+                                onChange={(e) => setHeroText({ ...heroText, spotlightId: e.target.value })}
+                                placeholder="e.g. RING-001"
+                                className="w-full border p-3 rounded text-sm outline-none focus:border-brand-gold bg-gray-50"
+                            />
+                            <p className="text-[10px] text-gray-400 mt-1">Found in the Product Collection list.</p>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                checked={heroText.showSpotlight || false}
+                                onChange={(e) => setHeroText({ ...heroText, showSpotlight: e.target.checked })}
+                                className="w-5 h-5 text-brand-gold focus:ring-brand-gold border-gray-300 rounded"
+                            />
+                            <label className="text-sm font-medium text-brand-navy">Show Spotlight Section on Homepage</label>
+                        </div>
+
+                        <button onClick={handleUpdateText} className="bg-brand-navy text-white px-8 py-3 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold transition-colors w-full">
+                            Save Configuration
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

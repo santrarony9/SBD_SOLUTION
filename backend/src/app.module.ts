@@ -29,6 +29,7 @@ import { InvoiceModule } from './invoice/invoice.module';
 import { MediaModule } from './media/media.module';
 import { ShiprocketModule } from './shiprocket/shiprocket.module';
 import { ChatModule } from './chat/chat.module';
+import { RazorpayModule } from './razorpay/razorpay.module';
 
 @Module({
   imports: [
@@ -57,7 +58,8 @@ import { ChatModule } from './chat/chat.module';
     CrmModule,
     InvoiceModule,
     MediaModule,
-    ShiprocketModule
+    ShiprocketModule,
+    RazorpayModule
   ],
   controllers: [AppController],
   providers: [AppService, CartCleanupService],

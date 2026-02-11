@@ -1,6 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
+import { RazorpayService } from '../razorpay/razorpay.service';
 import { CrmService } from '../crm/crm.service';
 import { InventoryService } from '../inventory/inventory.service';
 
@@ -14,6 +15,8 @@ export class OrdersService {
         private crmService: CrmService,
         private inventoryService: InventoryService,
         private shiprocketService: ShiprocketService,
+        @Inject(forwardRef(() => RazorpayService))
+        private razorpayService: RazorpayService,
     ) { }
 
     async testShiprocketAuth() {
@@ -67,20 +70,25 @@ export class OrdersService {
             } as any,
         });
 
-        // 4. Razorpay Logic (Stub)
+        // 4. Razorpay Logic
         let razorpayOrderId = null;
         if (paymentMethod === 'RAZORPAY') {
-            // TODO: Integrate Razorpay SDK here
-            // const razorpayOrder = await razorpay.orders.create({ ... })
-            // razorpayOrderId = razorpayOrder.id;
+            try {
+                const razorpayOrder = await this.razorpayService.createOrder(
+                    totalAmount,
+                    'INR',
+                    order.id
+                );
+                razorpayOrderId = razorpayOrder.id;
 
-            // MOCK ID for now
-            razorpayOrderId = `order_mock_${Date.now()}`;
-
-            await this.prisma.order.update({
-                where: { id: order.id },
-                data: { razorpayOrderId },
-            });
+                await this.prisma.order.update({
+                    where: { id: order.id },
+                    data: { razorpayOrderId },
+                });
+            } catch (error) {
+                console.error("Razorpay Creation Failed", error);
+                // Optionally cancel the created order or throw
+            }
         }
 
         // 5. Shiprocket Integration
@@ -219,5 +227,15 @@ export class OrdersService {
         }
 
         return order;
+    }
+    async markAsPaid(orderId: string, paymentId: string) {
+        return this.prisma.order.update({
+            where: { id: orderId },
+            data: {
+                status: 'CONFIRMED',
+                paymentStatus: 'PAID',
+                razorpayPaymentId: paymentId
+            }
+        });
     }
 }

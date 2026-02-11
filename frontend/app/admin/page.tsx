@@ -11,6 +11,7 @@ import AdminOrderList from '@/components/AdminOrderList';
 import AdminAddProduct from '@/components/AdminAddProduct';
 import AdminDashboardOverview from '@/components/AdminDashboardOverview';
 import AdminCMS from '@/components/AdminCMS';
+import AdminTeamManager from '@/components/AdminTeamManager';
 
 export default function AdminDashboard() {
     const [activeTab, setActiveTab] = useState('overview');
@@ -144,7 +145,13 @@ export default function AdminDashboard() {
 
                             <SidebarLink icon={<PiArrowLeft className="w-5 h-5" />} label="Affiliate Center" href="/admin/marketing" />
                             <SidebarLink icon={<PiChartLineUp className="w-5 h-5" />} label="Supply Chain" href="/admin/inventory" />
-                            <SidebarLink icon={<PiAddressBook className="w-5 h-5" />} label="CRM Circles" href="/admin/crm" />
+                            <SidebarLink
+                                active={activeTab === 'team'}
+                                onClick={() => setActiveTab('team')}
+                                icon={<PiAddressBook className="w-5 h-5" />}
+                                label="Team Access"
+                            />
+
                             <SidebarLink
                                 icon={<PiShoppingCart className="w-5 h-5" />}
                                 label="Live Pulse"
@@ -178,14 +185,16 @@ export default function AdminDashboard() {
                             <h1 className="text-5xl font-serif text-brand-navy">
                                 {activeTab === 'overview' ? 'Business Pulse' :
                                     activeTab === 'cms' ? 'Content Manager' :
-                                        activeTab === 'masters' ? 'Master Config' :
-                                            activeTab === 'products' ? 'Collection' : 'Order Console'}
+                                        activeTab === 'team' ? 'Team Access' :
+                                            activeTab === 'masters' ? 'Master Config' :
+                                                activeTab === 'products' ? 'Collection' : 'Order Console'}
                             </h1>
                         </div>
                     </header>
 
                     {activeTab === 'overview' && <AdminDashboardOverview />}
                     {activeTab === 'cms' && <AdminCMS />}
+                    {activeTab === 'team' && <AdminTeamManager />}
 
                     {activeTab === 'masters' && (
                         <div className="space-y-12 max-w-6xl animate-fade-in relative">

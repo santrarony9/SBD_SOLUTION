@@ -99,6 +99,32 @@ export class AuthService {
         return result;
     }
 
+    async createAdmin(data: any) {
+        const { name, email, password } = data;
+        const normalizedEmail = email.toLowerCase();
+
+        // Check if email already exists
+        const existingUser = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
+        if (existingUser) {
+            throw new UnauthorizedException('User with this email already exists');
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        const newAdmin = await this.prisma.user.create({
+            data: {
+                name,
+                email: normalizedEmail,
+                password: hashedPassword,
+                role: 'ADMIN',
+                mobile: null, // Admin created via email doesn't need mobile immediately
+            }
+        });
+
+        const { password: _, ...result } = newAdmin;
+        return result;
+    }
+
     // OTP LOGIC
     async sendOtp(mobile: string) {
         // Simple 6 digit random number

@@ -1,5 +1,6 @@
-import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -37,5 +38,15 @@ export class AuthController {
     @Post('reset-password')
     async resetPassword(@Body() body: { token: string; newPass: string }) {
         return this.authService.resetPassword(body.token, body.newPass);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('admin/create')
+    async createAdmin(@Body() body: any, @Request() req: any) {
+        // Simple role check
+        if (req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Only Admins can create new Admins');
+        }
+        return this.authService.createAdmin(body);
     }
 }

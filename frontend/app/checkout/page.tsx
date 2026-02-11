@@ -101,6 +101,18 @@ export default function CheckoutPage() {
         setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
     };
 
+    // Load Razorpay Script
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const loadRazorpay = () => {
+        return new Promise((resolve) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+        });
+    };
+
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -124,10 +136,66 @@ export default function CheckoutPage() {
 
             if (order) {
                 if (paymentMethod === 'RAZORPAY') {
-                    // 2a. Razorpay Flow (Simulated)
-                    // Ideally: Open Razorpay Modal here using order.razorpayOrderId
-                    // For now: Simulate success
-                    simulateRazorpaySuccess(order.id);
+                    // 2a. Razorpay Flow
+                    const res = await loadRazorpay();
+                    if (!res) {
+                        alert('Razorpay SDK failed to load. Are you online?');
+                        setIsLoading(false);
+                        return;
+                    }
+
+                    const options = {
+                        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || 'rzp_test_YourKeyHere', // Should be in env
+                        amount: order.totalAmount * 100, // Amount is in currency subunits. Default currency is INR.
+                        currency: "INR",
+                        name: "Spark Blue Diamond",
+                        description: "Jewellery Purchase",
+                        image: "/logo.png", // Add logo in public folder
+                        order_id: order.razorpayOrderId,
+                        handler: async function (response: any) {
+                            try {
+                                // 3. Verify Payment
+                                const verifyRes = await fetchAPI('/razorpay/verify', {
+                                    method: 'POST',
+                                    body: JSON.stringify({
+                                        razorpayOrderId: response.razorpay_order_id,
+                                        razorpayPaymentId: response.razorpay_payment_id,
+                                        signature: response.razorpay_signature,
+                                        orderId: order.id
+                                    })
+                                });
+
+                                if (verifyRes.success) {
+                                    await clearCart();
+                                    router.push(`/orders/success?id=${order.id}`);
+                                } else {
+                                    alert('Payment Verification Failed');
+                                }
+                            } catch (error) {
+                                console.error("Payment Verification Error", error);
+                                alert('Payment Verification Failed. Please contact support.');
+                            }
+                        },
+                        prefill: {
+                            name: shippingAddress.fullName,
+                            email: user?.email,
+                            contact: shippingAddress.phone
+                        },
+                        notes: {
+                            address: `${shippingAddress.street}, ${shippingAddress.city}`
+                        },
+                        theme: {
+                            color: "#001f3f" // Brand Navy
+                        }
+                    };
+
+                    const paymentObject = new (window as any).Razorpay(options);
+                    paymentObject.open();
+                    paymentObject.on('payment.failed', function (response: any) {
+                        alert(response.error.description);
+                        setIsLoading(false);
+                    });
+
                 } else {
                     // 2b. COD Flow
                     await clearCart();
@@ -137,16 +205,8 @@ export default function CheckoutPage() {
         } catch (error) {
             console.error('Order failed', error);
             alert('Failed to place order. Please try again.');
-        } finally {
             setIsLoading(false);
         }
-    };
-
-    const simulateRazorpaySuccess = async (orderId: string) => {
-        // Mocking the payment verification call
-        // alert(`Razorpay Payment Simulated! \nOrder ID: ${orderId} \nPayment ID: pay_mock_${Date.now()}`);
-        await clearCart();
-        router.push(`/orders/success?id=${orderId}`);
     };
 
     return (

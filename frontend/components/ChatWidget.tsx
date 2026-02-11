@@ -164,6 +164,66 @@ export default function ChatWidget() {
               </div>
             </div>
           )}
+
+          {/* Suggested Questions (only if chat is somewhat empty or user hasn't typed much) */}
+          {messages.length < 4 && !isLoading && (
+            <div className="flex flex-wrap justify-end gap-2 mt-4 px-2">
+              {['Engagement Rings?', 'Track my Order', 'Return Policy', 'Custom Design'].map((q) => (
+                <button
+                  key={q}
+                  onClick={() => {
+                    setInput(q);
+                    // Optional: auto-send
+                    // handleSend(q); 
+                    // But here we just set input for user to confirm or simply set it.
+                    // Let's set it and maybe user clicks send. 
+                    // Better UX: auto-send if they click a chip.
+                    setMessages(prev => [...prev, { role: 'user', content: q }]);
+                    setIsLoading(true);
+                    // We need to call API here, but handleSend relies on state 'input'. 
+                    // Refactor handleSend or just duplicate logic slightly for cleanliness or use useEffect to trigger?
+                    // Easiest: call a separate send function.
+                    // For now, let's just set input and focus? No, user expects action.
+                    // We will call the API directly here to avoid state race conditions.
+                    (async () => {
+                      try {
+                        const history = messages.map(m => ({ role: m.role, content: m.content }));
+                        // Add the new user message to history effectively
+                        history.push({ role: 'user', content: q });
+
+                        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/chat`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            ...(token && { 'Authorization': `Bearer ${token}` })
+                          },
+                          body: JSON.stringify({
+                            message: q,
+                            history: history,
+                            userId: user?.id
+                          })
+                        });
+
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        const data = await response.json();
+                        setMessages(prev => [...prev, { role: 'model', content: data.text }]);
+                      } catch (error) {
+                        console.error("Chat Error:", error);
+                        setMessages(prev => [...prev, { role: 'model', content: "I'm having trouble connecting. Please try again." }]);
+                      } finally {
+                        setIsLoading(false);
+                      }
+                    })();
+                  }}
+                  className="bg-brand-gold/10 hover:bg-brand-gold/20 text-brand-navy text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded-full border border-brand-gold/20 transition-all hover:scale-105"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div ref={messagesEndRef} />
         </div>
 
