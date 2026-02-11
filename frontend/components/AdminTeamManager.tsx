@@ -75,13 +75,27 @@ export default function AdminTeamManager() {
         }
     };
 
+    const handleDelete = async (id: string, name: string) => {
+        if (!confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
+            return;
+        }
+
+        try {
+            await fetchAPI(`/auth/admin/delete/${id}`, { method: 'DELETE' });
+            showStatus('User Deleted Successfully', 'success');
+            loadTeam(); // Refresh list
+        } catch (error: any) {
+            console.error("Failed to delete user", error);
+            showStatus(error.message || 'Failed to delete user', 'error');
+        }
+    };
+
     return (
         <div className="max-w-6xl animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Status Notification */}
             {status && (
-                <div className={`fixed top-8 right-8 z-[100] px-6 py-4 rounded shadow-2xl border flex items-center gap-3 transition-all transform animate-slide-up ${status.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
-                    <div className={`w-2 h-2 rounded-full ${status.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-                    <span className="text-sm font-bold tracking-wide">{status.message}</span>
+                <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${status.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
+                    {status.message}
                 </div>
             )}
 
@@ -105,21 +119,22 @@ export default function AdminTeamManager() {
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
-                            <thead className="bg-gray-50 text-gray-500 font-bold uppercase tracking-wider text-xs">
+                            <thead className="bg-gray-50 text-gray-500 font-medium border-b border-gray-100">
                                 <tr>
-                                    <th className="px-4 py-3 rounded-l-lg">User</th>
-                                    <th className="px-4 py-3">Role</th>
-                                    <th className="px-4 py-3 rounded-r-lg">Joined</th>
+                                    <th className="px-4 py-3">USER</th>
+                                    <th className="px-4 py-3">ROLE</th>
+                                    <th className="px-4 py-3">JOINED</th>
+                                    <th className="px-4 py-3 text-right">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={3} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                                        <td colSpan={4} className="px-4 py-8 text-center text-gray-400">Loading...</td>
                                     </tr>
                                 ) : error ? (
                                     <tr>
-                                        <td colSpan={3} className="px-4 py-8 text-center text-red-500">
+                                        <td colSpan={4} className="px-4 py-8 text-center text-red-500">
                                             <p className="font-bold">Error loading team</p>
                                             <p className="text-xs">{error}</p>
                                             <button onClick={loadTeam} className="mt-2 text-brand-navy underline text-xs">Retry</button>
@@ -127,31 +142,24 @@ export default function AdminTeamManager() {
                                     </tr>
                                 ) : teamMembers.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-4 py-8 text-center text-gray-400 italic">No team members found.</td>
+                                        <td colSpan={4} className="px-4 py-8 text-center text-gray-400 italic">No team members found.</td>
                                     </tr>
                                 ) : (
                                     teamMembers.map(member => (
                                         <tr key={member.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-brand-navy/10 flex items-center justify-center text-brand-navy font-bold text-xs">
-                                                        {member.name.charAt(0)}
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-medium text-brand-navy">{member.name}</p>
-                                                        <p className="text-xs text-gray-400">{member.email}</p>
-                                                    </div>
-                                                </div>
+                                                <div className="font-medium text-brand-navy">{member.name}</div>
+                                                <div className="text-xs text-gray-400">{member.email}</div>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wide border ${member.role === 'ADMIN' ? 'bg-purple-50 text-purple-600 border-purple-100' :
-                                                    member.role === 'PRICE_MANAGER' ? 'bg-blue-50 text-blue-600 border-blue-100' :
-                                                        'bg-gray-50 text-gray-600 border-gray-100'
+                                                <span className={`px-2 py-1 rounded text-xs font-bold ${member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
+                                                        member.role === 'PRICE_MANAGER' ? 'bg-blue-100 text-blue-700' :
+                                                            'bg-gray-100 text-gray-600'
                                                     }`}>
                                                     {member.role.replace('_', ' ')}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-400 font-mono text-xs">
+                                            <td className="px-4 py-3 text-gray-400">
                                                 {new Date(member.createdAt).toLocaleDateString()}
                                             </td>
                                         </tr>

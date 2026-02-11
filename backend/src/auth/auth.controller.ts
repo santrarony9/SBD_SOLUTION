@@ -1,4 +1,4 @@
-import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request, Delete, Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -75,5 +75,22 @@ export class AuthController {
     @Get('ping')
     async ping() {
         return { message: 'pong', version: '2.1' };
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('admin/delete/:id')
+    async deleteUser(@Request() req: any, @Param('id') id: string) {
+        if (req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Only Admins can delete users');
+        }
+        // req.user.userId might be req.user.sub or req.user.id depending on jwt strategy.
+        // Let's check both or log it if unsure. In AuthService.login payload has sub: user.id.
+        // So req.user.sub should be the id.
+        const currentUserId = req.user.sub || req.user.id || req.user.userId;
+
+        if (currentUserId === id) {
+            throw new UnauthorizedException('You cannot delete your own account');
+        }
+        return this.authService.deleteUser(id);
     }
 }
