@@ -13,6 +13,8 @@ async function bootstrap() {
   const logBufferService = app.get(LogBufferService);
   const httpAdapterHost = app.get(HttpAdapterHost);
 
+  console.log(`[BOOTSTRAP] Starting Backend v2.1 with Team Routes...`);
+
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
   app.setGlobalPrefix('api');
   app.enableCors({
