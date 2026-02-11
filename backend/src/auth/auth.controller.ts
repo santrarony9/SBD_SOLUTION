@@ -65,4 +65,9 @@ export class AuthController {
         }
         return this.authService.getTeamMembers();
     }
+
+    @Get('ping')
+    async ping() {
+        return { message: 'pong', version: '2.1' };
+    }
 }
