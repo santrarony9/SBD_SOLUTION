@@ -16,9 +16,19 @@ export class MediaController {
 
     @Post('upload')
     @UseInterceptors(FileInterceptor('file'))
-    async uploadFile(@UploadedFile() file: Express.Multer.File) {
+    async uploadFile(
+        @UploadedFile(
+            new ParseFilePipe({
+                validators: [
+                    new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+                    // new FileTypeValidator({ fileType: '.(png|jpeg|jpg|pdf|mp4)' }), // Optional: Strict type check
+                ],
+            }),
+        )
+        file: Express.Multer.File,
+    ) {
         try {
-            // Basic validation: Max 10MB for now, support images, videos, and pdf
+            // Validation passed
             const result = await this.mediaService.uploadFile(file);
             return {
                 url: result.secure_url,

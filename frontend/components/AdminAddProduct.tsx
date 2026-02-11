@@ -376,15 +376,27 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
                             {/* Image Gallery */}
                             <div className="space-y-2">
-                                <label className="block text-[10px] uppercase font-bold text-gray-500">Product Images (Min 3 / Max 4)</label>
-                                <div className="grid grid-cols-4 gap-4">
-                                    {[0, 1, 2, 3].map((index) => (
+                                <div className="flex justify-between items-end">
+                                    <label className="block text-[10px] uppercase font-bold text-gray-500">Product Images (Min 3 / Max 5)</label>
+                                    <span className="text-[9px] text-brand-gold font-bold bg-brand-navy/5 px-2 py-0.5 rounded">
+                                        Recommended: 1000x1000px | Max: 5MB
+                                    </span>
+                                </div>
+                                <div className="grid grid-cols-5 gap-4">
+                                    {[0, 1, 2, 3, 4].map((index) => (
                                         <div key={index} className="relative aspect-square group">
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                                onChange={(e) => handleMediaUpload(e.target.files?.[0], `image-${index}`)}
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file && file.size > 5 * 1024 * 1024) {
+                                                        alert('File is too large! Max 5MB allowed.');
+                                                        return;
+                                                    }
+                                                    handleMediaUpload(file, `image-${index}`);
+                                                }}
                                             />
                                             <div className="w-full h-full border-2 border-dashed border-gray-300 bg-white rounded-lg overflow-hidden flex items-center justify-center group-hover:border-brand-gold transition-all">
                                                 {tempImages[index] ? (
