@@ -252,7 +252,7 @@ export default function AdminCMS() {
                         onClick={() => setActiveSection(item.id as any)}
                         className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
                             ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
-                            : 'text-gray-400 hover:bg-gray-50 hover:text-brand-navy'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
                             }`}
                     >
                         <item.icon className={`text-lg ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
@@ -280,7 +280,7 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Image Source</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image Source</label>
                                         <input
                                             type="file"
                                             accept="image/*"
@@ -303,7 +303,7 @@ export default function AdminCMS() {
                                         {newBanner.imageUrl && <p className="text-[10px] text-green-600 font-bold truncate">✓ Ready</p>}
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Banner Title</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Banner Title</label>
                                         <input
                                             type="text"
                                             placeholder="e.g. Royal Wedding Collection"
@@ -313,7 +313,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Destination URL</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Destination URL</label>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
@@ -347,7 +347,7 @@ export default function AdminCMS() {
                                         </div>
                                     </div>
                                 ))}
-                                {banners.length === 0 && <div className="md:col-span-2 py-20 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-sm italic">No banners active</div>}
+                                {banners.length === 0 && <div className="md:col-span-2 py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No banners active</div>}
                             </div>
                         </div>
                     )}
@@ -364,7 +364,7 @@ export default function AdminCMS() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Offer Title</label>
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Offer Title</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. Valentine Special"
@@ -374,7 +374,7 @@ export default function AdminCMS() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Short Description</label>
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Short Description</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. Get 20% off on all rings"
@@ -386,7 +386,7 @@ export default function AdminCMS() {
                                     </div>
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Tag / Badge</label>
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Tag / Badge</label>
                                             <input
                                                 type="text"
                                                 placeholder="e.g. LIMITED TIME"
@@ -396,7 +396,7 @@ export default function AdminCMS() {
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Coupon Code (Optional)</label>
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Coupon Code (Optional)</label>
                                             <div className="flex gap-4">
                                                 <input
                                                     type="text"
@@ -426,7 +426,7 @@ export default function AdminCMS() {
                                                     <h4 className="font-serif text-brand-navy text-lg">{offer.title}</h4>
                                                     <span className="bg-brand-gold text-[8px] text-white px-2 py-0.5 rounded-full font-black tracking-widest uppercase">{offer.tag}</span>
                                                 </div>
-                                                <p className="text-gray-400 text-sm max-w-md">{offer.description}</p>
+                                                <p className="text-gray-600 text-sm max-w-md">{offer.description}</p>
                                                 {offer.code && <div className="mt-2 text-[10px] font-mono text-brand-gold ring-1 ring-brand-gold/30 inline-block px-2 py-0.5 rounded bg-brand-gold/5 uppercase tracking-tighter">Code: {offer.code}</div>}
                                             </div>
                                         </div>
@@ -435,7 +435,7 @@ export default function AdminCMS() {
                                         </button>
                                     </div>
                                 ))}
-                                {offers.length === 0 && <div className="py-20 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-sm italic">No active offers</div>}
+                                {offers.length === 0 && <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No active offers</div>}
                             </div>
                         </div>
                     )}
@@ -449,7 +449,7 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Category Name</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Category Name</label>
                                         <input
                                             type="text"
                                             placeholder="e.g. Diamond Necklaces"
@@ -459,7 +459,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">URL Slug</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">URL Slug</label>
                                         <input
                                             type="text"
                                             placeholder="necklaces"
@@ -469,7 +469,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Cover Image URL</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Cover Image URL</label>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
@@ -494,7 +494,7 @@ export default function AdminCMS() {
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-serif text-brand-navy truncate leading-tight">{cat.name}</h4>
-                                            <p className="text-[10px] text-gray-400 font-mono tracking-tighter truncate">{cat.slug}</p>
+                                            <p className="text-[10px] text-gray-600 font-mono tracking-tighter truncate">{cat.slug}</p>
                                         </div>
                                         <button onClick={() => handleDeleteCategory(cat.id)} className="text-gray-200 hover:text-red-500 transition-colors p-2">
                                             <PiTrash />
@@ -515,7 +515,7 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Label</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Label</label>
                                         <input
                                             type="text"
                                             placeholder="Under 50k"
@@ -525,7 +525,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Min Price (₹)</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Min Price (₹)</label>
                                         <input
                                             type="number"
                                             value={newPriceRange.minPrice || ''}
@@ -534,7 +534,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Max Price (₹)</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Max Price (₹)</label>
                                         <input
                                             type="number"
                                             value={newPriceRange.maxPrice || ''}
@@ -543,7 +543,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Category Image URL</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Category Image URL</label>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
@@ -579,7 +579,7 @@ export default function AdminCMS() {
                                         </button>
                                     </div>
                                 ))}
-                                {priceRanges.length === 0 && <div className="md:col-span-2 py-20 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-sm italic">No price ranges defined</div>}
+                                {priceRanges.length === 0 && <div className="md:col-span-2 py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No price ranges defined</div>}
                             </div>
                         </div>
                     )}
@@ -593,7 +593,7 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Tag Name</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Tag Name</label>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
@@ -607,7 +607,7 @@ export default function AdminCMS() {
                                             </button>
                                         </div>
                                     </div>
-                                    <p className="text-[10px] text-gray-400 font-mono italic">Slug: {newTag.slug}</p>
+                                    <p className="text-[10px] text-gray-600 font-mono italic">Slug: {newTag.slug}</p>
                                 </div>
                             </div>
 
@@ -620,7 +620,7 @@ export default function AdminCMS() {
                                         </button>
                                     </div>
                                 ))}
-                                {tags.length === 0 && <div className="w-full py-10 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-sm italic">No tags defined</div>}
+                                {tags.length === 0 && <div className="w-full py-10 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No tags defined</div>}
                             </div>
                         </div>
                     )}
@@ -634,7 +634,7 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Post Image URL</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Post Image URL</label>
                                         <input
                                             type="text"
                                             placeholder="https://instagram.com/p/..."
@@ -644,7 +644,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Reference Link</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Reference Link</label>
                                         <input
                                             type="text"
                                             placeholder="Optional Link"
@@ -654,7 +654,7 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Caption / User</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Caption / User</label>
                                         <div className="flex gap-4">
                                             <input
                                                 type="text"
@@ -683,7 +683,7 @@ export default function AdminCMS() {
                                         </div>
                                     </div>
                                 ))}
-                                {socialPosts.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-100 rounded-2xl text-gray-300 text-sm italic">No social posts curated</div>}
+                                {socialPosts.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No social posts curated</div>}
                             </div>
                         </div>
                     )}
@@ -698,7 +698,7 @@ export default function AdminCMS() {
 
                                 <div className="space-y-8">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Main Billboard Heading</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Main Billboard Heading</label>
                                         <input
                                             type="text"
                                             value={heroText.title}
@@ -709,7 +709,7 @@ export default function AdminCMS() {
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Supporting Narrative</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Supporting Narrative</label>
                                         <textarea
                                             value={heroText.subtitle}
                                             onChange={(e) => setHeroText({ ...heroText, subtitle: e.target.value })}
@@ -733,11 +733,11 @@ export default function AdminCMS() {
                                 <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-4 flex items-center gap-2">
                                     <PiSparkle className="text-brand-gold" /> Featured Product Spotlight
                                 </h3>
-                                <p className="text-xs text-gray-400 mb-8 leading-relaxed">Choose one masterpiece to showcase in the high-visibility spotlight section on your homepage.</p>
+                                <p className="text-xs text-gray-600 mb-8 leading-relaxed">Choose one masterpiece to showcase in the high-visibility spotlight section on your homepage.</p>
 
                                 <div className="space-y-8">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-400 tracking-wider">Product SKU / ID</label>
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Product SKU / ID</label>
                                         <input
                                             type="text"
                                             value={heroText.spotlightId || ''}
@@ -745,7 +745,7 @@ export default function AdminCMS() {
                                             placeholder="e.g. DIA-RING-001"
                                             className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors font-mono tracking-wider"
                                         />
-                                        <p className="text-[9px] text-gray-400 font-medium">Use the ID found in your Product Collection list.</p>
+                                        <p className="text-[9px] text-gray-600 font-bold">Use the ID found in your Product Collection list.</p>
                                     </div>
 
                                     <div className="flex items-center gap-4 bg-white/50 p-4 rounded-xl border border-gray-100">

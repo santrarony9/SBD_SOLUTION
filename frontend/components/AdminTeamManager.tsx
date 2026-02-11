@@ -105,7 +105,7 @@ export default function AdminTeamManager() {
                     <div className="flex justify-between items-center mb-6">
                         <div>
                             <h3 className="text-lg font-serif text-brand-navy">Team Members</h3>
-                            <p className="text-gray-400 text-sm">Manage administrators and staff access.</p>
+                            <p className="text-gray-600 text-sm italic">Manage administrators and staff access.</p>
                             {backendVersion && (
                                 <span className="text-xs text-brand-gold bg-brand-navy px-2 py-0.5 rounded ml-2">
                                     Backend: {backendVersion}
@@ -130,7 +130,7 @@ export default function AdminTeamManager() {
                             <tbody className="divide-y divide-gray-100">
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={4} className="px-4 py-8 text-center text-gray-400">Loading...</td>
+                                        <td colSpan={4} className="px-4 py-8 text-center text-gray-600">Loading...</td>
                                     </tr>
                                 ) : error ? (
                                     <tr>
@@ -148,8 +148,8 @@ export default function AdminTeamManager() {
                                     teamMembers.map(member => (
                                         <tr key={member.id} className="hover:bg-gray-50 transition-colors">
                                             <td className="px-4 py-3">
-                                                <div className="font-medium text-brand-navy">{member.name}</div>
-                                                <div className="text-xs text-gray-400">{member.email}</div>
+                                                <div className="font-bold text-brand-navy">{member.name}</div>
+                                                <div className="text-xs text-brand-navy/70">{member.email}</div>
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold ${member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
@@ -159,7 +159,7 @@ export default function AdminTeamManager() {
                                                     {member.role.replace('_', ' ')}
                                                 </span>
                                             </td>
-                                            <td className="px-4 py-3 text-gray-400">
+                                            <td className="px-4 py-3 text-brand-navy font-medium">
                                                 {new Date(member.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-4 py-3 text-right">
@@ -191,7 +191,7 @@ export default function AdminTeamManager() {
 
                     <form onSubmit={handleCreateAdmin} className="space-y-4">
                         <div>
-                            <label className="block text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1.5">Full Name</label>
+                            <label className="block text-[10px] font-black uppercase text-gray-600 tracking-widest mb-1.5">Full Name</label>
                             <input
                                 type="text"
                                 placeholder="e.g. John Doe"
@@ -202,7 +202,7 @@ export default function AdminTeamManager() {
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1.5">Email Address</label>
+                            <label className="block text-[10px] font-black uppercase text-gray-600 tracking-widest mb-1.5">Email Address</label>
                             <input
                                 type="email"
                                 placeholder="e.g. admin@sparkbluediamond.com"
@@ -213,7 +213,7 @@ export default function AdminTeamManager() {
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1.5">Access Role</label>
+                            <label className="block text-[10px] font-black uppercase text-gray-600 tracking-widest mb-1.5">Access Role</label>
                             <select
                                 value={newAdmin.role}
                                 onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
@@ -226,7 +226,7 @@ export default function AdminTeamManager() {
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold uppercase text-gray-400 tracking-widest mb-1.5">Password</label>
+                            <label className="block text-[10px] font-black uppercase text-gray-600 tracking-widest mb-1.5">Password</label>
                             <input
                                 type="password"
                                 placeholder="••••••••"

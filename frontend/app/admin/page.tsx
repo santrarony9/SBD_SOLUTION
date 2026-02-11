@@ -171,18 +171,18 @@ export default function AdminDashboard() {
                     <div className="pt-8 border-t border-white/5 space-y-4">
                         <button
                             onClick={() => setShowLogs(true)}
-                            className="flex items-center gap-3 text-gray-400 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
+                            className="flex items-center gap-3 text-gray-300 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
                         >
                             <PiTerminalWindow className="w-4 h-4" />
                             System Diagnostics
                         </button>
-                        <Link href="/" className="flex items-center gap-3 text-gray-400 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest">
+                        <Link href="/" className="flex items-center gap-3 text-gray-300 hover:text-brand-gold transition-colors text-xs font-bold uppercase tracking-widest">
                             <PiArrowLeft className="w-4 h-4" />
                             Return to Site
                         </Link>
                         <button
                             onClick={logout}
-                            className="flex items-center gap-3 text-red-400 hover:text-red-300 transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
+                            className="flex items-center gap-3 text-red-500 hover:text-red-400 transition-colors text-xs font-bold uppercase tracking-widest w-full text-left"
                         >
                             <PiSignOut className="w-4 h-4" />
                             Logout Security
@@ -420,7 +420,7 @@ function SidebarLink({ active, onClick, icon, label, href, suffix }: { active?: 
         </>
     );
 
-    const baseClass = `flex items-center gap-3 px-4 py-3 rounded transition-all duration-300 cursor-pointer ${active ? 'bg-white/10 text-brand-gold font-bold border-l-2 border-brand-gold' : 'text-gray-400 hover:text-white hover:bg-white/5'}`;
+    const baseClass = `flex items-center gap-3 px-4 py-3 rounded transition-all duration-300 cursor-pointer ${active ? 'bg-white/10 text-brand-gold font-bold border-l-2 border-brand-gold' : 'text-gray-300 hover:text-white hover:bg-white/5'}`;
 
     if (href) {
         return (
