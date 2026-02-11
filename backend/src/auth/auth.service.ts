@@ -1,6 +1,6 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from '@prisma/client';
+// import { Role } from '@prisma/client';
 
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -228,8 +228,14 @@ export class AuthService {
 
     async getTeamMembers() {
         try {
-            console.log('[Auth Debug] Fetching team members...');
-            // Fetch users with roles that are considered "Team Members"
+            console.log('[Auth Debug] Fetching team members (MOCK MODE)...');
+
+            // MOCK RETURN TO DEBUG DEPLOYMENT
+            return [
+                { id: 'mock-1', name: 'Debug User', email: 'debug@test.com', role: 'ADMIN', createdAt: new Date() }
+            ];
+
+            /*
             // CASTING TO ANY TO AVOID RUNTIME ENUM ISSUES
             const roles: any[] = ['ADMIN', 'STAFF', 'PRICE_MANAGER'];
 
@@ -253,6 +259,7 @@ export class AuthService {
             });
             console.log(`[Auth Debug] Found ${teamMembers.length} team members.`);
             return teamMembers;
+            */
         } catch (error: any) {
             console.error('[Auth Debug] Error fetching team members:', error);
             // using InternalServerErrorException to ensure message passes through filter
