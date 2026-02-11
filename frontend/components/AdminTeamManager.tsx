@@ -67,7 +67,7 @@ export default function AdminTeamManager() {
                                 placeholder="e.g. John Doe"
                                 value={newAdmin.name}
                                 onChange={(e) => setNewAdmin({ ...newAdmin, name: e.target.value })}
-                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors"
+                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 text-brand-navy transition-colors"
                             />
                         </div>
                     </div>
@@ -81,7 +81,7 @@ export default function AdminTeamManager() {
                                 placeholder="e.g. admin@sparkbluediamond.com"
                                 value={newAdmin.email}
                                 onChange={(e) => setNewAdmin({ ...newAdmin, email: e.target.value })}
-                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors"
+                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 text-brand-navy transition-colors"
                             />
                         </div>
                     </div>
@@ -93,7 +93,7 @@ export default function AdminTeamManager() {
                             <select
                                 value={newAdmin.role}
                                 onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
-                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors appearance-none"
+                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 text-brand-navy transition-colors appearance-none"
                             >
                                 <option value="ADMIN">Super Admin (Full Access)</option>
                                 <option value="PRICE_MANAGER">Price Manager (Rates Only)</option>
@@ -111,7 +111,7 @@ export default function AdminTeamManager() {
                                 placeholder="••••••••"
                                 value={newAdmin.password}
                                 onChange={(e) => setNewAdmin({ ...newAdmin, password: e.target.value })}
-                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 transition-colors"
+                                className="w-full border p-3 pl-10 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 text-brand-navy transition-colors"
                             />
                         </div>
                     </div>

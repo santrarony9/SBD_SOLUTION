@@ -105,7 +105,16 @@ export default async function Home() {
             {activeBanner.title}
           </h2>
 
-          <h1 className="text-5xl sm:text-6xl md:text-8xl lg:text-9xl font-serif text-white mb-8 leading-[0.9] tracking-tight animate-fade-in-up delay-300 drop-shadow-lg" dangerouslySetInnerHTML={{ __html: heroTitle.replace('Eternal', '<span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-gold-light via-brand-gold to-brand-gold-light italic pr-2">Eternal</span>') }}>
+          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight tracking-tight animate-fade-in-up delay-300 drop-shadow-lg">
+            {heroTitle.includes('Eternal') ? (
+              <>
+                {heroTitle.split('Eternal')[0]}
+                <span className="text-brand-gold italic pr-2">Eternal</span>
+                {heroTitle.split('Eternal')[1]}
+              </>
+            ) : (
+              heroTitle
+            )}
           </h1>
 
           <p className="text-gray-200 max-w-2xl text-lg md:text-xl mb-12 font-light tracking-wide leading-relaxed animate-fade-in-up delay-500 drop-shadow-md">

@@ -202,7 +202,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <label className="block text-xs uppercase tracking-widest text-gray-500 font-bold">Product Name</label>
                                 <input
                                     required
-                                    className="w-full border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white"
+                                    className="w-full border border-gray-200 bg-gray-50 p-3 text-sm text-brand-navy focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white"
                                     value={formData.name}
                                     placeholder="e.g. Royal Sapphire Ring"
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
@@ -212,7 +212,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <label className="block text-xs uppercase tracking-widest text-gray-500 font-bold">Category</label>
                                 <div className="relative">
                                     <select
-                                        className="w-full border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded appearance-none transition-all focus:bg-white"
+                                        className="w-full border border-gray-200 bg-gray-50 p-3 text-sm text-brand-navy focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded appearance-none transition-all focus:bg-white"
                                         value={formData.category}
                                         onChange={e => setFormData({ ...formData, category: e.target.value })}
                                     >
@@ -232,7 +232,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     Product ID / SKU <span className="text-gray-300 font-normal normal-case">(Internal Use Only)</span>
                                 </label>
                                 <input
-                                    className="w-full border border-gray-200 bg-gray-50 p-3 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white font-mono placeholder:text-gray-300"
+                                    className="w-full border border-gray-200 bg-gray-50 p-3 text-sm text-brand-navy focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white font-mono placeholder:text-gray-300"
                                     value={formData.sku || ''}
                                     placeholder="e.g. RING-SAP-001 (Auto-generated if left blank)"
                                     onChange={e => setFormData({ ...formData, sku: e.target.value })}
@@ -247,7 +247,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <div>
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Gold Purity (K)</label>
                                     <select
-                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white focus:border-brand-gold outline-none"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.goldPurity}
                                         onChange={e => setFormData({ ...formData, goldPurity: e.target.value })}
                                     >
@@ -262,7 +262,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Gold Wt (g)</label>
                                     <input
                                         type="number" step="0.01" required
-                                        className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold outline-none"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.goldWeight}
                                         onChange={e => setFormData({ ...formData, goldWeight: e.target.value })}
                                     />
@@ -271,7 +271,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Dia. Carat</label>
                                     <input
                                         type="number" step="0.01"
-                                        className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold outline-none"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.diamondCarat}
                                         onChange={e => setFormData({ ...formData, diamondCarat: e.target.value })}
                                     />
@@ -279,7 +279,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <div>
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Clarity</label>
                                     <select
-                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white focus:border-brand-gold outline-none"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.diamondClarity}
                                         onChange={e => setFormData({ ...formData, diamondClarity: e.target.value })}
                                     >
@@ -295,7 +295,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <div>
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Color</label>
                                     <select
-                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white focus:border-brand-gold outline-none"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm bg-white text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.diamondColor}
                                         onChange={e => setFormData({ ...formData, diamondColor: e.target.value })}
                                     >
@@ -412,7 +412,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 </button>
                             </div>
                             <textarea
-                                className="w-full border border-gray-200 bg-gray-50 p-4 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white min-h-[100px]"
+                                className="w-full border border-gray-200 bg-gray-50 p-4 text-sm text-brand-navy focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none rounded transition-all focus:bg-white min-h-[100px]"
                                 value={formData.description}
                                 onChange={e => setFormData({ ...formData, description: e.target.value })}
                                 placeholder="Detailed product description..."

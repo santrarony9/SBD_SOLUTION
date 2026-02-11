@@ -328,7 +328,7 @@ export default function AdminDashboard() {
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <select
-                                                                className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-gray-600 disabled:opacity-50"
+                                                                className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-brand-charcoal disabled:opacity-50"
                                                                 defaultValue={charge?.type || 'PER_GRAM'}
                                                                 onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
                                                                 disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
