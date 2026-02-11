@@ -66,6 +66,7 @@ export class AuthController {
         return this.authService.getTeamMembers();
     }
 
+    @UseGuards(JwtAuthGuard)
     @Get('admin/staff')
     async getStaff(@Request() req: any) {
         return this.getTeam(req);

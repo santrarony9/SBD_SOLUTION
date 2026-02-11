@@ -230,12 +230,7 @@ export class AuthService {
         try {
             console.log('[Auth Debug] Fetching team members (MOCK MODE)...');
 
-            // MOCK RETURN TO DEBUG DEPLOYMENT
-            return [
-                { id: 'mock-1', name: 'Debug User', email: 'debug@test.com', role: 'ADMIN', createdAt: new Date() }
-            ];
-
-            /*
+            // Fetch users with roles that are considered "Team Members"
             // CASTING TO ANY TO AVOID RUNTIME ENUM ISSUES
             const roles: any[] = ['ADMIN', 'STAFF', 'PRICE_MANAGER'];
 
@@ -259,7 +254,6 @@ export class AuthService {
             });
             console.log(`[Auth Debug] Found ${teamMembers.length} team members.`);
             return teamMembers;
-            */
         } catch (error: any) {
             console.error('[Auth Debug] Error fetching team members:', error);
             // using InternalServerErrorException to ensure message passes through filter
