@@ -25,6 +25,15 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     }
 
     if (!res.ok) {
+        if (res.status === 401 && typeof window !== 'undefined') {
+            console.error('[API] Unauthorized - Clearing session...');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            // Force reload to trigger AuthContext update and redirect to login
+            window.location.href = '/login?error=session_expired';
+            return;
+        }
+
         let errorMessage = `API Error: ${res.status} ${res.statusText}`;
         try {
             const errorData = await res.json();
