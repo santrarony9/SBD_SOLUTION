@@ -443,7 +443,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                             <button
                                 type="submit"
                                 disabled={loading || isUploading}
-                                className={`bg-brand-navy text-white px-8 py-3 rounded uppercase text-xs font-bold tracking-widest hover:bg-brand-gold hover:text-brand-navy transition-colors shadow-lg ${loading || isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`bg-brand-navy text-white px-8 py-3 rounded-xl uppercase text-xs font-bold tracking-widest hover:bg-brand-gold hover:text-brand-navy transition-colors shadow-lg ${loading || isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             >
                                 {loading ? (initialData ? 'Updating...' : 'Adding...') : isUploading ? 'Uploading Media...' : (initialData ? 'Update Product' : 'Save Product')}
                             </button>

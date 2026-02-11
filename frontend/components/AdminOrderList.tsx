@@ -192,7 +192,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                 alert('Connection Test Failed');
                             }
                         }}
-                        className="text-[10px] font-bold uppercase tracking-widest text-brand-navy border border-brand-navy/20 px-2 py-1 rounded hover:bg-brand-navy hover:text-white transition-all"
+                        className="text-[10px] font-bold uppercase tracking-widest text-brand-navy border border-brand-navy/20 px-3 py-1.5 rounded-xl hover:bg-brand-navy hover:text-white transition-all shadow-sm"
                     >
                         Test Shiprocket
                     </button>
@@ -201,10 +201,10 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                 {selectedOrders.length > 0 && (
                     <div className="flex items-center gap-3 animate-fadeIn">
                         <span className="text-xs font-bold text-brand-gold uppercase tracking-widest">{selectedOrders.length} Selected</span>
-                        <button onClick={() => handleBulkPrint('invoice')} className="px-3 py-1.5 bg-brand-navy text-white text-[10px] font-bold uppercase tracking-widest rounded hover:bg-brand-gold transition-colors">Bulk Invoices</button>
-                        <button onClick={() => handleBulkPrint('label')} className="px-3 py-1.5 bg-brand-gold text-brand-navy text-[10px] font-bold uppercase tracking-widest rounded hover:bg-brand-navy hover:text-white transition-colors">Bulk Labels</button>
-                        <button onClick={() => handleBulkPrint('credit-note')} className="px-3 py-1.5 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest rounded hover:bg-red-700 transition-colors">Bulk Credit Notes</button>
-                        <button onClick={() => setSelectedOrders([])} className="text-[10px] text-gray-400 uppercase font-bold tracking-widest hover:text-red-500">Cancel</button>
+                        <button onClick={() => handleBulkPrint('invoice')} className="px-4 py-2 bg-brand-navy text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-gold transition-colors shadow-md">Bulk Invoices</button>
+                        <button onClick={() => handleBulkPrint('label')} className="px-4 py-2 bg-brand-gold text-brand-navy text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-brand-navy hover:text-white transition-colors shadow-md">Bulk Labels</button>
+                        <button onClick={() => handleBulkPrint('credit-note')} className="px-4 py-2 bg-red-600 text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-red-700 transition-colors shadow-md">Bulk Credit Notes</button>
+                        <button onClick={() => setSelectedOrders([])} className="text-[10px] text-gray-500 uppercase font-black tracking-widest hover:text-red-500 underline ml-2">Cancel</button>
                     </div>
                 )}
             </div>

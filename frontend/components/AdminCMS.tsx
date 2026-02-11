@@ -314,19 +314,22 @@ export default function AdminCMS() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Destination URL</label>
-                                        <div className="flex gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="/shop/weddings"
-                                                value={newBanner.link}
-                                                onChange={(e) => setNewBanner({ ...newBanner, link: e.target.value })}
-                                                className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                            />
-                                            <button onClick={handleAddBanner} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md shadow-brand-navy/10 active:scale-95">
-                                                Add
-                                            </button>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="/shop/weddings"
+                                            value={newBanner.link}
+                                            onChange={(e) => setNewBanner({ ...newBanner, link: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                        />
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddBanner}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Banner
+                                    </button>
                                 </div>
                             </div>
 
@@ -338,7 +341,7 @@ export default function AdminCMS() {
                                             <div className="flex justify-between items-end">
                                                 <div>
                                                     <p className="text-white font-serif text-lg leading-tight">{banner.title}</p>
-                                                    <p className="text-brand-gold text-[10px] uppercase tracking-widest mt-1">{banner.link}</p>
+                                                    <p className="text-brand-gold text-[10px] uppercase tracking-widest mt-1">{banner.targetUrl}</p>
                                                 </div>
                                                 <button onClick={() => handleDeleteBanner(banner.id)} className="bg-white/10 backdrop-blur-md text-white p-3 rounded-full hover:bg-red-500 transition-colors border border-white/20">
                                                     <PiTrash />
@@ -397,20 +400,23 @@ export default function AdminCMS() {
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Coupon Code (Optional)</label>
-                                            <div className="flex gap-4">
-                                                <input
-                                                    type="text"
-                                                    placeholder="e.g. LOVE2024"
-                                                    value={newOffer.code}
-                                                    onChange={(e) => setNewOffer({ ...newOffer, code: e.target.value })}
-                                                    className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors font-mono tracking-widest text-brand-gold uppercase"
-                                                />
-                                                <button onClick={handleAddOffer} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
-                                                    Create
-                                                </button>
-                                            </div>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. LOVE20"
+                                                value={newOffer.code}
+                                                onChange={(e) => setNewOffer({ ...newOffer, code: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
                                         </div>
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddOffer}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Offer
+                                    </button>
                                 </div>
                             </div>
 
@@ -470,19 +476,22 @@ export default function AdminCMS() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Cover Image URL</label>
-                                        <div className="flex gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="https://..."
-                                                value={newCategory.imageUrl}
-                                                onChange={(e) => setNewCategory({ ...newCategory, imageUrl: e.target.value })}
-                                                className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                            />
-                                            <button onClick={handleAddCategory} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
-                                                Add
-                                            </button>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="https://..."
+                                            value={newCategory.imageUrl}
+                                            onChange={(e) => setNewCategory({ ...newCategory, imageUrl: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                        />
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddCategory}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Category
+                                    </button>
                                 </div>
                             </div>
 
@@ -544,19 +553,22 @@ export default function AdminCMS() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Category Image URL</label>
-                                        <div className="flex gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="https://..."
-                                                value={newPriceRange.imageUrl}
-                                                onChange={(e) => setNewPriceRange({ ...newPriceRange, imageUrl: e.target.value })}
-                                                className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                            />
-                                            <button onClick={handleAddPriceRange} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
-                                                Add
-                                            </button>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="https://..."
+                                            value={newPriceRange.imageUrl}
+                                            onChange={(e) => setNewPriceRange({ ...newPriceRange, imageUrl: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                        />
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddPriceRange}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Range
+                                    </button>
                                 </div>
                             </div>
 
@@ -594,20 +606,23 @@ export default function AdminCMS() {
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Tag Name</label>
-                                        <div className="flex gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="e.g. Recycled Gold"
-                                                value={newTag.name}
-                                                onChange={(e) => setNewTag({ ...newTag, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
-                                                className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                            />
-                                            <button onClick={handleAddTag} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
-                                                Add
-                                            </button>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Best Seller"
+                                            value={newTag.name}
+                                            onChange={(e) => setNewTag({ name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                        />
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end items-center gap-4">
                                     <p className="text-[10px] text-gray-600 font-mono italic">Slug: {newTag.slug}</p>
+                                    <button
+                                        onClick={handleAddTag}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Tag
+                                    </button>
                                 </div>
                             </div>
 
@@ -655,19 +670,22 @@ export default function AdminCMS() {
                                     </div>
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Caption / User</label>
-                                        <div className="flex gap-4">
-                                            <input
-                                                type="text"
-                                                placeholder="@username"
-                                                value={newSocialPost.caption}
-                                                onChange={(e) => setNewSocialPost({ ...newSocialPost, caption: e.target.value })}
-                                                className="flex-1 border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                            />
-                                            <button onClick={handleAddSocialPost} className="bg-brand-navy text-white px-6 py-2 rounded-xl hover:bg-brand-gold transition-all shadow-md active:scale-95">
-                                                Add
-                                            </button>
-                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="@sparkblue"
+                                            value={newSocialPost.caption}
+                                            onChange={(e) => setNewSocialPost({ ...newSocialPost, caption: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                        />
                                     </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddSocialPost}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Add Post
+                                    </button>
                                 </div>
                             </div>
 
@@ -717,9 +735,13 @@ export default function AdminCMS() {
                                             placeholder="A few sentences about your brand story..."
                                         />
                                     </div>
-
-                                    <button onClick={handleUpdateText} className="bg-brand-navy text-white px-10 py-4 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold transition-all shadow-lg active:scale-95">
-                                        Update Messaging
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleUpdateText}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Update Hero Narrative
                                     </button>
                                 </div>
                             </div>
@@ -765,9 +787,13 @@ export default function AdminCMS() {
                                         </div>
                                         <label htmlFor="toggle" className="text-sm font-bold text-brand-navy cursor-pointer">Activate Spotlight on Homepage</label>
                                     </div>
-
-                                    <button onClick={handleUpdateSpotlight} className="bg-brand-navy text-white px-10 py-4 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold transition-all shadow-lg active:scale-95">
-                                        Apply Configuration
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleUpdateSpotlight}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Update Spotlight
                                     </button>
                                 </div>
                             </div>

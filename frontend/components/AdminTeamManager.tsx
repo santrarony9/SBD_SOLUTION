@@ -165,7 +165,7 @@ export default function AdminTeamManager() {
                                             <td className="px-4 py-3 text-right">
                                                 <button
                                                     onClick={() => handleDelete(member.id, member.name)}
-                                                    className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 border border-red-200 rounded hover:bg-red-50 transition-colors"
+                                                    className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
                                                 >
                                                     Delete
                                                 </button>
@@ -239,7 +239,7 @@ export default function AdminTeamManager() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full bg-brand-navy text-white py-2.5 rounded font-bold uppercase tracking-widest text-xs hover:bg-brand-gold hover:text-brand-navy transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                            className="w-full bg-brand-navy text-white py-2.5 rounded-xl font-bold uppercase tracking-widest text-xs hover:bg-brand-gold hover:text-brand-navy transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                         >
                             {isLoading ? 'Creating...' : 'Create Admin Account'}
                         </button>
