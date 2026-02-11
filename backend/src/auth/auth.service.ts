@@ -255,7 +255,8 @@ export class AuthService {
             return teamMembers;
         } catch (error: any) {
             console.error('[Auth Debug] Error fetching team members:', error);
-            throw new Error(`Failed to fetch team: ${error.message}`);
+            // using InternalServerErrorException to ensure message passes through filter
+            throw new InternalServerErrorException(`Failed to fetch team: ${error.message}`);
         }
     }
 }
