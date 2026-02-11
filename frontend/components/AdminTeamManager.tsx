@@ -153,14 +153,22 @@ export default function AdminTeamManager() {
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className={`px-2 py-1 rounded text-xs font-bold ${member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                                                        member.role === 'PRICE_MANAGER' ? 'bg-blue-100 text-blue-700' :
-                                                            'bg-gray-100 text-gray-600'
+                                                    member.role === 'PRICE_MANAGER' ? 'bg-blue-100 text-blue-700' :
+                                                        'bg-gray-100 text-gray-600'
                                                     }`}>
                                                     {member.role.replace('_', ' ')}
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-gray-400">
                                                 {new Date(member.createdAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-4 py-3 text-right">
+                                                <button
+                                                    onClick={() => handleDelete(member.id, member.name)}
+                                                    className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 border border-red-200 rounded hover:bg-red-50 transition-colors"
+                                                >
+                                                    Delete
+                                                </button>
                                             </td>
                                         </tr>
                                     ))
