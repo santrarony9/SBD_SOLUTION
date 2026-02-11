@@ -66,6 +66,11 @@ export class AuthController {
         return this.authService.getTeamMembers();
     }
 
+    @Get('admin/staff')
+    async getStaff(@Request() req: any) {
+        return this.getTeam(req);
+    }
+
     @Get('ping')
     async ping() {
         return { message: 'pong', version: '2.1' };

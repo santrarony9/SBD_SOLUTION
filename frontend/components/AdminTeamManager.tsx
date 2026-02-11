@@ -11,16 +11,28 @@ export default function AdminTeamManager() {
     const [isLoading, setIsLoading] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
+    const [backendVersion, setBackendVersion] = useState<string | null>(null);
 
     useEffect(() => {
         loadTeam();
     }, []);
 
+    const checkVersion = async () => {
+        try {
+            const res = await fetchAPI('/version'); // Global version
+            setBackendVersion(res.version ? `v${res.version}` : 'Unknown');
+        } catch (e) {
+            setBackendVersion('Error');
+        }
+    };
+
     const loadTeam = async () => {
         setIsLoading(true);
         setError(null);
+        checkVersion(); // Check version on load
         try {
-            const data = await fetchAPI('/auth/admin/team');
+            // Using new endpoint to bypass cache
+            const data = await fetchAPI('/auth/admin/staff');
             if (Array.isArray(data)) {
                 setTeamMembers(data);
             } else {
@@ -80,6 +92,11 @@ export default function AdminTeamManager() {
                         <div>
                             <h3 className="text-lg font-serif text-brand-navy">Team Members</h3>
                             <p className="text-gray-400 text-sm">Manage administrators and staff access.</p>
+                            {backendVersion && (
+                                <span className="text-xs text-brand-gold bg-brand-navy px-2 py-0.5 rounded ml-2">
+                                    Backend: {backendVersion}
+                                </span>
+                            )}
                         </div>
                         <span className="bg-brand-navy text-brand-gold px-3 py-1 rounded-full text-xs font-bold">
                             Total: {teamMembers.length}
