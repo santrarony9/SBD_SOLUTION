@@ -57,7 +57,6 @@ import { UsersModule } from './users/users.module';
     ReviewsModule,
     DiagnosticsModule,
     OffersModule,
-    OffersModule,
     PromosModule,
     UsersModule,
     InventoryModule,

@@ -97,6 +97,7 @@ export class AuthService {
             },
         });
 
+        const { password: _, ...result } = updatedUser;
         return result;
     }
 
