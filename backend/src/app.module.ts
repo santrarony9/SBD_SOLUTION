@@ -31,6 +31,7 @@ import { MediaModule } from './media/media.module';
 import { ShiprocketModule } from './shiprocket/shiprocket.module';
 import { ChatModule } from './chat/chat.module';
 import { RazorpayModule } from './razorpay/razorpay.module';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { RazorpayModule } from './razorpay/razorpay.module';
     StoreModule,
     BannerModule,
     MarketingModule,
+    CategoriesModule,
     MailModule,
     ProfileModule,
     DashboardModule,

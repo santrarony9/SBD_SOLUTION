@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import ProductCard from '@/components/ProductCard';
 import { fetchAPI } from '@/lib/api';
 import FlashSale from '@/components/FlashSale';
+import InstagramFeed from '@/components/InstagramFeed';
 
 export const dynamic = 'force-dynamic';
 
@@ -60,6 +61,24 @@ async function getSpotlight() {
   }
 }
 
+async function getCategories() {
+  try {
+    return await fetchAPI('/categories');
+  } catch (e) { return []; }
+}
+
+async function getPriceRanges() {
+  try {
+    return await fetchAPI('/marketing/price-ranges');
+  } catch (e) { return []; }
+}
+
+async function getTags() {
+  try {
+    return await fetchAPI('/marketing/tags');
+  } catch (e) { return []; }
+}
+
 export default async function Home() {
   const allProducts = await getFeaturedProducts();
   const offers = await getOffers();
@@ -67,6 +86,11 @@ export default async function Home() {
   const featuredReviews = await getFeaturedReviews();
   const spotlightSetting = await getSpotlight();
   const heroText = await getHeroText();
+
+  // Dynamic Data
+  const categories = await getCategories();
+  const priceRanges = await getPriceRanges();
+  const tags = await getTags();
 
   const featuredProducts = allProducts.slice(0, 4);
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
@@ -181,30 +205,58 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. Featured Categories */}
+      {/* 4. Dynamic Categories */}
       <section className="py-24 max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">The Collection</span>
           <h2 className="text-4xl md:text-5xl font-serif text-brand-navy mt-4">Curated Excellence</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 lg:gap-8 auto-rows-[400px]">
-          <Link href="/shop?category=rings" className="group relative overflow-hidden md:col-span-2 bg-gray-100">
-            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
-            <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-3xl font-serif italic mb-2">Solitaire Rings</h3>
-              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1">Explore</span>
-            </div>
-          </Link>
-          <Link href="/shop?category=necklaces" className="group relative overflow-hidden bg-gray-100">
-            <div className="absolute inset-0 bg-[url('/featured-1.png')] bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" />
-            <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
-            <div className="absolute bottom-8 left-8 text-white">
-              <h3 className="text-3xl font-serif italic mb-2">Necklaces</h3>
-              <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1">Explore</span>
-            </div>
-          </Link>
+        {categories && categories.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {categories.map((cat: any) => (
+              <Link key={cat.id} href={`/shop?category=${cat.slug}`} className="group relative overflow-hidden bg-gray-100 aspect-square md:aspect-auto md:h-[400px]">
+                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style={{ backgroundImage: `url(${cat.imageUrl || '/featured-1.png'})` }} />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
+                <div className="absolute bottom-8 left-8 text-white">
+                  <h3 className="text-3xl font-serif italic mb-2">{cat.name}</h3>
+                  <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1">Explore</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center text-gray-400">Categories not configured.</div>
+        )}
+      </section>
+
+      {/* 5. Shop by Price (New) */}
+      <section className="py-16 bg-brand-cream border-t border-b border-brand-gold/10">
+        <div className="max-w-7xl mx-auto px-6">
+          <h2 className="text-3xl font-serif text-brand-navy mb-8 text-center">Shop by Price</h2>
+          <div className="flex flex-wrap justify-center gap-6">
+            {priceRanges && priceRanges.map((range: any) => (
+              <Link key={range.id} href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent hover:border-brand-gold min-w-[200px] text-center">
+                <span className="block text-2xl font-serif text-brand-navy mb-2 group-hover:text-brand-gold transition-colors">{range.label}</span>
+                {range.imageUrl && <img src={range.imageUrl} alt={range.label} className="w-12 h-12 object-contain mx-auto opacity-50 group-hover:opacity-100 transition-opacity" />}
+              </Link>
+            ))}
+            {(!priceRanges || priceRanges.length === 0) && <p className="text-gray-400">Price ranges not configured.</p>}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Trending Tags (New) */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-6 text-center">
+          <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Trending Now</span>
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            {tags && tags.map((tag: any) => (
+              <Link key={tag.id} href={`/shop?tag=${tag.slug}`} className="px-6 py-2 rounded-full border border-gray-200 text-brand-navy hover:bg-brand-navy hover:text-white transition-all text-sm uppercase tracking-widest">
+                #{tag.name}
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -282,6 +334,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* 8. Instagram Feed */}
+      <InstagramFeed />
 
       {/* 8. Brand Story */}
       <section className="py-24 bg-brand-navy text-white text-center">

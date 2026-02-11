@@ -20,6 +20,7 @@ interface Product {
         finalPrice: number;
     };
     category?: string;
+    tags?: string[];
 }
 
 import { Suspense } from 'react';
@@ -93,6 +94,25 @@ function ShopContent() {
             );
         }
 
+        // Filter by Tag (from URL)
+        const tagParam = searchParams.get('tag');
+        if (tagParam) {
+            result = result.filter(p => p.tags && p.tags.some(t => t.toLowerCase() === tagParam.toLowerCase()));
+        }
+
+        // Filter by Price (from URL)
+        const minPrice = searchParams.get('minPrice') ? Number(searchParams.get('minPrice')) : null;
+        const maxPrice = searchParams.get('maxPrice') ? Number(searchParams.get('maxPrice')) : null;
+
+        if (minPrice !== null || maxPrice !== null) {
+            result = result.filter(p => {
+                const price = p.pricing?.finalPrice || p.price || 0;
+                if (minPrice !== null && price < minPrice) return false;
+                if (maxPrice !== null && price > maxPrice) return false;
+                return true;
+            });
+        }
+
         // Sort
         result.sort((a, b) => {
             const priceA = a.pricing?.finalPrice || a.price || 0;
@@ -107,7 +127,7 @@ function ShopContent() {
         });
 
         return result;
-    }, [products, selectedCategories, sortBy]);
+    }, [products, selectedCategories, sortBy, searchParams]);
 
     return (
         <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">

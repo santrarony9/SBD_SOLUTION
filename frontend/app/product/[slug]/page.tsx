@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useCart } from "@/context/CartContext";
 import ProductReviews from "@/components/ProductReviews";
 import { fetchAPI } from '@/lib/api';
+import TrustBadges from '@/components/TrustBadges';
+import DropHintModal from '@/components/DropHintModal';
 
 interface Product {
     id: string;
@@ -49,6 +51,7 @@ export default function ProductDetailPage() {
     const [isCheckingPincode, setIsCheckingPincode] = useState(false);
     const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
     const [showCertificate, setShowCertificate] = useState(false);
+    const [showDropHint, setShowDropHint] = useState(false);
 
     const checkDelivery = () => {
         setIsCheckingPincode(true);
@@ -281,6 +284,16 @@ export default function ProductDetailPage() {
                             </button>
                         </div>
 
+                        <button
+                            onClick={() => setShowDropHint(true)}
+                            className="w-full h-10 border border-dashed border-brand-gold/50 text-brand-gold font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                            </svg>
+                            Drop a Hint
+                        </button>
+
                         {/* Price Breakup Panel */}
                         <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                             <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50">
@@ -323,6 +336,8 @@ export default function ProductDetailPage() {
                             <span>15 Day Returns</span>
                         </div>
                     </div>
+
+                    <TrustBadges />
 
                     {/* Delivery Estimator */}
                     <div className="mt-8 bg-brand-cream/20 p-5 rounded-sm border border-brand-gold/10">
@@ -408,6 +423,13 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             )}
+
+            <DropHintModal
+                isOpen={showDropHint}
+                onClose={() => setShowDropHint(false)}
+                productName={product.name}
+                productId={product.id}
+            />
 
             {/* Reviews Section - Kept Separate */}
             <div className="max-w-7xl mx-auto px-6 mt-24">

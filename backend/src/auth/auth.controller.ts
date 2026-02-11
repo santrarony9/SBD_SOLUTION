@@ -43,8 +43,12 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Post('admin/create')
     async createAdmin(@Body() body: any, @Request() req: any) {
+        console.log('[Auth Debug] createAdmin called by:', req.user);
+        console.log('[Auth Debug] Body:', body);
+
         // Simple role check
         if (req.user.role !== 'ADMIN') {
+            console.log('[Auth Debug] Access Denied. User role:', req.user.role);
             throw new UnauthorizedException('Only Admins can create new Admins');
         }
         return this.authService.createAdmin(body);

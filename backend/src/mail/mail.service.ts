@@ -44,4 +44,35 @@ export class MailService {
             throw new Error('Failed to send reset email');
         }
     }
+
+    async sendAbandonedCartEmail(to: string, userName: string, productName: string, productLink: string) {
+        const mailOptions = {
+            from: `"Spark Blue Diamond" <${process.env.SMTP_USER}>`,
+            to,
+            subject: 'You left something sparkling behind... ✨',
+            html: `
+                <div style="font-family: 'serif'; color: #001f3f; padding: 40px; border: 1px solid #D4AF37; max-width: 600px; margin: 0 auto; background-color: #f9f9f9;">
+                    <h1 style="color: #001f3f; text-align: center; border-bottom: 2px solid #D4AF37; padding-bottom: 20px;">Spark Blue Diamond</h1>
+                    
+                    <p style="font-size: 16px;">Dear ${userName},</p>
+                    
+                    <p style="font-size: 16px;">We noticed you left <strong>${productName}</strong> in your cart. It's a truly exquisite piece that deserves to be worn.</p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${productLink}" style="background: #001f3f; color: #D4AF37; padding: 15px 30px; text-decoration: none; display: inline-block; font-weight: bold; border: 1px solid #D4AF37;">COMPLETE YOUR ORDER</a>
+                    </div>
+                    
+                    <p style="font-size: 14px; color: #666; text-align: center;">Need help? Reply to this email or contact our concierge.</p>
+                </div>
+            `,
+        };
+
+        try {
+            await this.transporter.sendMail(mailOptions);
+            console.log(`Abandoned cart email sent to ${to}`);
+        } catch (error) {
+            console.error('Error sending abandoned cart email:', error);
+            // Don't throw, just log so cleanup service continues
+        }
+    }
 }

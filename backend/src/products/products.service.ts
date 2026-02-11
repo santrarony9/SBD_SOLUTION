@@ -93,12 +93,36 @@ export class ProductsService {
         return this.prisma.product.delete({ where: { id } });
     }
 
-    async findAll() {
-        const products = await this.prisma.product.findMany({ where: { isActive: true } });
-        // In list view, we might want to return calculated price too, or just basic info.
-        // For performance, maybe just basic info or simplified calc.
-        // Let's attach price for now.
-        return Promise.all(products.map(p => this.enrichWithPrice(p)));
+    async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number }) {
+        const where: any = { isActive: true };
+
+        if (filters?.category) {
+            where.category = filters.category;
+        }
+
+        if (filters?.tag) {
+            where.tags = { has: filters.tag };
+        }
+
+        // Price filtering is tricky because price is calculated dynamically.
+        // For MVP, we filter by 'category' and 'tag' at DB level.
+        // Price filtering might need to happen after fetching, or we store estimated price.
+        // Given existing structure, we filter after fetch if price filter exists.
+
+        const products = await this.prisma.product.findMany({ where });
+
+        const enriched = await Promise.all(products.map(p => this.enrichWithPrice(p)));
+
+        if (filters?.minPrice || filters?.maxPrice) {
+            return enriched.filter(p => {
+                const price = p.pricing?.finalPrice || 0;
+                if (filters.minPrice && price < filters.minPrice) return false;
+                if (filters.maxPrice && price > filters.maxPrice) return false;
+                return true;
+            });
+        }
+
+        return enriched;
     }
 
     async findOne(slugOrId: string) {

@@ -1,10 +1,14 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { MarketingService } from './marketing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Controller('marketing')
 export class MarketingController {
-    constructor(private whatsapp: WhatsappService) { }
+    constructor(
+        private readonly whatsapp: WhatsappService,
+        private readonly marketingService: MarketingService
+    ) { }
 
     @UseGuards(JwtAuthGuard)
     @Post('broadcast')
@@ -30,5 +34,82 @@ export class MarketingController {
             { id: '1', name: 'Rahul VIP', spent: 150000 },
             { id: '2', name: 'Priya Elite', spent: 250000 },
         ];
+    }
+
+    // --- Price Ranges ---
+    @Get('price-ranges')
+    findAllPriceRanges() {
+        return this.marketingService.findAllPriceRanges();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('price-ranges')
+    createPriceRange(@Body() data: any) {
+        return this.marketingService.createPriceRange(data);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('price-ranges/:id')
+    updatePriceRange(@Param('id') id: string, @Body() data: any) {
+        return this.marketingService.updatePriceRange(id, data);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('price-ranges/:id')
+    removePriceRange(@Param('id') id: string) {
+        return this.marketingService.removePriceRange(id);
+    }
+
+    // --- Tags ---
+    @Get('tags')
+    findAllTags() {
+        return this.marketingService.findAllTags();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('tags')
+    createTag(@Body() data: any) {
+        return this.marketingService.createTag(data);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Put('tags/:id')
+    updateTag(@Param('id') id: string, @Body() data: any) {
+        return this.marketingService.updateTag(id, data);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('tags/:id')
+    removeTag(@Param('id') id: string) {
+        return this.marketingService.removeTag(id);
+    }
+
+    // --- Social Posts ---
+    @Get('social-posts')
+    findAllSocialPosts() {
+        return this.marketingService.findAllSocialPosts();
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('social-posts')
+    createSocialPost(@Body() data: any) {
+        return this.marketingService.createSocialPost(data);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('social-posts/:id')
+    removeSocialPost(@Param('id') id: string) {
+        return this.marketingService.removeSocialPost(id);
+    }
+
+    // --- Drop a Hint ---
+    @Post('hint')
+    async sendHint(@Body() data: { productId: string, senderName: string, recipientName: string, recipientEmail: string, note?: string }) {
+        return this.marketingService.sendHint(data);
+    }
+
+    @Post('gift-recommendations')
+    async getGiftRecommendations(@Body() body: { recipient: string, occasion: string, budget: string, style: string }) {
+        return this.marketingService.getGiftRecommendations(body);
     }
 }

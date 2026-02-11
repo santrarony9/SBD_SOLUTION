@@ -174,7 +174,8 @@ model Product {
   certificatePdf       String? // URL
   
   // Products
-  category    String   // Rings, Necklaces, etc.
+  category    String   // Legacy string, can be migrated to relation later if needed
+  tags        String[] // Array of tag slugs/names
   
   // Media
   images      String[] // Support gallery
@@ -229,6 +230,43 @@ model PromoCode {
 }
 
 // --------------------------------------
+// DYNAMIC FRONTEND METADATA
+// --------------------------------------
+
+model Category {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique
+  slug        String   @unique
+  imageUrl    String?
+  description String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PriceRange {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  label       String   // e.g. "Under ₹10k"
+  minPrice    Float
+  maxPrice    Float?   // Null means "Above X"
+  imageUrl    String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Tag {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String   @unique // e.g. "Best Seller", "New Arrival"
+  slug        String   @unique
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// --------------------------------------
 // E-COMMERCE CORE
 // --------------------------------------
 
@@ -238,8 +276,22 @@ model Cart {
   user      User?      @relation(fields: [userId], references: [id])
   items     CartItem[]
   lastNotifiedAt DateTime?
+  recoveryEmailSent Boolean @default(false) // For Abandoned Cart Recovery
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
+}
+
+model SocialPost {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  imageUrl  String
+  caption   String?
+  link      String?
+  username  String?  @default("@sparkbluediamond")
+  likes     Int      @default(0)
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 // --------------------------------------

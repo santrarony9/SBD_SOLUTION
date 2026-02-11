@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class CartCleanupService {
@@ -9,7 +10,8 @@ export class CartCleanupService {
 
     constructor(
         private prisma: PrismaService,
-        private whatsappService: WhatsappService
+        private whatsappService: WhatsappService,
+        private mailService: MailService
     ) { }
 
     // Run every hour
@@ -17,16 +19,16 @@ export class CartCleanupService {
     async handleAbandonedCarts() {
         this.logger.log('Checking for abandoned carts...');
 
-        // Definition: Updated > 12 hours ago, Not yet notified
-        const deadline = new Date(Date.now() - 12 * 60 * 60 * 1000);
+        // Definition: Updated > 1 hour ago, Not yet notified
+        const deadline = new Date(Date.now() - 1 * 60 * 60 * 1000);
 
         const abandonedCarts = await this.prisma.cart.findMany({
             where: {
                 updatedAt: { lt: deadline },
-                lastNotifiedAt: null, // Only notify once
+                recoveryEmailSent: false, // Check new flag
                 items: { some: {} }, // Must have items
                 user: {
-                    is: { mobile: { not: null } } // Must have mobile
+                    is: { email: { not: null } } // Must have email
                 }
             },
             include: {
@@ -37,27 +39,41 @@ export class CartCleanupService {
             }
         });
 
-        this.logger.log(`Found ${abandonedCarts.length} abandoned carts.`);
+        this.logger.log(`Found ${abandonedCarts.length} abandoned carts eligible for recovery.`);
 
         for (const cart of abandonedCarts) {
             // Safety check
-            if (!cart.user || !cart.user.mobile || cart.items.length === 0) continue;
+            if (!cart.user || !cart.user.email || cart.items.length === 0) continue;
 
             const product = cart.items[0].product; // Use first item for preview
-            const discountCode = 'COMEBACK5'; // Could be dynamic
+            const productLink = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/product/${product.slug}`;
 
             try {
-                await this.whatsappService.sendAbandonedCartReminder(
-                    cart.user.mobile,
-                    product.images[0] || '',
+                // Send Email via MailService (assuming injected)
+                await this.mailService.sendAbandonedCartEmail(
+                    cart.user.email,
+                    cart.user.name,
                     product.name,
-                    discountCode
+                    productLink
                 );
 
-                // Update DB so we don't spam
+                // Also try WhatsApp if available (existing logic)
+                if (cart.user.mobile) {
+                    await this.whatsappService.sendAbandonedCartReminder(
+                        cart.user.mobile,
+                        product.images[0] || '',
+                        product.name,
+                        'COMEBACK5'
+                    );
+                }
+
+                // Update DB 
                 await this.prisma.cart.update({
                     where: { id: cart.id },
-                    data: { lastNotifiedAt: new Date() }
+                    data: {
+                        lastNotifiedAt: new Date(),
+                        recoveryEmailSent: true
+                    }
                 });
 
                 this.logger.log(`Notified user ${cart.user.email} (Cart ${cart.id})`);
