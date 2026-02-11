@@ -266,31 +266,64 @@ export default function AdminCMS() {
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <h3 className="text-lg font-serif text-brand-navy mb-4">Add New Banner</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <input
-                                type="text"
-                                placeholder="Image URL (e.g., /hero1.jpg)"
-                                value={newBanner.imageUrl}
-                                onChange={(e) => setNewBanner({ ...newBanner, imageUrl: e.target.value })}
-                                className="border p-2 rounded text-sm outline-none focus:border-brand-gold"
-                            />
-                            <input
-                                type="text"
-                                placeholder="Title (Optional)"
-                                value={newBanner.title}
-                                onChange={(e) => setNewBanner({ ...newBanner, title: e.target.value })}
-                                className="border p-2 rounded text-sm outline-none focus:border-brand-gold"
-                            />
-                            <div className="flex gap-2">
+                            <div className="relative group">
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">
+                                    Banner Image
+                                    <span className="ml-2 text-[9px] text-brand-gold bg-brand-navy/5 px-2 py-0.5 rounded">
+                                        Size: 1920x1080px | Max: 5MB
+                                    </span>
+                                </label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                if (file.size > 5 * 1024 * 1024) {
+                                                    alert('File is too large! Max 5MB allowed.');
+                                                    return;
+                                                }
+                                                // Reuse the same upload logic as products
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                fetchAPI('/media/upload', {
+                                                    method: 'POST',
+                                                    body: formData,
+                                                })
+                                                    .then(res => setNewBanner({ ...newBanner, imageUrl: res.url }))
+                                                    .catch(() => showStatus('Upload Failed', 'error'));
+                                            }
+                                        }}
+                                        className="border p-2 rounded text-sm outline-none focus:border-brand-gold w-full text-xs"
+                                    />
+                                </div>
+                                {newBanner.imageUrl && <p className="text-[10px] text-green-600 mt-1 truncate">Uploaded: {newBanner.imageUrl}</p>}
+                            </div>
+                            <div className="relative">
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Kicker / Title</label>
                                 <input
                                     type="text"
-                                    placeholder="Link (e.g. /shop)"
-                                    value={newBanner.link}
-                                    onChange={(e) => setNewBanner({ ...newBanner, link: e.target.value })}
-                                    className="border p-2 rounded text-sm outline-none focus:border-brand-gold flex-1"
+                                    placeholder="e.g. Est. 1995"
+                                    value={newBanner.title}
+                                    onChange={(e) => setNewBanner({ ...newBanner, title: e.target.value })}
+                                    className="border p-2 rounded text-sm outline-none focus:border-brand-gold w-full"
                                 />
-                                <button onClick={handleAddBanner} className="bg-brand-navy text-white px-4 rounded hover:bg-brand-gold/80 transition-colors">
-                                    <PiPlus />
-                                </button>
+                            </div>
+                            <div className="relative">
+                                <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Link URL</label>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        placeholder="/shop"
+                                        value={newBanner.link}
+                                        onChange={(e) => setNewBanner({ ...newBanner, link: e.target.value })}
+                                        className="border p-2 rounded text-sm outline-none focus:border-brand-gold flex-1"
+                                    />
+                                    <button onClick={handleAddBanner} className="bg-brand-navy text-white px-4 rounded hover:bg-brand-gold/80 transition-colors">
+                                        <PiPlus />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -5,6 +5,7 @@ import ProductCard from '@/components/ProductCard';
 import { fetchAPI } from '@/lib/api';
 import FlashSale from '@/components/FlashSale';
 import InstagramFeed from '@/components/InstagramFeed';
+import HeroSlider from '@/components/HeroSlider';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,78 +95,14 @@ export default async function Home() {
 
   const featuredProducts = allProducts.slice(0, 4);
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
-  const activeBanner = banners.find((b: any) => b.isActive) || banners[0] || {
-    imageUrl: '/hero-jewellery.png',
-    title: 'Est. 1995',
-    link: '/shop'
-  };
-
   const heroTitle = heroText?.title || "Elegance is Eternal";
   const heroSubtitle = heroText?.subtitle || "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
 
   return (
     <div className="bg-brand-cream font-sans overflow-x-hidden">
 
-      {/* 1. Hero Section */}
-      <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Image with Slow Parallax */}
-        <div className="absolute inset-0 z-0 h-full w-full select-none">
-          <Image
-            src={activeBanner.imageUrl}
-            alt={activeBanner.title || "Royal Diamond Collection"}
-            fill
-            priority
-            className="object-cover animate-scale-slow"
-            style={{ objectPosition: 'center 30%' }}
-          />
-          {/* Sophisticated Gradient - Darker at bottom for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/10 to-brand-navy/80 mix-blend-multiply" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
-
-          <h2 className="text-brand-gold/90 font-serif italic text-lg md:text-2xl mb-6 tracking-[0.3em] animate-fade-in-up delay-200 uppercase font-medium">
-            {activeBanner.title}
-          </h2>
-
-          <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight tracking-tight animate-fade-in-up delay-300 drop-shadow-lg">
-            {heroTitle.includes('Eternal') ? (
-              <>
-                {heroTitle.split('Eternal')[0]}
-                <span className="text-brand-gold italic pr-2">Eternal</span>
-                {heroTitle.split('Eternal')[1]}
-              </>
-            ) : (
-              heroTitle
-            )}
-          </h1>
-
-          <p className="text-gray-200 max-w-2xl text-lg md:text-xl mb-12 font-light tracking-wide leading-relaxed animate-fade-in-up delay-500 drop-shadow-md">
-            {heroSubtitle}
-          </p>
-
-          <div className="flex flex-col md:flex-row gap-8 animate-fade-in-up delay-700">
-            <Link
-              href={activeBanner.link || "/shop"}
-              className="bg-white text-brand-navy px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20"
-            >
-              Shop Collection
-            </Link>
-            <Link
-              href="/about"
-              className="bg-transparent text-white px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white"
-            >
-              Our Heritage
-            </Link>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-12 left-1/2 -translate-x-1/2 animate-bounce-slow opacity-0 animate-fade-in delay-1000">
-          <span className="text-white/60 text-[10px] tracking-[0.4em] uppercase">Explore</span>
-        </div>
-      </section>
+      {/* 1. Hero Section (Slider) */}
+      <HeroSlider banners={banners} heroText={{ title: heroTitle, subtitle: heroSubtitle }} />
 
       {/* 2. Flash Sale Component (Dynamic) */}
       <FlashSale />
