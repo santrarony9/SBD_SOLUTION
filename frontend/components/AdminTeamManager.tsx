@@ -31,8 +31,8 @@ export default function AdminTeamManager() {
         setError(null);
         checkVersion(); // Check version on load
         try {
-            // Using new endpoint to bypass cache
-            const data = await fetchAPI('/auth/admin/staff');
+            // Using new Users Module endpoint
+            const data = await fetchAPI('/users');
             if (Array.isArray(data)) {
                 setTeamMembers(data);
             } else {
@@ -60,7 +60,7 @@ export default function AdminTeamManager() {
 
         setIsLoading(true);
         try {
-            await fetchAPI('/auth/admin/create', {
+            await fetchAPI('/users', {
                 method: 'POST',
                 body: JSON.stringify(newAdmin)
             });
@@ -81,7 +81,7 @@ export default function AdminTeamManager() {
         }
 
         try {
-            await fetchAPI(`/auth/admin/delete/${id}`, { method: 'DELETE' });
+            await fetchAPI(`/users/${id}`, { method: 'DELETE' });
             showStatus('User Deleted Successfully', 'success');
             loadTeam(); // Refresh list
         } catch (error: any) {

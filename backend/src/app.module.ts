@@ -32,6 +32,7 @@ import { ShiprocketModule } from './shiprocket/shiprocket.module';
 import { ChatModule } from './chat/chat.module';
 import { RazorpayModule } from './razorpay/razorpay.module';
 import { CategoriesModule } from './categories/categories.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -56,7 +57,9 @@ import { CategoriesModule } from './categories/categories.module';
     ReviewsModule,
     DiagnosticsModule,
     OffersModule,
+    OffersModule,
     PromosModule,
+    UsersModule,
     InventoryModule,
     CrmModule,
     InvoiceModule,

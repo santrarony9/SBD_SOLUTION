@@ -97,33 +97,6 @@ export class AuthService {
             },
         });
 
-        const { password: _, ...result } = updatedUser;
-        return result;
-    }
-
-    async createAdmin(data: any) {
-        const { name, email, password, role } = data;
-        const normalizedEmail = email.toLowerCase();
-
-        // Check if email already exists
-        const existingUser = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
-        if (existingUser) {
-            throw new UnauthorizedException('User with this email already exists');
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-
-        const newAdmin = await this.prisma.user.create({
-            data: {
-                name,
-                email: normalizedEmail,
-                password: hashedPassword,
-                role: role || 'ADMIN', // Default to ADMIN if not provided
-                mobile: null, // Admin created via email doesn't need mobile immediately
-            }
-        });
-
-        const { password: _, ...result } = newAdmin;
         return result;
     }
 
@@ -224,40 +197,5 @@ export class AuthService {
         });
 
         return { message: 'Password reset successfully' };
-    }
-
-    async getTeamMembers() {
-        try {
-            console.log('[Auth Debug] Fetching team members (MOCK MODE)...');
-
-            // Fetch users with roles that are considered "Team Members"
-            // CASTING TO ANY TO AVOID RUNTIME ENUM ISSUES
-            const roles: any[] = ['ADMIN', 'STAFF', 'PRICE_MANAGER'];
-
-            const teamMembers = await this.prisma.user.findMany({
-                where: {
-                    role: {
-                        in: roles
-                    }
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    role: true,
-                    createdAt: true,
-                    // Exclude sensitive data like password
-                },
-                orderBy: {
-                    createdAt: 'desc'
-                }
-            });
-            console.log(`[Auth Debug] Found ${teamMembers.length} team members.`);
-            return teamMembers;
-        } catch (error: any) {
-            console.error('[Auth Debug] Error fetching team members:', error);
-            // using InternalServerErrorException to ensure message passes through filter
-            throw new InternalServerErrorException(`Failed to fetch team: ${error.message}`);
-        }
     }
 }
