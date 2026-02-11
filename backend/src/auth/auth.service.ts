@@ -227,25 +227,35 @@ export class AuthService {
     }
 
     async getTeamMembers() {
-        // Fetch users with roles that are considered "Team Members"
-        const teamMembers = await this.prisma.user.findMany({
-            where: {
-                role: {
-                    in: [Role.ADMIN, Role.STAFF, Role.PRICE_MANAGER]
+        try {
+            console.log('[Auth Debug] Fetching team members...');
+            // Fetch users with roles that are considered "Team Members"
+            // CASTING TO ANY TO AVOID RUNTIME ENUM ISSUES
+            const roles: any[] = ['ADMIN', 'STAFF', 'PRICE_MANAGER'];
+
+            const teamMembers = await this.prisma.user.findMany({
+                where: {
+                    role: {
+                        in: roles
+                    }
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    role: true,
+                    createdAt: true,
+                    // Exclude sensitive data like password
+                },
+                orderBy: {
+                    createdAt: 'desc'
                 }
-            },
-            select: {
-                id: true,
-                name: true,
-                email: true,
-                role: true,
-                createdAt: true,
-                // Exclude sensitive data like password
-            },
-            orderBy: {
-                createdAt: 'desc'
-            }
-        });
-        return teamMembers;
+            });
+            console.log(`[Auth Debug] Found ${teamMembers.length} team members.`);
+            return teamMembers;
+        } catch (error: any) {
+            console.error('[Auth Debug] Error fetching team members:', error);
+            throw new Error(`Failed to fetch team: ${error.message}`);
+        }
     }
 }
