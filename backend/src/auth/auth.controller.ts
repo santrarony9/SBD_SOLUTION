@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
 
@@ -52,5 +52,17 @@ export class AuthController {
             throw new UnauthorizedException('Only Admins can create new Admins');
         }
         return this.authService.createAdmin(body);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('admin/team')
+    // Note: Using POST purely for consistency if needed, but GET is more appropriate. 
+    // However, looking at previous patterns, let's use GET as planned.
+    @Get('admin/team')
+    async getTeam(@Request() req: any) {
+        if (req.user.role !== 'ADMIN') {
+            throw new UnauthorizedException('Only Admins can view team members');
+        }
+        return this.authService.getTeamMembers();
     }
 }

@@ -1,5 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { Role } from '@prisma/client';
+
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { SmsService } from '../sms/sms.service';
@@ -222,5 +224,28 @@ export class AuthService {
         });
 
         return { message: 'Password reset successfully' };
+    }
+
+    async getTeamMembers() {
+        // Fetch users with roles that are considered "Team Members"
+        const teamMembers = await this.prisma.user.findMany({
+            where: {
+                role: {
+                    in: [Role.ADMIN, Role.STAFF, Role.PRICE_MANAGER]
+                }
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                createdAt: true,
+                // Exclude sensitive data like password
+            },
+            orderBy: {
+                createdAt: 'desc'
+            }
+        });
+        return teamMembers;
     }
 }
