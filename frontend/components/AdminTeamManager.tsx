@@ -152,9 +152,10 @@ export default function AdminTeamManager() {
                                                 <div className="text-xs text-brand-navy/70">{member.email}</div>
                                             </td>
                                             <td className="px-4 py-3">
-                                                <span className={`px-2 py-1 rounded text-xs font-bold ${member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
-                                                    member.role === 'PRICE_MANAGER' ? 'bg-blue-100 text-blue-700' :
-                                                        'bg-gray-100 text-gray-600'
+                                                <span className={`px-2 py-1 rounded text-xs font-bold ${member.role === 'SUPER_ADMIN' ? 'bg-amber-100 text-amber-700' :
+                                                    member.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' :
+                                                        member.role === 'PRICE_MANAGER' ? 'bg-blue-100 text-blue-700' :
+                                                            'bg-gray-100 text-gray-600'
                                                     }`}>
                                                     {member.role.replace('_', ' ')}
                                                 </span>
@@ -163,12 +164,14 @@ export default function AdminTeamManager() {
                                                 {new Date(member.createdAt).toLocaleDateString()}
                                             </td>
                                             <td className="px-4 py-3 text-right">
-                                                <button
-                                                    onClick={() => handleDelete(member.id, member.name)}
-                                                    className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
-                                                >
-                                                    Delete
-                                                </button>
+                                                {member.role !== 'SUPER_ADMIN' && (
+                                                    <button
+                                                        onClick={() => handleDelete(member.id, member.name)}
+                                                        className="text-red-500 hover:text-red-700 text-xs font-medium px-2 py-1 border border-red-200 rounded-lg hover:bg-red-50 transition-colors"
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))
@@ -219,7 +222,8 @@ export default function AdminTeamManager() {
                                 onChange={(e) => setNewAdmin({ ...newAdmin, role: e.target.value })}
                                 className="w-full border p-2.5 rounded text-sm outline-none focus:border-brand-gold bg-gray-50 text-brand-navy appearance-none"
                             >
-                                <option value="ADMIN">Super Admin</option>
+                                <option value="SUPER_ADMIN">Kingdom Head (Super Admin)</option>
+                                <option value="ADMIN">Administrator</option>
                                 <option value="PRICE_MANAGER">Price Manager</option>
                                 <option value="STAFF">Staff</option>
                             </select>

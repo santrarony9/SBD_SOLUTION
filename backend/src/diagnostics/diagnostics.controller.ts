@@ -69,14 +69,14 @@ export class DiagnosticsController {
                 where: { email },
                 update: {
                     password: hashedPassword,
-                    role: Role.ADMIN,
+                    role: 'SUPER_ADMIN' as any,
                     name: 'Super Admin',
                 },
                 create: {
                     email,
                     password: hashedPassword,
                     name: 'Super Admin',
-                    role: Role.ADMIN,
+                    role: 'SUPER_ADMIN' as any,
                 },
             });
 

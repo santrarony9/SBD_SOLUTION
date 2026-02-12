@@ -31,10 +31,14 @@ export class UsersService {
         return result;
     }
 
+    async findById(id: string) {
+        return this.prisma.user.findUnique({ where: { id } });
+    }
+
     async findAll() {
         try {
             console.log('[Users Debug] Fetching users...');
-            const roles: any[] = ['ADMIN', 'STAFF', 'PRICE_MANAGER'];
+            const roles: any[] = ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PRICE_MANAGER'];
 
             const users = await this.prisma.user.findMany({
                 where: {
