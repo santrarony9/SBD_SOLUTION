@@ -154,6 +154,24 @@ function ShopContent() {
                 </div>
             </div>
 
+            {/* Mobile Category Scroll (Visible only on mobile/tablet) */}
+            <div className="md:hidden mb-8 px-6 overflow-x-auto scrollbar-hide">
+                <div className="flex space-x-3">
+                    {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
+                        <button
+                            key={cat}
+                            onClick={() => toggleCategory(cat)}
+                            className={`flex-shrink-0 px-4 py-2 border rounded-full text-[10px] uppercase tracking-widest font-bold whitespace-nowrap transition-colors ${selectedCategories.includes(cat.toLowerCase())
+                                    ? 'bg-brand-navy border-brand-navy text-white'
+                                    : 'bg-white border-gray-200 text-gray-500'
+                                }`}
+                        >
+                            {cat}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
             {/* Content Container */}
             <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-12">
 
@@ -248,7 +266,7 @@ function ShopContent() {
 
                             {/* Grid */}
                             {filteredAndSortedProducts.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
                                     {filteredAndSortedProducts.map((product, index) => (
                                         <div key={product.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
                                             <ProductCard product={mapToCardProps(product)} />

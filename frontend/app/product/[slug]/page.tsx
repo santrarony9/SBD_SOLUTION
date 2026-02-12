@@ -257,16 +257,16 @@ export default function ProductDetailPage() {
                         </p>
                     </div>
 
-                    {/* Actions - Sticky if needed within container */}
-                    <div className="space-y-3 mt-auto pt-4 border-t border-gray-100">
+                    {/* Actions - Sticky Bottom on Mobile */}
+                    <div className="bg-white/95 backdrop-blur-lg border-t border-gray-100 p-4 lg:p-0 lg:bg-transparent lg:border-none fixed bottom-0 left-0 right-0 z-50 lg:static lg:z-auto shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] lg:shadow-none space-y-3 mt-auto pt-4">
                         <button
                             onClick={() => product && addToCart(product.id, 1)}
-                            className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                            className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-14 lg:h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
                             <span className="relative z-10">Add to Cart</span>
                             <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                         </button>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        <div className="grid grid-cols-2 gap-3 pb-safe lg:pb-0">
                             <button
                                 onClick={() => setShowBreakup(!showBreakup)}
                                 className="w-full h-10 border border-brand-navy/10 text-brand-navy font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
@@ -274,25 +274,18 @@ export default function ProductDetailPage() {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                 </svg>
-                                {showBreakup ? 'Hide Breakup' : 'Price Breakup'}
+                                {showBreakup ? 'Hide' : 'Breakup'}
                             </button>
-                            <button className="w-full h-12 border border-brand-navy/10 text-brand-navy font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-xs flex items-center justify-center gap-2">
+                            <button
+                                onClick={() => setShowDropHint(true)}
+                                className="w-full h-10 border border-dashed border-brand-gold/50 text-brand-gold font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
+                            >
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                                 </svg>
-                                Wishlist
+                                Drop Hint
                             </button>
                         </div>
-
-                        <button
-                            onClick={() => setShowDropHint(true)}
-                            className="w-full h-10 border border-dashed border-brand-gold/50 text-brand-gold font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                            </svg>
-                            Drop a Hint
-                        </button>
 
                         {/* Price Breakup Panel */}
                         <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>

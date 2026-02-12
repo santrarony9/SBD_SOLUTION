@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -37,9 +37,19 @@ export class OrdersController {
 
     @UseGuards(JwtAuthGuard)
     @Get('all')
-    async getAllOrders() {
+    async getAllOrders(
+        @Query('status') status?: string,
+        @Query('search') search?: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+    ) {
         // In a real app, check for ADMIN role in guard
-        return this.ordersService.getAllOrders();
+        return this.ordersService.getAllOrders(
+            status,
+            search,
+            page ? Number(page) : 1,
+            limit ? Number(limit) : 20,
+        );
     }
 
     @UseGuards(JwtAuthGuard)

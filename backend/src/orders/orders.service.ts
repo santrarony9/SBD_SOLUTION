@@ -167,15 +167,59 @@ export class OrdersService {
     }
 
     // Admin: Get all orders
-    async getAllOrders() {
-        return this.prisma.order.findMany({
-            orderBy: { createdAt: 'desc' },
-            include: {
-                items: true,
-                user: {
-                    select: { name: true, email: true }
-                }
+    async getAllOrders(status?: string, search?: string, page: number = 1, limit: number = 20) {
+        const skip = (page - 1) * limit;
+        const where: any = {};
+
+        if (status && status !== 'ALL') {
+            where.status = status;
+        }
+
+        if (search) {
+            where.OR = [
+                { id: { contains: search, mode: 'insensitive' } },
+                { user: { name: { contains: search, mode: 'insensitive' } } },
+                { user: { email: { contains: search, mode: 'insensitive' } } },
+                { user: { phone: { contains: search, mode: 'insensitive' } } },
+            ];
+        }
+
+        const [orders, total] = await Promise.all([
+            this.prisma.order.findMany({
+                where,
+                include: {
+                    user: {
+                        select: { name: true, email: true },
+                    },
+                    items: true,
+                },
+                orderBy: { createdAt: 'desc' },
+                take: limit,
+                skip: skip,
+            }),
+            this.prisma.order.count({ where }),
+        ]);
+
+        return {
+            data: orders,
+            meta: {
+                total,
+                page,
+                last_page: Math.ceil(total / limit),
             },
+        };
+    }
+
+    async updatePhonePeDetails(orderId: string, merchantTransactionId: string) {
+        return (this.prisma as any).order.update({
+            where: { id: orderId },
+            data: { phonepeMerchantTransactionId: merchantTransactionId }
+        });
+    }
+
+    async findByPhonePeTransactionId(merchantTransactionId: string) {
+        return (this.prisma as any).order.findFirst({
+            where: { phonepeMerchantTransactionId: merchantTransactionId }
         });
     }
 
@@ -246,7 +290,7 @@ export class OrdersService {
         const order = await this.prisma.order.findUnique({ where: { id: orderId } });
         if (!order) return null;
 
-        const updatedOrder = await this.prisma.order.update({
+        const updatedOrder = await (this.prisma as any).order.update({
             where: { id: orderId },
             data: {
                 status: 'CONFIRMED',

@@ -379,7 +379,7 @@ model Order {
   
   // Payment Details (Razorpay)
   razorpayOrderId   String?
-  razorpayOrderId   String?
+
   razorpayPaymentId String?
   
   // Payment Details (PhonePe)

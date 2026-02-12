@@ -63,7 +63,7 @@ export class PhonePeService {
                 this.httpService.post(url, { request: base64Payload }, options)
             );
 
-            const data = response.data;
+            const data = response.data as any;
 
             if (data.success) {
                 // Save the merchantTransactionId to the order for later verification
@@ -102,7 +102,7 @@ export class PhonePeService {
                 })
             );
 
-            const data = response.data;
+            const data = response.data as any;
 
             if (data.success && data.code === 'PAYMENT_SUCCESS') {
                 return { success: true, data: data.data };

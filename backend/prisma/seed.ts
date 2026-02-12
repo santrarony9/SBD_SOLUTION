@@ -105,6 +105,51 @@ async function main() {
     }
   }
   console.log('Offers seeded');
+  console.log('Offers seeded');
+
+  // 6. Products
+  const products = [
+    {
+      name: 'Royal Diamond Ring',
+      slug: 'royal-diamond-ring',
+      description: 'A masterpiece of craftsmanship featuring a solitaire diamond set in 18K Gold.',
+      goldPurity: 18,
+      goldWeight: 4.5,
+      diamondClarity: 'VVS1',
+      diamondCarat: 0.5,
+      diamondColor: 'E-F',
+      diamondCut: 'Excellent',
+      images: ['https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=1000'],
+      sku: 'RDR-001',
+      stockCount: 5,
+      category: 'Rings',
+      tags: ['Best Seller', 'Engagement']
+    },
+    {
+      name: 'Eternal Gold Necklace',
+      slug: 'eternal-gold-necklace',
+      description: 'Timeless elegance with this 22K Gold necklace, perfect for weddings.',
+      goldPurity: 22,
+      goldWeight: 25.0,
+      diamondClarity: 'VS1', // Dummy, maybe no diamond
+      diamondCarat: 0.0,
+      diamondColor: null,
+      diamondCut: null,
+      images: ['https://images.unsplash.com/photo-1599643478518-17488fbbcd75?auto=format&fit=crop&q=80&w=1000'],
+      sku: 'EGN-002',
+      stockCount: 2,
+      category: 'Necklaces',
+      tags: ['Wedding', 'Traditional']
+    }
+  ];
+
+  for (const product of products) {
+    const existing = await prisma.product.findUnique({ where: { slug: product.slug } });
+    if (!existing) {
+      await prisma.product.create({ data: product });
+    }
+  }
+  console.log('Products seeded');
 }
 
 main()
