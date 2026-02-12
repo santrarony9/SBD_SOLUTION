@@ -86,7 +86,7 @@ export default function AboutPage() {
 
             {/* Support & Shipping */}
             <section id="shipping" className="bg-brand-navy py-24 text-white">
-                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
                     <div className="space-y-8">
                         <div>
                             <h2 className="text-3xl font-serif text-brand-gold mb-6">Concierge & Logistics</h2>
@@ -117,38 +117,39 @@ export default function AboutPage() {
                     </div>
                 </div>
 
-                <div id="contact" className="bg-white/5 backdrop-blur-sm p-10 rounded-2xl border border-white/10">
-                    <h3 className="text-2xl font-serif mb-8 text-brand-gold">Get in Touch</h3>
-                    <div className="space-y-6">
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">A</div>
-                            <div>
-                                <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Our Flagship Store</p>
-                                <p className="text-sm">Jeweller Street, Diamond Hub, Mumbai - 400001</p>
+                <div className="max-w-7xl mx-auto px-4">
+                    <div id="contact" className="bg-white/5 backdrop-blur-sm p-10 rounded-2xl border border-white/10">
+                        <h3 className="text-2xl font-serif mb-8 text-brand-gold">Get in Touch</h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">A</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Our Flagship Store</p>
+                                    <p className="text-sm">Jeweller Street, Diamond Hub, Mumbai - 400001</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">T</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Concierge Line</p>
+                                    <p className="text-sm">+91 98765 43210</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">E</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Official Inquiry</p>
+                                    <p className="text-sm">concierge@sparkbluediamond.com</p>
+                                </div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">T</div>
-                            <div>
-                                <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Concierge Line</p>
-                                <p className="text-sm">+91 98765 43210</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">E</div>
-                            <div>
-                                <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Official Inquiry</p>
-                                <p className="text-sm">concierge@sparkbluediamond.com</p>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div className="mt-10 pt-10 border-t border-white/10">
-                        <p className="text-xs text-gray-400 italic">"Luxury is personal. We are here to ensure your experience is as unique as your jem."</p>
+                        <div className="mt-10 pt-10 border-t border-white/10">
+                            <p className="text-xs text-gray-400 italic">"Luxury is personal. We are here to ensure your experience is as unique as your jem."</p>
+                        </div>
                     </div>
                 </div>
+            </section>
         </div>
-            </section >
-        </div >
     );
 }
