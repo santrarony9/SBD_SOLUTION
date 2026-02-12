@@ -33,6 +33,7 @@ import { ChatModule } from './chat/chat.module';
 import { RazorpayModule } from './razorpay/razorpay.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
+import { PhonePeModule } from './phonepe/phonepe.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { UsersModule } from './users/users.module';
     DashboardModule,
     SmsModule,
     AuthModule,
+    PhonePeModule,
     ProductsModule,
     MastersModule,
     PrismaModule,

@@ -24,7 +24,7 @@ export default function CheckoutPage() {
         phone: '',
     });
 
-    const [paymentMethod, setPaymentMethod] = useState('COD'); // COD or RAZORPAY
+    const [paymentMethod, setPaymentMethod] = useState('PHONEPE');
     const [isLoading, setIsLoading] = useState(false);
 
     const [showGST, setShowGST] = useState(false);
@@ -101,18 +101,6 @@ export default function CheckoutPage() {
         setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
     };
 
-    // Load Razorpay Script
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    const loadRazorpay = () => {
-        return new Promise((resolve) => {
-            const script = document.createElement('script');
-            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-            script.onload = () => resolve(true);
-            script.onerror = () => resolve(false);
-            document.body.appendChild(script);
-        });
-    };
-
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -124,7 +112,7 @@ export default function CheckoutPage() {
                 body: JSON.stringify({
                     shippingAddress,
                     billingAddress: billingSameAsShipping ? shippingAddress : billingAddress,
-                    paymentMethod,
+                    paymentMethod: 'PHONEPE',
                     promoCode: discount > 0 ? promoCode : null,
                     discountAmount: discount,
                     isB2B: showGST,
@@ -135,71 +123,30 @@ export default function CheckoutPage() {
             });
 
             if (order) {
-                if (paymentMethod === 'RAZORPAY') {
-                    // 2a. Razorpay Flow
-                    const res = await loadRazorpay();
-                    if (!res) {
-                        alert('Razorpay SDK failed to load. Are you online?');
-                        setIsLoading(false);
-                        return;
-                    }
-
-                    const options = {
-                        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY || 'rzp_test_YourKeyHere', // Should be in env
-                        amount: order.totalAmount * 100, // Amount is in currency subunits. Default currency is INR.
-                        currency: "INR",
-                        name: "Spark Blue Diamond",
-                        description: "Jewellery Purchase",
-                        image: "/logo.png", // Add logo in public folder
-                        order_id: order.razorpayOrderId,
-                        handler: async function (response: any) {
-                            try {
-                                // 3. Verify Payment
-                                const verifyRes = await fetchAPI('/razorpay/verify', {
-                                    method: 'POST',
-                                    body: JSON.stringify({
-                                        razorpayOrderId: response.razorpay_order_id,
-                                        razorpayPaymentId: response.razorpay_payment_id,
-                                        signature: response.razorpay_signature,
-                                        orderId: order.id
-                                    })
-                                });
-
-                                if (verifyRes.success) {
-                                    await clearCart();
-                                    router.push(`/orders/success?id=${order.id}`);
-                                } else {
-                                    alert('Payment Verification Failed');
-                                }
-                            } catch (error) {
-                                console.error("Payment Verification Error", error);
-                                alert('Payment Verification Failed. Please contact support.');
-                            }
-                        },
-                        prefill: {
-                            name: shippingAddress.fullName,
-                            email: user?.email,
-                            contact: shippingAddress.phone
-                        },
-                        notes: {
-                            address: `${shippingAddress.street}, ${shippingAddress.city}`
-                        },
-                        theme: {
-                            color: "#001f3f" // Brand Navy
-                        }
-                    };
-
-                    const paymentObject = new (window as any).Razorpay(options);
-                    paymentObject.open();
-                    paymentObject.on('payment.failed', function (response: any) {
-                        alert(response.error.description);
-                        setIsLoading(false);
+                // 2. Initiate PhonePe Payment
+                try {
+                    const paymentRes = await fetchAPI('/phonepe/initiate', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            orderId: order.id,
+                            amount: order.totalAmount, // Backend will convert to paise
+                            mobile: shippingAddress.phone || '9999999999',
+                            userId: user?.id || 'GUEST'
+                        })
                     });
 
-                } else {
-                    // 2b. COD Flow
-                    await clearCart();
-                    router.push(`/orders/success?id=${order.id}`); // Success Page
+                    if (paymentRes.url) {
+                        // Redirect to PhonePe Payment Page
+                        await clearCart(); // Clear cart before redirecting
+                        window.location.href = paymentRes.url;
+                    } else {
+                        alert('Failed to initiate PhonePe payment.');
+                        setIsLoading(false);
+                    }
+                } catch (paymentError) {
+                    console.error('PhonePe Initiation Error', paymentError);
+                    alert('Payment System Unavailable. Please try again.');
+                    setIsLoading(false);
                 }
             }
         } catch (error) {
@@ -327,22 +274,19 @@ export default function CheckoutPage() {
 
                             <div className="pl-4 md:pl-12 border-l border-brand-charcoal/10">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <label className={`relative p-6 border transition-all cursor-pointer group ${paymentMethod === 'RAZORPAY' ? 'border-brand-gold bg-white shadow-lg shadow-brand-gold/5' : 'border-gray-200 bg-white/50 hover:border-brand-gold/30'}`}>
-                                        <input type="radio" name="payment" value="RAZORPAY" checked={paymentMethod === 'RAZORPAY'} onChange={(e) => setPaymentMethod(e.target.value)} className="hidden" />
+                                    <label className={`relative p-6 border transition-all cursor-pointer group ${paymentMethod === 'PHONEPE' ? 'border-brand-gold bg-white shadow-lg shadow-brand-gold/5' : 'border-gray-200 bg-white/50 hover:border-brand-gold/30'}`}>
+                                        <input type="radio" name="payment" value="PHONEPE" checked={paymentMethod === 'PHONEPE'} onChange={(e) => setPaymentMethod(e.target.value)} className="hidden" />
                                         <div className="flex justify-between items-start mb-4">
-                                            <span className="font-serif text-lg text-brand-navy">Digital Payment</span>
-                                            {paymentMethod === 'RAZORPAY' && <div className="w-4 h-4 rounded-full bg-brand-gold"></div>}
+                                            <span className="font-serif text-lg text-brand-navy">PhonePe Secure</span>
+                                            {paymentMethod === 'PHONEPE' && <div className="w-4 h-4 rounded-full bg-brand-gold"></div>}
                                         </div>
-                                        <p className="text-xs text-gray-500 leading-relaxed mb-4">Secure transfer via Credit Card, Debit Card, Net Banking, or UPI.</p>
+                                        <p className="text-xs text-gray-500 leading-relaxed mb-4">Pay securely via UPI, Credit/Debit Card, or Net Banking using PhonePe gateway.</p>
                                         <div className="flex gap-2">
-                                            {/* Icons can go here */}
-                                            <div className="h-6 w-10 bg-gray-100/50 rounded"></div>
-                                            <div className="h-6 w-10 bg-gray-100/50 rounded"></div>
+                                            <div className="h-6 w-10 bg-purple-600/10 rounded flex items-center justify-center text-[8px] text-purple-600 font-bold">UPI</div>
+                                            <div className="h-6 w-10 bg-gray-100/50 rounded flex items-center justify-center text-[8px] text-gray-500 font-bold">CARD</div>
                                         </div>
                                         <span className="absolute top-0 right-0 bg-brand-gold text-brand-navy text-[9px] px-3 py-1 font-bold uppercase tracking-widest">Preferred</span>
                                     </label>
-
-                                    {/* COD Removed as per policy update */}
                                 </div>
                             </div>
                         </div>
@@ -353,7 +297,7 @@ export default function CheckoutPage() {
                             className="w-full bg-brand-navy text-white py-6 md:py-5 mt-8 font-bold uppercase tracking-[0.3em] text-xs hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 shadow-xl shadow-brand-navy/20 relative overflow-hidden group"
                         >
                             <span className="relative z-10 group-hover:tracking-[0.4em] transition-all duration-500">
-                                {isLoading ? 'Processing Request...' : `Complete Order — ₹${(cartTotal - discount).toLocaleString()}`}
+                                {isLoading ? 'Processing...' : `Pay & Complete — ₹${Math.round((cartTotal - discount) * 1.03).toLocaleString()}`}
                             </span>
                             <div className="absolute inset-0 bg-brand-gold/0 group-hover:bg-brand-gold/10 transition-colors duration-500"></div>
                         </button>
@@ -425,7 +369,7 @@ export default function CheckoutPage() {
                                 <div className="border-t border-dashed border-gray-200 pt-4 mt-4 flex justify-between items-baseline text-brand-navy">
                                     <span className="text-sm font-bold uppercase tracking-widest">Total</span>
                                     <span className="text-3xl font-sans">
-                                        ₹{((cartTotal - (discount || 0)) * 1.03).toLocaleString()}
+                                        ₹{Math.round((cartTotal - (discount || 0)) * 1.03).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
