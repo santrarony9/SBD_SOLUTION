@@ -102,13 +102,13 @@ export class ChatService {
             A: If you receive an incorrect product, please contact us immediately with photos. Our support team will resolve the issue promptly.
 
             Q: What is your return policy?
-            A: Returns are free if requested within 48 hours of delivery, provided the tags are intact, the box is unbroken, and there are no signs of use. For returns after 48 hours, a 20% restocking fee applies.
+            A: 48-hour free returns (tags intact, unused). After 48 hours, a 20% restocking fee applies.
 
             Q: How long does refund processing take?
-            A: Refunds are processed after quality verification and usually take 7–10 business days to reflect in the original payment method.
+            A: Usually 7–10 business days after quality verification.
 
             Q: Is jewellery insured during delivery?
-            A: Yes. All jewellery shipments are fully insured until they are delivered to the customer.
+            A: Yes, all shipments are fully insured until delivered.
 
             Q: Are product images real?
             A: Yes. Product images show real designs. Minor variations may occur due to lighting, screen settings, or handcrafted detailing.
@@ -116,24 +116,17 @@ export class ChatService {
             Q: Which jewellery is best for engagement?
             A: Solitaire rings and minimal diamond rings are the most popular and timeless choices for engagements.
 
-            Q: Can I talk to a human expert?
-            A: Yes. You can email info@sparkbluediamond.com and our team will personally respond within 48 hours.
+            Q: Can I talk to a human expert? / Contact Support
+            A: Connect with our Personal Assistants: **Samarjeet Koley** (9230969276) or **Rabi Shankar Koley** (8981420463) for expert guidance.
 
-            Q: I am confused, can you help me decide?
-            A: Absolutely. Share your budget, occasion, and preferences, and we’ll guide you to the best jewellery option.
-
-            Q: What is your exchange policy?
-            A: For exchanges, we adjust the full value of the gold. Only the making charges and other operational fees (not shown on the product page) are deducted from the total value.
-            
-            Q: Do you offer Cash on Delivery?
-            A: No, Spark Blue Diamond does not offer Cash on Delivery. We accept all major digital payments via our secure checkout.
+            Q: How do I track my order? / Track My Order
+            A: Provide your Order ID or share your **WhatsApp number** for a direct concierge update.
 
             INSTRUCTIONS:
-            - Use the KNOWLEDGE BASE answers exactly when the user asks a matching question.
-            - If recommending products, mention their name and key specs.
-            - LEAD GENERATION: Cleverly and professionally ask for the user's WhatsApp number to "connect you with a specialized human concierge" or to "send high-resolution videos of these pieces". Do this after providing initial assistance or for complex bespoke inquiries.
-            - Keep responses concise (under 3 sentences) unless asked for details.
-            - If you don't know, suggest they contact support at support@sparkbluediamond.com.
+            - Use KNOWLEDGE BASE answers exactly for matching questions.
+            - LEAD GENERATION: Ask for WhatsApp to "connect with Samarjeet or Rabi Shankar for live updates".
+            - BREVITY IS MANDATORY: Keep responses under 2 sentences. No flowery filler.
+            - Default: support@sparkbluediamond.com.
             `;
 
             // 3. Chat Session
