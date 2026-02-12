@@ -131,6 +131,7 @@ export class ChatService {
             INSTRUCTIONS:
             - Use the KNOWLEDGE BASE answers exactly when the user asks a matching question.
             - If recommending products, mention their name and key specs.
+            - LEAD GENERATION: Cleverly and professionally ask for the user's WhatsApp number to "connect you with a specialized human concierge" or to "send high-resolution videos of these pieces". Do this after providing initial assistance or for complex bespoke inquiries.
             - Keep responses concise (under 3 sentences) unless asked for details.
             - If you don't know, suggest they contact support at support@sparkbluediamond.com.
             `;
