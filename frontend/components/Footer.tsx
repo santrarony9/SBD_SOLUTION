@@ -38,10 +38,10 @@ export default function Footer() {
                     <h3 className="text-white font-bold uppercase tracking-widest mb-4">Concierge</h3>
                     <ul className="space-y-2">
                         {[
-                            { label: 'Book Appointment', href: '/about' },
-                            { label: 'Shipping & Returns', href: '/about' },
-                            { label: 'Care Guide', href: '/about' },
-                            { label: 'Contact Us', href: '/about' }
+                            { label: 'Book Appointment', href: '/about#contact' },
+                            { label: 'Shipping & Returns', href: '/about#shipping' },
+                            { label: 'Care Guide', href: '/about#care' },
+                            { label: 'Contact Us', href: '/about#contact' }
                         ].map(item => (
                             <li key={item.label}>
                                 <Link href={item.href} className="hover:text-brand-gold transition-colors block py-0.5">{item.label}</Link>

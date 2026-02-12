@@ -18,6 +18,11 @@ export default function AboutPage() {
                     <p className="text-gray-200 text-lg md:text-xl font-light tracking-wide max-w-2xl mx-auto animate-fade-in delay-300">
                         Redefining luxury with transparency, integrity, and timeless craftsmanship.
                     </p>
+                    <div className="flex justify-center gap-6 mt-10">
+                        <Link href="#values" className="text-xs uppercase tracking-widest border-b border-white/30 hover:border-brand-gold pb-1 transition-all">Values</Link>
+                        <Link href="#shipping" className="text-xs uppercase tracking-widest border-b border-white/30 hover:border-brand-gold pb-1 transition-all">Support</Link>
+                        <Link href="#contact" className="text-xs uppercase tracking-widest border-b border-white/30 hover:border-brand-gold pb-1 transition-all">Contact</Link>
+                    </div>
                 </div>
             </section>
 
@@ -73,6 +78,73 @@ export default function AboutPage() {
                             <div className="text-5xl mb-6 grayscale group-hover:grayscale-0 transition-all duration-500">🖐️</div>
                             <h3 className="text-xl font-serif text-brand-navy mb-4 group-hover:text-brand-gold transition-colors">Master Craftsmanship</h3>
                             <p className="text-brand-charcoal font-light leading-relaxed">Designed by artisans who blend modern aesthetics with traditional techniques.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Support & Shipping */}
+            <section id="shipping" className="bg-brand-navy py-24 text-white">
+                <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <div className="space-y-8">
+                        <div>
+                            <h2 className="text-3xl font-serif text-brand-gold mb-6">Concierge & Logistics</h2>
+                            <p className="text-gray-400 font-light leading-relaxed">We ensure your treasures reach you with the same care they were crafted with.</p>
+                        </div>
+
+                        <div className="space-y-6">
+                            <div className="flex gap-4">
+                                <span className="text-brand-gold font-bold">01.</span>
+                                <div>
+                                    <h4 className="font-bold uppercase tracking-widest text-sm mb-2">Insured Shipping</h4>
+                                    <p className="text-xs text-gray-500 leading-relaxed">Complimentary insured shipping on all orders over ₹50,000. Every package is sealed with a tamper-proof security code.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4">
+                                <span className="text-brand-gold font-bold">02.</span>
+                                <div>
+                                    <h4 className="font-bold uppercase tracking-widest text-sm mb-2">Purity Guarantee</h4>
+                                    <p className="text-xs text-gray-500 leading-relaxed">Our diamonds come with IGI certification and gold items are BIS Hallmarked. Documentation is included in the premium packaging.</p>
+                                </div>
+                            </div>
+                            <div className="flex gap-4" id="care">
+                                <span className="text-brand-gold font-bold">03.</span>
+                                <div>
+                                    <h4 className="font-bold uppercase tracking-widest text-sm mb-2">Lifetime Care</h4>
+                                    <p className="text-xs text-gray-500 leading-relaxed">We offer professional cleaning and stone-tightening checks annually at our flagship store.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="contact" className="bg-white/5 backdrop-blur-sm p-10 rounded-2xl border border-white/10">
+                        <h3 className="text-2xl font-serif mb-8 text-brand-gold">Get in Touch</h3>
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">A</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Our Flagship Store</p>
+                                    <p className="text-sm">Jeweller Street, Diamond Hub, Mumbai - 400001</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">T</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Concierge Line</p>
+                                    <p className="text-sm">+91 98765 43210</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">E</div>
+                                <div>
+                                    <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Official Inquiry</p>
+                                    <p className="text-sm">concierge@sparkbluediamond.com</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-10 pt-10 border-t border-white/10">
+                            <p className="text-xs text-gray-400 italic">"Luxury is personal. We are here to ensure your experience is as unique as your jem."</p>
                         </div>
                     </div>
                 </div>

@@ -25,7 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
       return {
         title: data.value.title || "Spark Blue Diamond",
         description: data.value.description || "Premium Jewellery",
-        keywords: data.value.keywords || "jewellery, diamond, gold"
+        keywords: data.value.keywords || "jewellery, diamond, gold",
+        icons: {
+          icon: '/favicon.png',
+          apple: '/favicon.png',
+        }
       };
     }
   } catch (e) {
@@ -35,6 +39,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Spark Blue Diamond | Premium Jewellery",
     description: "IGI Certified Diamond & Hallmarked Gold Jewellery",
+    icons: {
+      icon: '/favicon.png',
+      apple: '/favicon.png',
+    }
   };
 }
 
