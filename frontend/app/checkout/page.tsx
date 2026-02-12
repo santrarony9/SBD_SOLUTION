@@ -157,8 +157,8 @@ export default function CheckoutPage() {
     };
 
     return (
-        <div className="min-h-screen bg-brand-cream/50 py-16">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 relative">
+        <div className="min-h-screen bg-brand-cream/50 py-8 md:py-16">
+            <div className="max-w-[1400px] mx-auto px-4 md:px-12 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-24 relative">
 
                 {/* Left: Shipping Form */}
                 <div className="lg:col-span-7">

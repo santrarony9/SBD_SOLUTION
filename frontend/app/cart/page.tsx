@@ -36,7 +36,7 @@ export default function CartPage() {
     }
 
     return (
-        <div className="min-h-screen bg-brand-cream/50 py-16 md:py-24">
+        <div className="min-h-screen bg-brand-cream/50 py-8 md:py-24">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header */}

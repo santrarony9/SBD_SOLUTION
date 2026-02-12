@@ -90,7 +90,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                 </div>
 
                 {/* Main Hero Text (Static Global Setting) */}
-                <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-serif text-white mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl">
+                <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl">
                     {heroText.title.includes('Eternal') ? (
                         <>
                             {heroText.title.split('Eternal')[0]}
@@ -102,20 +102,20 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     )}
                 </h1>
 
-                <p className="text-gray-200 max-w-2xl text-lg md:text-xl mb-12 font-light tracking-wide leading-relaxed drop-shadow-md">
+                <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
                     {heroText.subtitle}
                 </p>
 
-                <div className="flex flex-col md:flex-row gap-8">
+                <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full md:w-auto px-6 md:px-0">
                     <Link
                         href={currentBanner.link || "/shop"}
-                        className="bg-white text-brand-navy px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20"
+                        className="bg-white text-brand-navy px-8 py-3 md:px-12 md:py-4 uppercase tracking-[0.25em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full md:w-auto"
                     >
                         Shop Collection
                     </Link>
                     <Link
                         href="/about"
-                        className="bg-transparent text-white px-12 py-4 uppercase tracking-[0.25em] font-bold text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white"
+                        className="bg-transparent text-white px-8 py-3 md:px-12 md:py-4 uppercase tracking-[0.25em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full md:w-auto"
                     >
                         Our Heritage
                     </Link>

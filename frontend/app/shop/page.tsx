@@ -34,6 +34,7 @@ function ShopContent() {
     const [error, setError] = useState('');
     const [sortBy, setSortBy] = useState('featured');
     const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
+    const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile Filter State
 
     useEffect(() => {
         async function loadProducts() {
@@ -162,8 +163,8 @@ function ShopContent() {
                             key={cat}
                             onClick={() => toggleCategory(cat)}
                             className={`flex-shrink-0 px-4 py-2 border rounded-full text-[10px] uppercase tracking-widest font-bold whitespace-nowrap transition-colors ${selectedCategories.includes(cat.toLowerCase())
-                                    ? 'bg-brand-navy border-brand-navy text-white'
-                                    : 'bg-white border-gray-200 text-gray-500'
+                                ? 'bg-brand-navy border-brand-navy text-white'
+                                : 'bg-white border-gray-200 text-gray-500'
                                 }`}
                         >
                             {cat}
@@ -266,7 +267,7 @@ function ShopContent() {
 
                             {/* Grid */}
                             {filteredAndSortedProducts.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-12">
+                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 md:gap-x-6 md:gap-y-12">
                                     {filteredAndSortedProducts.map((product, index) => (
                                         <div key={product.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
                                             <ProductCard product={mapToCardProps(product)} />
@@ -283,6 +284,85 @@ function ShopContent() {
                         </>
                     )}
                 </div>
+
+                {/* Mobile Filter & Sort Bar */}
+                <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-brand-navy text-white rounded-full shadow-2xl px-6 py-3 flex items-center gap-6 border border-brand-gold/20">
+                    <button
+                        onClick={() => setIsFilterOpen(true)}
+                        className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest"
+                    >
+                        <svg className="w-4 h-4 text-brand-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" /></svg>
+                        Filters
+                    </button>
+                    <div className="w-px h-4 bg-white/20"></div>
+                    <div className="relative">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="bg-transparent text-xs font-bold uppercase tracking-widest focus:outline-none appearance-none pr-4"
+                        >
+                            <option value="featured" className="text-black">Sort: Featured</option>
+                            <option value="price-low" className="text-black">Price: Low</option>
+                            <option value="price-high" className="text-black">Price: High</option>
+                        </select>
+                    </div>
+                </div>
+
+                {/* Mobile Filter Drawer Overlay */}
+                {isFilterOpen && (
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm animate-in fade-in">
+                        <div className="w-full sm:w-[400px] h-[80vh] bg-white rounded-t-2xl sm:rounded-2xl p-6 overflow-y-auto animate-in slide-in-from-bottom-10 shadow-2xl">
+                            <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
+                                <h3 className="text-xl font-serif text-brand-navy">Refine Selection</h3>
+                                <button onClick={() => setIsFilterOpen(false)} className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                                </button>
+                            </div>
+
+                            <div className="space-y-8">
+                                {/* Reusing Component Logic for Category */}
+                                <div>
+                                    <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Category</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => toggleCategory(cat)}
+                                                className={`px-4 py-2 border rounded-sm text-xs uppercase tracking-wider ${selectedCategories.includes(cat.toLowerCase())
+                                                        ? 'bg-brand-navy text-white border-brand-navy'
+                                                        : 'bg-white text-gray-600 border-gray-200'
+                                                    }`}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Metal Logic (Placeholder for now) */}
+                                <div>
+                                    <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Metal</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                            <button key={metal} className="px-4 py-2 border border-gray-200 rounded-sm text-xs uppercase tracking-wider text-gray-600">
+                                                {metal}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-10 pt-6 border-t border-gray-100">
+                                <button
+                                    onClick={() => setIsFilterOpen(false)}
+                                    className="w-full bg-brand-navy text-white text-sm font-bold uppercase tracking-widest py-4 hover:bg-gold-gradient hover:text-brand-navy transition-all"
+                                >
+                                    Show {filteredAndSortedProducts.length} Results
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </div>
         </div>
