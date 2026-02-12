@@ -44,7 +44,8 @@ export default function ProductDetailPage() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const [showBreakup, setShowBreakup] = useState(false);
-    const [activeMedia, setActiveMedia] = useState<{ type: 'image' | 'video', src: string | undefined }>({ type: 'image', src: undefined });
+    const [activeImage, setActiveImage] = useState<string | null>(null);
+    const [showVideo, setShowVideo] = useState(false);
 
     // PDP Enhancements State
     const [pincode, setPincode] = useState('');
@@ -71,11 +72,17 @@ export default function ProductDetailPage() {
             try {
                 const data = await fetchAPI(`/products/${slug}`);
                 setProduct(data);
-                // Prioritize video first
+
+                // Set initial image
+                if (data.images && data.images.length > 0) {
+                    setActiveImage(data.images[0]);
+                }
+
+                // Prioritize video ONLY if explicitly desired, but standard UX is usually image first. 
+                // However, user logic was "Prioritize video first".
+                // We will set showVideo=true if video exists.
                 if (data.videoUrl) {
-                    setActiveMedia({ type: 'video', src: data.videoUrl });
-                } else if (data.images && data.images.length > 0) {
-                    setActiveMedia({ type: 'image', src: data.images[0] });
+                    setShowVideo(true);
                 }
             } catch (err) {
                 console.error("Failed to load product", err);
@@ -121,11 +128,12 @@ export default function ProductDetailPage() {
                 {/* Left Column: Media Gallery (Constrained Height) */}
                 <div className="flex flex-col h-full">
                     {/* Main Viewer */}
-                    <div key={activeMedia.src || 'default'} className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-full max-h-[75vh]">
-                        {activeMedia.type === 'video' ? (
+                    {/* Main Viewer */}
+                    <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-full max-h-[75vh]">
+                        {showVideo && product.videoUrl ? (
                             <div className="w-full h-full bg-gray-900 relative">
                                 <video
-                                    src={activeMedia.src}
+                                    src={product.videoUrl}
                                     className="w-full h-full object-cover"
                                     controls
                                     autoPlay
@@ -137,10 +145,10 @@ export default function ProductDetailPage() {
                                     360° View
                                 </div>
                             </div>
-                        ) : activeMedia.src ? (
+                        ) : activeImage ? (
                             <div className="relative w-full h-full">
                                 <Image
-                                    src={activeMedia.src}
+                                    src={activeImage}
                                     alt={product.name}
                                     fill
                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
@@ -154,7 +162,7 @@ export default function ProductDetailPage() {
                             </div>
                         )}
 
-                        {activeMedia.type === 'image' && (
+                        {!showVideo && (
                             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <span className="bg-white/90 backdrop-blur-md text-[9px] uppercase font-bold px-3 py-1.5 tracking-[0.2em] shadow-sm text-brand-navy">
                                     Zoom
@@ -167,8 +175,8 @@ export default function ProductDetailPage() {
                     <div className="flex gap-3 overflow-x-auto py-3 scrollbar-hide h-20 shrink-0">
                         {product.videoUrl && (
                             <button
-                                onClick={() => setActiveMedia({ type: 'video', src: product.videoUrl })}
-                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${activeMedia.type === 'video' ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
+                                onClick={() => setShowVideo(true)}
+                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${showVideo ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
                             >
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/5 z-10">
                                     <div className="w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-brand-navy shadow-sm">
@@ -185,8 +193,11 @@ export default function ProductDetailPage() {
                         {product.images?.map((img, i) => (
                             <button
                                 key={i}
-                                onClick={() => setActiveMedia({ type: 'image', src: img })}
-                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${activeMedia.src === img ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
+                                onClick={() => {
+                                    setShowVideo(false);
+                                    setActiveImage(img);
+                                }}
+                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${!showVideo && activeImage === img ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
                             >
                                 <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
                             </button>
