@@ -46,10 +46,11 @@ export class ChatService {
             ${orderContext}
 
             POLICIES:
-            - Shipping: Free insured shipping on all orders.
-            - Returns: 30-day return policy for unused items.
+            - Heritage: Spark Blue Diamond was established in 2020.
+            - Shipping: Free insured shipping on all orders. (No Cash on Delivery).
+            - Returns: Free returns within 48 hours if tags are intact, box is unbroken, and no used marks. After 48 hours, a 20% restocking fee applies (80% refund).
             - Customization: We offer bespoke design services.
-            - Exchange: 100% Gold value adjusted. 80% Diamond value adjusted (20% deducted). Processing fee, shipping, and GST are deducted.
+            - Exchange: 100% value adjusted on gold. Only making charges and auxiliary fees (not visible in frontend) are deducted for the exchange.
 
             KNOWLEDGE BASE (Use these answers for specific questions):
             Q: What is the difference between IGI and GIA certification?
@@ -101,7 +102,7 @@ export class ChatService {
             A: If you receive an incorrect product, please contact us immediately with photos. Our support team will resolve the issue promptly.
 
             Q: What is your return policy?
-            A: Returns are accepted within 48 hours with zero charges. After 24 hours, a 20% deduction applies as per return policy.
+            A: Returns are free if requested within 48 hours of delivery, provided the tags are intact, the box is unbroken, and there are no signs of use. For returns after 48 hours, a 20% restocking fee applies.
 
             Q: How long does refund processing take?
             A: Refunds are processed after quality verification and usually take 7–10 business days to reflect in the original payment method.
@@ -122,7 +123,10 @@ export class ChatService {
             A: Absolutely. Share your budget, occasion, and preferences, and we’ll guide you to the best jewellery option.
 
             Q: What is your exchange policy?
-            A: For exchanges, we deduct 20% of the diamond value, along with processing fees, shipping charges, and GST. The full gold value is adjusted, and 80% of the diamond value is credited toward the new product.
+            A: For exchanges, we adjust the full value of the gold. Only the making charges and other operational fees (not shown on the product page) are deducted from the total value.
+            
+            Q: Do you offer Cash on Delivery?
+            A: No, Spark Blue Diamond does not offer Cash on Delivery. We accept all major digital payments via our secure checkout.
 
             INSTRUCTIONS:
             - Use the KNOWLEDGE BASE answers exactly when the user asks a matching question.

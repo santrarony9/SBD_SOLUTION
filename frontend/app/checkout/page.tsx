@@ -342,14 +342,7 @@ export default function CheckoutPage() {
                                         <span className="absolute top-0 right-0 bg-brand-gold text-brand-navy text-[9px] px-3 py-1 font-bold uppercase tracking-widest">Preferred</span>
                                     </label>
 
-                                    <label className={`relative p-6 border transition-all cursor-pointer group ${paymentMethod === 'COD' ? 'border-brand-gold bg-white shadow-lg shadow-brand-gold/5' : 'border-gray-200 bg-white/50 hover:border-brand-gold/30'}`}>
-                                        <input type="radio" name="payment" value="COD" checked={paymentMethod === 'COD'} onChange={(e) => setPaymentMethod(e.target.value)} className="hidden" />
-                                        <div className="flex justify-between items-start mb-4">
-                                            <span className="font-serif text-lg text-brand-navy">Cash on Delivery</span>
-                                            {paymentMethod === 'COD' && <div className="w-4 h-4 rounded-full bg-brand-gold"></div>}
-                                        </div>
-                                        <p className="text-xs text-gray-500 leading-relaxed">Pay in cash or UPI when the courier arrives at your doorstep.</p>
-                                    </label>
+                                    {/* COD Removed as per policy update */}
                                 </div>
                             </div>
                         </div>

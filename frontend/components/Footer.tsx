@@ -4,15 +4,16 @@ import { PiInstagramLogo, PiFacebookLogo, PiYoutubeLogo, PiPinterestLogo } from 
 export default function Footer() {
     return (
         <footer className="bg-[#0A1128] text-gray-400 border-t border-brand-gold/10 font-sans text-xs">
-            <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-12">
 
                 {/* 1. Brand & Ethos */}
-                <div className="space-y-4">
-                    <h2 className="font-serif text-2xl text-white tracking-widest">SPARK BLUE</h2>
-                    <p className="leading-relaxed opacity-80">
-                        Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.
+                <div className="md:col-span-1">
+                    <h2 className="text-xl font-serif text-white mb-4">Spark Blue Diamond</h2>
+                    <p className="text-brand-gold text-[10px] uppercase tracking-[0.2em] mb-4 font-bold">Established 2020</p>
+                    <p className="text-gray-400 text-xs leading-relaxed mb-6">
+                        Curating the world's most exquisite lab-grown diamonds and hallmarked gold jewellery since 2020.
                     </p>
-                    <div className="flex gap-4 pt-2">
+                    <div className="flex gap-4">
                         {[PiInstagramLogo, PiFacebookLogo, PiYoutubeLogo, PiPinterestLogo].map((Icon, i) => (
                             <a key={i} href="#" className="text-white hover:text-brand-gold transition-colors">
                                 <Icon className="w-5 h-5" />
@@ -50,7 +51,7 @@ export default function Footer() {
                     </ul>
                 </div>
 
-                {/* 4. Newsletter - Compact */}
+                {/* 4. Newsletter */}
                 <div>
                     <h3 className="text-white font-bold uppercase tracking-widest mb-4">The Register</h3>
                     <p className="mb-4 opacity-80">Join for exclusive previews.</p>
