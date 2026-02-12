@@ -28,12 +28,39 @@ export class PhonePeController {
                 this.logger.log(`PhonePe Callback: ${JSON.stringify(data)}`);
 
                 if (data.code === 'PAYMENT_SUCCESS') {
-                    // Extract Order ID or use MerchantTransactionID to find order
-                    // Since we encoded orderId in merchantTransactionId (MT_TIMESTAMP_ORDERID), we can extract it or link it
-                    // For simplicity, let's assume we can confirm via transaction ID logic
+                    // Extract Order ID from MerchantTransactionID (MT_TIMESTAMP_ORDERID)
+                    // Assuming format MT{timestamp}_{orderIdSuffix} or just finding by merchantTransactionId
 
-                    // TODO: Update Order Status
-                    // await this.ordersService.confirmPayment(...)
+                    // Since we can't easily parse OrderID if we hashed/sliced it, 
+                    // we should ideally store merchantTransactionId in DB during initiate.
+                    // BUT: In our initiatePayment service, we didn't save it to DB yet.
+                    // Let's rely on the metadata or the fact that we can store it in createOrder.
+
+                    /* 
+                       Better approach: 
+                       In initiatePayment, we passed `merchantTransactionId`. 
+                       We should try to find the order by `phonepeMerchantTransactionId` if we saved it.
+                       However, we haven't saved it in createOrder yet.
+                       
+                       Let's extract orderId from the `merchantTransactionId` if we structured it predictably.
+                       Our service uses: `MT${Date.now()}_${orderId.slice(-6)}`.
+                       This is lossy (only last 6 chars). 
+                       
+                       CRITICAL FIX: 
+                       We need to pass the full Order ID in the merchantTransactionId OR 
+                       update the Order with the merchantTransactionId at the time of initiation.
+                    */
+
+                    const merchantTransactionId = data.data.merchantTransactionId;
+                    const phonepeTransactionId = data.data.transactionId;
+
+                    // We need to find the order. 
+                    // OPTION: We search for the order where phonepeMerchantTransactionId matches.
+                    const order = await this.ordersService.findByPhonePeTransactionId(merchantTransactionId);
+
+                    if (order) {
+                        await this.ordersService.confirmPhonePePayment(order.id, merchantTransactionId, phonepeTransactionId);
+                    }
                 }
             }
         } catch (e) {

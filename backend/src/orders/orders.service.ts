@@ -240,4 +240,30 @@ export class OrdersService {
             }
         });
     }
+
+    async confirmPhonePePayment(orderId: string, merchantTransactionId: string, phonepeTransactionId?: string) {
+        // Find order first to ensure it exists
+        const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return null;
+
+        const updatedOrder = await this.prisma.order.update({
+            where: { id: orderId },
+            data: {
+                status: 'CONFIRMED',
+                paymentStatus: 'PAID',
+                phonepeMerchantTransactionId: merchantTransactionId,
+                phonepeTransactionId: phonepeTransactionId
+            }
+        });
+
+        // Trigger CRM
+        if (updatedOrder.userId) {
+            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
+        }
+
+        // Push to Shiprocket (if not already)
+        this.pushToShiprocket(updatedOrder.id).catch(e => console.error("Shiprocket Push Retry:", e.message));
+
+        return updatedOrder;
+    }
 }

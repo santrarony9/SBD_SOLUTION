@@ -379,7 +379,12 @@ model Order {
   
   // Payment Details (Razorpay)
   razorpayOrderId   String?
+  razorpayOrderId   String?
   razorpayPaymentId String?
+  
+  // Payment Details (PhonePe)
+  phonepeMerchantTransactionId String?
+  phonepeTransactionId         String?
   
   // GST & B2B
   invoiceNumber     String?

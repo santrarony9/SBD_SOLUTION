@@ -67,9 +67,7 @@ export class PhonePeService {
 
             if (data.success) {
                 // Save the merchantTransactionId to the order for later verification
-                // We might need to update the Order schema or just store it in existing fields if possible
-                // For now, let's assuming we update the order's payment details
-                // await this.ordersService.updatePaymentDetails(orderId, { merchantTransactionId }); 
+                await this.ordersService.updatePhonePeDetails(orderId, merchantTransactionId);
 
                 return {
                     url: data.data.instrumentResponse.redirectInfo.url,
