@@ -6,6 +6,7 @@ import { fetchAPI } from '@/lib/api';
 import FlashSale from '@/components/FlashSale';
 import InstagramFeed from '@/components/InstagramFeed';
 import HeroSlider from '@/components/HeroSlider';
+import CategoryCarousel from '@/components/CategoryCarousel';
 
 export const dynamic = 'force-dynamic';
 
@@ -142,30 +143,18 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 4. Dynamic Categories */}
-      <section className="py-24 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">The Collection</span>
-          <h2 className="text-4xl md:text-5xl font-serif text-brand-navy mt-4">Curated Excellence</h2>
-        </div>
-
-        {categories && categories.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {categories.map((cat: any) => (
-              <Link key={cat.id} href={`/shop?category=${cat.slug}`} className="group relative overflow-hidden bg-gray-100 aspect-square md:aspect-auto md:h-[400px]">
-                <div className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 group-hover:scale-110" style={{ backgroundImage: `url(${cat.imageUrl || '/featured-1.png'})` }} />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-500" />
-                <div className="absolute bottom-8 left-8 text-white">
-                  <h3 className="text-3xl font-serif italic mb-2">{cat.name}</h3>
-                  <span className="text-xs font-bold uppercase tracking-widest border-b border-brand-gold pb-1">Explore</span>
-                </div>
-              </Link>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center text-gray-400">Categories not configured.</div>
-        )}
-      </section>
+      {/* 4. Category Discovery Carousels (Horizontal) */}
+      {categories && categories.length > 0 && categories.map((cat: any) => {
+        const catProducts = allProducts.filter((p: any) => p.category === cat.slug || p.category?.slug === cat.slug);
+        if (catProducts.length === 0) return null;
+        return (
+          <CategoryCarousel
+            key={cat.id}
+            category={cat}
+            products={catProducts.slice(0, 8)}
+          />
+        );
+      })}
 
       {/* 5. Shop by Price (New) */}
       <section className="py-16 bg-brand-cream border-t border-b border-brand-gold/10">

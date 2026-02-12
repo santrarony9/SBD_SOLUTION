@@ -122,7 +122,7 @@ export default function AdminDashboard() {
                                 active={activeTab === 'cms'}
                                 onClick={() => setActiveTab('cms')}
                                 icon={<PiLayout className="w-5 h-5" />}
-                                label="Content Manager"
+                                label="Home UI Editor"
                             />
                             <SidebarLink
                                 active={activeTab === 'masters'}
@@ -197,7 +197,7 @@ export default function AdminDashboard() {
                             <span className="text-[10px] text-brand-gold tracking-[0.3em] uppercase font-bold mb-2 block">Control Center</span>
                             <h1 className="text-5xl font-serif text-brand-navy">
                                 {activeTab === 'overview' ? 'Business Pulse' :
-                                    activeTab === 'cms' ? 'Content Manager' :
+                                    activeTab === 'cms' ? 'Home UI Editor' :
                                         activeTab === 'team' ? 'Team Access' :
                                             activeTab === 'masters' ? 'Master Config' :
                                                 activeTab === 'products' ? 'Collection' : 'Order Console'}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle } from "react-icons/pi";
+import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 
 export default function AdminCMS() {
@@ -235,27 +235,70 @@ export default function AdminCMS() {
             {/* Sidebar Navigation */}
             <aside className="w-full md:w-64 flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-1 sticky top-8">
                 <div className="px-4 py-4 mb-2 border-b border-gray-50">
-                    <h3 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">Content Manager</h3>
+                    <h3 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">Home UI Sections</h3>
+                </div>
+
+                {/* Group 1: Billboard */}
+                <div className="px-4 py-2 mt-2">
+                    <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest">01 Billboard</span>
                 </div>
                 {[
-                    { id: 'banners', label: 'Banners', icon: PiImage },
-                    { id: 'offers', label: 'Offers', icon: PiTag },
-                    { id: 'text', label: 'Hero Text', icon: PiTextT },
-                    { id: 'spotlight', label: 'Spotlight', icon: PiSparkle },
-                    { id: 'categories', label: 'Categories', icon: PiTag },
-                    { id: 'price', label: 'Price Ranges', icon: PiTag },
-                    { id: 'tags', label: 'Tags', icon: PiTag },
-                    { id: 'social', label: 'Social Wall', icon: PiImage },
+                    { id: 'banners', label: 'Slider Banners', icon: PiImage },
+                    { id: 'text', label: 'Brand Narratives', icon: PiTextT },
+                    { id: 'spotlight', label: 'Master Spotlight', icon: PiSparkle },
                 ].map((item) => (
                     <button
                         key={item.id}
                         onClick={() => setActiveSection(item.id as any)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-xs font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
                             ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
                             : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
                             }`}
                     >
-                        <item.icon className={`text-lg ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
+                        <item.icon className={`text-base ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
+                        {item.label}
+                    </button>
+                ))}
+
+                {/* Group 2: Highlights */}
+                <div className="px-4 py-2 mt-4">
+                    <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest">02 Highlights</span>
+                </div>
+                {[
+                    { id: 'offers', label: 'Royal Privileges', icon: PiTag },
+                    { id: 'categories', label: 'Product Discovery', icon: PiTag },
+                ].map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveSection(item.id as any)}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
+                            ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
+                            }`}
+                    >
+                        <item.icon className={`text-base ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
+                        {item.label}
+                    </button>
+                ))}
+
+                {/* Group 3: Engagement */}
+                <div className="px-4 py-2 mt-4">
+                    <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest">03 Engagement</span>
+                </div>
+                {[
+                    { id: 'social', label: 'Social Moments', icon: PiImage },
+                    { id: 'price', label: 'Price Curations', icon: PiTag },
+                    { id: 'tags', label: 'Trend Tags', icon: PiTag },
+                ].map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => setActiveSection(item.id as any)}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
+                            ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
+                            }`}
+                    >
+                        <item.icon className={`text-base ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
                         {item.label}
                     </button>
                 ))}
@@ -265,8 +308,9 @@ export default function AdminCMS() {
             <main className="flex-1 w-full space-y-6">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 min-h-[500px]">
                     <div className="flex justify-between items-center mb-8 border-b border-gray-50 pb-6">
-                        <h2 className="text-2xl font-serif text-brand-navy capitalize">
-                            {activeSection.replace('-', ' ')} Manager
+                        <h2 className="text-2xl font-serif text-brand-navy flex items-center gap-3">
+                            <span className="p-2 bg-brand-gold/10 rounded-xl"><PiLayout className="text-brand-gold text-xl" /></span>
+                            {activeSection.replace('-', ' ')}
                         </h2>
                         {isLoading && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-gold" />}
                     </div>
@@ -475,14 +519,30 @@ export default function AdminCMS() {
                                         />
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Cover Image URL</label>
+                                        <div className="flex justify-between items-center">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Discovery Cover</label>
+                                            <span className="text-[8px] text-brand-gold font-bold">RECOM: 800x1200px</span>
+                                        </div>
                                         <input
-                                            type="text"
-                                            placeholder="https://..."
-                                            value={newCategory.imageUrl}
-                                            onChange={(e) => setNewCategory({ ...newCategory, imageUrl: e.target.value })}
-                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={(e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    if (file.size > 5 * 1024 * 1024) {
+                                                        alert('File is too large! Max 5MB allowed.');
+                                                        return;
+                                                    }
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+                                                    fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                        .then(res => setNewCategory({ ...newCategory, imageUrl: res.url }))
+                                                        .catch(() => showStatus('Upload Failed', 'error'));
+                                                }
+                                            }}
+                                            className="w-full text-[10px] text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-brand-navy hover:file:bg-brand-gold hover:file:text-white transition-all cursor-pointer"
                                         />
+                                        {newCategory.imageUrl && <p className="text-[8px] text-green-600 font-bold truncate tracking-tighter">✓ Image Linked: {newCategory.imageUrl.split('/').pop()}</p>}
                                     </div>
                                 </div>
                                 <div className="mt-6 flex justify-end">
