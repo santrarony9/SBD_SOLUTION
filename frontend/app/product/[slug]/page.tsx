@@ -121,7 +121,7 @@ export default function ProductDetailPage() {
                 {/* Left Column: Media Gallery (Constrained Height) */}
                 <div className="flex flex-col h-full">
                     {/* Main Viewer */}
-                    <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-full max-h-[75vh]">
+                    <div key={activeMedia.src || 'default'} className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-full max-h-[75vh]">
                         {activeMedia.type === 'video' ? (
                             <div className="w-full h-full bg-gray-900 relative">
                                 <video
