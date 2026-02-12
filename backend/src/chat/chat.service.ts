@@ -16,7 +16,7 @@ export class ChatService {
         }
     }
 
-    async generateResponse(message: string, userId?: string, history: any[] = []) {
+    async generateResponse(message: string, userId?: string, history: any[] = [], ipAddress?: string) {
         if (!this.genAI) {
             return { text: "System Error: GEMINI_API_KEY is missing in backend environment variables." };
         }
@@ -25,11 +25,15 @@ export class ChatService {
             const model = this.genAI.getGenerativeModel({ model: modelName });
 
             // 1. Gather Context
-            const [userContext, productContext, orderContext] = await Promise.all([
+            const [userContext, productContext, orderContext, marketingContext] = await Promise.all([
                 this.getUserContext(userId),
                 this.getProductContext(message),
-                this.getOrderContext(userId)
+                this.getOrderContext(userId),
+                this.getMarketingContext(ipAddress, userId)
             ]);
+
+            // 1b. Log Activity for Marketing Memory
+            this.logActivity(message, ipAddress, userId, productContext);
 
             // 2. System Prompt
             const systemInstruction = `
@@ -44,6 +48,9 @@ export class ChatService {
 
             RECENT ORDERS (Use these if the user asks about status):
             ${orderContext}
+
+            MARKETING MEMORY (Past Interactions/Interests for this IP/User):
+            ${marketingContext}
 
             POLICIES:
             - Heritage: Spark Blue Diamond was established in 2020.
@@ -221,5 +228,46 @@ export class ChatService {
         if (orders.length === 0) return "User has no recent orders.";
 
         return orders.map(o => `Order #${o.id.slice(-6)}: ${o.status} (placed on ${o.createdAt.toDateString()})`).join('\n');
+    }
+
+    private async logActivity(message: string, ipAddress?: string, userId?: string, productContext?: string) {
+        if (!ipAddress) return;
+        try {
+            await this.prisma.userActivity.create({
+                data: {
+                    ipAddress,
+                    userId,
+                    activity: 'CHAT_QUERY',
+                    metadata: {
+                        query: message,
+                        foundProducts: productContext !== "No specific products found."
+                    }
+                }
+            });
+        } catch (e) {
+            this.logger.error('Failed to log activity', e);
+        }
+    }
+
+    private async getMarketingContext(ipAddress?: string, userId?: string): Promise<string> {
+        if (!ipAddress && !userId) return "No marketing history.";
+
+        const activities = await this.prisma.userActivity.findMany({
+            where: {
+                OR: [
+                    userId ? { userId } : { ipAddress }
+                ]
+            },
+            orderBy: { createdAt: 'desc' },
+            take: 5,
+            select: { metadata: true, createdAt: true }
+        });
+
+        if (activities.length === 0) return "New customer (no previous interaction history).";
+
+        return activities.map(a => {
+            const meta = a.metadata as any;
+            return `- [${a.createdAt.toDateString()}] Searched for: "${meta?.query}"`;
+        }).join('\n');
     }
 }

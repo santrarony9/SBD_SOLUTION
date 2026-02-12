@@ -499,3 +499,15 @@ model LoyaltyLog {
   createdAt   DateTime @default(now())
 }
 
+model UserActivity {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ipAddress String
+  userId    String?  @db.ObjectId
+  activity  String   // "CHAT_QUERY", "PRODUCT_VIEW", etc.
+  metadata  Json?    // Store searched category, price range, etc.
+  createdAt DateTime @default(now())
+  
+  @@index([ipAddress])
+  @@index([userId])
+}
+

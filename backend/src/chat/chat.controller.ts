@@ -1,5 +1,6 @@
-import { Controller, Post, Body, Logger, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Body, Logger, Req } from '@nestjs/common';
 import { ChatService } from './chat.service';
+import { Request } from 'express';
 
 @Controller('chat')
 export class ChatController {
@@ -8,15 +9,19 @@ export class ChatController {
     constructor(private readonly chatService: ChatService) { }
 
     @Post()
-    async chat(@Body() body: { message: string, history: any[], userId?: string }) {
-        this.logger.log(`Chat request received: ${JSON.stringify(body)}`);
+    async chat(
+        @Body() body: { message: string, history: any[], userId?: string },
+        @Req() req: Request
+    ) {
+        const ip = req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+        this.logger.log(`Chat request from ${ip}: ${JSON.stringify(body)}`);
 
         try {
             if (!body || !body.message) {
                 return { text: "Error: Message is required." };
             }
 
-            const response = await this.chatService.generateResponse(body.message, body.userId, body.history);
+            const response = await this.chatService.generateResponse(body.message, body.userId, body.history, ip as string);
 
             if (!response) {
                 this.logger.error("ChatService returned null/undefined");
