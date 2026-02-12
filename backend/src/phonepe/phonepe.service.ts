@@ -1,7 +1,6 @@
 
 import { Injectable, Logger, BadRequestException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
 import * as crypto from 'crypto';
 import { lastValueFrom } from 'rxjs';
 import { OrdersService } from '../orders/orders.service';
