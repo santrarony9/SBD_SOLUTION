@@ -16,10 +16,11 @@ interface Product {
     diamondCarat: number;
     pricing?: {
         finalPrice: number;
-        category?: string;
-        sku?: string;
-        slug?: string;
-    }
+    };
+    category?: string;
+    sku?: string;
+    slug?: string;
+}
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
     const [products, setProducts] = useState<Product[]>([]);
