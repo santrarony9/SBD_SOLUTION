@@ -37,7 +37,7 @@ export class UsersService {
 
     async findAll() {
         try {
-            console.log('[Users Debug] Fetching users...');
+
             const roles: any[] = ['SUPER_ADMIN', 'ADMIN', 'STAFF', 'PRICE_MANAGER'];
 
             const users = await this.prisma.user.findMany({

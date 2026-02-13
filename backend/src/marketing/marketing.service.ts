@@ -73,7 +73,7 @@ export class MarketingService {
     async sendHint(data: { productId: string, senderName: string, recipientName: string, recipientEmail: string, note?: string }) {
         // In a real app, inject MailService and send email.
         // For now, we'll log it and return success to simulate.
-        console.log(`💌 HINT SENT: From ${data.senderName} to ${data.recipientEmail} about Product ${data.productId}`);
+
         return { success: true, message: 'Hint sent successfully!' };
     }
 

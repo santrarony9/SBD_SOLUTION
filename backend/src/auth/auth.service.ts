@@ -19,19 +19,19 @@ export class AuthService {
 
     async validateUser(email: string, pass: string): Promise<any> {
         const normalizedEmail = email.toLowerCase();
-        console.log(`[AUTH DEBUG] Attempting login for: ${email} -> ${normalizedEmail}`);
+
 
         const user = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
 
         if (!user) {
-            console.log(`[AUTH DEBUG] User NOT FOUND: ${normalizedEmail}`);
+
             return null;
         }
 
-        console.log(`[AUTH DEBUG] User FOUND: ${user.email}, Role: ${user.role}, Hash: ${user.password?.substring(0, 10)}...`);
+
 
         const isMatch = await bcrypt.compare(pass, user.password || '');
-        console.log(`[AUTH DEBUG] Password validation result: ${isMatch}`);
+
 
         if (user && isMatch) {
             const { password, ...result } = user;

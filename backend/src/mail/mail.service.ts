@@ -38,7 +38,7 @@ export class MailService {
 
         try {
             await this.transporter.sendMail(mailOptions);
-            console.log(`Reset email sent to ${to}`);
+
         } catch (error) {
             console.error('Error sending email:', error);
             throw new Error('Failed to send reset email');
@@ -69,7 +69,7 @@ export class MailService {
 
         try {
             await this.transporter.sendMail(mailOptions);
-            console.log(`Abandoned cart email sent to ${to}`);
+
         } catch (error) {
             console.error('Error sending abandoned cart email:', error);
             // Don't throw, just log so cleanup service continues
