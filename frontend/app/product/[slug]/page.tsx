@@ -55,9 +55,7 @@ export default function ProductDetailPage() {
     const [showCertificate, setShowCertificate] = useState(false);
     const [showDropHint, setShowDropHint] = useState(false);
 
-    const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
-    const [showCertificate, setShowCertificate] = useState(false);
-    const [showDropHint, setShowDropHint] = useState(false);
+
     // Share State
     const [showShareMenu, setShowShareMenu] = useState(false);
 
