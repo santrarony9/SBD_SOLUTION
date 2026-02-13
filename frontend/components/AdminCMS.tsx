@@ -326,42 +326,80 @@ export default function AdminCMS() {
                                 </h3>
                                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image Source</label>
-                                        <input
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={(e) => {
-                                                const file = e.target.files?.[0];
-                                                if (file) {
-                                                    if (file.size > 5 * 1024 * 1024) {
-                                                        alert('File is too large! Max 5MB allowed.');
-                                                        return;
-                                                    }
-                                                    const formData = new FormData();
-                                                    formData.append('file', file);
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image Source</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Rec: 1920x1080px | Max 5MB
+                                            </span>
+                                        </div>
 
-                                                    // Show uploading state
-                                                    const statusId = showStatus('Uploading...', 'success'); // Hacky but works for now to show feedback
-
-                                                    fetchAPI('/media/upload', { method: 'POST', body: formData })
-                                                        .then(res => {
-                                                            if (res.url) {
-                                                                setNewBanner(prev => ({ ...prev, imageUrl: res.url }));
-                                                                showStatus('Image Uploaded!', 'success');
-                                                            } else {
-                                                                showStatus('Upload failed: No URL returned', 'error');
+                                        {!newBanner.imageUrl ? (
+                                            <label className={`relative block w-full h-32 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-300 hover:border-brand-navy hover:bg-gray-50'}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    disabled={isUploading}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 5 * 1024 * 1024) {
+                                                                alert('File is too large! Max 5MB allowed.');
+                                                                return;
                                                             }
-                                                        })
-                                                        .catch(() => showStatus('Upload Failed', 'error'));
-                                                }
-                                            }}
-                                            className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-navy file:text-white hover:file:bg-brand-gold transition-all cursor-pointer"
-                                        />
-                                        {newBanner.imageUrl && (
-                                            <div className="mt-2 relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+                                                            setIsUploading(true);
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+
+                                                            showStatus('Uploading...', 'success');
+
+                                                            fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                .then(res => {
+                                                                    if (res.url) {
+                                                                        setNewBanner(prev => ({ ...prev, imageUrl: res.url }));
+                                                                        showStatus('Image Uploaded!', 'success');
+                                                                    } else {
+                                                                        showStatus('Upload failed: No URL returned', 'error');
+                                                                    }
+                                                                })
+                                                                .catch(err => {
+                                                                    console.error(err);
+                                                                    showStatus('Upload Failed', 'error');
+                                                                })
+                                                                .finally(() => setIsUploading(false));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full">
+                                                    {isUploading ? (
+                                                        <>
+                                                            <div className="w-5 h-5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin mb-2"></div>
+                                                            <span className="text-[10px] font-bold text-brand-gold">UPLOADING...</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <span className="text-xl text-gray-300 mb-1">📷</span>
+                                                            <span className="text-[10px] font-bold text-gray-400">CLICK TO UPLOAD</span>
+                                                        </>
+                                                    )}
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
                                                 <img src={newBanner.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <p className="text-white text-[10px] font-bold">Change Image</p>
+
+                                                {/* Overlay Actions */}
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-3">
+                                                    <button
+                                                        onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))}
+                                                        className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors transform hover:scale-110"
+                                                        title="Remove Image"
+                                                    >
+                                                        <span className="text-xs font-bold">✕</span>
+                                                    </button>
+                                                </div>
+                                                <div className="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow">
+                                                    UPLOADED
                                                 </div>
                                             </div>
                                         )}
