@@ -47,6 +47,7 @@ export default function ProductDetailPage() {
     const [showBreakup, setShowBreakup] = useState(false);
     const [activeImage, setActiveImage] = useState<string | null>(null);
     const [showVideo, setShowVideo] = useState(false);
+    const [quantity, setQuantity] = useState(1); // Added Quantity State
 
     // PDP Enhancements State
     const [pincode, setPincode] = useState('');
@@ -72,9 +73,12 @@ export default function ProductDetailPage() {
         }, 1500);
     };
 
+    const handleIncrement = () => setQuantity(prev => prev + 1);
+    const handleDecrement = () => setQuantity(prev => (prev > 1 ? prev - 1 : 1));
+
     const handleBuyNow = async () => {
         if (!product) return;
-        await addToCart(product.id, 1);
+        await addToCart(product.id, quantity);
         router.push('/checkout');
     };
 
@@ -315,9 +319,32 @@ export default function ProductDetailPage() {
 
                     {/* Actions - Sticky Bottom on Mobile */}
                     <div className="bg-white/95 backdrop-blur-lg border-t border-gray-100 p-4 lg:p-0 lg:bg-transparent lg:border-none fixed bottom-0 left-0 right-0 z-50 lg:static lg:z-auto shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] lg:shadow-none space-y-3 mt-auto pt-4">
+
+                        {/* Quantity Selector */}
+                        <div className="flex items-center gap-4 mb-2">
+                            <div className="ml-auto flex items-center border border-gray-200 rounded-sm h-10">
+                                <button
+                                    onClick={handleDecrement}
+                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors"
+                                    disabled={quantity <= 1}
+                                >
+                                    -
+                                </button>
+                                <span className="w-12 h-full flex items-center justify-center text-sm font-sans font-medium text-brand-navy border-x border-gray-200">
+                                    {quantity}
+                                </span>
+                                <button
+                                    onClick={handleIncrement}
+                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-3">
                             <button
-                                onClick={() => product && addToCart(product.id, 1)}
+                                onClick={() => product && addToCart(product.id, quantity)}
                                 className="w-full bg-white border border-brand-gold text-brand-navy h-14 lg:h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
                                 <span>Add to Cart</span>
                             </button>
