@@ -133,8 +133,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
         setItems(newItems);
         // Recalculate total locally for responsiveness
-        // Note: Logic should ideally match backend calculateLocalTotal
-        const total = newItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0); // Warning: using snapshot price
+        const total = newItems.reduce((sum, item) => {
+            const price = item.calculatedPrice || item.product.price || 0;
+            return sum + (price * item.quantity);
+        }, 0);
         setCartTotal(total);
 
         if (user) {
