@@ -40,7 +40,7 @@ export default function AdminCMS() {
     const loadContent = async () => {
         setIsLoading(true);
         try {
-            const [fetchedBanners, fetchedOffers, fetchedHeroText, fetchedCategories, fetchedPriceRanges, fetchedTags, fetchedSocialPosts] = await Promise.all([
+            const results = await Promise.allSettled([
                 fetchAPI('/banners'),
                 fetchAPI('/offers'),
                 fetchAPI('/store/settings/homepage_hero_text'),
@@ -49,27 +49,50 @@ export default function AdminCMS() {
                 fetchAPI('/marketing/tags'),
                 fetchAPI('/marketing/social-posts')
             ]);
-            setBanners(fetchedBanners || []);
-            setOffers(fetchedOffers || []);
-            setCategories(fetchedCategories || []);
-            setPriceRanges(fetchedPriceRanges || []);
-            setTags(fetchedTags || []);
-            setSocialPosts(fetchedSocialPosts || []);
-            setHeroText(fetchedHeroText?.value ? JSON.parse(fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
 
-            // Fetch Spotlight separately
-            const spotlightSetting = await fetchAPI('/store/settings/spotlight');
-            if (spotlightSetting?.value) {
-                const spotlight = spotlightSetting.value; // It's already parsed object from API if verified above
-                setHeroText(prev => ({
-                    ...prev,
-                    spotlightId: spotlight.productId || '',
-                    showSpotlight: spotlight.isActive || false
-                }));
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes] = results;
+
+            if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
+            else console.error('Failed to load banners', bannersRes.reason);
+
+            if (offersRes.status === 'fulfilled') setOffers(offersRes.value || []);
+            else console.error('Failed to load offers', offersRes.reason);
+
+            if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value || []);
+            else console.error('Failed to load categories', categoriesRes.reason);
+
+            if (priceRangesRes.status === 'fulfilled') setPriceRanges(priceRangesRes.value || []);
+            else console.error('Failed to load price ranges', priceRangesRes.reason);
+
+            if (tagsRes.status === 'fulfilled') setTags(tagsRes.value || []);
+            else console.error('Failed to load tags', tagsRes.reason);
+
+            if (socialPostsRes.status === 'fulfilled') setSocialPosts(socialPostsRes.value || []);
+            else console.error('Failed to load social posts', socialPostsRes.reason);
+
+            if (heroTextRes.status === 'fulfilled') {
+                const fetchedHeroText = heroTextRes.value;
+                setHeroText(fetchedHeroText?.value ? JSON.parse(fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
             }
+
+            // Fetch Spotlight separately (fail silently if missing)
+            try {
+                const spotlightSetting = await fetchAPI('/store/settings/spotlight');
+                if (spotlightSetting?.value) {
+                    const spotlight = spotlightSetting.value;
+                    setHeroText(prev => ({
+                        ...prev,
+                        spotlightId: spotlight.productId || '',
+                        showSpotlight: spotlight.isActive || false
+                    }));
+                }
+            } catch (err) {
+                console.warn('Spotlight settings not found or failed to load');
+            }
+
         } catch (error) {
-            console.error("Failed to load content", error);
-            showStatus('Failed to load content', 'error');
+            console.error("Critical failure in loadContent", error);
+            showStatus('Partial content load failure - check console', 'error');
         } finally {
             setIsLoading(false);
         }
