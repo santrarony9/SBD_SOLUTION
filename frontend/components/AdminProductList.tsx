@@ -99,15 +99,14 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
 
     return (
         <div className="mt-12 bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
-        </h3>
 
-            {/* Header / Selection Bar */ }
+            {/* Header / Selection Bar */}
             <div className={`p-6 flex justify-between items-center transition-colors ${selectedIds.length > 0 ? 'bg-brand-navy text-white' : 'bg-brand-navy text-white'}`}>
                 {selectedIds.length > 0 ? (
-                   <div className="flex items-center gap-6 w-full animate-fade-in">
-                       <span className="text-sm font-bold uppercase tracking-widest">{selectedIds.length} Selected</span>
+                    <div className="flex items-center gap-6 w-full animate-fade-in">
+                        <span className="text-sm font-bold uppercase tracking-widest">{selectedIds.length} Selected</span>
                         <div className="h-4 w-px bg-white/20"></div>
-                       <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3">
                             <button
                                 onClick={handleGenerateBundleLink}
                                 className="bg-brand-gold text-brand-navy px-4 py-2 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all shadow-lg flex items-center gap-2"
@@ -120,8 +119,8 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                             >
                                 Reset
                             </button>
-                       </div>
-                   </div> 
+                        </div>
+                    </div>
                 ) : (
                     <div className="flex justify-between items-center w-full flex-wrap gap-4 animate-fade-in">
                         <div className="flex items-center gap-4">
