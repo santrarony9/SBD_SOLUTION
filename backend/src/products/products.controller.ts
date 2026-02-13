@@ -10,6 +10,11 @@ export class ProductsController {
         return this.productsService.createProduct(createProductDto);
     }
 
+    @Post('seed-pricing')
+    async seedPricing() {
+        return this.productsService.seedPricing();
+    }
+
     @Post('ai-description')
     async generateDescription(@Body() body: any) {
         const description = await this.productsService.generateDescription(body);

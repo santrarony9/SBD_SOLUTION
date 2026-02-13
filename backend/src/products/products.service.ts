@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { ApplyOn } from '@prisma/client';
+import { ApplyOn, ChargeType } from '@prisma/client';
 // DTOs would normally be defined in a separate file, defining inline for brevity or need to create them.
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
@@ -58,6 +58,68 @@ export class ProductsService {
                 console.error("AI Generation Failed (Fallback also failed):", fallbackError);
                 return `AI Error: ${fallbackError.message}`;
             }
+        }
+    }
+
+    async seedPricing() {
+        try {
+            // 1. Gold Prices
+            const goldPurities = [18, 22, 24];
+            for (const purity of goldPurities) {
+                const exists = await this.prisma.goldPrice.findUnique({ where: { purity } });
+                if (!exists) {
+                    await this.prisma.goldPrice.create({
+                        data: {
+                            purity,
+                            pricePer10g: 65000 + (purity - 18) * 1000,
+                        },
+                    });
+                }
+            }
+
+            // 2. Diamond Prices
+            const clarities = ['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2'];
+            let price = 50000;
+            for (const clarity of clarities) {
+                const exists = await this.prisma.diamondPrice.findUnique({ where: { clarity } });
+                if (!exists) {
+                    await this.prisma.diamondPrice.create({
+                        data: {
+                            clarity,
+                            pricePerCarat: price,
+                        },
+                    });
+                }
+                price -= 3000;
+            }
+
+            // 3. Charges
+            const charges = [
+                {
+                    name: 'Making Charges',
+                    type: ChargeType.PER_GRAM,
+                    amount: 800,
+                    applyOn: ApplyOn.GOLD_VALUE, // Matches schema/pricing service logic for per-gram on gold
+                },
+                {
+                    name: 'GST',
+                    type: ChargeType.PERCENTAGE,
+                    amount: 3,
+                    applyOn: ApplyOn.FINAL_AMOUNT,
+                }
+            ];
+
+            for (const charge of charges) {
+                const existing = await this.prisma.charge.findUnique({ where: { name: charge.name } });
+                if (!existing) {
+                    await this.prisma.charge.create({ data: charge });
+                }
+            }
+
+            return { success: true, message: "Pricing data seeded successfully." };
+        } catch (error) {
+            console.error("Seeding failed:", error);
+            return { success: false, error: error.message };
         }
     }
 
