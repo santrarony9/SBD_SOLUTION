@@ -26,10 +26,12 @@ export default function MotionGallery() {
     }, []);
 
     const handleNext = () => {
+        if (galleryItems.length === 0) return;
         setActiveIndex((prev) => (prev + 1) % galleryItems.length);
     };
 
     const handlePrev = () => {
+        if (galleryItems.length === 0) return;
         setActiveIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
     };
 
