@@ -5,24 +5,15 @@ import axios from 'axios';
 export class ShiprocketService {
     private readonly logger = new Logger(ShiprocketService.name);
     private token: string | null = null;
-    private tokenExpiry: number | null = null;
+    private tokenExpiry: Date | null = null;
 
     private readonly email = process.env.SHIPROCKET_EMAIL;
     private readonly password = process.env.SHIPROCKET_PASSWORD;
 
     constructor() { }
 
-    async testAuth() {
-        try {
-            await this.login();
-            return { success: true, message: "Connection Successful" };
-        } catch (error) {
-            return { success: false, message: "Connection Failed: " + (error.message || "Unknown Error") };
-        }
-    }
-
     private async login() {
-        if (this.token && this.tokenExpiry && Date.now() < this.tokenExpiry) {
+        if (this.token && this.tokenExpiry && new Date() < this.tokenExpiry) {
             return this.token;
         }
 
@@ -33,98 +24,97 @@ export class ShiprocketService {
             });
 
             this.token = response.data.token;
-            // Token is usually valid for 10 days, but let's refresh every 24 hours to be safe
-            this.tokenExpiry = Date.now() + 24 * 60 * 60 * 1000;
+            // Token is usually valid for 10 days, but we'll refresh sooner to be safe (e.g., 9 days)
+            const expiry = new Date();
+            expiry.setDate(expiry.getDate() + 9);
+            this.tokenExpiry = expiry;
+
+            this.logger.log('Shiprocket Login Successful');
             return this.token;
         } catch (error) {
-            this.logger.error('Failed to login to Shiprocket', error.response?.data || error.message);
-            throw new Error('Shiprocket Login Failed');
+            this.logger.error('Shiprocket Login Failed', error.response?.data || error.message);
+            throw new Error('Shiprocket Authentication Failed');
         }
     }
 
     async createOrder(orderData: any) {
+        const token = await this.login();
+
+        // Map our Order to Shiprocket Order Schema
+        const payload = {
+            order_id: orderData.id,
+            order_date: new Date(orderData.createdAt).toISOString().split('T')[0] + ' ' + new Date(orderData.createdAt).toTimeString().split(' ')[0],
+            pickup_location: "Primary", // Default, user can change if needed
+            billing_customer_name: orderData.user?.name || orderData.shippingAddress.fullName,
+            billing_last_name: "",
+            billing_address: orderData.shippingAddress.street,
+            billing_address_2: "",
+            billing_city: orderData.shippingAddress.city,
+            billing_pincode: orderData.shippingAddress.zip,
+            billing_state: orderData.shippingAddress.state,
+            billing_country: "India",
+            billing_email: orderData.user?.email || "guest@example.com",
+            billing_phone: orderData.shippingAddress.phone,
+            shipping_is_billing: true,
+            order_items: orderData.items.map(item => ({
+                name: item.product.name,
+                sku: item.product.slug || item.productId,
+                units: item.quantity,
+                selling_price: item.price,
+                discount: 0,
+                tax: 0,
+                hsn: 7113 // Jewellery
+            })),
+            payment_method: "Prepaid",
+            sub_total: orderData.totalAmount, // Assuming total includes tax for now
+            length: 10,
+            breadth: 10,
+            height: 10,
+            weight: 0.5 // Default weight 500g, should come from product in future
+        };
+
         try {
-            const token = await this.login();
-
-            // Transform local order data to Shiprocket payload
-            // This mapping assumes standard Shiprocket fields. Adjust as per specific requirements.
-            const payload = {
-                order_id: orderData.id,
-                order_date: new Date(orderData.createdAt).toISOString().split('T')[0],
-                pickup_location: 'Primary', // Needs to be configured in Shiprocket dashboard
-                billing_customer_name: orderData.billingAddress.fullName.split(' ')[0],
-                billing_last_name: orderData.billingAddress.fullName.split(' ').slice(1).join(' '),
-                billing_address: orderData.billingAddress.street,
-                billing_city: orderData.billingAddress.city,
-                billing_pincode: orderData.billingAddress.zip,
-                billing_state: orderData.billingAddress.state,
-                billing_country: 'India',
-                billing_email: orderData.user.email,
-                billing_phone: orderData.billingAddress.phone,
-                shipping_is_billing: true, // Assuming for now, update if different
-                order_items: orderData.items.map(item => ({
-                    name: item.product.name,
-                    sku: item.product.sku || item.productId,
-                    units: item.quantity,
-                    selling_price: item.price,
-                    discount: 0,
-                    tax: item.product.gstRate || 3,
-                    hsn: item.product.hsnCode || 7113
-                })),
-                payment_method: orderData.paymentMethod === 'COD' ? 'COD' : 'Prepaid',
-                sub_total: orderData.totalAmount, // This should be the total value
-                length: 10, // Placeholder dimensions
-                breadth: 10,
-                height: 10,
-                weight: orderData.items.reduce((acc, item) => acc + (item.product.realWeight || 0.5), 0) / 1000 // Convert grams to kg? Shiprocket creates shipment in kg usually. CHECK THIS.
-            };
-
             const response = await axios.post('https://apiv2.shiprocket.in/v1/external/orders/create/adhoc', payload, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
             });
 
+            this.logger.log(`Shiprocket Order Created: ${response.data.order_id}`);
             return response.data;
         } catch (error) {
-            this.logger.error('Failed to create order in Shiprocket', error.response?.data || error.message);
-            // Don't throw, just return null so we don't block the main order flow
-            return null;
-        }
-    }
-
-    async generateLabel(shipmentId: string) {
-        try {
-            const token = await this.login();
-            const response = await axios.post('https://apiv2.shiprocket.in/v1/external/courier/generate/label', {
-                shipment_id: [shipmentId]
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            return response.data; // Includes label_url
-        } catch (error) {
-            this.logger.error('Failed to generate label', error.response?.data || error.message);
+            this.logger.error('Shiprocket Create Order Failed', error.response?.data || error.message);
+            // Don't throw, just return null so we don't break the main order flow
             return null;
         }
     }
 
     async cancelOrder(shiprocketOrderId: string) {
+        const token = await this.login();
         try {
-            const token = await this.login();
-            const response = await axios.post('https://apiv2.shiprocket.in/v1/external/orders/cancel', {
+            await axios.post('https://apiv2.shiprocket.in/v1/external/orders/cancel', {
                 ids: [shiprocketOrderId]
             }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
-            return response.data;
+            return true;
         } catch (error) {
-            this.logger.error('Failed to cancel order in Shiprocket', error.response?.data || error.message);
-            throw error; // Throw to let OrdersService handle the error
+            this.logger.error('Shiprocket Cancel Failed', error.message);
+            return false;
+        }
+    }
+
+    async generateLabel(shipmentId: string) {
+        // Implementation for later
+        return null;
+    }
+
+    async testAuth() {
+        try {
+            const token = await this.login();
+            return { success: true, token: !!token };
+        } catch (e) {
+            return { success: false, error: e.message };
         }
     }
 }
