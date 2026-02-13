@@ -47,7 +47,6 @@ export default function MotionGallery() {
     if (galleryItems.length === 0) return null;
 
     return (
-    return (
         <section className="py-24 bg-white relative">
             <div className="text-center mb-16 px-4">
                 <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3 animate-fade-in-up">Curated For You</span>
