@@ -385,22 +385,46 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 <div className="grid grid-cols-5 gap-4">
                                     {[0, 1, 2, 3, 4].map((index) => (
                                         <div key={index} className="relative aspect-square group">
-                                            <input
-                                                type="file"
-                                                accept="image/*"
-                                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                                                onChange={(e) => {
-                                                    const file = e.target.files?.[0];
-                                                    if (file && file.size > 5 * 1024 * 1024) {
-                                                        alert('File is too large! Max 5MB allowed.');
-                                                        return;
-                                                    }
-                                                    handleMediaUpload(file, `image-${index}`);
-                                                }}
-                                            />
-                                            <div className="w-full h-full border-2 border-dashed border-gray-300 bg-white rounded-lg overflow-hidden flex items-center justify-center group-hover:border-brand-gold transition-all">
+                                            {/* File Input (Only if no image) */}
+                                            {!tempImages[index] && (
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file && file.size > 5 * 1024 * 1024) {
+                                                            alert('File is too large! Max 5MB allowed.');
+                                                            return;
+                                                        }
+                                                        handleMediaUpload(file, `image-${index}`);
+                                                    }}
+                                                />
+                                            )}
+
+                                            <div className={`w-full h-full border-2 ${tempImages[index] ? 'border-gray-200' : 'border-dashed border-gray-300'} bg-white rounded-lg overflow-hidden flex items-center justify-center group-hover:border-brand-gold transition-all relative`}>
                                                 {tempImages[index] ? (
-                                                    <img src={tempImages[index]} className="w-full h-full object-cover" alt={`Preview ${index}`} />
+                                                    <>
+                                                        <img src={tempImages[index]} className="w-full h-full object-cover" alt={`Preview ${index}`} />
+
+                                                        {/* Remove Button Overlay */}
+                                                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20">
+                                                            <button
+                                                                type="button"
+                                                                onClick={(e) => {
+                                                                    e.preventDefault();
+                                                                    const newImages = [...tempImages];
+                                                                    newImages[index] = ''; // Clear image
+                                                                    setTempImages(newImages);
+                                                                }}
+                                                                className="bg-red-500 text-white w-8 h-8 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-lg"
+                                                                title="Remove Image"
+                                                            >
+                                                                ✕
+                                                            </button>
+                                                        </div>
+                                                        <div className="absolute top-1 right-1 bg-green-500 w-2 h-2 rounded-full shadow z-10"></div>
+                                                    </>
                                                 ) : (
                                                     <span className="text-xl text-gray-200 font-serif group-hover:text-brand-gold">{index + 1}</span>
                                                 )}

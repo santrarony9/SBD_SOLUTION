@@ -21,6 +21,7 @@ export default function AdminCMS() {
 
     // Form States
     const [newBanner, setNewBanner] = useState({ imageUrl: '', title: '', link: '' });
+    const [isUploading, setIsUploading] = useState(false);
     const [newOffer, setNewOffer] = useState({ title: '', description: '', tag: '', code: '' });
     const [newCategory, setNewCategory] = useState({ name: '', slug: '', imageUrl: '' });
     const [newPriceRange, setNewPriceRange] = useState({ label: '', minPrice: 0, maxPrice: 0, imageUrl: '' });
