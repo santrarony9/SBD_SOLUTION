@@ -4,6 +4,21 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { LogBufferService } from './diagnostics/log-buffer.service';
+import * as fs from 'fs';
+import * as path from 'path';
+
+// Manual .env loading since @nestjs/config is missing
+const envPath = path.resolve(__dirname, '../../.env');
+if (fs.existsSync(envPath)) {
+  const envConfig = fs.readFileSync(envPath).toString();
+  envConfig.split('\n').forEach((line) => {
+    const [key, value] = line.split('=');
+    if (key && value && !process.env[key.trim()]) {
+      process.env[key.trim()] = value.trim().replace(/^["']|["']$/g, '');
+    }
+  });
+  console.log('[BOOTSTRAP] Loaded .env manually');
+}
 
 const PORT = process.env.PORT || 3001;
 let cachedApp: any;

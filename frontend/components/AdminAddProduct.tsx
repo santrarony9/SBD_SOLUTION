@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+// const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'; // Removed local definition
 
 interface ProductFormProps {
     isOpen: boolean;
@@ -81,7 +81,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
             if (!response.ok) {
                 const errorText = await response.text();
-                throw new Error(`Upload Failed (${response.status}): ${errorText}`);
+                throw new Error(errorText || `Upload Failed (${response.status})`);
             }
 
             const result = await response.json();

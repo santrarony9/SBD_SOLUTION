@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart, PiTerminalWindow } from "react-icons/pi";
+import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart, PiTerminalWindow, PiImage } from "react-icons/pi";
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 import AdminGuard from '@/components/AdminGuard';
@@ -12,6 +12,7 @@ import AdminAddProduct from '@/components/AdminAddProduct';
 import AdminDashboardOverview from '@/components/AdminDashboardOverview';
 import AdminCMS from '@/components/AdminCMS';
 import AdminTeamManager from '@/components/AdminTeamManager';
+import AdminGallery from '@/components/AdminGallery';
 import LogViewer from '@/components/LogViewer';
 
 
@@ -131,6 +132,12 @@ export default function AdminDashboard() {
                                 label="Rates & Masters"
                             />
                             <SidebarLink
+                                active={activeTab === 'gallery'}
+                                onClick={() => setActiveTab('gallery')}
+                                icon={<PiImage className="w-5 h-5" />}
+                                label="Gallery & Top Picks"
+                            />
+                            <SidebarLink
                                 active={activeTab === 'products'}
                                 onClick={() => setActiveTab('products')}
                                 icon={<PiCube className="w-5 h-5" />}
@@ -200,7 +207,8 @@ export default function AdminDashboard() {
                                     activeTab === 'cms' ? 'Home UI Editor' :
                                         activeTab === 'team' ? 'Team Access' :
                                             activeTab === 'masters' ? 'Master Config' :
-                                                activeTab === 'products' ? 'Collection' : 'Order Console'}
+                                                activeTab === 'gallery' ? 'Visual Merchandising' :
+                                                    activeTab === 'products' ? 'Collection' : 'Order Console'}
                             </h1>
                         </div>
                     </header>
@@ -208,6 +216,7 @@ export default function AdminDashboard() {
                     {activeTab === 'overview' && <AdminDashboardOverview />}
                     {activeTab === 'cms' && <AdminCMS />}
                     {activeTab === 'team' && <AdminTeamManager />}
+                    {activeTab === 'gallery' && <AdminGallery />}
 
                     {activeTab === 'masters' && (
                         <div className="space-y-12 max-w-6xl animate-fade-in relative">

@@ -50,39 +50,34 @@ export default function MotionGallery() {
                         let offset = (index - activeIndex);
                         const length = galleryItems.length;
 
+                        // Circular buffer logic
                         if (offset > length / 2) offset -= length;
                         if (offset < -length / 2) offset += length;
 
-                        if (Math.abs(offset) > 1) return null;
+                        // Show 2 neighbors on each side (5 total visible)
+                        if (Math.abs(offset) > 2) return null;
 
                         const isActive = offset === 0;
-                        const isLeft = offset === -1;
-                        const isRight = offset === 1;
+                        const direction = offset > 0 ? 1 : -1;
+                        const absOffset = Math.abs(offset);
 
                         return (
                             <motion.div
                                 key={item.id}
                                 layout
-                                initial={{
-                                    scale: 0.8,
-                                    opacity: 0,
-                                    x: isLeft ? '-100%' : isRight ? '100%' : 0,
-                                    rotateY: isLeft ? 45 : isRight ? -45 : 0
-                                }}
+                                initial={false}
                                 animate={{
-                                    scale: isActive ? 1.0 : 0.8, // Slightly reduced scale for mobile fitting
-                                    opacity: 1,
-                                    x: isActive ? '0%' : isLeft ? '-60%' : '60%',
-                                    zIndex: isActive ? 20 : 10,
-                                    rotateY: isActive ? 0 : isLeft ? 25 : -25,
-                                    filter: isActive ? 'blur(0px) brightness(1)' : 'blur(2px) brightness(0.7)'
+                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.15)), // 1.0 -> 0.85 -> 0.70
+                                    opacity: isActive ? 1 : (1 - (absOffset * 0.2)),
+                                    x: isActive ? '0%' : `${direction * (50 + (absOffset * 25))}%`, // Spacing: Center -> 50% -> 75%
+                                    zIndex: 30 - absOffset, // 30 -> 29 -> 28
+                                    rotateY: isActive ? 0 : direction * -45, // Fan effect facing center
+                                    filter: isActive ? 'blur(0px) brightness(1)' : `blur(${absOffset * 2}px) brightness(${1 - (absOffset * 0.2)})`
                                 }}
-                                exit={{ opacity: 0, scale: 0.5 }}
                                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="absolute w-[260px] md:w-[350px] aspect-[3/4] rounded-2xl shadow-xl md:shadow-2xl overflow-hidden cursor-pointer bg-gray-100"
+                                className="absolute w-[260px] md:w-[350px] aspect-[3/4] rounded-2xl shadow-xl md:shadow-2xl overflow-hidden cursor-pointer bg-gray-100 border border-white/20"
                                 onClick={() => {
-                                    if (isLeft) handlePrev();
-                                    if (isRight) handleNext();
+                                    if (offset !== 0) setActiveIndex((activeIndex + offset + length) % length);
                                 }}
                             >
                                 <div className="relative w-full h-full">
@@ -91,15 +86,21 @@ export default function MotionGallery() {
                                         alt={item.title}
                                         className="w-full h-full object-cover"
                                     />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90" />
+                                    {/* Gradient overlay for better text readability */}
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80" />
 
-                                    <div className="absolute bottom-0 left-0 w-full p-6 text-center transform transition-transform duration-500">
-                                        <h3 className="text-xl md:text-2xl font-serif text-white mb-1 drop-shadow-md">{item.title}</h3>
-                                        {item.subtitle && <p className="text-brand-gold text-[10px] uppercase tracking-widest mb-4 drop-shadow">{item.subtitle}</p>}
+                                    {/* Text Content - Matches sketch "Daily Wear", "Office" placement */}
+                                    <div className="absolute bottom-6 left-0 w-full px-6 text-center transform transition-transform duration-500">
+                                        <h3 className={`font-serif text-white mb-1 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg'}`}>
+                                            {item.title}
+                                        </h3>
+                                        <p className="text-brand-gold text-[10px] uppercase tracking-[0.2em] mb-4 drop-shadow font-bold">
+                                            {item.subtitle || 'Collection'}
+                                        </p>
 
                                         {isActive && item.link && (
                                             <Link href={item.link}>
-                                                <span className="inline-block border border-white/50 text-white px-6 py-2 text-[10px] uppercase tracking-widest hover:bg-white hover:text-black transition-all rounded-full backdrop-blur-md">
+                                                <span className="inline-block border border-white/30 bg-white/10 text-white px-8 py-2.5 text-[10px] uppercase tracking-widest hover:bg-white hover:text-brand-navy transition-all rounded-full backdrop-blur-md shadow-lg">
                                                     Explore
                                                 </span>
                                             </Link>
