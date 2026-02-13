@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
+import { PiLink, PiCopy } from "react-icons/pi";
 
 interface Product {
     id: string;
@@ -15,16 +16,17 @@ interface Product {
     diamondCarat: number;
     pricing?: {
         finalPrice: number;
-    };
-    category?: string;
-    sku?: string;
-}
+        category?: string;
+        sku?: string;
+        slug?: string;
+    }
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     const loadProducts = async () => {
         try {
@@ -63,6 +65,35 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
         }
     };
 
+    const handleCopyLink = (slug: string) => {
+        const link = `/product/${slug}`;
+        navigator.clipboard.writeText(link);
+        showFeedback(`copy-btn-${slug}`);
+    };
+
+    const toggleSelect = (id: string) => {
+        setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+    };
+
+    const handleGenerateBundleLink = () => {
+        if (selectedIds.length === 0) return;
+        const link = `/shop?ids=${selectedIds.join(',')}`;
+        navigator.clipboard.writeText(link);
+        alert(`Bundle Link Copied!\n${link}`);
+        setSelectedIds([]);
+    };
+
+    const showFeedback = (id: string) => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<span class="text-green-600">Copied!</span>';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+    };
+
     if (isLoading) return <div className="text-brand-navy/60 text-sm font-medium animate-pulse">Loading inventory...</div>;
 
     return (
@@ -82,10 +113,43 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                     onChange={(e) => setSearchTerm(e.target.value)}
                 />
             </h3>
+
+            {/* Action Bar for Selection */}
+            {selectedIds.length > 0 && (
+                <div className="bg-brand-gold/10 px-6 py-3 flex justify-between items-center border-b border-brand-gold/20 animate-fade-in">
+                    <span className="text-xs font-bold text-brand-navy uppercase tracking-widest">{selectedIds.length} Products Selected</span>
+                    <div className="flex gap-4">
+                        <button
+                            onClick={() => setSelectedIds([])}
+                            className="text-gray-500 text-[10px] font-bold uppercase hover:text-brand-navy"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            onClick={handleGenerateBundleLink}
+                            className="bg-brand-navy text-white px-4 py-2 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-brand-gold transition-colors shadow-sm flex items-center gap-2"
+                        >
+                            <PiLink size={14} /> Copy Bundle Link
+                        </button>
+                    </div>
+                </div>
+            )}
+
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-gray-600">
                     <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500 border-b border-gray-200">
                         <tr>
+                            <th className="px-6 py-5 w-10">
+                                <input
+                                    type="checkbox"
+                                    className="rounded border-gray-300 text-brand-navy focus:ring-brand-gold"
+                                    onChange={(e) => {
+                                        if (e.target.checked) setSelectedIds(filteredProducts.map(p => p.id));
+                                        else setSelectedIds([]);
+                                    }}
+                                    checked={selectedIds.length === filteredProducts.length && filteredProducts.length > 0}
+                                />
+                            </th>
                             <th className="px-6 py-5 whitespace-nowrap">Product</th>
                             <th className="px-6 py-5 whitespace-nowrap">SKU / ID</th>
                             <th className="px-6 py-5 whitespace-nowrap">Price</th>
@@ -96,7 +160,15 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                         {filteredProducts.map((product) => (
-                            <tr key={product.id} className="hover:bg-brand-cream/30 transition-colors group">
+                            <tr key={product.id} className={`hover:bg-brand-cream/30 transition-colors group ${selectedIds.includes(product.id) ? 'bg-brand-gold/5' : ''}`}>
+                                <td className="px-6 py-4">
+                                    <input
+                                        type="checkbox"
+                                        className="rounded border-gray-300 text-brand-navy focus:ring-brand-gold"
+                                        checked={selectedIds.includes(product.id)}
+                                        onChange={() => toggleSelect(product.id)}
+                                    />
+                                </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center space-x-4">
                                         <div className="relative w-12 h-12 rounded bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200 group-hover:border-brand-gold/50 transition-colors">
@@ -135,6 +207,14 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                             className="text-red-500 hover:bg-red-50 px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider transition-all"
                                         >
                                             Delete
+                                        </button>
+                                        <button
+                                            id={`copy-btn-${product.slug}`}
+                                            onClick={() => handleCopyLink(product.slug || product.id)}
+                                            className="text-brand-gold hover:bg-brand-gold/10 px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-1 border border-brand-gold/20"
+                                            title="Copy Product Link"
+                                        >
+                                            <PiLink size={14} /> Link
                                         </button>
                                     </div>
                                 </td>

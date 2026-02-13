@@ -114,6 +114,15 @@ function ShopContent() {
             });
         }
 
+        // Filter by specific IDs (Curated Link)
+        const idsParam = searchParams.get('ids');
+        if (idsParam) {
+            const targetIds = idsParam.split(',').map(id => id.trim());
+            if (targetIds.length > 0) {
+                result = result.filter(p => targetIds.includes(p.id));
+            }
+        }
+
         // Sort
         result.sort((a, b) => {
             const priceA = a.pricing?.finalPrice || a.price || 0;
@@ -329,8 +338,8 @@ function ShopContent() {
                                                 key={cat}
                                                 onClick={() => toggleCategory(cat)}
                                                 className={`px-4 py-2 border rounded-sm text-xs uppercase tracking-wider ${selectedCategories.includes(cat.toLowerCase())
-                                                        ? 'bg-brand-navy text-white border-brand-navy'
-                                                        : 'bg-white text-gray-600 border-gray-200'
+                                                    ? 'bg-brand-navy text-white border-brand-navy'
+                                                    : 'bg-white text-gray-600 border-gray-200'
                                                     }`}
                                             >
                                                 {cat}
