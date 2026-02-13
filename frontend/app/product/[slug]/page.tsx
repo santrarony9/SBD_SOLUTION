@@ -33,7 +33,7 @@ interface Product {
     };
 }
 
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 
 export default function ProductDetailPage() {
     const params = useParams();
