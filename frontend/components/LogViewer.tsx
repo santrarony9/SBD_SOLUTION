@@ -14,7 +14,11 @@ export default function LogViewer({ onClose }: { onClose: () => void }) {
             setLogs(data.logs || []);
         } catch (error) {
             console.error("Failed to fetch logs", error);
-            setLogs(["Failed to load logs. Backend might be unreachable."]);
+            setLogs([
+                `Error loading logs: ${error instanceof Error ? error.message : String(error)}`,
+                `Attempted URL: ${process.env.NEXT_PUBLIC_API_URL || '/api'}/diagnostics/logs`,
+                "Check console for details."
+            ]);
         } finally {
             setIsLoading(false);
         }

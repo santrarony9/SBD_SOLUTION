@@ -45,7 +45,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem('user', JSON.stringify(newUser));
         setToken(newToken);
         setUser(newUser);
-        if (newUser.role === 'ADMIN' || newUser.role === 'STAFF') {
+        // Check for any admin-level role
+        const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'];
+        if (adminRoles.includes(newUser.role)) {
             router.push('/admin');
         } else {
             router.push('/account');

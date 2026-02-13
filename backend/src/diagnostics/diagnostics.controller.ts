@@ -1,6 +1,6 @@
 import { Controller, Get, Post } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
 
 import { LogBufferService } from './log-buffer.service';
@@ -11,6 +11,11 @@ export class DiagnosticsController {
         private prisma: PrismaService,
         private logBuffer: LogBufferService
     ) { }
+
+    @Get('ping')
+    ping() {
+        return { status: 'ok', message: 'pong', timestamp: new Date().toISOString() };
+    }
 
     @Get('logs')
     async getLogs() {

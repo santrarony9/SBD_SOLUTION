@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 // import { Role } from '@prisma/client';
 
 import { JwtService } from '@nestjs/jwt';
-import * as bcrypt from 'bcrypt';
+import * as bcrypt from 'bcryptjs';
 import { SmsService } from '../sms/sms.service';
 import { MailService } from '../mail/mail.service';
 import { v4 as uuidv4 } from 'uuid';
