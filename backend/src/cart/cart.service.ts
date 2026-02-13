@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { PricingService } from '../pricing/pricing.service';
 
 @Injectable()
 export class CartService {
-    constructor(private prisma: PrismaService) { }
+    constructor(private prisma: PrismaService, private pricingService: PricingService) { }
 
     async getCart(userId: string) {
         let cart = await this.prisma.cart.findUnique({
@@ -22,14 +23,17 @@ export class CartService {
             });
         }
 
-        // Calculate totals dynamically
-        const enrichedItems = cart.items.map(item => {
-            // Logic for price calculation could be complex (e.g. live gold rates).
-            // For now, using stored price or dummy calculation. 
-            // Ideally, we fetch live price here using ProductsService logic.
-            const price = item.product.goldWeight * 6000 + item.product.diamondCarat * 50000; // Simplified Example
-            return { ...item, calculatedPrice: price, total: price * item.quantity };
-        });
+        // Calculate totals dynamically using Shared Pricing Service
+        const enrichedItems = await Promise.all(cart.items.map(async (item) => {
+            const pricing = await this.pricingService.calculateProductPrice(item.product);
+            const price = pricing ? pricing.finalPrice : 0;
+            return {
+                ...item,
+                calculatedPrice: price,
+                total: price * item.quantity,
+                pricingDetails: pricing // Optional: pass full breakdown if needed frontend
+            };
+        }));
 
         const total = enrichedItems.reduce((sum, item) => sum + item.total, 0);
 
