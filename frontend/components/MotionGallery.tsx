@@ -46,16 +46,11 @@ export default function MotionGallery() {
 
             <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center perspective-1000">
                 <AnimatePresence mode='popLayout'>
-                    {galleryItems.map((item, index) => {
-                        let offset = (index - activeIndex);
-                        const length = galleryItems.length;
+                    {[-2, -1, 0, 1, 2].map((offset) => {
+                        const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length; // Ensure positive modulo
+                        const item = galleryItems[itemIndex];
 
-                        // Circular buffer logic
-                        if (offset > length / 2) offset -= length;
-                        if (offset < -length / 2) offset += length;
-
-                        // Show 2 neighbors on each side (5 total visible)
-                        if (Math.abs(offset) > 2) return null;
+                        if (!item) return null;
 
                         const isActive = offset === 0;
                         const direction = offset > 0 ? 1 : -1;
@@ -63,44 +58,63 @@ export default function MotionGallery() {
 
                         return (
                             <motion.div
-                                key={item.id}
+                                key={`${item.id}-${offset}`} // Unique key for virtual positions
                                 layout
                                 initial={false}
                                 animate={{
-                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.15)), // 1.0 -> 0.85 -> 0.70
-                                    opacity: isActive ? 1 : (1 - (absOffset * 0.2)),
-                                    x: isActive ? '0%' : `${direction * (50 + (absOffset * 25))}%`, // Spacing: Center -> 50% -> 75%
-                                    zIndex: 30 - absOffset, // 30 -> 29 -> 28
-                                    rotateY: isActive ? 0 : direction * -45, // Fan effect facing center
-                                    filter: isActive ? 'blur(0px) brightness(1)' : `blur(${absOffset * 2}px) brightness(${1 - (absOffset * 0.2)})`
+                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
+                                    opacity: isActive ? 1 : (0.8 - (absOffset * 0.2)),
+                                    x: `${offset * 60}%`, // Fixed percentage spacing relative to center
+                                    zIndex: 50 - absOffset, // Higher z-index for center
+                                    rotateY: isActive ? 0 : direction * -30,
+                                    filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
+                                    boxShadow: isActive
+                                        ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)' // Gold glow for active
+                                        : '0 10px 30px -10px rgba(0,0,0,0.3)'
                                 }}
-                                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                className="absolute w-[260px] md:w-[350px] aspect-[3/4] rounded-2xl shadow-xl md:shadow-2xl overflow-hidden cursor-pointer bg-gray-100 border border-white/20"
+                                transition={{ type: "spring", stiffness: 200, damping: 25, mass: 0.8 }} // Smoother/Lighter feel
+                                className={`absolute w-[280px] md:w-[380px] aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border ${isActive ? 'border-brand-gold/50' : 'border-white/10'} bg-brand-navy`}
+                                style={{
+                                    transformStyle: 'preserve-3d',
+                                }}
                                 onClick={() => {
-                                    if (offset !== 0) setActiveIndex((activeIndex + offset + length) % length);
+                                    if (offset !== 0) setActiveIndex((prev) => (prev + offset + galleryItems.length) % galleryItems.length);
                                 }}
                             >
-                                <div className="relative w-full h-full">
+                                <div className="relative w-full h-full group">
                                     <img
                                         src={item.imageUrl}
                                         alt={item.title}
-                                        className="w-full h-full object-cover"
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
-                                    {/* Gradient overlay for better text readability */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-80" />
+                                    {/* Lustrous Overlay */}
+                                    <div className={`absolute inset-0 bg-gradient-to-t from-brand-navy via-transparent to-transparent opacity-${isActive ? '60' : '80'}`} />
 
-                                    {/* Text Content - Matches sketch "Daily Wear", "Office" placement */}
-                                    <div className="absolute bottom-6 left-0 w-full px-6 text-center transform transition-transform duration-500">
-                                        <h3 className={`font-serif text-white mb-1 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg'}`}>
-                                            {item.title}
-                                        </h3>
-                                        <p className="text-brand-gold text-[10px] uppercase tracking-[0.2em] mb-4 drop-shadow font-bold">
-                                            {item.subtitle || 'Collection'}
-                                        </p>
+                                    {/* Light Sheen Effect */}
+                                    {isActive && <div className="absolute inset-0 bg-gradient-to-tr from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />}
+
+                                    {/* Text Content */}
+                                    <div className="absolute bottom-8 left-0 w-full px-6 text-center">
+                                        <motion.div
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: 0.1 }}
+                                        >
+                                            <h3 className={`font-serif text-white mb-2 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg opacity-80'}`}>
+                                                {item.title}
+                                            </h3>
+                                            <div className="flex justify-center items-center gap-2 mb-4">
+                                                <span className="h-[1px] w-8 bg-brand-gold/50"></span>
+                                                <p className="text-brand-gold text-[10px] uppercase tracking-[0.25em] font-bold drop-shadow">
+                                                    {item.subtitle || 'COLLECTION'}
+                                                </p>
+                                                <span className="h-[1px] w-8 bg-brand-gold/50"></span>
+                                            </div>
+                                        </motion.div>
 
                                         {isActive && item.link && (
                                             <Link href={item.link}>
-                                                <span className="inline-block border border-white/30 bg-white/10 text-white px-8 py-2.5 text-[10px] uppercase tracking-widest hover:bg-white hover:text-brand-navy transition-all rounded-full backdrop-blur-md shadow-lg">
+                                                <span className="inline-block border border-brand-gold/50 bg-brand-gold/10 text-brand-gold px-8 py-3 text-[10px] uppercase tracking-widest hover:bg-brand-gold hover:text-brand-navy transition-all rounded-sm backdrop-blur-md shadow-[0_0_15px_rgba(212,175,55,0.3)] hover:shadow-[0_0_25px_rgba(212,175,55,0.6)]">
                                                     Explore
                                                 </span>
                                             </Link>
