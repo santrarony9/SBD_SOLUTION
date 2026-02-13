@@ -99,42 +99,49 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
 
     return (
         <div className="mt-12 bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
-            <h3 className="font-serif text-xl text-white bg-brand-navy p-6 flex justify-between items-center flex-wrap gap-4">
-                <div className="flex items-center gap-4">
-                    <span>Current Inventory</span>
-                    <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full uppercase tracking-widest border border-brand-gold/30">
-                        {filteredProducts.length} Items
-                    </span>
-                </div>
-                <input
-                    type="text"
-                    placeholder="Search by Name or SKU..."
-                    className="px-4 py-2 rounded bg-brand-navy-light border border-brand-gold/20 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-gold w-64"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </h3>
+        </h3>
 
-            {/* Action Bar for Selection */}
-            {selectedIds.length > 0 && (
-                <div className="bg-brand-gold/10 px-6 py-3 flex justify-between items-center border-b border-brand-gold/20 animate-fade-in">
-                    <span className="text-xs font-bold text-brand-navy uppercase tracking-widest">{selectedIds.length} Products Selected</span>
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => setSelectedIds([])}
-                            className="text-gray-500 text-[10px] font-bold uppercase hover:text-brand-navy"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleGenerateBundleLink}
-                            className="bg-brand-navy text-white px-4 py-2 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-brand-gold transition-colors shadow-sm flex items-center gap-2"
-                        >
-                            <PiLink size={14} /> Copy Bundle Link
-                        </button>
+            {/* Header / Selection Bar */ }
+            <div className={`p-6 flex justify-between items-center transition-colors ${selectedIds.length > 0 ? 'bg-brand-navy text-white' : 'bg-brand-navy text-white'}`}>
+                {selectedIds.length > 0 ? (
+                   <div className="flex items-center gap-6 w-full animate-fade-in">
+                       <span className="text-sm font-bold uppercase tracking-widest">{selectedIds.length} Selected</span>
+                        <div className="h-4 w-px bg-white/20"></div>
+                       <div className="flex items-center gap-3">
+                            <button
+                                onClick={handleGenerateBundleLink}
+                                className="bg-brand-gold text-brand-navy px-4 py-2 rounded text-[10px] font-bold uppercase tracking-widest hover:bg-white transition-all shadow-lg flex items-center gap-2"
+                            >
+                                <PiLink size={14} /> Copy Bundle Link
+                            </button>
+                            <button
+                                onClick={() => setSelectedIds([])}
+                                className="text-white/70 text-[10px] font-bold uppercase hover:text-white underline decoration-white/30 underline-offset-4"
+                            >
+                                Reset
+                            </button>
+                       </div>
+                   </div> 
+                ) : (
+                    <div className="flex justify-between items-center w-full flex-wrap gap-4 animate-fade-in">
+                        <div className="flex items-center gap-4">
+                            <h3 className="font-serif text-xl">Current Inventory</h3>
+                            <span className="text-[10px] bg-brand-gold/20 text-brand-gold px-3 py-1 rounded-full uppercase tracking-widest border border-brand-gold/30">
+                                {filteredProducts.length} Items
+                            </span>
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search by Name or SKU..."
+                            className="px-4 py-2 rounded bg-brand-navy-light/50 border border-brand-gold/20 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brand-gold w-64"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
                     </div>
-                </div>
-            )}
+                )}
+            </div>
+
+
 
             <div className="overflow-x-auto">
                 <table className="w-full text-left text-sm text-gray-600">
@@ -231,6 +238,6 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div >
     );
 }

@@ -338,14 +338,32 @@ export default function AdminCMS() {
                                                     }
                                                     const formData = new FormData();
                                                     formData.append('file', file);
+
+                                                    // Show uploading state
+                                                    const statusId = showStatus('Uploading...', 'success'); // Hacky but works for now to show feedback
+
                                                     fetchAPI('/media/upload', { method: 'POST', body: formData })
-                                                        .then(res => setNewBanner({ ...newBanner, imageUrl: res.url }))
+                                                        .then(res => {
+                                                            if (res.url) {
+                                                                setNewBanner(prev => ({ ...prev, imageUrl: res.url }));
+                                                                showStatus('Image Uploaded!', 'success');
+                                                            } else {
+                                                                showStatus('Upload failed: No URL returned', 'error');
+                                                            }
+                                                        })
                                                         .catch(() => showStatus('Upload Failed', 'error'));
                                                 }
                                             }}
                                             className="w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-brand-navy file:text-white hover:file:bg-brand-gold transition-all cursor-pointer"
                                         />
-                                        {newBanner.imageUrl && <p className="text-[10px] text-green-600 font-bold truncate">✓ Ready</p>}
+                                        {newBanner.imageUrl && (
+                                            <div className="mt-2 relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200">
+                                                <img src={newBanner.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <p className="text-white text-[10px] font-bold">Change Image</p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Banner Title</label>
