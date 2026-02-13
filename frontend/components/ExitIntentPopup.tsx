@@ -13,8 +13,11 @@ export default function ExitIntentPopup() {
             try {
                 const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/store/settings/exit_intent`);
                 if (res.ok) {
-                    const data = await res.json();
-                    setSetting(data.value);
+                    const text = await res.text();
+                    if (text) {
+                        const data = JSON.parse(text);
+                        setSetting(data.value);
+                    }
                 }
             } catch (e) {
                 console.error("ExitIntent fetch failed", e);

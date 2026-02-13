@@ -1,5 +1,5 @@
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     // Get token from storage
@@ -54,5 +54,11 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         throw new Error(errorMessage);
     }
 
-    return res.json();
+    const text = await res.text();
+    try {
+        return text ? JSON.parse(text) : {};
+    } catch (e) {
+        console.error('Failed to parse successful response JSON', e);
+        return {};
+    }
 }

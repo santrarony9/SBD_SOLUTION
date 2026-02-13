@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'password' | 'otp' | 'admin'>('password');
@@ -38,7 +38,7 @@ export default function LoginPage() {
             if (err.message.includes('401')) {
                 setError('Invalid email or password');
             } else {
-                setError('Connection Error: Failed to fetch. Please ensure the backend is running.');
+                setError(`Connection Error: Failed to fetch from ${API_URL}. Please ensure the backend is running at ${API_URL}`);
             }
         } finally {
             setIsLoading(false);
