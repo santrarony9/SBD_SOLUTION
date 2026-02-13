@@ -218,11 +218,11 @@ export default function CheckoutPage() {
                 <header className="mb-12 text-center">
                     <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4">Checkout</h1>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                        <span className="text-brand-gold font-bold">Cart</span>
+                        <Link href="/cart" className="text-gray-500 hover:text-brand-gold transition-colors font-medium">Cart</Link>
                         <span>/</span>
-                        <span className="text-brand-navy font-bold">Details</span>
+                        <Link href="#shipping" className="text-brand-gold font-bold hover:text-brand-navy transition-colors">Details</Link>
                         <span>/</span>
-                        <span>Payment</span>
+                        <Link href="#payment" className="text-brand-navy font-bold hover:text-brand-gold transition-colors">Payment</Link>
                     </div>
                 </header>
 
@@ -230,7 +230,7 @@ export default function CheckoutPage() {
                     {/* Left Column: Form */}
                     <div className="lg:col-span-2 space-y-8">
                         {/* Shipping Address */}
-                        <div className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl">
+                        <div id="shipping" className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl scroll-mt-24">
                             <h2 className="text-2xl font-serif text-brand-navy mb-6 flex items-center">
                                 <PiCheckCircle className="mr-3 text-brand-gold" />
                                 Shipping Details
@@ -264,7 +264,7 @@ export default function CheckoutPage() {
                         </div>
 
                         {/* Payment Method */}
-                        <div className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl">
+                        <div id="payment" className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl scroll-mt-24">
                             <h2 className="text-2xl font-serif text-brand-navy mb-6 flex items-center">
                                 <PiCreditCard className="mr-3 text-brand-gold" />
                                 Payment Method
