@@ -1,5 +1,8 @@
 
-export const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+const envUrl = process.env.NEXT_PUBLIC_API_URL;
+export const API_URL = envUrl
+    ? (envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`)
+    : '/api';
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     // Get token from storage
