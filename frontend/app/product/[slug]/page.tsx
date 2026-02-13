@@ -8,6 +8,7 @@ import ProductReviews from "@/components/ProductReviews";
 import { fetchAPI } from '@/lib/api';
 import TrustBadges from '@/components/TrustBadges';
 import DropHintModal from '@/components/DropHintModal';
+import { formatPrice } from '@/lib/utils';
 
 interface Product {
     id: string;
@@ -220,7 +221,7 @@ export default function ProductDetailPage() {
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-baseline gap-3">
                             <span className="text-3xl font-sans font-light text-brand-gold">
-                                {product.pricing?.finalPrice ? `₹${product.pricing.finalPrice.toLocaleString()}` : 'Price on Request'}
+                                {product.pricing?.finalPrice ? `₹${formatPrice(product.pricing.finalPrice)}` : 'Price on Request'}
                             </span>
                             <span className="text-[9px] text-brand-navy/60 uppercase tracking-widest font-bold">Inc. taxes</span>
                         </div>
@@ -303,23 +304,23 @@ export default function ProductDetailPage() {
                             <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50">
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Gold Value</span>
-                                    <span>₹{product.pricing?.components?.goldValue?.toLocaleString()}</span>
+                                    <span>₹{formatPrice(product.pricing?.components?.goldValue)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Diamond Value</span>
-                                    <span>₹{product.pricing?.components?.diamondValue?.toLocaleString()}</span>
+                                    <span>₹{formatPrice(product.pricing?.components?.diamondValue)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Making Charges</span>
-                                    <span>₹{product.pricing?.components?.makingCharges?.toLocaleString()}</span>
+                                    <span>₹{formatPrice(product.pricing?.components?.makingCharges)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>GST (3%)</span>
-                                    <span>₹{product.pricing?.components?.gst?.toLocaleString()}</span>
+                                    <span>₹{formatPrice(product.pricing?.components?.gst)}</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-brand-navy border-t border-gray-200 pt-3 mt-2">
                                     <span>Total</span>
-                                    <span>₹{product.pricing?.finalPrice?.toLocaleString()}</span>
+                                    <span>₹{formatPrice(product.pricing?.finalPrice)}</span>
                                 </div>
                             </div>
                         </div>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/utils';
 
 interface Product {
     id: string;
@@ -112,7 +113,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                     {product.sku || '-'}
                                 </td>
                                 <td className="px-6 py-4 font-serif text-brand-navy whitespace-nowrap">
-                                    ₹{product.pricing?.finalPrice?.toLocaleString() ?? 'N/A'}
+                                    ₹{formatPrice(product.pricing?.finalPrice) ?? 'N/A'}
                                 </td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
                                     {product.category || '-'}

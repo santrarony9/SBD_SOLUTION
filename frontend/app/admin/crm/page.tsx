@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { PiUsers, PiTrophy, PiStar, PiNotebook, PiUserCircle, PiArrowUpRight } from 'react-icons/pi';
+import { formatPrice } from '@/lib/utils';
 
 export default function CRMDashboard() {
     const [customers, setCustomers] = useState<any[]>([]);
@@ -94,13 +95,13 @@ export default function CRMDashboard() {
                                     </td>
                                     <td className="px-6 py-4 text-center">
                                         <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${user.tier === 'PLATINUM' ? 'bg-purple-100 text-purple-600' :
-                                                user.tier === 'GOLD' ? 'bg-yellow-100 text-yellow-600' :
-                                                    user.tier === 'SILVER' ? 'bg-gray-100 text-gray-600' : 'bg-orange-100 text-orange-600'
+                                            user.tier === 'GOLD' ? 'bg-yellow-100 text-yellow-600' :
+                                                user.tier === 'SILVER' ? 'bg-gray-100 text-gray-600' : 'bg-orange-100 text-orange-600'
                                             }`}>
                                             {user.tier}
                                         </span>
                                     </td>
-                                    <td className="px-6 py-4 text-right font-mono font-medium">₹{user.lifetimeSpend?.toLocaleString()}</td>
+                                    <td className="px-6 py-4 text-right font-mono font-medium">₹{formatPrice(user.lifetimeSpend)}</td>
                                     <td className="px-6 py-4 text-right font-bold text-brand-gold">{user.loyaltyPoints}</td>
                                     <td className="px-6 py-4 text-center">
                                         <PiArrowUpRight className="inline text-gray-300" />
@@ -128,7 +129,7 @@ export default function CRMDashboard() {
                             <div className="grid grid-cols-2 gap-4 mb-8">
                                 <div className="p-4 bg-gray-50 rounded-lg text-center">
                                     <span className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Total Orders</span>
-                                    <span className="text-lg font-bold">₹{selectedUser.lifetimeSpend?.toLocaleString()}</span>
+                                    <span className="text-lg font-bold">₹{formatPrice(selectedUser.lifetimeSpend)}</span>
                                 </div>
                                 <div className="p-4 bg-gray-50 rounded-lg text-center">
                                     <span className="text-[9px] uppercase font-bold text-gray-400 block mb-1">Available Points</span>

@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { formatPrice } from '@/lib/utils';
 
 export default function DashboardOverview() {
     const { user } = useAuth();
@@ -63,7 +64,7 @@ export default function DashboardOverview() {
                             <div className="h-full bg-gold-gradient transition-all duration-1000 ease-out" style={{ width: `${Math.min(progress, 100)}%` }}></div>
                         </div>
                         <p className="text-[10px] mt-3 opacity-50 uppercase tracking-widest font-sans">
-                            {nextLimit > 0 ? `₹${(nextLimit - portfolio?.lifetimeSpend).toLocaleString()} to next tier` : 'Highest Tier Reached'}
+                            {nextLimit > 0 ? `₹${formatPrice(nextLimit - (portfolio?.lifetimeSpend || 0))} to next tier` : 'Highest Tier Reached'}
                         </p>
                     </div>
                 </div>
@@ -73,7 +74,7 @@ export default function DashboardOverview() {
                     <div className="absolute inset-0 bg-brand-cream/30 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                     <div className="relative z-10">
                         <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-4 group-hover:text-brand-navy transition-colors">Spark Points</p>
-                        <h3 className="text-4xl font-sans font-light text-brand-navy mb-2">{portfolio?.loyaltyPoints?.toLocaleString() || '0'}</h3>
+                        <h3 className="text-4xl font-sans font-light text-brand-navy mb-2">{formatPrice(portfolio?.loyaltyPoints) || '0'}</h3>
                         <Link href="/account/rewards" className="inline-flex items-center gap-2 text-[10px] mt-4 text-brand-gold font-bold uppercase tracking-widest hover:text-brand-navy transition-colors">
                             Redeem Rewards <span className="text-xs">→</span>
                         </Link>
@@ -85,7 +86,7 @@ export default function DashboardOverview() {
                     <div className="absolute inset-0 bg-brand-cream/30 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                     <div className="relative z-10">
                         <p className="text-[10px] uppercase tracking-widest text-gray-400 font-bold mb-4 group-hover:text-brand-navy transition-colors">Total Investment</p>
-                        <h3 className="text-4xl font-sans font-light text-brand-navy mb-2">₹{portfolio?.lifetimeSpend?.toLocaleString() || '0'}</h3>
+                        <h3 className="text-4xl font-sans font-light text-brand-navy mb-2">₹{formatPrice(portfolio?.lifetimeSpend) || '0'}</h3>
                         <p className="text-[10px] uppercase tracking-widest text-brand-gold mt-4 font-bold">Lifetime Value</p>
                     </div>
                 </div>

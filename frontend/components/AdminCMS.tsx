@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
+import { formatPrice } from '@/lib/utils';
 
 export default function AdminCMS() {
     const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social'>('banners');
@@ -641,9 +642,9 @@ export default function AdminCMS() {
                                         <div className="flex-1">
                                             <h4 className="font-serif text-brand-navy text-lg leading-tight mb-1">{range.label}</h4>
                                             <div className="text-brand-gold font-mono text-xs flex items-center gap-2">
-                                                <span>₹{range.minPrice.toLocaleString()}</span>
+                                                <span>₹{formatPrice(range.minPrice)}</span>
                                                 <span className="text-gray-300">→</span>
-                                                <span>{range.maxPrice ? `₹${range.maxPrice.toLocaleString()}` : 'Unlimited'}</span>
+                                                <span>{range.maxPrice ? `₹${formatPrice(range.maxPrice)}` : 'Unlimited'}</span>
                                             </div>
                                         </div>
                                         <button onClick={() => handleDeletePriceRange(range.id)} className="text-gray-200 hover:text-red-500 transition-colors p-2">

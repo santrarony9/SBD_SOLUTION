@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { PiPackage, PiVault, PiGraph, PiWarning, PiPlus, PiArrowsLeftRight, PiPencilSimple } from 'react-icons/pi';
 import AdminAddProduct from '@/components/AdminAddProduct';
+import { formatPrice } from '@/lib/utils';
 
 export default function InventoryDashboard() {
     const [products, setProducts] = useState<any[]>([]);
@@ -80,7 +81,7 @@ export default function InventoryDashboard() {
                     <div className="bg-white px-6 py-3 rounded-lg shadow-sm border-l-4 border-brand-gold">
                         <span className="text-[10px] uppercase font-bold text-gray-400 block">Total Portfolio Value</span>
                         <span className="text-xl font-serif text-brand-navy">
-                            ₹{valuation?.totalValue?.toLocaleString() || '0'}
+                            ₹{formatPrice(valuation?.totalValue) || '0'}
                         </span>
                     </div>
                 </div>
@@ -149,7 +150,7 @@ export default function InventoryDashboard() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right font-bold text-brand-navy">
-                                        ₹{((valuation?.breakdown?.find((b: any) => b.sku === product.sku)?.value) || 0).toLocaleString()}
+                                        ₹{formatPrice(((valuation?.breakdown?.find((b: any) => b.sku === product.sku)?.value) || 0))}
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex justify-center gap-2">

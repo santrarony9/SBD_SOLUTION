@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { formatPrice } from '@/lib/utils';
 
 // Sub-components can ideally be split, but for speed we'll keep them here or import if complex.
 // We will tackle the features in groups.
@@ -435,7 +436,7 @@ export default function MarketingDashboard() {
                                                     <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold">{promo.usageCount}</span>
                                                 </td>
                                                 <td className="py-3 text-right font-mono font-bold text-green-600">
-                                                    ₹{promo.totalSales.toLocaleString()}
+                                                    ₹{formatPrice(promo.totalSales)}
                                                 </td>
                                                 <td className="py-3 text-right">
                                                     <button onClick={() => handleDeletePromo(promo.id)} className="text-red-400 hover:text-red-600 text-xs uppercase font-bold">Delete</button>

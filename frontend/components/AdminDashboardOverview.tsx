@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { formatPrice } from '@/lib/utils';
 
 interface DashboardStats {
     totalRevenue: number;
@@ -35,7 +36,7 @@ export default function AdminDashboardOverview() {
     if (!stats) return <div className="p-8 text-center text-red-500">Failed to load data</div>;
 
     const cards = [
-        { title: 'Total Revenue', value: `₹${stats.totalRevenue.toLocaleString()}`, color: 'bg-green-50 text-green-700' },
+        { title: 'Total Revenue', value: `₹${formatPrice(stats.totalRevenue)}`, color: 'bg-green-50 text-green-700' },
         { title: 'Total Orders', value: stats.totalOrders, color: 'bg-blue-50 text-blue-700' },
         { title: 'Customers', value: stats.totalCustomers, color: 'bg-purple-50 text-purple-700' },
         { title: 'Products', value: stats.totalProducts, color: 'bg-orange-50 text-orange-700' },
@@ -64,7 +65,7 @@ export default function AdminDashboardOverview() {
                                 <XAxis dataKey="name" axisLine={false} tickLine={false} fontSize={12} />
                                 <YAxis axisLine={false} tickLine={false} fontSize={12} tickFormatter={(value) => `₹${value}`} />
                                 <Tooltip
-                                    formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, 'Sales']}
+                                    formatter={(value: any) => [`₹${formatPrice(Number(value))}`, 'Sales']}
                                     cursor={{ fill: 'transparent' }}
                                 />
                                 <Bar dataKey="value" fill="#C6A87C" radius={[2, 2, 0, 0]} barSize={40} />
@@ -90,7 +91,7 @@ export default function AdminDashboardOverview() {
                                     <tr key={order.id} className="border-b last:border-0 border-gray-50 hover:bg-gray-50/50">
                                         <td className="py-3 font-mono text-xs">{order.id.substring(0, 8)}...</td>
                                         <td className="py-3">{order.user?.name || 'Guest'}</td>
-                                        <td className="py-3 text-right font-medium text-brand-navy">₹{order.total.toLocaleString()}</td>
+                                        <td className="py-3 text-right font-medium text-brand-navy">₹{formatPrice(order.total)}</td>
                                     </tr>
                                 ))}
                             </tbody>

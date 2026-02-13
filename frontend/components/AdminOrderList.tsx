@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { PiRocket, PiCheckCircle, PiMagnifyingGlass, PiFunnel, PiCaretLeft, PiCaretRight } from "react-icons/pi";
+import { formatPrice } from '@/lib/utils';
 
 interface Order {
     id: string;
@@ -325,7 +326,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                         <div className="text-xs text-brand-gold">{order.user?.email || '-'}</div>
                                     </td>
                                     <td className="px-6 py-4 font-serif text-brand-navy">
-                                        ₹{order.totalAmount.toLocaleString()}
+                                        ₹{formatPrice(order.totalAmount)}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>
