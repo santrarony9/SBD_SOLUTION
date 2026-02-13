@@ -13,10 +13,14 @@ export default function MotionGallery() {
     useEffect(() => {
         const loadItems = async () => {
             try {
-                const items = await fetchAPI('/gallery');
+                let items = await fetchAPI('/gallery');
                 if (items && Array.isArray(items) && items.length > 0) {
+                    // Ensure enough items for unique keys in 5-slot view
+                    while (items.length < 6) {
+                        items = [...items, ...items].map((item, idx) => ({ ...item, id: `${item.id}-${idx}` })); // Unique IDs for duplicates
+                    }
                     setGalleryItems(items);
-                    setActiveIndex(Math.floor(items.length / 2)); // Start in middle
+                    setActiveIndex(Math.floor(items.length / 2));
                 }
             } catch (error) {
                 console.error("Failed to load gallery items", error);
@@ -54,9 +58,9 @@ export default function MotionGallery() {
             </div>
 
             <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center perspective-1000 overflow-visible">
-                <AnimatePresence mode='popLayout'>
+                <AnimatePresence initial={false} mode='popLayout'>
                     {[-2, -1, 0, 1, 2].map((offset) => {
-                        const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length; // Ensure positive modulo
+                        const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length;
                         const item = galleryItems[itemIndex];
 
                         if (!item) return null;
@@ -67,22 +71,26 @@ export default function MotionGallery() {
 
                         return (
                             <motion.div
-                                key={`${item.id}-${offset}`} // Unique key for virtual positions
-                                initial={false}
+                                key={item.id} // Stable Key for Motion
+                                layout // Enable layout animations
+                                initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{
                                     scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
-                                    opacity: isActive ? 1 : 0.9, // High opacity to ensure visibility
-                                    // Centering logic: Start at left-1/2 (-50%), then shift by offset * 40% (tighter)
-                                    x: `${-50 + (offset * 40)}%`,
+                                    opacity: isActive ? 1 : 0.9,
+                                    x: `${-50 + (offset * 40)}%`, // Centered Fan Layout
                                     zIndex: 50 - absOffset,
-                                    rotateY: isActive ? 0 : direction * -25, // Reduced rotation
+                                    rotateY: isActive ? 0 : direction * -25,
                                     filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
                                     boxShadow: isActive
-                                        ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)' // Gold glow for active
+                                        ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)'
                                         : '0 10px 30px -10px rgba(0,0,0,0.3)'
                                 }}
-                                transition={{ type: "spring", stiffness: 200, damping: 25, mass: 0.8 }}
-                                // ADDED left-1/2 to ensure origin is center of container
+                                transition={{
+                                    type: "spring",
+                                    stiffness: 120, // Softer spring for elegance
+                                    damping: 20,
+                                    mass: 1.1
+                                }}
                                 className={`absolute left-1/2 top-4 w-[280px] md:w-[380px] aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border ${isActive ? 'border-brand-gold/50' : 'border-white/10'} bg-brand-navy`}
                                 style={{
                                     transformStyle: 'preserve-3d',
