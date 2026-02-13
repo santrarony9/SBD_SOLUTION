@@ -114,14 +114,14 @@ export default function CartPage() {
                                 {/* Price */}
                                 <div className="col-span-2 text-right hidden md:block">
                                     <p className="text-sm text-gray-500">
-                                        ₹{item.calculatedPrice ? formatPrice(item.calculatedPrice / item.quantity) : 'N/A'}
+                                        ₹{item.calculatedPrice ? formatPrice(item.calculatedPrice) : 'N/A'}
                                     </p>
                                 </div>
 
                                 {/* Total & Remove Actions */}
                                 <div className="col-span-2 text-right w-full md:w-auto flex flex-col items-end justify-between h-full">
                                     <p className="text-lg font-sans text-brand-navy">
-                                        ₹{formatPrice(item.calculatedPrice)}
+                                        ₹{item.calculatedPrice ? formatPrice(item.calculatedPrice * item.quantity) : 'N/A'}
                                     </p>
                                     <button
                                         onClick={() => removeFromCart(item.id)}
