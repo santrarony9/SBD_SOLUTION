@@ -104,6 +104,7 @@ export default function ProductDetailPage() {
     };
 
     const shareToWhatsapp = () => {
+        if (!product) return;
         const text = `Check out this amazing ${product.name} on Spark Blue Diamond! ${window.location.href}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
         setShowShareMenu(false);
