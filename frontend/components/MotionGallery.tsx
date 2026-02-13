@@ -73,18 +73,21 @@ export default function MotionGallery() {
                                 animate={{
                                     scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
                                     opacity: isActive ? 1 : (0.8 - (absOffset * 0.2)),
-                                    x: `${offset * 40}%`, // Fixed percentage spacing relative to center (was 60%)
-                                    zIndex: 50 - absOffset, // Higher z-index for center
-                                    rotateY: isActive ? 0 : direction * -25, // Reduced rotation for visibility
+                                    // Centering logic: Start at left-1/2 (-50%), then shift by offset * 55%
+                                    x: `${-50 + (offset * 55)}%`,
+                                    zIndex: 50 - absOffset,
+                                    rotateY: isActive ? 0 : direction * -30,
                                     filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
                                     boxShadow: isActive
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)' // Gold glow for active
                                         : '0 10px 30px -10px rgba(0,0,0,0.3)'
                                 }}
-                                transition={{ type: "spring", stiffness: 200, damping: 25, mass: 0.8 }} // Smoother/Lighter feel
-                                className={`absolute w-[280px] md:w-[380px] aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border ${isActive ? 'border-brand-gold/50' : 'border-white/10'} bg-brand-navy`}
+                                transition={{ type: "spring", stiffness: 200, damping: 25, mass: 0.8 }}
+                                // ADDED left-1/2 to ensure origin is center of container
+                                className={`absolute left-1/2 top-4 w-[280px] md:w-[380px] aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border ${isActive ? 'border-brand-gold/50' : 'border-white/10'} bg-brand-navy`}
                                 style={{
                                     transformStyle: 'preserve-3d',
+                                    transformOrigin: 'center center' // Ensure rotation happens from center
                                 }}
                                 onClick={() => {
                                     if (offset !== 0) setActiveIndex((prev) => (prev + offset + galleryItems.length) % galleryItems.length);
@@ -112,7 +115,7 @@ export default function MotionGallery() {
                                             <h3 className={`font-serif text-white mb-2 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg opacity-80'}`}>
                                                 {item.title}
                                             </h3>
-                                            <div className={`flex justify-center items-center gap-2 mb-4 ${!isActive ? 'opacity-70' : ''}`}>
+                                            <div className="flex justify-center items-center gap-2 mb-4">
                                                 <span className="h-[1px] w-8 bg-brand-gold/50"></span>
                                                 <p className="text-brand-gold text-[10px] uppercase tracking-[0.25em] font-bold drop-shadow">
                                                     {item.subtitle || 'COLLECTION'}
