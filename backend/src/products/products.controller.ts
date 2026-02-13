@@ -11,7 +11,12 @@ export class ProductsController {
     }
 
     @Post('seed-pricing')
-    async seedPricing() {
+    async seedPricingPost() {
+        return this.productsService.seedPricing();
+    }
+
+    @Get('seed-pricing')
+    async seedPricingGet() {
         return this.productsService.seedPricing();
     }
 
