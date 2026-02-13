@@ -25,6 +25,15 @@ export default function MotionGallery() {
         loadItems();
     }, []);
 
+    // Auto-Play
+    useEffect(() => {
+        if (galleryItems.length === 0) return;
+        const interval = setInterval(() => {
+            setActiveIndex((prev) => (prev + 1) % galleryItems.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [galleryItems.length]);
+
     const handleNext = () => {
         if (galleryItems.length === 0) return;
         setActiveIndex((prev) => (prev + 1) % galleryItems.length);
@@ -44,7 +53,7 @@ export default function MotionGallery() {
                 <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
             </div>
 
-            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center perspective-1000">
+            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center perspective-1000 overflow-visible">
                 <AnimatePresence mode='popLayout'>
                     {[-2, -1, 0, 1, 2].map((offset) => {
                         const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length; // Ensure positive modulo
@@ -64,9 +73,9 @@ export default function MotionGallery() {
                                 animate={{
                                     scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
                                     opacity: isActive ? 1 : (0.8 - (absOffset * 0.2)),
-                                    x: `${offset * 60}%`, // Fixed percentage spacing relative to center
+                                    x: `${offset * 40}%`, // Fixed percentage spacing relative to center (was 60%)
                                     zIndex: 50 - absOffset, // Higher z-index for center
-                                    rotateY: isActive ? 0 : direction * -30,
+                                    rotateY: isActive ? 0 : direction * -25, // Reduced rotation for visibility
                                     filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
                                     boxShadow: isActive
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)' // Gold glow for active
@@ -103,7 +112,7 @@ export default function MotionGallery() {
                                             <h3 className={`font-serif text-white mb-2 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg opacity-80'}`}>
                                                 {item.title}
                                             </h3>
-                                            <div className="flex justify-center items-center gap-2 mb-4">
+                                            <div className={`flex justify-center items-center gap-2 mb-4 ${!isActive ? 'opacity-70' : ''}`}>
                                                 <span className="h-[1px] w-8 bg-brand-gold/50"></span>
                                                 <p className="text-brand-gold text-[10px] uppercase tracking-[0.25em] font-bold drop-shadow">
                                                     {item.subtitle || 'COLLECTION'}
