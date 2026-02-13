@@ -517,3 +517,15 @@ model UserActivity {
   @@index([userId])
 }
 
+model GalleryItem {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  subtitle  String?
+  imageUrl  String
+  link      String?  // Optional link
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+

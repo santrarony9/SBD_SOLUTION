@@ -6,7 +6,7 @@ import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
@@ -18,6 +18,7 @@ export default function AdminCMS() {
     const [priceRanges, setPriceRanges] = useState<any[]>([]);
     const [tags, setTags] = useState<any[]>([]);
     const [socialPosts, setSocialPosts] = useState<any[]>([]);
+    const [galleryItems, setGalleryItems] = useState<any[]>([]);
 
     // Form States
     const [newBanner, setNewBanner] = useState({ imageUrl: '', title: '', link: '' });
@@ -27,6 +28,7 @@ export default function AdminCMS() {
     const [newPriceRange, setNewPriceRange] = useState({ label: '', minPrice: 0, maxPrice: 0, imageUrl: '' });
     const [newTag, setNewTag] = useState({ name: '', slug: '' });
     const [newSocialPost, setNewSocialPost] = useState({ imageUrl: '', caption: '', link: '' });
+    const [newGalleryItem, setNewGalleryItem] = useState({ title: '', subtitle: '', imageUrl: '', link: '' });
 
     useEffect(() => {
         loadContent();
@@ -47,10 +49,12 @@ export default function AdminCMS() {
                 fetchAPI('/categories'),
                 fetchAPI('/marketing/price-ranges'),
                 fetchAPI('/marketing/tags'),
-                fetchAPI('/marketing/social-posts')
+                fetchAPI('/marketing/tags'),
+                fetchAPI('/marketing/social-posts'),
+                fetchAPI('/gallery')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes, galleryRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else console.error('Failed to load banners', bannersRes.reason);
@@ -69,6 +73,9 @@ export default function AdminCMS() {
 
             if (socialPostsRes.status === 'fulfilled') setSocialPosts(socialPostsRes.value || []);
             else console.error('Failed to load social posts', socialPostsRes.reason);
+
+            if (galleryRes.status === 'fulfilled') setGalleryItems(galleryRes.value || []);
+            else console.error('Failed to load gallery items', galleryRes.reason);
 
             if (heroTextRes.status === 'fulfilled') {
                 const fetchedHeroText = heroTextRes.value;
@@ -218,6 +225,26 @@ export default function AdminCMS() {
         } catch (e) { showStatus('Failed to delete post', 'error'); }
     };
 
+    // --- Gallery Actions ---
+    const handleAddGalleryItem = async () => {
+        if (!newGalleryItem.imageUrl) return showStatus('Image URL is required', 'error');
+        try {
+            await fetchAPI('/gallery', { method: 'POST', body: JSON.stringify(newGalleryItem) });
+            showStatus('Gallery Item Added', 'success');
+            setNewGalleryItem({ title: '', subtitle: '', imageUrl: '', link: '' });
+            loadContent();
+        } catch (e) { showStatus('Failed to add gallery item', 'error'); }
+    };
+
+    const handleDeleteGalleryItem = async (id: string) => {
+        if (!confirm('Delete this item?')) return;
+        try {
+            await fetchAPI(`/gallery/${id}`, { method: 'DELETE' });
+            showStatus('Item Deleted', 'success');
+            loadContent();
+        } catch (e) { showStatus('Failed to delete item', 'error'); }
+    };
+
     // --- Text Actions ---
     const handleUpdateText = async () => {
         try {
@@ -269,6 +296,7 @@ export default function AdminCMS() {
                 </div>
                 {[
                     { id: 'banners', label: 'Slider Banners', icon: PiImage },
+                    { id: 'gallery', label: 'Motion Gallery', icon: PiImage },
                     { id: 'text', label: 'Brand Narratives', icon: PiTextT },
                     { id: 'spotlight', label: 'Master Spotlight', icon: PiSparkle },
                 ].map((item) => (

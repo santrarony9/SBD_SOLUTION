@@ -34,10 +34,12 @@ import { RazorpayModule } from './razorpay/razorpay.module';
 import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { PhonePeModule } from './phonepe/phonepe.module';
+import { GalleryModule } from './gallery/gallery.module';
 
 @Module({
   imports: [
     ScheduleModule.forRoot(),
+    GalleryModule,
     ChatModule,
     WhatsappModule,
     StoreModule,
