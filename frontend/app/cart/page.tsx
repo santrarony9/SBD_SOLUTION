@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function CartPage() {
-    const { items, cartTotal, removeFromCart, clearCart, isLoading } = useCart();
+    const { items, cartTotal, removeFromCart, updateQuantity, clearCart, isLoading } = useCart();
 
     if (isLoading) {
         return (
@@ -91,9 +91,24 @@ export default function CartPage() {
 
                                 {/* Quantity */}
                                 <div className="col-span-2 flex items-center justify-center">
-                                    <span className="text-sm font-medium text-brand-navy bg-white px-4 py-2 border border-gray-100">
-                                        {item.quantity}
-                                    </span>
+                                    <div className="flex items-center border border-gray-200 h-8 rounded-sm">
+                                        <button
+                                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                            disabled={item.quantity <= 1}
+                                            className="w-8 h-full flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:hover:bg-transparent transition-colors"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="w-8 h-full flex items-center justify-center text-sm font-sans font-medium text-brand-navy border-x border-gray-200">
+                                            {item.quantity}
+                                        </span>
+                                        <button
+                                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                            className="w-8 h-full flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Price */}

@@ -82,6 +82,16 @@ export class CartService {
         }
     }
 
+    async updateCartItem(userId: string, itemId: string, quantity: number) {
+        if (quantity <= 0) {
+            return this.removeFromCart(userId, itemId);
+        }
+        return this.prisma.cartItem.update({
+            where: { id: itemId },
+            data: { quantity },
+        });
+    }
+
     async removeFromCart(userId: string, itemId: string) {
         return this.prisma.cartItem.delete({
             where: { id: itemId },

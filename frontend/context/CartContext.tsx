@@ -24,6 +24,7 @@ interface CartContextType {
     cartTotal: number;
     addToCart: (productId: string, quantity: number) => Promise<void>;
     removeFromCart: (itemId: string) => Promise<void>;
+    updateQuantity: (itemId: string, quantity: number) => Promise<void>;
     clearCart: () => Promise<void>;
     isLoading: boolean;
 }
@@ -122,8 +123,43 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
     };
 
+    const updateQuantity = async (itemId: string, quantity: number) => {
+        if (quantity < 1) return;
+
+        // Optimistic UI Update
+        const oldItems = [...items];
+        const newItems = items.map(item =>
+            item.id === itemId ? { ...item, quantity } : item
+        );
+        setItems(newItems);
+        // Recalculate total locally for responsiveness
+        // Note: Logic should ideally match backend calculateLocalTotal
+        const total = newItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0); // Warning: using snapshot price
+        setCartTotal(total);
+
+        if (user) {
+            try {
+                await fetchAPI(`/cart/items/${itemId}`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ quantity })
+                });
+                await fetchServerCart(); // Resync for accurate pricing/totals
+            } catch (error) {
+                console.error("Update failed", error);
+                setItems(oldItems); // Revert on failure
+            }
+        } else {
+            // Guest Logic
+            // Update local storage...
+            // For MVP, since guest logic is partial, we'll focus on authenticated user first.
+            // But let's support local update for now.
+            const localCart = JSON.stringify({ items: newItems });
+            localStorage.setItem('guest_cart', localCart);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, clearCart, isLoading }}>
+        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading }}>
             {children}
         </CartContext.Provider>
     );
