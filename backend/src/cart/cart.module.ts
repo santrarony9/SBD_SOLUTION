@@ -5,7 +5,7 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { ProductsModule } from '../products/products.module'; // To check product validity if needed
 
 @Module({
-    imports: [PrismaModule, ProductsModule],
+    imports: [PrismaModule, ProductsModule, PricingModule],
     controllers: [CartController],
     providers: [CartService],
     exports: [CartService],
