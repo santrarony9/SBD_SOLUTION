@@ -7,6 +7,7 @@ import FlashSale from '@/components/FlashSale';
 import InstagramFeed from '@/components/InstagramFeed';
 import HeroSlider from '@/components/HeroSlider';
 import CategoryCarousel from '@/components/CategoryCarousel';
+import MotionGallery from '@/components/MotionGallery';
 
 export const dynamic = 'force-dynamic';
 
@@ -142,6 +143,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* 3.5. Motion Gallery (3D Cover Flow) */}
+      <MotionGallery />
 
       {/* 4. Category Discovery Carousels (Horizontal) */}
       {categories && categories.length > 0 && categories.map((cat: any) => {
