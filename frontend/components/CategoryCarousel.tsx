@@ -26,7 +26,7 @@ export default function CategoryCarousel({ category, products }: CategoryCarouse
         }
     };
 
-    if (products.length === 0) return null;
+    if (!products || products.length === 0 || !category) return null;
 
     return (
         <section className="py-16 border-b border-brand-gold/5 overflow-hidden">
