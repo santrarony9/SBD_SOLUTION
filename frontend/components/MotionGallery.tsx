@@ -47,7 +47,8 @@ export default function MotionGallery() {
     if (galleryItems.length === 0) return null;
 
     return (
-        <section className="py-24 bg-white overflow-hidden relative">
+    return (
+        <section className="py-24 bg-white relative">
             <div className="text-center mb-16 px-4">
                 <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3 animate-fade-in-up">Curated For You</span>
                 <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
@@ -68,15 +69,14 @@ export default function MotionGallery() {
                         return (
                             <motion.div
                                 key={`${item.id}-${offset}`} // Unique key for virtual positions
-                                layout
                                 initial={false}
                                 animate={{
                                     scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
-                                    opacity: isActive ? 1 : (0.8 - (absOffset * 0.2)),
-                                    // Centering logic: Start at left-1/2 (-50%), then shift by offset * 55%
-                                    x: `${-50 + (offset * 55)}%`,
+                                    opacity: isActive ? 1 : 0.9, // High opacity to ensure visibility
+                                    // Centering logic: Start at left-1/2 (-50%), then shift by offset * 40% (tighter)
+                                    x: `${-50 + (offset * 40)}%`,
                                     zIndex: 50 - absOffset,
-                                    rotateY: isActive ? 0 : direction * -30,
+                                    rotateY: isActive ? 0 : direction * -25, // Reduced rotation
                                     filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
                                     boxShadow: isActive
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)' // Gold glow for active
