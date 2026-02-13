@@ -79,4 +79,12 @@ export class PhonePeController {
     async checkStatus(@Param('txnId') txnId: string) {
         return await this.phonepeService.verifyPayment(txnId);
     }
+
+    @Post('redirect')
+    async handleRedirect(@Query('orderId') orderId: string, @Res() res: Response) {
+        // This endpoint handles the POST redirect from PhonePe after payment
+        // We simply redirect the user to the frontend success page
+        const frontendUrl = process.env.FRONTEND_URL || 'https://www.sparkbluediamond.com';
+        return res.redirect(`${frontendUrl}/orders/success?id=${orderId}`);
+    }
 }

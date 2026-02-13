@@ -34,7 +34,7 @@ export class PhonePeService {
                 merchantTransactionId: merchantTransactionId,
                 merchantUserId: userId,
                 amount: amountInPaise,
-                redirectUrl: `${this.callbackUrl}?id=${merchantTransactionId}`, // We handle redirect via callback or separate route
+                redirectUrl: `${process.env.API_URL || 'https://api.sparkbluediamond.com/api'}/phonepe/redirect?orderId=${orderId}`, // Backend redirect endpoint
                 redirectMode: "POST", // PhonePe will POST to this URL
                 callbackUrl: this.callbackUrl,
                 mobileNumber: mobile,
