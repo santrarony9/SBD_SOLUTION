@@ -9,20 +9,34 @@ export class LoggingMiddleware implements NestMiddleware {
     constructor(private readonly logBuffer: LogBufferService) { }
 
     use(req: Request, res: Response, next: NextFunction) {
-        const { method, originalUrl, body, query } = req;
-        const userAgent = req.get('user-agent') || '';
-        const start = Date.now();
+        try {
+            const { method, originalUrl, body, query } = req;
+            const userAgent = req.get('user-agent') || '';
+            const start = Date.now();
 
-        res.on('finish', () => {
-            const { statusCode } = res;
-            const contentLength = res.get('content-length');
-            const delay = Date.now() - start;
+            res.on('finish', () => {
+                try {
+                    const { statusCode } = res;
+                    const contentLength = res.get('content-length');
+                    const delay = Date.now() - start;
 
-            const message = `${method} ${originalUrl} ${statusCode} ${contentLength}b - ${delay}ms - ${userAgent}`;
-            this.logger.log(`${message} \nQuery: ${JSON.stringify(query)} \nBody: ${JSON.stringify(body)}`);
-            this.logBuffer.addLog(message);
-        });
+                    const message = `${method} ${originalUrl} ${statusCode} ${contentLength}b - ${delay}ms - ${userAgent}`;
+                    this.logger.log(`${message}`);
+                    // this.logger.log(`Query: ${JSON.stringify(query)}`);
+                    // this.logger.log(`Body: ${JSON.stringify(body)}`); // Commented out to prevent circular json errors
 
-        next();
+                    if (this.logBuffer) {
+                        this.logBuffer.addLog(message);
+                    }
+                } catch (err) {
+                    console.error('LoggingMiddleware finish error', err);
+                }
+            });
+
+            next();
+        } catch (error) {
+            console.error('LoggingMiddleware loop error', error);
+            next();
+        }
     }
 }
