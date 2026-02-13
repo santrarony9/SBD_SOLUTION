@@ -57,7 +57,7 @@ export default function MotionGallery() {
                 <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
             </div>
 
-            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center perspective-1000 overflow-visible">
+            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center [perspective:1000px] overflow-visible">
                 <AnimatePresence initial={false} mode='popLayout'>
                     {[-2, -1, 0, 1, 2].map((offset) => {
                         const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length;
@@ -71,25 +71,25 @@ export default function MotionGallery() {
 
                         return (
                             <motion.div
-                                key={item.id} // Stable Key for Motion
-                                layout // Enable layout animations
+                                key={`${item.id}-${offset}`} // Stabilization Key
+                                layout
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{
-                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.1)),
-                                    opacity: isActive ? 1 : 0.9,
-                                    x: `${-50 + (offset * 40)}%`, // Centered Fan Layout
+                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.15)), // More sizing difference
+                                    opacity: isActive ? 1 : 0.7,
+                                    x: `${-50 + (offset * 65)}%`, // WIDER SPREAD (Was 40)
                                     zIndex: 50 - absOffset,
-                                    rotateY: isActive ? 0 : direction * -25,
-                                    filter: isActive ? 'blur(0px) brightness(1.05) contrast(1.05)' : `blur(${absOffset * 1}px) brightness(${1 - (absOffset * 0.15)})`,
+                                    rotateY: isActive ? 0 : direction * -15, // Reduced rotation
+                                    filter: isActive ? 'blur(0px) brightness(1.05)' : `blur(${absOffset * 2}px) brightness(${1 - (absOffset * 0.2)})`,
                                     boxShadow: isActive
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)'
                                         : '0 10px 30px -10px rgba(0,0,0,0.3)'
                                 }}
                                 transition={{
                                     type: "spring",
-                                    stiffness: 120, // Softer spring for elegance
+                                    stiffness: 100,
                                     damping: 20,
-                                    mass: 1.1
+                                    mass: 1
                                 }}
                                 className={`absolute left-1/2 top-4 w-[280px] md:w-[380px] aspect-[3/4] rounded-2xl overflow-hidden cursor-pointer border ${isActive ? 'border-brand-gold/50' : 'border-white/10'} bg-brand-navy`}
                                 style={{
