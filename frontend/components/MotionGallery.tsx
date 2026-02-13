@@ -57,7 +57,10 @@ export default function MotionGallery() {
                 <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
             </div>
 
-            <div className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center [perspective:1000px] overflow-visible">
+            <div
+                className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center overflow-visible"
+                style={{ perspective: '1000px' }}
+            >
                 <AnimatePresence initial={false} mode='popLayout'>
                     {[-2, -1, 0, 1, 2].map((offset) => {
                         const itemIndex = (activeIndex + offset + galleryItems.length * 100) % galleryItems.length;
@@ -69,17 +72,20 @@ export default function MotionGallery() {
                         const direction = offset > 0 ? 1 : -1;
                         const absOffset = Math.abs(offset);
 
+                        // Use explicit pixel offsets for reliability
+                        const xOffset = offset * 220; // 220px separation
+
                         return (
                             <motion.div
-                                key={`${item.id}-${offset}`} // Stabilization Key
+                                key={item.id} // Stable Key is CRITICAL for layout animations
                                 layout
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{
-                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.15)), // More sizing difference
+                                    scale: isActive ? 1.0 : (1 - (absOffset * 0.15)),
                                     opacity: isActive ? 1 : 0.7,
-                                    x: `${-50 + (offset * 65)}%`, // WIDER SPREAD (Was 40)
+                                    x: `calc(-50% + ${xOffset}px)`, // Center anchor + offset
                                     zIndex: 50 - absOffset,
-                                    rotateY: isActive ? 0 : direction * -15, // Reduced rotation
+                                    rotateY: isActive ? 0 : direction * -15,
                                     filter: isActive ? 'blur(0px) brightness(1.05)' : `blur(${absOffset * 2}px) brightness(${1 - (absOffset * 0.2)})`,
                                     boxShadow: isActive
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)'
@@ -87,7 +93,7 @@ export default function MotionGallery() {
                                 }}
                                 transition={{
                                     type: "spring",
-                                    stiffness: 100,
+                                    stiffness: 80,
                                     damping: 20,
                                     mass: 1
                                 }}
