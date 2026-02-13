@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import { formatPrice } from '@/lib/utils';
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
@@ -297,7 +298,7 @@ export default function CheckoutPage() {
                             className="w-full bg-brand-navy text-white py-6 md:py-5 mt-8 font-bold uppercase tracking-[0.3em] text-xs hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 shadow-xl shadow-brand-navy/20 relative overflow-hidden group"
                         >
                             <span className="relative z-10 group-hover:tracking-[0.4em] transition-all duration-500">
-                                {isLoading ? 'Processing...' : `Pay & Complete — ₹${Math.round((cartTotal - discount) * 1.03).toLocaleString()}`}
+                                {isLoading ? 'Processing...' : `Pay & Complete — ₹${formatPrice(Math.round((cartTotal - discount) * 1.03))}`}
                             </span>
                             <div className="absolute inset-0 bg-brand-gold/0 group-hover:bg-brand-gold/10 transition-colors duration-500"></div>
                         </button>
@@ -322,7 +323,7 @@ export default function CheckoutPage() {
                                             <p className="font-serif text-brand-navy text-lg leading-tight mb-1">{item.product.name}</p>
                                             <p className="text-[10px] uppercase tracking-wider text-gray-400">Qty: {item.quantity}</p>
                                         </div>
-                                        <span className="font-serif text-brand-navy">₹{item.calculatedPrice?.toLocaleString()}</span>
+                                        <span className="font-serif text-brand-navy">₹{formatPrice(item.calculatedPrice)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -357,19 +358,19 @@ export default function CheckoutPage() {
                             <div className="space-y-3 pt-4 border-t border-dashed border-gray-200">
                                 <div className="flex justify-between items-center text-gray-500 text-sm">
                                     <span>Subtotal</span>
-                                    <span className="font-mono">₹{cartTotal.toLocaleString()}</span>
+                                    <span className="font-mono">₹{formatPrice(cartTotal)}</span>
                                 </div>
                                 {discount > 0 && (
                                     <div className="flex justify-between items-center text-green-600 text-sm font-medium">
                                         <span>Discount</span>
-                                        <span className="font-mono">- ₹{discount.toLocaleString()}</span>
+                                        <span className="font-mono">- ₹{formatPrice(discount)}</span>
                                     </div>
                                 )}
 
                                 <div className="border-t border-dashed border-gray-200 pt-4 mt-4 flex justify-between items-baseline text-brand-navy">
                                     <span className="text-sm font-bold uppercase tracking-widest">Total</span>
                                     <span className="text-3xl font-sans">
-                                        ₹{Math.round((cartTotal - (discount || 0)) * 1.03).toLocaleString()}
+                                        ₹{formatPrice(Math.round((cartTotal - (discount || 0)) * 1.03))}
                                     </span>
                                 </div>
                             </div>

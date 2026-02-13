@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '@/context/CartContext';
@@ -85,7 +86,7 @@ export default function WishlistPage() {
                         </div>
                         <div className="p-4 text-center">
                             <h3 className="font-serif text-lg text-brand-navy mb-1">{product.name}</h3>
-                            <p className="text-brand-gold font-bold mb-4">₹{product.price.toLocaleString()}</p>
+                            <p className="text-brand-gold font-bold mb-4">₹{formatPrice(product.price)}</p>
                             <button
                                 onClick={() => addToCart(product.id, 1)}
                                 className="w-full py-2 border border-brand-navy text-brand-navy text-xs font-bold uppercase hover:bg-brand-navy hover:text-white transition-colors"

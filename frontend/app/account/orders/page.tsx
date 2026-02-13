@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
+import { formatPrice } from '@/lib/utils';
 
 interface Order {
     id: string;
@@ -106,7 +107,7 @@ export default function OrderHistoryPage() {
                             </div>
                             <div className="mt-4 sm:mt-0 flex flex-col items-end">
                                 <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Amount</p>
-                                <p className="text-xl font-sans font-light text-brand-navy">₹{order.totalAmount.toLocaleString()}</p>
+                                <p className="text-xl font-sans font-light text-brand-navy">₹{formatPrice(order.totalAmount)}</p>
                             </div>
                         </div>
 
@@ -133,7 +134,7 @@ export default function OrderHistoryPage() {
                                                 <span className="uppercase tracking-wider font-bold text-[9px]">Qty: {item.quantity}</span>
                                             </div>
                                         </div>
-                                        <p className="text-brand-navy font-sans text-right">₹{item.price.toLocaleString()}</p>
+                                        <p className="text-brand-navy font-sans text-right">₹{formatPrice(item.price)}</p>
                                     </div>
                                 ))}
                             </div>

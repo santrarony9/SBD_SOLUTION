@@ -1,6 +1,7 @@
 'use client';
 
 import { useCart } from '@/context/CartContext';
+import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -98,14 +99,14 @@ export default function CartPage() {
                                 {/* Price */}
                                 <div className="col-span-2 text-right hidden md:block">
                                     <p className="text-sm text-gray-500">
-                                        ₹{item.calculatedPrice ? (item.calculatedPrice / item.quantity).toLocaleString() : 'N/A'}
+                                        ₹{item.calculatedPrice ? formatPrice(item.calculatedPrice / item.quantity) : 'N/A'}
                                     </p>
                                 </div>
 
                                 {/* Total & Remove Actions */}
                                 <div className="col-span-2 text-right w-full md:w-auto flex flex-col items-end justify-between h-full">
                                     <p className="text-lg font-sans text-brand-navy">
-                                        ₹{item.calculatedPrice ? item.calculatedPrice.toLocaleString() : 'N/A'}
+                                        ₹{formatPrice(item.calculatedPrice)}
                                     </p>
                                     <button
                                         onClick={() => removeFromCart(item.id)}
@@ -139,7 +140,7 @@ export default function CartPage() {
                                 <div className="space-y-4 mb-8 relative z-10">
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Subtotal</span>
-                                        <span className="font-mono font-sans">₹{cartTotal.toLocaleString()}</span>
+                                        <span className="font-mono font-sans">₹{formatPrice(cartTotal)}</span>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <span>Shipping</span>
@@ -152,7 +153,7 @@ export default function CartPage() {
 
                                     <div className="border-t border-brand-charcoal/10 pt-6 mt-6 flex justify-between items-baseline">
                                         <span className="text-sm font-bold uppercase tracking-widest text-brand-navy">Total</span>
-                                        <span className="text-3xl font-sans text-brand-navy">₹{cartTotal.toLocaleString()}</span>
+                                        <span className="text-3xl font-sans text-brand-navy">₹{formatPrice(cartTotal)}</span>
                                     </div>
                                 </div>
 

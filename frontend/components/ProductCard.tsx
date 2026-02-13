@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { PiBasket } from 'react-icons/pi';
+import { formatPrice } from '@/lib/utils';
 
 interface ProductProps {
     id: string;
@@ -85,11 +86,9 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     </div>
                 </div>
 
-                <div className="mt-2 relative">
-                    <span className="text-base font-bold font-sans text-brand-charcoal relative z-10">
-                        ₹{Math.round(product.price || (product as any).pricing?.finalPrice || 0).toLocaleString('en-IN')}
-                    </span>
-                </div>
+                <span className="text-base font-bold font-sans text-brand-charcoal relative z-10">
+                    ₹{formatPrice(product.price || (product as any).pricing?.finalPrice || 0)}
+                </span>
             </div>
         </div>
     );

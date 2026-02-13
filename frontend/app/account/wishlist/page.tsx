@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { formatPrice } from '@/lib/utils';
 import Link from 'next/link';
 
 export default function WishlistPage() {
@@ -82,7 +83,7 @@ export default function WishlistPage() {
                                 <div>
                                     <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1">{item.product.category}</p>
                                     <h3 className="font-serif text-lg text-brand-navy mb-2 line-clamp-1">{item.product.name}</h3>
-                                    <p className="text-xs text-brand-gold font-bold uppercase tracking-widest">₹{item.product.price?.toLocaleString() || 'P.O.A'}</p>
+                                    <p className="text-xs text-brand-gold font-bold uppercase tracking-widest">₹{formatPrice(item.product.price) || 'P.O.A'}</p>
                                 </div>
                                 <div className="space-y-2">
                                     <Link
