@@ -26,7 +26,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // Fallback if no banners
-    const activeBanners = banners.length > 0 ? banners : [{
+    const activeBanners = (banners && Array.isArray(banners) && banners.length > 0) ? banners : [{
         id: 'default',
         imageUrl: '/hero-jewellery.png',
         title: 'Est. 1995',

@@ -113,26 +113,26 @@ export default async function Home() {
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-gold/30 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Our Promise</span>
-            <h2 className="text-3xl md:text-4xl font-serif text-white mt-4">The Royal Standard</h2>
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block animate-fade-in-up">Our Promise</span>
+            <h2 className="text-3xl md:text-4xl font-serif text-white mt-4 animate-fade-in-up animate-delay-100">The Royal Standard</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm animate-fade-in-up animate-delay-200">
               <span className="text-4xl text-brand-gold mb-6 block font-serif">01.</span>
               <h3 className="text-xl text-white font-serif mb-4">Certified Purity</h3>
               <p className="text-gray-400 text-sm leading-relaxed font-light">
                 Every nanogram of gold is BIS Hallmarked. Our diamonds come with IGI certification.
               </p>
             </div>
-            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm animate-fade-in-up animate-delay-300">
               <span className="text-4xl text-brand-gold mb-6 block font-serif">02.</span>
               <h3 className="text-xl text-white font-serif mb-4">Skin-Safe Alchemy</h3>
               <p className="text-gray-400 text-sm leading-relaxed font-light">
                 Crafted with hypoallergenic alloys and free from nickel. 18K and 22K blends.
               </p>
             </div>
-            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm">
+            <div className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm animate-fade-in-up animate-delay-300">
               <span className="text-4xl text-brand-gold mb-6 block font-serif">03.</span>
               <h3 className="text-xl text-white font-serif mb-4">Conflict-Free Legacy</h3>
               <p className="text-gray-400 text-sm leading-relaxed font-light">
@@ -191,10 +191,10 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex justify-between items-end mb-16">
             <div>
-              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Latest Drops</span>
-              <h2 className="text-4xl font-serif text-brand-navy mt-4">New Arrivals</h2>
+              <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block animate-fade-in-up">Latest Drops</span>
+              <h2 className="text-4xl font-serif text-brand-navy mt-4 animate-fade-in-up animate-delay-100">New Arrivals</h2>
             </div>
-            <Link href="/shop" className="text-brand-navy border-b border-brand-navy pb-1 text-sm font-bold uppercase tracking-widest">
+            <Link href="/shop" className="text-brand-navy border-b border-brand-navy pb-1 text-sm font-bold uppercase tracking-widest animate-fade-in-up animate-delay-200">
               View All
             </Link>
           </div>
@@ -210,8 +210,8 @@ export default async function Home() {
       <section className="py-20 bg-brand-navy relative overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 relative z-10">
           <div className="text-center mb-12">
-            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Exclusive Benefits</span>
-            <h2 className="text-3xl md:text-5xl font-serif text-white mt-4">Royal Privileges</h2>
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block animate-fade-in-up">Exclusive Benefits</span>
+            <h2 className="text-3xl md:text-5xl font-serif text-white mt-4 animate-fade-in-up animate-delay-100">Royal Privileges</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {offers.length > 0 ? offers.map((offer: any, idx: number) => (
@@ -236,8 +236,8 @@ export default async function Home() {
       <section className="py-24 bg-brand-cream">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-16">
-            <span className="text-brand-navy/60 text-xs font-bold uppercase tracking-[0.3em]">Social Proof</span>
-            <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4">Voices of Royalty</h2>
+            <span className="text-brand-navy/60 text-xs font-bold uppercase tracking-[0.3em] inline-block animate-fade-in-up">Social Proof</span>
+            <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4 animate-fade-in-up animate-delay-100">Voices of Royalty</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {featuredReviews.length > 0 ? featuredReviews.map((review: any) => (
