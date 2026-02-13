@@ -55,6 +55,14 @@ export default function ProductDetailPage() {
     const [showCertificate, setShowCertificate] = useState(false);
     const [showDropHint, setShowDropHint] = useState(false);
 
+    const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
+    const [showCertificate, setShowCertificate] = useState(false);
+    const [showDropHint, setShowDropHint] = useState(false);
+    // Share State
+    const [showShareMenu, setShowShareMenu] = useState(false);
+
+    const router = useRouter(); // Ensure this is imported from 'next/navigation'
+
     const checkDelivery = () => {
         setIsCheckingPincode(true);
         // Simulate API call
@@ -64,6 +72,43 @@ export default function ProductDetailPage() {
             setDeliveryDate(date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }));
             setIsCheckingPincode(false);
         }, 1500);
+    };
+
+    const handleBuyNow = async () => {
+        if (!product) return;
+        await addToCart(product.id, 1);
+        router.push('/checkout');
+    };
+
+    const handleShare = async () => {
+        if (!product) return;
+        const shareData = {
+            title: product.name,
+            text: `Check out this amazing ${product.name} on Spark Blue Diamond!`,
+            url: window.location.href,
+        };
+
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Share canceled');
+            }
+        } else {
+            setShowShareMenu(!showShareMenu);
+        }
+    };
+
+    const copyToClipboard = () => {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+        setShowShareMenu(false);
+    };
+
+    const shareToWhatsapp = () => {
+        const text = `Check out this amazing ${product.name} on Spark Blue Diamond! ${window.location.href}`;
+        window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        setShowShareMenu(false);
     };
 
     useEffect(() => {
@@ -271,14 +316,21 @@ export default function ProductDetailPage() {
 
                     {/* Actions - Sticky Bottom on Mobile */}
                     <div className="bg-white/95 backdrop-blur-lg border-t border-gray-100 p-4 lg:p-0 lg:bg-transparent lg:border-none fixed bottom-0 left-0 right-0 z-50 lg:static lg:z-auto shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] lg:shadow-none space-y-3 mt-auto pt-4">
-                        <button
-                            onClick={() => product && addToCart(product.id, 1)}
-                            className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-14 lg:h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
-                            <span className="relative z-10">Add to Cart</span>
-                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
-                        </button>
+                        <div className="grid grid-cols-2 gap-3">
+                            <button
+                                onClick={() => product && addToCart(product.id, 1)}
+                                className="w-full bg-white border border-brand-gold text-brand-navy h-14 lg:h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                <span>Add to Cart</span>
+                            </button>
+                            <button
+                                onClick={handleBuyNow}
+                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-14 lg:h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                <span className="relative z-10">Buy Now</span>
+                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+                            </button>
+                        </div>
 
-                        <div className="grid grid-cols-2 gap-3 pb-safe lg:pb-0">
+                        <div className="grid grid-cols-3 gap-3 pb-safe lg:pb-0 relative">
                             <button
                                 onClick={() => setShowBreakup(!showBreakup)}
                                 className="w-full h-10 border border-brand-navy/10 text-brand-navy font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
@@ -286,8 +338,9 @@ export default function ProductDetailPage() {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
                                 </svg>
-                                {showBreakup ? 'Hide' : 'Breakup'}
+                                Details
                             </button>
+
                             <button
                                 onClick={() => setShowDropHint(true)}
                                 className="w-full h-10 border border-dashed border-brand-gold/50 text-brand-gold font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
@@ -295,8 +348,30 @@ export default function ProductDetailPage() {
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
                                 </svg>
-                                Drop Hint
+                                Hint
                             </button>
+
+                            <div className="relative">
+                                <button
+                                    onClick={handleShare}
+                                    className="w-full h-10 border border-brand-navy/10 text-gray-500 font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                                    </svg>
+                                    Share
+                                </button>
+                                {showShareMenu && (
+                                    <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-gray-100 shadow-xl rounded-sm p-2 z-20 animate-fade-in-up">
+                                        <button onClick={shareToWhatsapp} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-green-500"></span> WhatsApp
+                                        </button>
+                                        <button onClick={copyToClipboard} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-2">
+                                            <span className="w-2 h-2 rounded-full bg-gray-400"></span> Copy Link
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Price Breakup Panel */}

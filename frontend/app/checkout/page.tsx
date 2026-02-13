@@ -30,6 +30,12 @@ export default function CheckoutPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    // Promo Code State
+    const [promoCode, setPromoCode] = useState('');
+    const [appliedPromo, setAppliedPromo] = useState<{ code: string; value: number; type: string } | null>(null);
+    const [promoLoading, setPromoLoading] = useState(false);
+    const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
     // ... (Existing GST/Billing state - Keeping minimalistic for this view but functional)
     const [showGST, setShowGST] = useState(false);
     const [billingAddress, setBillingAddress] = useState({
@@ -41,6 +47,56 @@ export default function CheckoutPage() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
     };
+
+    const handleApplyPromo = async () => {
+        if (!promoCode.trim()) return;
+        setPromoLoading(true);
+        setPromoMessage(null);
+
+        try {
+            const res = await fetchAPI('/promos/validate', {
+                method: 'POST',
+                body: JSON.stringify({ code: promoCode })
+            });
+
+            if (res && res.code) {
+                setAppliedPromo({
+                    code: res.code,
+                    value: res.discountValue,
+                    type: res.discountType
+                });
+                setPromoMessage({ type: 'success', text: `Coupon '${res.code}' applied!` });
+            } else {
+                setAppliedPromo(null);
+                setPromoMessage({ type: 'error', text: 'Invalid Coupon Code' });
+            }
+        } catch (err: any) {
+            setAppliedPromo(null);
+            setPromoMessage({ type: 'error', text: err.message || 'Failed to apply coupon' });
+        } finally {
+            setPromoLoading(false);
+        }
+    };
+
+    const removePromo = () => {
+        setAppliedPromo(null);
+        setPromoCode('');
+        setPromoMessage(null);
+    };
+
+    // Calculate Totals
+    const calculateDiscount = () => {
+        if (!appliedPromo) return 0;
+        if (appliedPromo.type === 'PERCENTAGE') {
+            return (cartTotal * appliedPromo.value) / 100;
+        }
+        return appliedPromo.value; // FLAT
+    };
+
+    const discountAmount = calculateDiscount();
+    const finalTotal = Math.max(0, cartTotal - discountAmount);
+    const taxAmount = showGST ? finalTotal * 0.03 : 0; // GST on discounted price (standard practice, verify if needed on gross)
+    const grandTotal = finalTotal + taxAmount;
 
     const handlePlaceOrder = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -60,11 +116,14 @@ export default function CheckoutPage() {
                 shippingAddress,
                 billingAddress: shippingAddress, // simplified for now
                 paymentMethod,
-                totalAmount: cartTotal, // sending explicitly to avoid mismatch if cart changes
+                totalAmount: grandTotal, // Send FINAL amount
                 items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
                 isB2B: showGST,
                 customerGSTIN: showGST ? billingAddress.gstin : undefined,
-                businessName: showGST ? billingAddress.businessName : undefined
+                businessName: showGST ? billingAddress.businessName : undefined,
+                // Promo Data
+                promoCode: appliedPromo ? appliedPromo.code : null,
+                discountAmount: discountAmount
             };
 
             console.log("Creating Order:", orderPayload);
@@ -258,17 +317,60 @@ export default function CheckoutPage() {
                                     <span>Shipping</span>
                                     <span className="text-brand-gold">Free</span>
                                 </div>
+
+                                {appliedPromo && (
+                                    <div className="flex justify-between text-brand-gold">
+                                        <span>Discount ({appliedPromo.code})</span>
+                                        <span>- {formatPrice(discountAmount)}</span>
+                                    </div>
+                                )}
+
                                 {showGST && (
                                     <div className="flex justify-between text-white/70 text-xs mt-2 pt-2 border-t border-white/10">
                                         <span>GST (3%)</span>
-                                        <span>{formatPrice(cartTotal * 0.03)}</span>
+                                        <span>{formatPrice(taxAmount)}</span>
                                     </div>
+                                )}
+                            </div>
+
+                            {/* Promo Code Input */}
+                            <div className="mb-6">
+                                {appliedPromo ? (
+                                    <div className="flex justify-between items-center bg-brand-gold/20 p-3 rounded border border-brand-gold/30">
+                                        <div className="flex items-center text-brand-gold text-xs font-bold uppercase tracking-wider">
+                                            <PiCheckCircle className="mr-2 text-lg" />
+                                            {appliedPromo.code} Applied
+                                        </div>
+                                        <button onClick={removePromo} className="text-white/50 hover:text-white text-xs underline">Remove</button>
+                                    </div>
+                                ) : (
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="text"
+                                            placeholder="Coupon Code"
+                                            value={promoCode}
+                                            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                            className="w-full bg-white/10 border border-white/10 p-3 text-white placeholder-white/40 focus:outline-none focus:border-brand-gold text-sm uppercase"
+                                        />
+                                        <button
+                                            onClick={handleApplyPromo}
+                                            disabled={promoLoading || !promoCode}
+                                            className="px-4 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
+                                        >
+                                            {promoLoading ? '...' : 'Apply'}
+                                        </button>
+                                    </div>
+                                )}
+                                {promoMessage && (
+                                    <p className={`text-[10px] mt-2 ${promoMessage.type === 'success' ? 'text-brand-gold' : 'text-red-300'}`}>
+                                        {promoMessage.text}
+                                    </p>
                                 )}
                             </div>
 
                             <div className="flex justify-between items-center text-2xl font-serif mb-8 pt-4 border-t border-white/10">
                                 <span>Total</span>
-                                <span>{formatPrice(cartTotal)}</span>
+                                <span>{formatPrice(grandTotal)}</span>
                             </div>
 
                             {error && (
