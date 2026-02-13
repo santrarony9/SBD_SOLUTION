@@ -18,8 +18,8 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
             await this.$connect();
             console.log('✅ Connected to MongoDB successfully!');
         } catch (error) {
-            console.error('❌ MongoDB Connection Failed:', error);
-            throw error;
+            console.error('❌ MongoDB Connection Failed (Logged but not fatal):', error);
+            // DO NOT THROW. Allow app to start so we can diagnose via /api/diagnostics
         }
     }
 
