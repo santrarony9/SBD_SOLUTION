@@ -10,15 +10,7 @@ export class ProductsController {
         return this.productsService.createProduct(createProductDto);
     }
 
-    @Post('seed-pricing')
-    async seedPricingPost() {
-        return this.productsService.seedPricing();
-    }
 
-    @Get('seed-pricing')
-    async seedPricingGet() {
-        return this.productsService.seedPricing();
-    }
 
     @Post('ai-description')
     async generateDescription(@Body() body: any) {
