@@ -22,7 +22,7 @@ export default function AdminCMS() {
     // Form States
     const [newBanner, setNewBanner] = useState({ imageUrl: '', title: '', link: '' });
     const [isUploading, setIsUploading] = useState(false);
-    const [newOffer, setNewOffer] = useState({ title: '', description: '', tag: '', code: '' });
+    const [newOffer, setNewOffer] = useState({ title: '', description: '', tag: '', code: '', imageUrl: '' });
     const [newCategory, setNewCategory] = useState({ name: '', slug: '', imageUrl: '' });
     const [newPriceRange, setNewPriceRange] = useState({ label: '', minPrice: 0, maxPrice: 0, imageUrl: '' });
     const [newTag, setNewTag] = useState({ name: '', slug: '' });
@@ -124,7 +124,7 @@ export default function AdminCMS() {
         try {
             await fetchAPI('/offers', { method: 'POST', body: JSON.stringify(newOffer) });
             showStatus('Offer Added', 'success');
-            setNewOffer({ title: '', description: '', tag: '', code: '' });
+            setNewOffer({ title: '', description: '', tag: '', code: '', imageUrl: '' });
             loadContent();
         } catch (e) { showStatus('Failed to add offer', 'error'); }
     };
@@ -489,7 +489,7 @@ export default function AdminCMS() {
                                 <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center gap-2">
                                     <PiPlus className="text-brand-gold" /> Create New Offer
                                 </h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                                     <div className="space-y-4">
                                         <div className="space-y-2">
                                             <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Offer Title</label>
@@ -534,6 +534,56 @@ export default function AdminCMS() {
                                             />
                                         </div>
                                     </div>
+                                    {/* Image Upload for Offer */}
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Offer Background (Optional)</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Rec: 800x600px
+                                            </span>
+                                        </div>
+                                        {!newOffer.imageUrl ? (
+                                            <label className="relative block w-full h-32 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-brand-gold hover:bg-gray-50 transition-all">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 5 * 1024 * 1024) {
+                                                                alert('File is too large! Max 5MB allowed.');
+                                                                return;
+                                                            }
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showStatus('Uploading...', 'success');
+                                                            fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                .then(res => {
+                                                                    setNewOffer(prev => ({ ...prev, imageUrl: res.url }));
+                                                                    showStatus('Image Uploaded', 'success');
+                                                                })
+                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiImage className="text-2xl mb-1" />
+                                                    <span className="text-[9px] font-bold">CLICK TO UPLOAD</span>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                                <img src={newOffer.imageUrl} alt="Offer Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    onClick={() => setNewOffer(prev => ({ ...prev, imageUrl: '' }))}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <PiX />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="mt-6 flex justify-end">
                                     <button
@@ -547,23 +597,33 @@ export default function AdminCMS() {
 
                             <div className="grid grid-cols-1 gap-6">
                                 {offers.map(offer => (
-                                    <div key={offer.id} className="relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:border-brand-gold/30 transition-all flex justify-between items-center group">
-                                        <div className="flex items-start gap-4">
-                                            <div className="bg-brand-gold/10 p-3 rounded-full text-brand-gold mt-1 group-hover:scale-110 transition-transform">
-                                                <PiTag />
+                                    <div key={offer.id} className="relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:border-brand-gold/30 transition-all overflow-hidden group">
+
+                                        {offer.imageUrl && (
+                                            <div className="absolute inset-0 z-0">
+                                                <img src={offer.imageUrl} alt="" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" />
                                             </div>
-                                            <div>
-                                                <div className="flex items-center gap-3 mb-1">
-                                                    <h4 className="font-serif text-brand-navy text-lg">{offer.title}</h4>
-                                                    <span className="bg-brand-gold text-[8px] text-white px-2 py-0.5 rounded-full font-black tracking-widest uppercase">{offer.tag}</span>
+                                        )}
+
+                                        <div className="relative z-10 p-6 flex justify-between items-center">
+                                            <div className="flex items-start gap-4">
+                                                <div className="bg-brand-gold/10 p-3 rounded-full text-brand-gold mt-1 group-hover:scale-110 transition-transform">
+                                                    <PiTag />
                                                 </div>
-                                                <p className="text-gray-600 text-sm max-w-md">{offer.description}</p>
-                                                {offer.code && <div className="mt-2 text-[10px] font-mono text-brand-gold ring-1 ring-brand-gold/30 inline-block px-2 py-0.5 rounded bg-brand-gold/5 uppercase tracking-tighter">Code: {offer.code}</div>}
+                                                <div>
+                                                    <div className="flex items-center gap-3 mb-1">
+                                                        <h4 className="font-serif text-brand-navy text-lg">{offer.title}</h4>
+                                                        <span className="bg-brand-gold text-[8px] text-white px-2 py-0.5 rounded-full font-black tracking-widest uppercase">{offer.tag}</span>
+                                                    </div>
+                                                    <p className="text-gray-600 text-sm max-w-md">{offer.description}</p>
+                                                    {offer.code && <div className="mt-2 text-[10px] font-mono text-brand-gold ring-1 ring-brand-gold/30 inline-block px-2 py-0.5 rounded bg-brand-gold/5 uppercase tracking-tighter">Code: {offer.code}</div>}
+                                                </div>
                                             </div>
+                                            <button onClick={() => handleDeleteOffer(offer.id)} className="text-gray-300 hover:text-red-500 p-2 transition-colors">
+                                                <PiTrash />
+                                            </button>
                                         </div>
-                                        <button onClick={() => handleDeleteOffer(offer.id)} className="text-gray-300 hover:text-red-500 p-2 transition-colors">
-                                            <PiTrash />
-                                        </button>
                                     </div>
                                 ))}
                                 {offers.length === 0 && <div className="py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No active offers</div>}

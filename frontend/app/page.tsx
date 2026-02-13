@@ -215,15 +215,30 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {offers.length > 0 ? offers.map((offer: any, idx: number) => (
-              <div key={offer.id} className="relative group overflow-hidden border border-brand-gold/30 p-8 md:p-12 flex flex-col justify-center items-start bg-white/5 backdrop-blur-sm">
-                <span className="bg-brand-gold text-brand-navy text-[10px] font-bold uppercase px-3 py-1 tracking-widest mb-6">{offer.tag || "Special"}</span>
-                <h3 className="text-2xl md:text-3xl font-serif text-white mb-4">{offer.title}</h3>
-                <p className="text-gray-300 font-light mb-8 max-w-sm">{offer.description}</p>
-                {offer.code && (
-                  <div className="border border-dashed border-gray-500 px-4 py-2 text-gray-400 font-mono text-xs tracking-widest">
-                    CODE: <span className="text-white font-bold">{offer.code}</span>
+              <div key={offer.id} className="relative group overflow-hidden border border-brand-gold/30 p-8 md:p-12 flex flex-col justify-center items-start bg-white/5 backdrop-blur-sm min-h-[300px]">
+                {/* Background Image Layer */}
+                {offer.imageUrl && (
+                  <div className="absolute inset-0 z-0">
+                    <Image
+                      src={offer.imageUrl}
+                      alt={offer.title}
+                      fill
+                      className="object-cover opacity-30 group-hover:opacity-50 transition-all duration-700 grayscale group-hover:grayscale-0"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/90 to-brand-navy/30 mix-blend-multiply" />
                   </div>
                 )}
+
+                <div className="relative z-10 w-full">
+                  <span className="bg-brand-gold text-brand-navy text-[10px] font-bold uppercase px-3 py-1 tracking-widest mb-6 inline-block">{offer.tag || "Special"}</span>
+                  <h3 className="text-2xl md:text-3xl font-serif text-white mb-4 drop-shadow-md">{offer.title}</h3>
+                  <p className="text-gray-200 font-light mb-8 max-w-sm drop-shadow">{offer.description}</p>
+                  {offer.code && (
+                    <div className="border border-dashed border-gray-400 px-4 py-2 text-gray-300 font-mono text-xs tracking-widest bg-brand-navy/40 backdrop-blur-md inline-block">
+                      CODE: <span className="text-white font-bold">{offer.code}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )) : (
               <p className="text-white text-center col-span-2 opacity-50">No exclusive privileges active today.</p>

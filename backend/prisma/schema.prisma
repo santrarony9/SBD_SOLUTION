@@ -207,6 +207,7 @@ model Offer {
   id          String   @id @default(auto()) @map("_id") @db.ObjectId
   title       String
   description String
+  imageUrl    String?   // Added for rich offers
   tag         String?   // e.g. "Limited Time"
   code        String?   // e.g. "ROYALFIRST"
   isActive    Boolean   @default(true)
