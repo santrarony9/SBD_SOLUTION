@@ -170,6 +170,13 @@ export default function CartPage() {
                                         <span>Money-back Guarantee</span>
                                     </div>
                                 </div>
+
+                                <button
+                                    onClick={clearCart}
+                                    className="w-full text-center mt-6 text-[10px] uppercase font-bold tracking-widest text-gray-400 hover:text-red-500 transition-colors"
+                                >
+                                    Clear Cart
+                                </button>
                             </div>
                         </div>
                     </div>
