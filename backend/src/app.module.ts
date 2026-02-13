@@ -35,6 +35,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { PhonePeModule } from './phonepe/phonepe.module';
 import { GalleryModule } from './gallery/gallery.module';
+import { CcavenueModule } from './ccavenue/ccavenue.module';
 
 @Module({
   imports: [
@@ -68,7 +69,8 @@ import { GalleryModule } from './gallery/gallery.module';
     InvoiceModule,
     MediaModule,
     ShiprocketModule,
-    RazorpayModule
+    RazorpayModule,
+    CcavenueModule
   ],
   controllers: [AppController],
   providers: [AppService, CartCleanupService],

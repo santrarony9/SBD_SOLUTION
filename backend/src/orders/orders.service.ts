@@ -310,4 +310,28 @@ export class OrdersService {
 
         return updatedOrder;
     }
+    async confirmCcavenuePayment(orderId: string, trackingId: string, bankRefNo?: string) {
+        const order = await this.prisma.order.findUnique({ where: { id: orderId } });
+        if (!order) return null;
+
+        const updatedOrder = await (this.prisma as any).order.update({
+            where: { id: orderId },
+            data: {
+                status: 'CONFIRMED',
+                paymentStatus: 'PAID',
+                ccavenueTrackingId: trackingId,
+                ccavenueBankRefNo: bankRefNo
+            }
+        });
+
+        // Trigger CRM
+        if (updatedOrder.userId) {
+            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
+        }
+
+        // Push to Shiprocket
+        this.pushToShiprocket(updatedOrder.id).catch(e => console.error("Shiprocket Push Retry:", e.message));
+
+        return updatedOrder;
+    }
 }

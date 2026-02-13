@@ -386,6 +386,10 @@ model Order {
   // Payment Details (PhonePe)
   phonepeMerchantTransactionId String?
   phonepeTransactionId         String?
+
+  // Payment Details (CC Avenue)
+  ccavenueTrackingId           String?
+  ccavenueBankRefNo            String?
   
   // GST & B2B
   invoiceNumber     String?
