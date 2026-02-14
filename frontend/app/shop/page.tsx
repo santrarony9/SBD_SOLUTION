@@ -109,6 +109,7 @@ function ShopContent() {
         if (selectedMetals.length > 0) {
             result = result.filter(p => {
                 return selectedMetals.some(metal => {
+                    if (metal === '16K Gold') return p.goldPurity === 16;
                     if (metal === '18K Gold') return p.goldPurity === 18;
                     if (metal === '22K Gold') return p.goldPurity === 22;
                     if (metal === 'Platinum') return p.tags?.some(t => t.toLowerCase().includes('platinum')) || p.name.toLowerCase().includes('platinum');
@@ -246,7 +247,7 @@ function ShopContent() {
                                 Metal
                             </h3>
                             <ul className="space-y-4">
-                                {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
                                     <li key={metal}>
                                         <label className="group flex items-center cursor-pointer" onClick={() => toggleMetal(metal)}>
                                             <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedMetals.includes(metal) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
@@ -387,7 +388,7 @@ function ShopContent() {
                                 <div>
                                     <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Metal</h4>
                                     <div className="flex flex-wrap gap-2">
-                                        {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                        {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
                                             <button
                                                 key={metal}
                                                 onClick={() => toggleMetal(metal)}
