@@ -26,7 +26,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         diamondColor: 'EF', // Added Diamond Color w/ default
         description: '',
         videoUrl: '',
-        certificatePdf: ''
+        certificatePdf: '',
+        coverImage: ''
     });
     const [tempImages, setTempImages] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -48,7 +49,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 diamondColor: initialData.diamondColor || 'EF', // Hydrate Edit
                 description: initialData.description || '',
                 videoUrl: initialData.videoUrl || '',
-                certificatePdf: initialData.certificatePdf || ''
+                certificatePdf: initialData.certificatePdf || '',
+                coverImage: initialData.coverImage || ''
             });
             setTempImages(initialData.images || []);
         } else {
@@ -59,7 +61,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', diamondColor: 'EF', // Reset
                 description: '',
                 videoUrl: '',
-                certificatePdf: ''
+                certificatePdf: '',
+                coverImage: ''
             });
             setTempImages([]);
         }
@@ -93,6 +96,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
             if (type === 'video') setFormData({ ...formData, videoUrl: result.url });
             else if (type === 'certificate') setFormData({ ...formData, certificatePdf: result.url });
+            else if (type === 'cover') setFormData({ ...formData, coverImage: result.url });
             else if (type.startsWith('image')) {
                 const index = parseInt(type.split('-')[1]);
                 const newImages = [...tempImages];
@@ -156,7 +160,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 diamondColor: formData.diamondColor,
                 images: validImages,
                 videoUrl: formData.videoUrl,
-                certificatePdf: formData.certificatePdf
+                certificatePdf: formData.certificatePdf,
+                coverImage: formData.coverImage
             };
 
             const url = initialData
