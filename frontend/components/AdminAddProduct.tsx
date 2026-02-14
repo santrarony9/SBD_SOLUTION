@@ -28,8 +28,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         description: '',
         videoUrl: '',
         certificatePdf: '',
-        videoUrl: '',
-        certificatePdf: '',
+
         coverImage: '',
         stockCount: '' // Added for Inventory Management
     });
@@ -54,7 +53,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 description: initialData.description || '',
                 videoUrl: initialData.videoUrl || '',
                 certificatePdf: initialData.certificatePdf || '',
-                certificatePdf: initialData.certificatePdf || '',
+
                 coverImage: initialData.coverImage || '',
                 stockCount: initialData.stockCount?.toString() || '' // Hydrate Stock
             });
@@ -68,7 +67,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 description: '',
                 videoUrl: '',
                 certificatePdf: '',
-                certificatePdf: '',
+
                 coverImage: '',
                 stockCount: '' // Reset Stock
             });
@@ -169,8 +168,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 images: validImages,
                 videoUrl: formData.videoUrl,
                 certificatePdf: formData.certificatePdf,
-                videoUrl: formData.videoUrl,
-                certificatePdf: formData.certificatePdf,
+
                 coverImage: formData.coverImage,
                 stockCount: parseInt(formData.stockCount) || 0 // Include stock count in payload
             };

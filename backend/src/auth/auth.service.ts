@@ -7,6 +7,7 @@ import * as bcrypt from 'bcryptjs';
 import { SmsService } from '../sms/sms.service';
 import { MailService } from '../mail/mail.service';
 import { v4 as uuidv4 } from 'uuid';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class AuthService {
@@ -15,6 +16,7 @@ export class AuthService {
         private jwtService: JwtService,
         private smsService: SmsService,
         private mailService: MailService,
+        private whatsappService: WhatsappService,
     ) { }
 
     async validateUser(email: string, pass: string): Promise<any> {
@@ -98,6 +100,12 @@ export class AuthService {
         });
 
         const { password: _, ...result } = updatedUser;
+
+        // Send Welcome Message (AI Powered)
+        if (updatedUser.mobile) {
+            this.whatsappService.sendWelcomeMessage(updatedUser.mobile, updatedUser.name).catch(e => console.error("Welcome Msg Failed", e));
+        }
+
         return result;
     }
 
@@ -132,7 +140,12 @@ export class AuthService {
         }
 
         // Send SMS
+        // Send SMS
         await this.smsService.sendOtp(mobile, otp);
+
+        // Send WhatsApp OTP
+        this.whatsappService.sendOtp(mobile, otp).catch(e => console.error("WhatsApp OTP Failed", e));
+
         return { message: 'OTP Sent successfully' };
     }
 

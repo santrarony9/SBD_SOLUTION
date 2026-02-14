@@ -11,7 +11,6 @@ interface Order {
     totalAmount: number;
     status: string;
     paymentStatus: string;
-    paymentStatus: string;
     createdAt: string;
     awbCode?: string; // Added for Shiprocket Tracking
     items: {

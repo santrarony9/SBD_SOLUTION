@@ -8,6 +8,7 @@ import { InventoryModule } from '../inventory/inventory.module';
 
 import { ShiprocketModule } from '../shiprocket/shiprocket.module';
 import { RazorpayModule } from '../razorpay/razorpay.module';
+import { WhatsappModule } from '../whatsapp/whatsapp.module';
 
 @Module({
     imports: [
@@ -16,7 +17,8 @@ import { RazorpayModule } from '../razorpay/razorpay.module';
         CrmModule,
         InventoryModule,
         ShiprocketModule,
-        forwardRef(() => RazorpayModule)
+        forwardRef(() => RazorpayModule),
+        WhatsappModule
     ],
     providers: [OrdersService],
     controllers: [OrdersController],

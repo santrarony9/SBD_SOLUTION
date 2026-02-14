@@ -6,6 +6,7 @@ import { CrmService } from '../crm/crm.service';
 import { InventoryService } from '../inventory/inventory.service';
 
 import { ShiprocketService } from '../shiprocket/shiprocket.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class OrdersService {
@@ -17,6 +18,7 @@ export class OrdersService {
         private crmService: CrmService,
         private inventoryService: InventoryService,
         private shiprocketService: ShiprocketService,
+        private whatsappService: WhatsappService,
         @Inject(forwardRef(() => RazorpayService))
         private razorpayService: RazorpayService,
     ) { }
@@ -122,6 +124,20 @@ export class OrdersService {
             );
         }
 
+        // 8. WhatsApp Alerts (New Order - PENDING payment but created)
+        // Usually wait for payment confirmation, but admins might want to know about attempted orders too
+        try {
+            const userPhone = shippingAddress.phone;
+            if (userPhone && order.id) {
+                // Customer Alert (Optional at this stage, maybe better after payment)
+                // this.whatsappService.sendOrderConfirmation(userPhone, order.id, totalAmount);
+            }
+            // Admin Alert
+            await this.whatsappService.sendAdminNewOrderAlert(order.id, totalAmount);
+        } catch (e) {
+            console.error("WhatsApp Alert Failed", e);
+        }
+
         return { ...order, razorpayOrderId };
     }
 
@@ -201,6 +217,14 @@ export class OrdersService {
             });
 
             // 3. Notify CRM / Email (Future)
+
+            // 4. WhatsApp Dispatch Alert
+            if (order.shippingAddress?.phone) {
+                this.whatsappService.sendDispatchAlert(
+                    order.shippingAddress.phone,
+                    this.shiprocketService.getTrackingUrl(awbData.awb_code)
+                );
+            }
 
             return { success: true, awb: awbData.awb_code, trackingUrl: this.shiprocketService.getTrackingUrl(awbData.awb_code) };
 
@@ -318,28 +342,44 @@ export class OrdersService {
             // Future: Call Shiprocket Return API here.
         }
 
-        const order = await (this.prisma as any).order.update({
+        if (status === 'SHIPPED') {
+            updateData.updatedAt = new Date(); // Update timestamp
+        }
+
+        const updatedOrder = await (this.prisma as any).order.update({
             where: { id },
             data: updateData,
+            include: { shippingAddress: true, user: true }
         });
 
+        // WhatsApp Alerts for Status Changes
+        try {
+            if (status === 'RETURN_REQUESTED') {
+                this.whatsappService.sendAdminReturnAlert(id, "Customer requested return via Support/App").catch(e => console.error(e));
+            } else if (status === 'EXCHANGE_REQUESTED') {
+                this.whatsappService.sendAdminExchangeAlert(id, "Customer requested exchange via Support/App").catch(e => console.error(e));
+            }
+        } catch (e) {
+            console.error("Status Change Alert Failed", e);
+        }
+
         // Trigger CRM Logic if order is CONFIRMED (Treating it as successful payment for now)
-        if (status === 'CONFIRMED' && order.userId) {
-            await this.crmService.onOrderComplete(order.userId, order.id, order.totalAmount);
+        if (status === 'CONFIRMED' && updatedOrder.userId) {
+            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
         }
 
         // Trigger Reversal Logic if order is CANCELLED
         if (status === 'CANCELLED') {
             // 1. Restock Inventory
-            await this.inventoryService.onOrderCancel(order.id);
+            await this.inventoryService.onOrderCancel(updatedOrder.id);
 
             // 2. Reverse CRM Points
-            if (order.userId) {
-                await this.crmService.onOrderCancel(order.userId, order.id, order.totalAmount);
+            if (updatedOrder.userId) {
+                await this.crmService.onOrderCancel(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
             }
         }
 
-        return order;
+        return updatedOrder;
     }
     async markAsPaid(orderId: string, paymentId: string) {
         return this.prisma.order.update({

@@ -406,6 +406,10 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                             <option value="SHIPPED">Shipped</option>
                                             <option value="DELIVERED">Delivered</option>
                                             <option value="CANCELLED">Cancelled</option>
+                                            <option value="RETURN_REQUESTED">Return Requested</option>
+                                            <option value="RETURNED">Returned</option>
+                                            <option value="EXCHANGE_REQUESTED">Exchange Requested</option>
+                                            <option value="EXCHANGED">Exchanged</option>
                                         </select>
                                     </td>
                                 </tr>

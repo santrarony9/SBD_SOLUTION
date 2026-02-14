@@ -6,16 +6,20 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { JwtStrategy } from './jwt.strategy';
 import { SmsModule } from '../sms/sms.module';
+import { MailModule } from '../mail/mail.module';
+import { WhatsappModule } from '../whatsapp/whatsapp.module';
 
 @Module({
   imports: [
     PrismaModule,
     PassportModule,
-    SmsModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'SUPER_SECRET_KEY_123',
-      signOptions: { expiresIn: '7d' },
+      secret: process.env.JWT_SECRET || 'secretKey',
+      signOptions: { expiresIn: '60m' },
     }),
+    SmsModule,
+    MailModule,
+    WhatsappModule
   ],
   providers: [AuthService, JwtStrategy],
   controllers: [AuthController],

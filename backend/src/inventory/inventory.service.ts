@@ -1,9 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class InventoryService {
-    constructor(private prisma: PrismaService) { }
+    private readonly logger = new Logger(InventoryService.name);
+
+    constructor(
+        private prisma: PrismaService,
+        private whatsappService: WhatsappService
+    ) { }
 
     // 1. SKU Generation Utility
     generateSKU(category: string, purity: number, weight: number) {
@@ -23,6 +29,11 @@ export class InventoryService {
                 stockCount: { [quantity >= 0 ? 'increment' : 'decrement']: Math.abs(quantity) }
             }
         });
+
+        // WhatsApp Alert: Check Low Stock
+        if (updated.stockCount <= 3) {
+            this.whatsappService.sendAdminStockAlert(product.name, updated.stockCount).catch(e => console.error(e));
+        }
 
         await (this.prisma as any).inventoryLog.create({
             data: {
