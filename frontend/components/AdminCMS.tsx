@@ -508,11 +508,138 @@ export default function AdminCMS() {
                         </div>
                     )}
 
+                    {/* GALLERY SECTION */}
+                    {activeSection === 'gallery' && (
+                        <div className="space-y-10">
+                            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-4 flex items-center gap-2">
+                                    <PiPlus className="text-brand-gold" /> Add Motion Gallery Item
+                                </h3>
+                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image / Video Source</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Rec: 1080x1350px (Portrait)
+                                            </span>
+                                        </div>
+
+                                        {!newGalleryItem.imageUrl ? (
+                                            <label className="relative block w-full h-32 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-brand-gold hover:bg-gray-50 transition-all">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*,video/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 10 * 1024 * 1024) {
+                                                                alert('File is too large! Max 10MB allowed for gallery.');
+                                                                return;
+                                                            }
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showStatus('Uploading...', 'success');
+                                                            fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                .then(res => {
+                                                                    setNewGalleryItem(prev => ({ ...prev, imageUrl: res.url }));
+                                                                    showStatus('Media Uploaded', 'success');
+                                                                })
+                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiImage className="text-2xl mb-1" />
+                                                    <span className="text-[9px] font-bold">CLICK TO UPLOAD</span>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                                {newGalleryItem.imageUrl.match(/\.(mp4|webm)$/i) ? (
+                                                    <video src={newGalleryItem.imageUrl} className="w-full h-full object-cover" autoPlay muted loop />
+                                                ) : (
+                                                    <img src={newGalleryItem.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                )}
+                                                <button
+                                                    onClick={() => setNewGalleryItem(prev => ({ ...prev, imageUrl: '' }))}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <PiX />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Title / Heading</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Summer Vibes"
+                                                value={newGalleryItem.title}
+                                                onChange={(e) => setNewGalleryItem({ ...newGalleryItem, title: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Subtitle</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. New Collection"
+                                                value={newGalleryItem.subtitle}
+                                                onChange={(e) => setNewGalleryItem({ ...newGalleryItem, subtitle: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Link URL</label>
+                                            <input
+                                                type="text"
+                                                placeholder="/shop/summer"
+                                                value={newGalleryItem.link}
+                                                onChange={(e) => setNewGalleryItem({ ...newGalleryItem, link: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end pt-4">
+                                            <button
+                                                onClick={handleAddGalleryItem}
+                                                className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10 w-full"
+                                            >
+                                                Add Item
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                {galleryItems.map(item => (
+                                    <div key={item.id} className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+                                        {item.imageUrl?.match(/\.(mp4|webm)$/i) ? (
+                                            <video src={item.imageUrl} className="w-full h-full object-cover" muted loop onMouseOver={e => e.currentTarget.play()} onMouseOut={e => e.currentTarget.pause()} />
+                                        ) : (
+                                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        )}
+                                        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                            <p className="text-white text-sm font-serif">{item.title}</p>
+                                            <p className="text-brand-gold text-[9px] uppercase tracking-widest mb-3">{item.subtitle}</p>
+                                            <button onClick={() => handleDeleteGalleryItem(item.id)} className="bg-white/10 backdrop-blur-md text-white p-2 rounded-full hover:bg-red-500 transition-colors border border-white/20 self-end">
+                                                <PiTrash size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {galleryItems.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No gallery items (Motion Gallery is hidden)</div>}
+                            </div>
+                        </div>
+                    )}
+
                     {/* OFFERS SECTION */}
                     {activeSection === 'offers' && (
                         <div className="space-y-10">
-                            {/* ... Content remains same but fixing the double if ... */}
-                            {/* (I will just replace the whole section to be safe and clean) */}
                             <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
                                 <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center gap-2">
                                     <PiPlus className="text-brand-gold" /> Create New Offer
