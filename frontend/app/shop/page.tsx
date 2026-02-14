@@ -21,6 +21,7 @@ interface Product {
     };
     category?: string;
     tags?: string[];
+    createdAt?: string;
 }
 
 import { Suspense } from 'react';
@@ -32,8 +33,9 @@ function ShopContent() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [sortBy, setSortBy] = useState('featured');
-    const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory] : []);
+    const [sortBy, setSortBy] = useState('newest'); // Default to Newest
+    const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory.toLowerCase()] : []);
+    const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile Filter State
 
     useEffect(() => {
@@ -57,7 +59,7 @@ function ShopContent() {
     useEffect(() => {
         const cat = searchParams.get('category');
         if (cat) {
-            setSelectedCategories([cat]);
+            setSelectedCategories([cat.toLowerCase()]);
         }
     }, [searchParams]);
 
@@ -75,10 +77,19 @@ function ShopContent() {
     });
 
     const toggleCategory = (category: string) => {
+        const lowerCat = category.toLowerCase();
         setSelectedCategories(prev =>
-            prev.includes(category)
-                ? prev.filter(c => c !== category)
-                : [...prev, category]
+            prev.includes(lowerCat)
+                ? prev.filter(c => c !== lowerCat)
+                : [...prev, lowerCat]
+        );
+    };
+
+    const toggleMetal = (metal: string) => {
+        setSelectedMetals(prev =>
+            prev.includes(metal)
+                ? prev.filter(m => m !== metal)
+                : [...prev, metal]
         );
     };
 
@@ -86,13 +97,24 @@ function ShopContent() {
     const filteredAndSortedProducts = useMemo(() => {
         let result = [...products];
 
-        // Filter by Category
         if (selectedCategories.length > 0) {
             result = result.filter(p =>
                 p.category && selectedCategories.some(cat =>
-                    p.category?.toLowerCase().includes(cat.toLowerCase())
+                    p.category?.toLowerCase() === cat // Exact match for reliable filtering
                 )
             );
+        }
+
+        // Filter by Metal (Gold Purity or Tags for Platinum)
+        if (selectedMetals.length > 0) {
+            result = result.filter(p => {
+                return selectedMetals.some(metal => {
+                    if (metal === '18K Gold') return p.goldPurity === 18;
+                    if (metal === '22K Gold') return p.goldPurity === 22;
+                    if (metal === 'Platinum') return p.tags?.some(t => t.toLowerCase().includes('platinum')) || p.name.toLowerCase().includes('platinum');
+                    return false;
+                });
+            });
         }
 
         // Filter by Tag (from URL)
@@ -132,12 +154,15 @@ function ShopContent() {
                 return priceA - priceB;
             } else if (sortBy === 'price-high') {
                 return priceB - priceA;
+            } else if (sortBy === 'newest') {
+                // Sort by createdAt desc
+                return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
             }
-            return 0; // Default: Featured (Original Order)
+            return 0; // Default
         });
 
         return result;
-    }, [products, selectedCategories, sortBy, searchParams]);
+    }, [products, selectedCategories, selectedMetals, sortBy, searchParams]);
 
     return (
         <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">
@@ -167,7 +192,7 @@ function ShopContent() {
             {/* Mobile Category Scroll (Visible only on mobile/tablet) */}
             <div className="md:hidden mb-8 px-6 overflow-x-auto scrollbar-hide">
                 <div className="flex space-x-3">
-                    {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
+                    {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
                         <button
                             key={cat}
                             onClick={() => toggleCategory(cat)}
@@ -196,9 +221,9 @@ function ShopContent() {
                                 Category
                             </h3>
                             <ul className="space-y-4">
-                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
+                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
                                     <li key={cat}>
-                                        <label className="group flex items-center cursor-pointer">
+                                        <label className="group flex items-center cursor-pointer" onClick={() => toggleCategory(cat)}>
                                             <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedCategories.includes(cat.toLowerCase()) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
                                                 {selectedCategories.includes(cat.toLowerCase()) && (
                                                     <svg className="w-2.5 h-2.5 text-brand-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -223,9 +248,17 @@ function ShopContent() {
                             <ul className="space-y-4">
                                 {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
                                     <li key={metal}>
-                                        <label className="group flex items-center cursor-pointer">
-                                            <div className="w-4 h-4 border border-gray-300 mr-3 group-hover:border-brand-gold transition-colors"></div>
-                                            <span className="text-xs uppercase tracking-widest text-gray-500 group-hover:text-brand-navy transition-colors">{metal}</span>
+                                        <label className="group flex items-center cursor-pointer" onClick={() => toggleMetal(metal)}>
+                                            <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedMetals.includes(metal) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
+                                                {selectedMetals.includes(metal) && (
+                                                    <svg className="w-2.5 h-2.5 text-brand-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <span className={`text-xs uppercase tracking-widest transition-colors duration-300 ${selectedMetals.includes(metal) ? 'text-brand-navy font-bold' : 'text-gray-500 group-hover:text-brand-navy'}`}>
+                                                {metal}
+                                            </span>
                                         </label>
                                     </li>
                                 ))}
@@ -262,6 +295,7 @@ function ShopContent() {
                                             className="appearance-none bg-white border border-gray-200 px-4 py-2 pr-8 text-xs uppercase tracking-wider text-gray-600 focus:outline-none focus:border-brand-gold cursor-pointer min-w-[150px]"
                                         >
                                             <option value="featured">Featured</option>
+                                            <option value="newest">Newest Arrivals</option>
                                             <option value="price-low">Price: Low to High</option>
                                             <option value="price-high">Price: High to Low</option>
                                         </select>
@@ -311,6 +345,7 @@ function ShopContent() {
                             className="bg-transparent text-xs font-bold uppercase tracking-widest focus:outline-none appearance-none pr-4"
                         >
                             <option value="featured" className="text-black">Sort: Featured</option>
+                            <option value="newest" className="text-black">Sort: Newest</option>
                             <option value="price-low" className="text-black">Price: Low</option>
                             <option value="price-high" className="text-black">Price: High</option>
                         </select>
@@ -333,7 +368,7 @@ function ShopContent() {
                                 <div>
                                     <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Category</h4>
                                     <div className="flex flex-wrap gap-2">
-                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants'].map(cat => (
+                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
                                             <button
                                                 key={cat}
                                                 onClick={() => toggleCategory(cat)}
@@ -353,7 +388,14 @@ function ShopContent() {
                                     <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Metal</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {['18K Gold', '22K Gold', 'Platinum'].map(metal => (
-                                            <button key={metal} className="px-4 py-2 border border-gray-200 rounded-sm text-xs uppercase tracking-wider text-gray-600">
+                                            <button
+                                                key={metal}
+                                                onClick={() => toggleMetal(metal)}
+                                                className={`px-4 py-2 border rounded-sm text-xs uppercase tracking-wider ${selectedMetals.includes(metal)
+                                                    ? 'bg-brand-navy text-white border-brand-navy'
+                                                    : 'bg-white text-gray-600 border-gray-200'
+                                                    }`}
+                                            >
                                                 {metal}
                                             </button>
                                         ))}
