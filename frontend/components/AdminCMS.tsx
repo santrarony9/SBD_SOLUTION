@@ -368,6 +368,110 @@ export default function AdminCMS() {
                         {isLoading && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-gold" />}
                     </div>
 
+                    {/* CATEGORIES SECTION */}
+                    {activeSection === 'categories' && (
+                        <div className="space-y-10">
+                            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center gap-2">
+                                    <PiPlus className="text-brand-gold" /> Add New Category
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Category Image</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Rec: 600x600px
+                                            </span>
+                                        </div>
+
+                                        {!newCategory.imageUrl ? (
+                                            <label className="relative block w-full h-32 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-brand-gold hover:bg-gray-50 transition-all">
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showStatus('Uploading...', 'success');
+                                                            fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                .then(res => {
+                                                                    setNewCategory(prev => ({ ...prev, imageUrl: res.url }));
+                                                                    showStatus('Image Uploaded', 'success');
+                                                                })
+                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiImage className="text-2xl mb-1" />
+                                                    <span className="text-[9px] font-bold">CLICK TO UPLOAD</span>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                                                <img src={newCategory.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                <button
+                                                    onClick={() => setNewCategory(prev => ({ ...prev, imageUrl: '' }))}
+                                                    className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <PiX />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="space-y-4 md:col-span-2">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Category Name</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Diamond Rings"
+                                                value={newCategory.name}
+                                                onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-') })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Slug (Auto-generated)</label>
+                                            <input
+                                                type="text"
+                                                value={newCategory.slug}
+                                                readOnly
+                                                className="w-full border-b border-gray-200 py-2 text-sm text-gray-400 outline-none bg-transparent font-mono"
+                                            />
+                                        </div>
+                                        <div className="flex justify-end pt-2">
+                                            <button
+                                                onClick={handleAddCategory}
+                                                className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                            >
+                                                Add Category
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                                {categories.map(cat => (
+                                    <div key={cat.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+                                        <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                                            <p className="text-white text-sm font-serif font-bold">{cat.name}</p>
+                                            <p className="text-brand-gold text-[9px] font-mono tracking-widest mb-3">{cat.slug}</p>
+                                            <button onClick={() => handleDeleteCategory(cat.id)} className="bg-white/10 backdrop-blur-md text-white p-2 rounded-full hover:bg-red-500 transition-colors border border-white/20 self-end">
+                                                <PiTrash size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {categories.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No categories defined</div>}
+                            </div>
+                        </div>
+                    )}
+
                     {/* BANNERS SECTION */}
                     {activeSection === 'banners' && (
                         <div className="space-y-10">

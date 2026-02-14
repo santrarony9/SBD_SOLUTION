@@ -153,6 +153,20 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             return;
         }
 
+        // Validation: Stock Quantity
+        if (!formData.stockCount || parseInt(formData.stockCount) < 0) {
+            alert('Please enter a valid Stock Quantity.');
+            setLoading(false);
+            return;
+        }
+
+        // Validation: IGI Certificate
+        if (!formData.certificatePdf) {
+            alert('Please upload the IGI Certificate.');
+            setLoading(false);
+            return;
+        }
+
         try {
             const payload = {
                 name: formData.name,
@@ -235,6 +249,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         <option value="Earrings">Earrings</option>
                                         <option value="Bangles">Bangles</option>
                                         <option value="Pendants">Pendants</option>
+                                        <option value="Nosepin">Nosepin</option>
                                     </select>
                                     <div className="absolute right-3 top-3.5 pointer-events-none text-gray-400">▼</div>
                                 </div>
@@ -375,7 +390,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
                                 {/* IGI Certificate */}
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] uppercase font-bold text-gray-500">IGI Certification</label>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-500">IGI Certificate <span className="text-red-500">*</span></label>
                                     <div className="relative group">
                                         <input
                                             type="file"
