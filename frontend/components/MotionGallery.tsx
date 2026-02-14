@@ -77,8 +77,7 @@ export default function MotionGallery() {
 
                         return (
                             <motion.div
-                                key={item.id} // Stable Key is CRITICAL for layout animations
-                                layout
+                                key={item.id + '-' + offset} // Force re-mount on position change to avoid layout thrashing
                                 initial={{ opacity: 0, scale: 0.8 }}
                                 animate={{
                                     scale: isActive ? 1.0 : (1 - (absOffset * 0.15)),
@@ -91,6 +90,7 @@ export default function MotionGallery() {
                                         ? '0 20px 50px -10px rgba(212, 175, 55, 0.4)'
                                         : '0 10px 30px -10px rgba(0,0,0,0.3)'
                                 }}
+                                exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                                 transition={{
                                     type: "spring",
                                     stiffness: 80,
