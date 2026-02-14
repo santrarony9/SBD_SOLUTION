@@ -61,7 +61,8 @@ export class OrdersController {
     @UseGuards(JwtAuthGuard)
     @Post(':id/shiprocket')
     async pushToShiprocket(@Param('id') id: string) {
-        return this.ordersService.pushToShiprocket(id);
+        // Logic Updated: This now acts as a "Sync & Ship" trigger
+        return this.ordersService.shipOrder(id);
     }
 
     @UseGuards(JwtAuthGuard)

@@ -11,7 +11,9 @@ interface Order {
     totalAmount: number;
     status: string;
     paymentStatus: string;
+    paymentStatus: string;
     createdAt: string;
+    awbCode?: string; // Added for Shiprocket Tracking
     items: {
         id: string;
         name: string;
@@ -173,6 +175,16 @@ export default function OrderHistoryPage() {
                                     <button className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all">
                                         Download Invoice
                                     </button>
+                                    {order.awbCode && (
+                                        <a
+                                            href={`https://shiprocket.co/tracking/${order.awbCode}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="px-4 py-2 bg-brand-navy text-white text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-brand-gold transition-colors shadow-sm"
+                                        >
+                                            Track Order
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         </div>

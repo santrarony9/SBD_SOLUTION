@@ -13,6 +13,7 @@ interface ProductFormProps {
 }
 
 export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialData }: ProductFormProps) {
+    console.log('AdminAddProduct Rendered - Version 2.0'); // DEBUG: Force Rebuild
     const [formData, setFormData] = useState({
         name: '',
         category: 'Rings',
@@ -27,7 +28,10 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         description: '',
         videoUrl: '',
         certificatePdf: '',
-        coverImage: ''
+        videoUrl: '',
+        certificatePdf: '',
+        coverImage: '',
+        stockCount: '' // Added for Inventory Management
     });
     const [tempImages, setTempImages] = useState<string[]>([]);
     const [isUploading, setIsUploading] = useState(false);
@@ -50,7 +54,9 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 description: initialData.description || '',
                 videoUrl: initialData.videoUrl || '',
                 certificatePdf: initialData.certificatePdf || '',
-                coverImage: initialData.coverImage || ''
+                certificatePdf: initialData.certificatePdf || '',
+                coverImage: initialData.coverImage || '',
+                stockCount: initialData.stockCount?.toString() || '' // Hydrate Stock
             });
             setTempImages(initialData.images || []);
         } else {
@@ -62,7 +68,9 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 description: '',
                 videoUrl: '',
                 certificatePdf: '',
-                coverImage: ''
+                certificatePdf: '',
+                coverImage: '',
+                stockCount: '' // Reset Stock
             });
             setTempImages([]);
         }
@@ -161,7 +169,10 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 images: validImages,
                 videoUrl: formData.videoUrl,
                 certificatePdf: formData.certificatePdf,
-                coverImage: formData.coverImage
+                videoUrl: formData.videoUrl,
+                certificatePdf: formData.certificatePdf,
+                coverImage: formData.coverImage,
+                stockCount: parseInt(formData.stockCount) || 0 // Include stock count in payload
             };
 
             const url = initialData
@@ -260,8 +271,20 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         <option value="16">16K</option>
                                         <option value="18">18K</option>
                                         <option value="22">22K</option>
+                                        <option value="22">22K</option>
                                         <option value="24">24K</option>
                                     </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Stock Qty</label>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm text-brand-navy focus:border-brand-gold outline-none"
+                                        value={formData.stockCount}
+                                        onChange={e => setFormData({ ...formData, stockCount: e.target.value })}
+                                        placeholder="0"
+                                    />
                                 </div>
                                 <div>
                                     <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Gold Wt (g)</label>

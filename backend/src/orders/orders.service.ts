@@ -41,6 +41,17 @@ export class OrdersService {
             throw new BadRequestException('Cart is empty');
         }
 
+        // 1.1 Check Stock Availability
+        for (const item of cart.items) {
+            // Re-fetch product to get latest stock
+            const product = await (this.prisma as any).product.findUnique({ where: { id: item.productId } });
+            if (!product) throw new BadRequestException(`Product ${item.product.name} not found`);
+
+            if (product.stockCount < item.quantity) {
+                throw new BadRequestException(`Insufficient stock for ${product.name}. Available: ${product.stockCount}`);
+            }
+        }
+
         // 2. Calculate Totals (Re-verify)
         const totalAmount = cart.cartTotal;
         const taxRate = 0.03;
@@ -100,6 +111,17 @@ export class OrdersService {
         // 6. Clear Cart
         await this.cartService.clearCart(userId);
 
+        // 7. Deduct Stock
+        for (const item of cart.items) {
+            await this.inventoryService.adjustStock(
+                item.productId,
+                -item.quantity,
+                'SALE',
+                `Order Created: ${order.id}`,
+                userId
+            );
+        }
+
         return { ...order, razorpayOrderId };
     }
 
@@ -114,6 +136,10 @@ export class OrdersService {
         try {
             // Check if already pushed
             if (order.shiprocketOrderId) {
+                // If pushed but no AWB, try to generate AWB (Auto-Ship Flow)
+                if (!order.awbCode) {
+                    return this.shipOrder(orderId);
+                }
                 return { success: true, message: "Order already pushed", shiprocketOrderId: order.shiprocketOrderId };
             }
 
@@ -134,12 +160,53 @@ export class OrdersService {
                         awbCode: shiprocketOrder.awb_code || null
                     }
                 });
+
+                // Auto-trigger AWB generation if configured (Optional, usually manual step for admin)
+                // await this.shipOrder(order.id); 
+
                 return { success: true, shiprocketOrder };
             }
             return { success: false, message: "Shiprocket returned no data" };
         } catch (e) {
             console.error("Shiprocket Service Error:", e.message);
             throw new BadRequestException("Failed to push to Shiprocket: " + e.message);
+        }
+    }
+
+    // New Method: Assign Courier & Generate AWB
+    async shipOrder(orderId: string) {
+        const order = await (this.prisma as any).order.findUnique({ where: { id: orderId } });
+        if (!order || !order.shipmentId) {
+            // Ensure pushed first
+            if (order && !order.shiprocketOrderId) {
+                await this.pushToShiprocket(orderId);
+                // Re-fetch
+                return this.shipOrder(orderId);
+            }
+            throw new BadRequestException("Order not ready for shipping (No Shipment ID).");
+        }
+
+        try {
+            // 1. Generate AWB (Assign Courier)
+            const awbData = await this.shiprocketService.generateAWB(order.shipmentId);
+
+            // 2. Update Order
+            const updatedOrder = await (this.prisma as any).order.update({
+                where: { id: orderId },
+                data: {
+                    awbCode: awbData.awb_code,
+                    status: 'SHIPPED', // Move to SHIPPED
+                    updatedAt: new Date()
+                }
+            });
+
+            // 3. Notify CRM / Email (Future)
+
+            return { success: true, awb: awbData.awb_code, trackingUrl: this.shiprocketService.getTrackingUrl(awbData.awb_code) };
+
+        } catch (e) {
+            console.error("Shipping Failed:", e.message);
+            throw new BadRequestException("Failed to ship order: " + e.message);
         }
     }
 

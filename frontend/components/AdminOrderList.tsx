@@ -103,16 +103,21 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
         }
     };
 
-    const handleShiprocketPush = async (id: string) => {
+    const handleShipOrder = async (id: string) => {
         setPushingId(id);
         try {
-            await fetchAPI(`/orders/${id}/shiprocket`, { method: 'POST' });
-            // Ideally check response for success, but refresh will show updated state if successful
-            await loadOrders();
-            alert("Order pushed to Shiprocket!");
+            const res = await fetchAPI(`/orders/${id}/shiprocket`, { method: 'POST' });
+            // The backend now returns { success: true, awb: ..., trackingUrl: ... }
+            if (res.success || res.awb) {
+                alert(`Order Shipped! AWB: ${res.awb || res.shiprocketOrder?.awb_code}`);
+                await loadOrders();
+            } else {
+                alert("Shipment initiated but no AWB returned yet. Check status.");
+                await loadOrders();
+            }
         } catch (error) {
-            console.error("Shiprocket push failed", error);
-            alert("Failed to push to Shiprocket. Check console/logs.");
+            console.error("Ship order failed", error);
+            alert("Failed to ship order. Check console/logs.");
         } finally {
             setPushingId(null);
         }
@@ -350,13 +355,13 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                             </div>
                                         ) : (
                                             <button
-                                                onClick={() => handleShiprocketPush(order.id)}
+                                                onClick={() => handleShipOrder(order.id)}
                                                 disabled={pushingId === order.id}
-                                                className="flex items-center gap-1.5 text-brand-navy bg-gray-100 hover:bg-brand-gold hover:text-white px-2 py-1 rounded-md transition-all disabled:opacity-50"
+                                                className="flex items-center gap-1.5 text-white bg-brand-navy hover:bg-brand-gold px-3 py-1.5 rounded-md transition-all disabled:opacity-50 shadow-sm"
                                             >
                                                 <PiRocket className={`w-3.5 h-3.5 ${pushingId === order.id ? 'animate-bounce' : ''}`} />
                                                 <span className="text-[10px] font-bold uppercase tracking-widest">
-                                                    {pushingId === order.id ? 'Pushing...' : 'Push to SR'}
+                                                    {pushingId === order.id ? 'Shipping...' : 'Ship Order'}
                                                 </span>
                                             </button>
                                         )}

@@ -20,6 +20,7 @@ interface Product {
     category?: string;
     sku?: string;
     slug?: string;
+    stockCount?: number; // Added stockCount property
 }
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
@@ -160,6 +161,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                             <th className="px-6 py-5 whitespace-nowrap">Product</th>
                             <th className="px-6 py-5 whitespace-nowrap">SKU / ID</th>
                             <th className="px-6 py-5 whitespace-nowrap">Price</th>
+                            <th className="px-6 py-5 whitespace-nowrap">Stock</th>
                             <th className="px-6 py-5 whitespace-nowrap">Category</th>
                             <th className="px-6 py-5 whitespace-nowrap">Specs</th>
                             <th className="px-6 py-5 text-right whitespace-nowrap">Actions</th>
@@ -193,6 +195,14 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                 </td>
                                 <td className="px-6 py-4 font-serif text-brand-navy whitespace-nowrap">
                                     ₹{formatPrice(product.pricing?.finalPrice) ?? 'N/A'}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap">
+                                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${(product.stockCount || 0) === 0 ? 'bg-red-100 text-red-600' :
+                                        (product.stockCount || 0) <= 3 ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-green-100 text-green-700'
+                                        }`}>
+                                        {(product.stockCount || 0) === 0 ? 'Out of Stock' : `${product.stockCount} Units`}
+                                    </span>
                                 </td>
                                 <td className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider whitespace-nowrap">
                                     {product.category || '-'}

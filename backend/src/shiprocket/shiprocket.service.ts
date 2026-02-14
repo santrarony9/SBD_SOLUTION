@@ -104,9 +104,43 @@ export class ShiprocketService {
         }
     }
 
+    async generateAWB(shipmentId: string) {
+        const token = await this.login();
+        try {
+            const response = await axios.post('https://apiv2.shiprocket.in/v1/external/courier/assign/awb', {
+                shipment_id: shipmentId,
+                // courier_id: optional, if not sent, Shiprocket auto-assigns best
+            }, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            this.logger.log(`Shiprocket AWB Generated: ${response.data.response.data.awb_code}`);
+            return response.data.response.data; // contains awb_code, courier_company_id, etc.
+        } catch (error) {
+            this.logger.error('Shiprocket AWB Generation Failed', error.response?.data || error.message);
+            throw new Error('Failed to generate AWB');
+        }
+    }
+
     async generateLabel(shipmentId: string) {
-        // Implementation for later
-        return null;
+        const token = await this.login();
+        try {
+            const response = await axios.post('https://apiv2.shiprocket.in/v1/external/courier/generate/label', {
+                shipment_id: [shipmentId]
+            }, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            this.logger.log(`Shiprocket Label Generated for ${shipmentId}`);
+            return response.data; // contains label_url
+        } catch (error) {
+            this.logger.error('Shiprocket Label Generation Failed', error.response?.data || error.message);
+            return null;
+        }
+    }
+
+    getTrackingUrl(awbCode: string) {
+        return `https://shiprocket.co/tracking/${awbCode}`;
     }
 
     async testAuth() {
