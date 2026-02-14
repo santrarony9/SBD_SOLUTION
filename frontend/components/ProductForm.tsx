@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { PiUploadSimple, PiX } from 'react-icons/pi';
 
 interface ProductFormProps {
     onSuccess?: () => void;
@@ -20,6 +21,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
         diamondClarity: 'SI1',
     });
     const [isLoading, setIsLoading] = useState(false);
+    const [isUploading, setIsUploading] = useState(false);
     const [message, setMessage] = useState('');
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -28,6 +30,36 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
             ...prev,
             [name]: name === 'goldWeight' || name === 'diamondWeight' || name === 'goldPurity' ? Number(value) : value
         }));
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setIsUploading(true);
+        const uploadData = new FormData();
+        uploadData.append('file', file);
+
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/media/upload`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: uploadData
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+
+            const data = await res.json();
+            setFormData(prev => ({ ...prev, coverImage: data.url }));
+        } catch (error) {
+            console.error("Upload error:", error);
+            setMessage("Failed to upload image");
+        } finally {
+            setIsUploading(false);
+        }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -88,8 +120,35 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
                     <label className={labelClasses}>Image URLs (comma separated)</label>
                 </div>
                 <div className="relative z-0 w-full group">
-                    <input name="coverImage" value={formData.coverImage} onChange={handleChange} className={inputClasses} placeholder=" " />
-                    <label className={labelClasses}>Cover Image URL (Hover Effect)</label>
+                    <label className="text-xs text-gray-500 uppercase tracking-widest block mb-2">Cover Image (Hover Effect)</label>
+
+                    {!formData.coverImage ? (
+                        <div className="relative border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-brand-gold transition-colors text-center">
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                disabled={isUploading}
+                            />
+                            <div className="flex flex-col items-center justify-center text-gray-400">
+                                <PiUploadSimple className={`w-8 h-8 mb-2 ${isUploading ? 'animate-bounce' : ''}`} />
+                                <span className="text-xs uppercase tracking-widest">{isUploading ? 'Uploading...' : 'Click to Upload'}</span>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="relative w-full aspect-square md:aspect-video bg-gray-50 rounded-lg overflow-hidden border border-brand-gold/20 group">
+                            <img src={formData.coverImage} alt="Cover Preview" className="w-full h-full object-contain" />
+                            <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, coverImage: '' }))}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full shadow-md hover:bg-red-600 transition-colors"
+                                title="Remove Image"
+                            >
+                                <PiX />
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
 
