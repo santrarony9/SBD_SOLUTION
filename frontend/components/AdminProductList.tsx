@@ -211,7 +211,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                     <span className="block">{product.goldPurity}K Gold <span className="text-gray-300">|</span> {product.goldWeight}g</span>
                                     <span className="block text-brand-gold">{product.diamondCarat}ct <span className="text-gray-300">|</span> {(product as any).diamondClarity}</span>
                                 </td>
-                                <td className="px-6 py-4 text-right whitespace-nowrap">
+                                <td className="px-6 py-4 whitespace-nowrap text-right sticky right-0 bg-white shadow-[-4px_0_8px_-4px_rgba(0,0,0,0.1)]">
                                     <div className="flex justify-end gap-2">
                                         <button
                                             onClick={() => onEdit && onEdit(product)}

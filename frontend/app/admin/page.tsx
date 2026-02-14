@@ -377,35 +377,37 @@ export default function AdminDashboard() {
                         </div>
                     )}
 
-                    <div className="max-w-5xl">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="font-serif text-2xl text-brand-navy">Product Management</h3>
-                            <button
-                                className="text-sm text-brand-gold hover:underline font-bold uppercase tracking-wider"
-                                onClick={() => {
-                                    setEditingProduct(null);
+                    {activeTab === 'products' && (
+                        <div className="max-w-5xl">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="font-serif text-2xl text-brand-navy">Product Management</h3>
+                                <button
+                                    className="text-sm text-brand-gold hover:underline font-bold uppercase tracking-wider"
+                                    onClick={() => {
+                                        setEditingProduct(null);
+                                        setIsProductModalOpen(true);
+                                    }}
+                                >
+                                    + Add New
+                                </button>
+                            </div>
+
+                            <AdminAddProduct
+                                isOpen={isProductModalOpen}
+                                onClose={() => setIsProductModalOpen(false)}
+                                onSuccess={() => setRefreshTrigger(prev => prev + 1)}
+                                initialData={editingProduct}
+                            />
+
+                            <AdminProductList
+                                refreshTrigger={refreshTrigger}
+                                onEdit={(product) => {
+                                    setEditingProduct(product);
                                     setIsProductModalOpen(true);
                                 }}
-                            >
-                                + Add New
-                            </button>
+                            />
                         </div>
-
-                        <AdminAddProduct
-                            isOpen={isProductModalOpen}
-                            onClose={() => setIsProductModalOpen(false)}
-                            onSuccess={() => setRefreshTrigger(prev => prev + 1)}
-                            initialData={editingProduct}
-                        />
-
-                        <AdminProductList
-                            refreshTrigger={refreshTrigger}
-                            onEdit={(product) => {
-                                setEditingProduct(product);
-                                setIsProductModalOpen(true);
-                            }}
-                        />
-                    </div>
+                    )}
 
                     {activeTab === 'orders' && (
                         <div className="max-w-6xl">
