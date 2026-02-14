@@ -13,6 +13,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
         slug: '',
         description: '',
         images: '',
+        coverImage: '',
         goldPurity: 22,
         goldWeight: 0,
         diamondWeight: 0,
@@ -45,7 +46,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
             });
             setMessage('Product created successfully!');
             setFormData({
-                name: '', slug: '', description: '', images: '',
+                name: '', slug: '', description: '', images: '', coverImage: '',
                 goldPurity: 22, goldWeight: 0, diamondWeight: 0, diamondClarity: 'SI1'
             });
             if (onSuccess) onSuccess();
@@ -81,9 +82,15 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
                 <label className={labelClasses}>Description</label>
             </div>
 
-            <div className="relative z-0 w-full group">
-                <input name="images" value={formData.images} onChange={handleChange} className={inputClasses} placeholder=" " />
-                <label className={labelClasses}>Image URLs (comma separated)</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="relative z-0 w-full group">
+                    <input name="images" value={formData.images} onChange={handleChange} className={inputClasses} placeholder=" " />
+                    <label className={labelClasses}>Image URLs (comma separated)</label>
+                </div>
+                <div className="relative z-0 w-full group">
+                    <input name="coverImage" value={formData.coverImage} onChange={handleChange} className={inputClasses} placeholder=" " />
+                    <label className={labelClasses}>Cover Image URL (Hover Effect)</label>
+                </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4">

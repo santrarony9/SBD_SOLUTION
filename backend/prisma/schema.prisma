@@ -181,6 +181,7 @@ model Product {
   // Media
   images      String[] // Support gallery
   videoUrl    String?  // Support product videos
+  coverImage  String?  // Hover/Cover image
   hsnCode     String?  @default("7113") // Default HSN for Gold Jewellery
   gstRate     Float?   @default(3.0)    // Default 3% for Precious items
   realWeight  Float?   // Actual weight in grams

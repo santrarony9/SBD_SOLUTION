@@ -14,6 +14,7 @@ interface ProductProps {
     image: string | null;
     category?: string;
     images?: string[];
+    coverImage?: string;
     goldPurity?: number;
     goldWeight?: number;
     diamondCarat?: number;
@@ -40,9 +41,20 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     src={displayImage}
                     alt={product.name}
                     fill
-                    className="object-contain p-4 transition-transform duration-700 ease-out group-hover:scale-105 multiply-blend-mode"
+                    className="object-contain p-4 transition-opacity duration-700 ease-out group-hover:opacity-0"
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                 />
+
+                {/* Cover Image (Reveals on Hover) */}
+                {(product.coverImage || (product.images && product.images[1])) && (
+                    <Image
+                        src={product.coverImage || product.images![1]}
+                        alt={product.name + " cover"}
+                        fill
+                        className="object-contain p-4 absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-out"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                    />
+                )}
 
                 {/* Overlay (Subtle Gradient) */}
                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-all duration-500" />
