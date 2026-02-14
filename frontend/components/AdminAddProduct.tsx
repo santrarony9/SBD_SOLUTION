@@ -379,6 +379,33 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                 </div>
                             </div>
 
+                            {/* Cover Image Upload (New Row) */}
+                            <div className="space-y-2 pt-4 border-t border-gray-200">
+                                <label className="block text-[10px] uppercase font-bold text-gray-500">Cover Image (Hover Effect)</label>
+                                <div className="relative group max-w-md">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                        onChange={(e) => handleMediaUpload(e.target.files?.[0], 'cover')}
+                                    />
+                                    <div className="border-2 border-dashed border-gray-300 bg-white rounded-lg p-4 text-center group-hover:border-brand-gold transition-colors h-32 flex flex-col items-center justify-center">
+                                        {formData.coverImage ? (
+                                            <div className="relative w-full h-full bg-gray-100 rounded overflow-hidden group/preview">
+                                                <img src={formData.coverImage} className="w-full h-full object-contain" alt="Cover" />
+                                                <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-xs opacity-0 group-hover/preview:opacity-100 transition-opacity">Change Cover</div>
+                                                <button type="button" onClick={(e) => { e.preventDefault(); setFormData({ ...formData, coverImage: '' }) }} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 z-20">✕</button>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <span className="text-2xl mb-2 text-gray-300 group-hover:text-brand-gold transition-colors">🖼️</span>
+                                                <p className="text-[10px] text-gray-400 font-bold group-hover:text-brand-navy">UPLOAD COVER IMAGE</p>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* Image Gallery */}
                             <div className="space-y-2">
                                 <div className="flex justify-between items-end">
