@@ -29,14 +29,16 @@ export default function MotionGallery() {
         loadItems();
     }, []);
 
+    const [isPaused, setIsPaused] = useState(false);
+
     // Auto-Play
     useEffect(() => {
-        if (galleryItems.length === 0) return;
+        if (galleryItems.length === 0 || isPaused) return;
         const interval = setInterval(() => {
             setActiveIndex((prev) => (prev + 1) % galleryItems.length);
-        }, 3000);
+        }, 5000); // Slowed down to 5 seconds
         return () => clearInterval(interval);
-    }, [galleryItems.length]);
+    }, [galleryItems.length, isPaused]);
 
     const handleNext = () => {
         if (galleryItems.length === 0) return;
@@ -60,6 +62,8 @@ export default function MotionGallery() {
             <div
                 className="relative h-[400px] md:h-[500px] w-full flex items-center justify-center overflow-visible"
                 style={{ perspective: '1000px' }}
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
             >
                 <AnimatePresence initial={false} mode='popLayout'>
                     {[-2, -1, 0, 1, 2].map((offset) => {
