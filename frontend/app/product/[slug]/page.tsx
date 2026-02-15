@@ -189,6 +189,7 @@ export default function ProductDetailPage() {
                                     muted
                                     loop
                                     playsInline
+                                    poster={product.images?.[0] || ''}
                                 />
                                 <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-navy text-[9px] font-bold uppercase px-2 py-1 tracking-[0.2em] shadow-sm">
                                     360° View
@@ -402,7 +403,7 @@ export default function ProductDetailPage() {
 
                         {/* Price Breakup Panel */}
                         <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                            <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50">
+                            <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-20 relative">
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Gold Value</span>
                                     <span>₹{formatPrice(product.pricing?.components?.goldValue)}</span>
