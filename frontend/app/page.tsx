@@ -8,6 +8,7 @@ import InstagramFeed from '@/components/InstagramFeed';
 import HeroSlider from '@/components/HeroSlider';
 import CategoryCarousel from '@/components/CategoryCarousel';
 import MotionGallery from '@/components/MotionGallery';
+import ShopByCategory from '@/components/ShopByCategory';
 
 export const dynamic = 'force-dynamic';
 
@@ -105,6 +106,9 @@ export default async function Home() {
 
       {/* 1. Hero Section (Slider) */}
       <HeroSlider banners={banners} heroText={{ title: heroTitle, subtitle: heroSubtitle }} />
+
+      {/* 1.5 Shop By Category (Palmanos Style) */}
+      <ShopByCategory categories={categories} />
 
       {/* 2. Flash Sale Component (Dynamic) */}
       <FlashSale />
