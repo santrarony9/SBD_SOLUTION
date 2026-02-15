@@ -19,10 +19,8 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
     // Filter out categories without images if preferred, or show placeholder
     // For now, we show all, assuming they have images or we use a gradient fallback.
 
-    // Sort or filter if needed? usually the API returns them in order.
-    // If there are too many, maybe limit to top 4-5 or 8?
-    // Let's show up to 8 for now.
-    const displayCategories = categories.slice(0, 8);
+    // Show all categories dynamically
+    const displayCategories = categories;
 
     if (displayCategories.length === 0) return null;
 
