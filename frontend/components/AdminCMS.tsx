@@ -79,7 +79,7 @@ export default function AdminCMS() {
 
             if (heroTextRes.status === 'fulfilled') {
                 const fetchedHeroText = heroTextRes.value;
-                setHeroText(fetchedHeroText?.value ? JSON.parse(fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
+                setHeroText(fetchedHeroText?.value ? (typeof fetchedHeroText.value === 'string' ? JSON.parse(fetchedHeroText.value) : fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
             }
 
             // Fetch Spotlight separately (fail silently if missing)

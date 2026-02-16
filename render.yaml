@@ -12,4 +12,20 @@ services:
         sync: false
       - key: JWT_SECRET
         sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: SHIPROCKET_EMAIL
+        sync: false
+      - key: SHIPROCKET_PASSWORD
+        sync: false
+      - key: CCAVENUE_MERCHANT_ID
+        sync: false
+      - key: CCAVENUE_ACCESS_CODE
+        sync: false
+      - key: CCAVENUE_WORKING_KEY
+        sync: false
     autoDeploy: true

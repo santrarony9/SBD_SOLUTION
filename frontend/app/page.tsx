@@ -43,7 +43,13 @@ async function getBanners() {
 async function getHeroText() {
   try {
     const setting = await fetchAPI('/store/settings/homepage_hero_text');
-    return setting?.value ? JSON.parse(setting.value) : null;
+    if (!setting?.value) return null;
+    try {
+      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+    } catch (parseError) {
+      console.error("Failed to parse hero text setting", parseError);
+      return null;
+    }
   } catch (e) {
     return null;
   }
