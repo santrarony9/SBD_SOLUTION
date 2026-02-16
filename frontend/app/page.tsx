@@ -170,24 +170,41 @@ export default async function Home() {
         );
       })}
 
-      {/* 5. Shop by Price (New) */}
-      <section className="py-16 bg-brand-cream border-t border-b border-brand-gold/10">
-        <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl font-serif text-brand-navy mb-8 text-center">Shop by Price</h2>
-          <div className="flex flex-wrap justify-center gap-6">
-            {priceRanges && priceRanges.map((range: any) => (
-              <Link key={range.id} href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all border border-transparent hover:border-brand-gold min-w-[200px] text-center">
-                <span className="block text-2xl font-serif text-brand-navy mb-2 group-hover:text-brand-gold transition-colors">{range.label}</span>
-                {range.imageUrl && <img src={range.imageUrl} alt={range.label} className="w-12 h-12 object-contain mx-auto opacity-50 group-hover:opacity-100 transition-opacity" />}
+      {/* 5. Shop by Price (New - Premium Redesign) */}
+      <section className="py-20 bg-brand-cream/30 border-t border-brand-gold/10 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#D4AF37 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+
+        <div className="max-w-7xl mx-auto px-6 relative z-10">
+          <div className="text-center mb-12">
+            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3 animate-fade-in-up">Curated Collections</span>
+            <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Shop by Price</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {priceRanges && priceRanges.map((range: any, idx: number) => (
+              <Link key={range.id} href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-8 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(212,175,55,0.3)] overflow-hidden flex flex-col items-center justify-center min-h-[180px]">
+
+                {/* Hover Background */}
+                <div className="absolute inset-0 bg-brand-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out-expo z-0"></div>
+
+                {/* Content */}
+                <div className="relative z-10 flex flex-col items-center transition-transform duration-500 group-hover:scale-105">
+                  <span className="block text-2xl md:text-3xl font-serif text-brand-navy group-hover:text-white transition-colors duration-500 mb-2">{range.label}</span>
+                  <span className="text-[10px] uppercase tracking-widest text-brand-gold font-bold opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-500 delay-100">Explore Collection</span>
+                </div>
+
+                {/* Corner Accents */}
+                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </Link>
             ))}
             {(!priceRanges || priceRanges.length === 0) && (
               <>
-                {/* Placeholders if no price ranges found */}
+                {/* Premium Placeholders */}
                 {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="group bg-gray-50 p-6 rounded-xl border border-dashed border-gray-200 min-w-[200px] text-center opacity-70">
-                    <span className="block text-xl font-serif text-gray-400 mb-2">Coming Soon</span>
-                    <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto" />
+                  <div key={i} className="group relative bg-white/50 p-8 border border-dashed border-brand-gold/30 flex flex-col items-center justify-center min-h-[180px] opacity-60">
+                    <span className="block text-xl font-serif text-gray-400 mb-2 font-light italic">Coming Soon</span>
                   </div>
                 ))}
               </>
