@@ -104,8 +104,8 @@ export default async function Home() {
 
   const featuredProducts = allProducts.slice(0, 4);
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
-  const heroTitle = heroText?.title || "Elegance is Eternal";
-  const heroSubtitle = heroText?.subtitle || "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
+  const heroTitle = heroText?.title ?? "Elegance is Eternal";
+  const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
 
   return (
     <div className="bg-brand-cream font-sans overflow-x-hidden">
