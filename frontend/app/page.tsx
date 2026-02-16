@@ -181,7 +181,17 @@ export default async function Home() {
                 {range.imageUrl && <img src={range.imageUrl} alt={range.label} className="w-12 h-12 object-contain mx-auto opacity-50 group-hover:opacity-100 transition-opacity" />}
               </Link>
             ))}
-            {(!priceRanges || priceRanges.length === 0) && <p className="text-gray-400">Price ranges not configured.</p>}
+            {(!priceRanges || priceRanges.length === 0) && (
+              <>
+                {/* Placeholders if no price ranges found */}
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="group bg-gray-50 p-6 rounded-xl border border-dashed border-gray-200 min-w-[200px] text-center opacity-70">
+                    <span className="block text-xl font-serif text-gray-400 mb-2">Coming Soon</span>
+                    <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto" />
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         </div>
       </section>

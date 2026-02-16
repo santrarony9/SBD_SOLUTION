@@ -50,7 +50,23 @@ export default function MotionGallery() {
         setActiveIndex((prev) => (prev - 1 + galleryItems.length) % galleryItems.length);
     };
 
-    if (galleryItems.length === 0) return null;
+    // if (galleryItems.length === 0) return null; // Old behavior: Hide if empty
+
+    // New behavior: Show placeholder if empty
+    if (galleryItems.length === 0) {
+        return (
+            <section className="py-24 bg-white relative">
+                <div className="text-center mb-16 px-4">
+                    <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3 animate-fade-in-up">Curated For You</span>
+                    <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
+                </div>
+                <div className="flex flex-col items-center justify-center h-[300px] border border-dashed border-gray-200 mx-6 rounded-2xl bg-gray-50">
+                    <p className="text-brand-navy font-serif text-xl mb-2">Curated Collection Coming Soon</p>
+                    <p className="text-gray-500 text-sm">Stay tuned for our exclusive motion gallery.</p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="py-24 bg-white relative">
