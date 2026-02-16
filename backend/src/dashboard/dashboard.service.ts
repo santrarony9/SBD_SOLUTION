@@ -13,13 +13,21 @@ export class DashboardService {
     async getStats() {
         const totalRevenueResult = await this.prisma.order.aggregate({
             _sum: { totalAmount: true },
-            where: { status: { not: 'CANCELLED' } }
+            where: {
+                status: { not: 'CANCELLED' },
+                paymentStatus: 'PAID' // Only count paid orders
+            }
         });
         const totalRevenue = totalRevenueResult._sum.totalAmount || 0;
 
-        const totalOrders = await this.prisma.order.count();
+        const totalOrders = await this.prisma.order.count({
+            where: {
+                status: { not: 'CANCELLED' },
+                paymentStatus: 'PAID'
+            }
+        });
         const totalProducts = await this.prisma.product.count();
-        const totalCustomers = await this.prisma.user.count({ where: { role: Role.USER } });
+        const totalCustomers = await this.prisma.user.count({ where: { role: 'USER' } });
 
         const recentOrders = await this.prisma.order.findMany({
             take: 5,
@@ -29,7 +37,10 @@ export class DashboardService {
 
         const allOrders = await this.prisma.order.findMany({
             select: { createdAt: true, totalAmount: true },
-            where: { status: { not: 'CANCELLED' } }
+            where: {
+                status: { not: 'CANCELLED' },
+                paymentStatus: 'PAID'
+            }
         });
 
         const monthlySalesMap = new Map<string, number>();
