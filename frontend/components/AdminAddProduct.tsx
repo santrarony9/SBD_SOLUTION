@@ -160,12 +160,12 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             return;
         }
 
-        // Validation: IGI Certificate
-        if (!formData.certificatePdf) {
-            alert('Please upload the IGI Certificate.');
-            setLoading(false);
-            return;
-        }
+        // Validation: IGI Certificate - REMOVED as per user request
+        // if (!formData.certificatePdf) {
+        //     alert('Please upload the IGI Certificate.');
+        //     setLoading(false);
+        //     return;
+        // }
 
         try {
             const payload = {
@@ -390,7 +390,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
                                 {/* IGI Certificate */}
                                 <div className="space-y-2">
-                                    <label className="block text-[10px] uppercase font-bold text-gray-500">IGI Certificate <span className="text-red-500">*</span></label>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-500">IGI Certificate (Optional)</label>
                                     <div className="relative group">
                                         <input
                                             type="file"
