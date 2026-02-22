@@ -70,40 +70,40 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     )}
                 </motion.div>
 
-                {/* Quick Action Overlay - Subtle wash on hover */}
-                <div className="absolute inset-0 bg-brand-navy/0 group-hover:bg-brand-navy/[0.02] transition-all duration-500" />
+                {/* Quick Action Overlay - Removed the dark wash to prevent "melting" */}
+                <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300" />
 
                 <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
                     <button
                         onClick={handleAddToCart}
-                        className="w-full bg-brand-navy/90 text-brand-gold py-3.5 text-[10px] uppercase font-bold tracking-[0.2em] hover:bg-brand-navy hover:text-white transition-all flex items-center justify-center gap-2 backdrop-blur-md"
+                        className="w-full bg-brand-navy text-white py-2.5 text-[9px] uppercase font-black tracking-[0.25em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
                     >
-                        <PiBasket className="w-4 h-4" />
+                        <PiBasket className="w-3.5 h-3.5" />
                         Quick Add
                     </button>
                 </div>
             </Link>
 
             {/* Product Details */}
-            <div className="pt-4 pb-4 px-3 text-center flex-grow flex flex-col justify-between relative bg-white">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-[1px] bg-brand-gold/10"></div>
+            <div className="pt-3.5 pb-4 px-3 text-center flex-grow flex flex-col justify-between relative bg-white">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-10 h-[1px] bg-brand-gold/15"></div>
 
                 <div>
-                    <p className="text-[9px] uppercase tracking-[0.3em] text-brand-gold/70 mb-1.5 font-black">
+                    <p className="text-[8px] uppercase tracking-[0.4em] text-brand-gold mb-1 font-black">
                         {product.category || 'Jewellery'}
                     </p>
 
                     <Link href={`/product/${product.slug}`}>
-                        <h3 className="text-sm md:text-base font-serif text-brand-navy mb-1.5 group-hover:text-brand-gold transition-colors duration-300 leading-tight px-1 line-clamp-2 min-h-[2.4rem]">
+                        <h3 className="text-sm md:text-base font-serif text-brand-navy mb-1 group-hover:text-brand-gold transition-colors duration-300 leading-tight px-1 line-clamp-2 min-h-[2.4rem]">
                             {product.name}
                         </h3>
                     </Link>
 
-                    <div className="flex justify-center items-center gap-3 text-[9px] uppercase tracking-[0.15em] text-gray-400 mb-2 font-bold opacity-60">
+                    <div className="flex justify-center items-center gap-2.5 text-[8.5px] uppercase tracking-[0.1em] text-gray-400 mb-1.5 font-bold opacity-70">
                         {product.goldPurity && <span>{product.goldPurity}K Gold</span>}
                         {product.diamondCarat && (
                             <>
-                                <span className="w-1 h-1 rounded-full bg-brand-gold/30"></span>
+                                <span className="w-0.5 h-0.5 rounded-full bg-brand-gold/40"></span>
                                 <span>{product.diamondCarat.toFixed(2)}ct Diamond</span>
                             </>
                         )}
@@ -114,7 +114,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     <span className="text-base font-bold font-sans text-brand-navy tracking-tight">
                         ₹{formatPrice(product.price || (product as any).pricing?.finalPrice || 0)}
                     </span>
-                    <div className="w-0 group-hover:w-12 h-[1px] bg-brand-gold/40 transition-all duration-700 mt-1"></div>
+                    <div className="w-0 group-hover:w-10 h-[1px] bg-brand-gold/50 transition-all duration-500 mt-0.5"></div>
                 </div>
             </div>
         </motion.div>
