@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function AddressBook() {
     const { user, login } = useAuth();
+    const { showToast } = useToast();
     const [isAdding, setIsAdding] = useState(false);
     const [formData, setFormData] = useState({
         fullName: '',
@@ -30,8 +32,9 @@ export default function AddressBook() {
             login(localStorage.getItem('token') || '', updatedUser);
             setIsAdding(false);
             setFormData({ fullName: '', street: '', city: '', state: '', zip: '', country: 'India', phone: '' });
+            showToast('Residency Added', 'success');
         } catch (error) {
-            alert('Faced an era in adding residency.');
+            showToast('Failed to add residency', 'error');
         } finally {
             setLoading(false);
         }
@@ -44,8 +47,9 @@ export default function AddressBook() {
                 method: 'DELETE'
             });
             login(localStorage.getItem('token') || '', updatedUser);
+            showToast('Residency Removed', 'success');
         } catch (error) {
-            alert('Failed to remove.');
+            showToast('Failed to remove residency', 'error');
         }
     };
 

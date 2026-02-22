@@ -15,7 +15,18 @@ export default function Footer() {
                     </p>
                     <div className="flex gap-4">
                         {[PiInstagramLogo, PiFacebookLogo, PiYoutubeLogo, PiPinterestLogo].map((Icon, i) => (
-                            <a key={i} href="#" className="text-white hover:text-brand-gold transition-colors">
+                            <a
+                                key={i}
+                                href={[
+                                    "https://instagram.com/sparkbluediamond",
+                                    "https://facebook.com/sparkbluediamond",
+                                    "https://youtube.com/@sparkbluediamond",
+                                    "https://pinterest.com/sparkbluediamond"
+                                ][i]}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-white hover:text-brand-gold transition-colors"
+                            >
                                 <Icon className="w-5 h-5" />
                             </a>
                         ))}

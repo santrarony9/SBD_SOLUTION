@@ -41,7 +41,6 @@ function ShopContent() {
     useEffect(() => {
         async function loadProducts() {
             try {
-                console.log('🛒 Fetching products from:', process.env.NEXT_PUBLIC_API_URL);
                 const data = await fetchAPI('/products');
                 setProducts(data);
             } catch (err) {

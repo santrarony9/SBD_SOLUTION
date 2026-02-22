@@ -90,7 +90,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                 </div>
 
                 {/* Main Hero Text (Static Global Setting) */}
-                <h1 className="text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl">
+                <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl">
                     {heroText.title.includes('Eternal') ? (
                         <>
                             {heroText.title.split('Eternal')[0]}

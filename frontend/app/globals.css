@@ -128,3 +128,53 @@ html {
 .animate-delay-500 {
   animation-delay: 500ms;
 }
+
+/* Responsive Typography */
+.fluid-h1 {
+  font-size: clamp(2rem, 8vw, 5rem);
+  line-height: 1.1;
+}
+
+.fluid-h2 {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  line-height: 1.2;
+}
+
+.fluid-h3 {
+  font-size: clamp(1.25rem, 4vw, 2rem);
+}
+
+.fluid-h4 {
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+}
+
+/* Layout Utilities */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@layer utilities {
+  .mobile-only {
+    @apply md:hidden;
+  }
+  .desktop-only {
+    @apply hidden md:block;
+  }
+}
+
+/* Premium Button Hover for Mobile (Active state) */
+@media (max-width: 768px) {
+  .btn-premium:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+  }
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #C6A87C 0%, #F0E6D2 50%, #C6A87C 100%);
+}

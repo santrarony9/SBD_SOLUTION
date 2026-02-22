@@ -5,6 +5,7 @@ import { fetchAPI } from '@/lib/api';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
 import { PiLink, PiCopy } from "react-icons/pi";
+import { useToast } from '@/context/ToastContext';
 
 interface Product {
     id: string;
@@ -24,6 +25,7 @@ interface Product {
 }
 
 export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTrigger: number, onEdit?: (product: any) => void }) {
+    const { showToast } = useToast();
     const [products, setProducts] = useState<Product[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -62,8 +64,9 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
         try {
             await fetchAPI(`/products/${id}`, { method: 'DELETE' });
             loadProducts(); // Refresh list
+            showToast('Product Deleted', 'success');
         } catch (error) {
-            alert('Failed to delete product');
+            showToast('Failed to delete product', 'error');
         }
     };
 
@@ -81,7 +84,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
         if (selectedIds.length === 0) return;
         const link = `/shop?ids=${selectedIds.join(',')}`;
         navigator.clipboard.writeText(link);
-        alert(`Bundle Link Copied!\n${link}`);
+        showToast('Bundle Link Copied', 'success');
         setSelectedIds([]);
     };
 

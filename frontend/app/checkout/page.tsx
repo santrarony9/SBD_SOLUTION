@@ -10,10 +10,12 @@ import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle } from 'react-icons/pi';
+import { useToast } from '@/context/ToastContext';
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
     const { user } = useAuth();
+    const { showToast } = useToast();
     const router = useRouter();
 
     const [shippingAddress, setShippingAddress] = useState({
@@ -126,13 +128,10 @@ export default function CheckoutPage() {
                 discountAmount: discountAmount
             };
 
-            console.log("Creating Order:", orderPayload);
             const order = await fetchAPI('/orders', {
                 method: 'POST',
                 body: JSON.stringify(orderPayload)
             });
-
-            console.log("Order Created:", order);
 
             if (order && order.id) {
                 if (paymentMethod === 'CCAVENUE') {
@@ -152,13 +151,10 @@ export default function CheckoutPage() {
                         }
                     };
 
-                    console.log("Initiating Payment:", paymentPayload);
                     const paymentRes = await fetchAPI('/ccavenue/initiate', {
                         method: 'POST',
                         body: JSON.stringify(paymentPayload)
                     });
-
-                    console.log("Payment Response:", paymentRes);
 
                     if (paymentRes.encRequest && paymentRes.access_code && paymentRes.url) {
                         // Create hidden form
@@ -189,15 +185,13 @@ export default function CheckoutPage() {
                         throw new Error('Invalid payment initialization response from server.');
                     }
                 } else {
-                    // Placeholder for other methods
-                    alert("Selected payment method is currently disabled.");
+                    showToast("Payment method disabled", "info");
                     setIsLoading(false);
                 }
             } else {
                 throw new Error("Failed to create order. Please try again.");
             }
         } catch (err: any) {
-            console.error('Checkout Error:', err);
             setError(err.message || 'Payment System Unavailable. Please check your connection.');
             setIsLoading(false);
         }
@@ -216,7 +210,7 @@ export default function CheckoutPage() {
         <section className="bg-brand-cream/30 py-12 min-h-screen">
             <div className="container mx-auto px-4 max-w-6xl">
                 <header className="mb-12 text-center">
-                    <h1 className="text-4xl md:text-5xl font-serif text-brand-navy mb-4">Checkout</h1>
+                    <h1 className="fluid-h2 font-serif text-brand-navy mb-4">Checkout</h1>
                     <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
                         <Link href="/cart" className="text-gray-500 hover:text-brand-gold transition-colors font-medium">Cart</Link>
                         <span>/</span>

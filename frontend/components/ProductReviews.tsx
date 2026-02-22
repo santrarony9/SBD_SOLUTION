@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 interface Review {
     id: string;
@@ -15,6 +16,7 @@ interface Review {
 
 export default function ProductReviews({ productId }: { productId: string }) {
     const [reviews, setReviews] = useState<Review[]>([]);
+    const { showToast } = useToast();
     const [newRating, setNewRating] = useState(5);
     const [newComment, setNewComment] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,9 +43,10 @@ export default function ProductReviews({ productId }: { productId: string }) {
                 body: JSON.stringify({ productId, rating: newRating, comment: newComment }),
             });
             setNewComment('');
-            loadReviews(); // Refresh
+            loadReviews();
+            showToast('Review submitted successfully', 'success');
         } catch (error) {
-            alert('Failed to submit review. Please login first.');
+            showToast('Failed to submit review. Please login first.', 'error');
         } finally {
             setIsSubmitting(false);
         }

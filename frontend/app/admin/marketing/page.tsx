@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 // Sub-components can ideally be split, but for speed we'll keep them here or import if complex.
 // We will tackle the features in groups.
 
 export default function MarketingDashboard() {
+    const { showToast } = useToast();
     const [activeTab, setActiveTab] = useState('content'); // content | engagement | pricing
 
     // Store Settings State
@@ -51,14 +53,14 @@ export default function MarketingDashboard() {
                 if (s.key === 'exit_intent') setExitIntent(s.value);
                 if (s.key === 'spotlight') setSpotlight(s.value);
             });
-        } catch (err) { console.error(err); }
+        } catch (err) { }
     };
 
     const loadBanners = async () => {
         try {
             const data = await fetchAPI('/banners');
             setBanners(data);
-        } catch (err) { console.error(err); }
+        } catch (err) { }
     };
 
     const saveSetting = async (key: string, value: any) => {
@@ -67,8 +69,8 @@ export default function MarketingDashboard() {
                 method: 'POST',
                 body: JSON.stringify({ key, value })
             });
-            alert('Saved successfully!');
-        } catch (err) { alert('Failed to save'); }
+            showToast('Settings Saved', 'success');
+        } catch (err) { showToast('Failed to save settings', 'error'); }
     };
 
     const loadPromos = async () => {
@@ -76,7 +78,6 @@ export default function MarketingDashboard() {
             const data = await fetchAPI('/promos');
             setPromos(data);
         } catch (error) {
-            console.error("Failed to load promos", error);
         } finally {
             setIsLoading(false);
         }
@@ -95,8 +96,9 @@ export default function MarketingDashboard() {
             });
             setNewPromo({ code: '', discountType: 'FLAT', discountValue: '', creatorName: '' });
             loadPromos(); // Refresh list
+            showToast('Promo Code Created', 'success');
         } catch (error) {
-            alert('Failed to create promo code');
+            showToast('Failed to create promo code', 'error');
         } finally {
             setIsCreating(false);
         }
@@ -107,22 +109,23 @@ export default function MarketingDashboard() {
         try {
             await fetchAPI(`/promos/${id}`, { method: 'DELETE' });
             loadPromos();
+            showToast('Promo Deleted', 'success');
         } catch (error) {
-            alert('Failed to delete promo');
+            showToast('Failed to delete promo', 'error');
         }
     };
 
     const handleBroadcast = async () => {
-        if (!broadcastMsg) return alert('Enter message');
+        if (!broadcastMsg) return showToast('Enter message first', 'info');
         try {
             await fetchAPI('/marketing/broadcast', {
                 method: 'POST',
                 body: JSON.stringify({ message: broadcastMsg, segment: 'ALL' })
             });
-            alert('Broadcast initiated via AiSensy!');
+            showToast('Broadcast initiated', 'success');
             setBroadcastMsg('');
         } catch (err) {
-            alert('Failed to send broadcast');
+            showToast('Failed to send broadcast', 'error');
         }
     };
 

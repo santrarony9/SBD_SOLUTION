@@ -3,11 +3,12 @@
 import { useState, useEffect } from 'react';
 import { PiUserPlus, PiShieldCheck, PiEnvelope, PiLockKey } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function AdminTeamManager() {
+    const { showToast } = useToast();
     const [teamMembers, setTeamMembers] = useState<any[]>([]);
     const [newAdmin, setNewAdmin] = useState({ name: '', email: '', password: '', role: 'ADMIN' });
-    const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
     const [error, setError] = useState<string | null>(null);
@@ -36,26 +37,20 @@ export default function AdminTeamManager() {
             if (Array.isArray(data)) {
                 setTeamMembers(data);
             } else {
-                console.error("Unexpected response format:", data);
                 setTeamMembers([]);
             }
         } catch (error: any) {
-            console.error("Failed to load team", error);
             setError(error.message || "Failed to load team members");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const showStatus = (message: string, type: 'success' | 'error') => {
-        setStatus({ message, type });
-        setTimeout(() => setStatus(null), 3000);
-    };
 
     const handleCreateAdmin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newAdmin.name || !newAdmin.email || !newAdmin.password) {
-            return showStatus('All fields are required', 'error');
+            return showToast('All fields are required', 'error');
         }
 
         setIsLoading(true);
@@ -64,12 +59,11 @@ export default function AdminTeamManager() {
                 method: 'POST',
                 body: JSON.stringify(newAdmin)
             });
-            showStatus('New Admin Created Successfully', 'success');
+            showToast('New Admin Created Successfully', 'success');
             setNewAdmin({ name: '', email: '', password: '', role: 'ADMIN' });
             loadTeam(); // Refresh list
         } catch (error: any) {
-            console.error("Failed to create admin", error);
-            showStatus(error.message || 'Failed to create admin', 'error');
+            showToast(error.message || 'Failed to create admin', 'error');
         } finally {
             setIsLoading(false);
         }
@@ -82,22 +76,15 @@ export default function AdminTeamManager() {
 
         try {
             await fetchAPI(`/users/${id}`, { method: 'DELETE' });
-            showStatus('User Deleted Successfully', 'success');
+            showToast('User Deleted Successfully', 'success');
             loadTeam(); // Refresh list
         } catch (error: any) {
-            console.error("Failed to delete user", error);
-            showStatus(error.message || 'Failed to delete user', 'error');
+            showToast(error.message || 'Failed to delete user', 'error');
         }
     };
 
     return (
         <div className="max-w-6xl animate-fade-in grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Status Notification */}
-            {status && (
-                <div className={`fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${status.type === 'success' ? 'bg-green-600' : 'bg-red-600'}`}>
-                    {status.message}
-                </div>
-            )}
 
             {/* Left Column: Team List */}
             <div className="lg:col-span-2 space-y-6">

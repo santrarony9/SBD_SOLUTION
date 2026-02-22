@@ -121,9 +121,9 @@ export default function Navbar() {
             </div>
 
             {/* Mobile Menu Overlay */}
-            <div className={`md:hidden fixed inset-0 bg-white/95 backdrop-blur-xl z-40 transition-transform duration-500 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="flex flex-col h-full justify-center items-center space-y-8 p-8">
-                    <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 text-brand-navy p-2">
+            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-40 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                <div className="flex flex-col h-full justify-center items-center space-y-8 p-8 relative">
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 right-8 text-brand-navy p-2 hover:bg-brand-gold/10 rounded-full transition-colors">
                         <PiX className="h-8 w-8" />
                     </button>
 
@@ -132,12 +132,12 @@ export default function Navbar() {
                     <MobileNavLink href="/about" label="Heritage" onClick={() => setIsMobileMenuOpen(false)} />
                     <MobileNavLink href="/wishlist" label="Wishlist" onClick={() => setIsMobileMenuOpen(false)} />
 
-                    <div className="w-12 h-px bg-brand-gold/30 my-4"></div>
+                    <div className="w-16 h-px bg-brand-gold/20 my-4"></div>
 
                     {isAuthenticated ? (
                         <>
                             <MobileNavLink href="/account" label="My Account" onClick={() => setIsMobileMenuOpen(false)} />
-                            <button onClick={logout} className="text-red-400 uppercase text-xs tracking-[0.2em] font-bold pt-4">Logout</button>
+                            <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.3em] font-black pt-4 hover:text-red-500 transition-colors">Logout</button>
                         </>
                     ) : (
                         <MobileNavLink href="/login" label="Login" onClick={() => setIsMobileMenuOpen(false)} />

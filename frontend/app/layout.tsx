@@ -5,6 +5,7 @@ import ClientLayoutWrapper from "@/components/ClientLayoutWrapper";
 import { fetchAPI } from "@/lib/api";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
+import { ToastProvider } from "@/context/ToastContext";
 import ChatWidget from "@/components/ChatWidget";
 
 const playfair = Playfair_Display({
@@ -56,13 +57,15 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
       >
-        <AuthProvider>
-          <CartProvider>
-            <ClientLayoutWrapper>
-              {children}
-            </ClientLayoutWrapper>
-          </CartProvider>
-        </AuthProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CartProvider>
+              <ClientLayoutWrapper>
+                {children}
+              </ClientLayoutWrapper>
+            </CartProvider>
+          </AuthProvider>
+        </ToastProvider>
       </body>
     </html>
   );

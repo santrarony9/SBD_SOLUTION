@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { fetchAPI } from '@/lib/api';
+import { useToast } from './ToastContext';
 
 // Types
 interface CartItem {
@@ -33,6 +34,7 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: ReactNode }) {
     const { user, token } = useAuth();
+    const { showToast } = useToast();
     const [items, setItems] = useState<CartItem[]>([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
@@ -80,23 +82,44 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     const addToCart = async (productId: string, quantity: number) => {
         if (user) {
-            // Server Sync
             try {
                 await fetchAPI('/cart/items', {
                     method: 'POST',
                     body: JSON.stringify({ productId, quantity })
                 });
-                await fetchServerCart(); // Refresh
+                await fetchServerCart();
+                showToast("Added to your collection", "success");
             } catch (error) {
                 console.error("Add to cart failed", error);
-                alert("Failed to add to cart");
+                showToast("Failed to add to cart", "error");
             }
         } else {
-            // Guest Logic (Simplification: We need product details to store locally)
-            // Realistically we'd fetch product details then store. 
-            // For now, alerting user to login is easier for this MVP phase, OR we just store ID.
-            alert("Please login to add items to cart.");
-            // Ideally: fetchAPI(`/products/${productId}`) -> push to local state.
+            // Guest Logic: Fetch product briefly to store in local cart
+            try {
+                const product = await fetchAPI(`/products/${productId}`);
+                if (product) {
+                    const newItem: CartItem = {
+                        id: Math.random().toString(36).substr(2, 9),
+                        productId: product.id,
+                        quantity,
+                        product: {
+                            name: product.name,
+                            price: product.pricing?.finalPrice || product.price || 0,
+                            images: product.images,
+                            slug: product.slug,
+                            category: product.category
+                        }
+                    };
+
+                    const newItems = [...items, newItem];
+                    setItems(newItems);
+                    calculateLocalTotal(newItems);
+                    localStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
+                    showToast("Added to your guest collection", "success");
+                }
+            } catch (err) {
+                showToast("Please login to add items", "info");
+            }
         }
     };
 
@@ -105,6 +128,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             try {
                 await fetchAPI(`/cart/items/${itemId}`, { method: 'DELETE' });
                 await fetchServerCart();
+                showToast("Item removed", "info");
             } catch (error) {
                 console.error("Remove failed", error);
             }

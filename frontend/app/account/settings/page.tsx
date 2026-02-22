@@ -3,9 +3,11 @@
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function AccountSettings() {
     const { user, login } = useAuth();
+    const { showToast } = useToast();
 
     // Profile State
     const [profileData, setProfileData] = useState({
@@ -31,9 +33,9 @@ export default function AccountSettings() {
                 body: JSON.stringify(profileData)
             });
             login(localStorage.getItem('token') || '', updatedUser);
-            alert('Your profile has been polished.');
+            showToast('Your profile has been polished', 'success');
         } catch (error) {
-            alert('Failed to update profile.');
+            showToast('Failed to update profile', 'error');
         } finally {
             setIsProfileUpdating(false);
         }
@@ -42,7 +44,7 @@ export default function AccountSettings() {
     const handleChangePassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-            alert('New passwords do not match the confirm input.');
+            showToast('New passwords do not match', 'error');
             return;
         }
         setIsPasswordUpdating(true);
@@ -55,9 +57,9 @@ export default function AccountSettings() {
                 })
             });
             setPasswordData({ oldPassword: '', newPassword: '', confirmPassword: '' });
-            alert('Your security credentials have been updated.');
+            showToast('Your security credentials have been updated', 'success');
         } catch (error: any) {
-            alert(error.message || 'Face an error in updating security.');
+            showToast(error.message || 'Failed to update security', 'error');
         } finally {
             setIsPasswordUpdating(false);
         }

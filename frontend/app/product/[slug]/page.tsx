@@ -9,6 +9,8 @@ import { fetchAPI } from '@/lib/api';
 import TrustBadges from '@/components/TrustBadges';
 import DropHintModal from '@/components/DropHintModal';
 import { formatPrice } from '@/lib/utils';
+import { PiShoppingBag } from 'react-icons/pi';
+import { useToast } from '@/context/ToastContext';
 
 interface Product {
     id: string;
@@ -39,6 +41,7 @@ export default function ProductDetailPage() {
     const params = useParams();
     const slug = params?.slug as string;
     const { addToCart } = useCart();
+    const { showToast } = useToast();
 
     // State
     const [product, setProduct] = useState<Product | null>(null);
@@ -94,7 +97,6 @@ export default function ProductDetailPage() {
             try {
                 await navigator.share(shareData);
             } catch (err) {
-                console.log('Share canceled');
             }
         } else {
             setShowShareMenu(!showShareMenu);
@@ -103,7 +105,7 @@ export default function ProductDetailPage() {
 
     const copyToClipboard = () => {
         navigator.clipboard.writeText(window.location.href);
-        alert('Link copied to clipboard!');
+        showToast('Link copied to clipboard', 'success');
         setShowShareMenu(false);
     };
 
@@ -134,8 +136,7 @@ export default function ProductDetailPage() {
                     setShowVideo(true);
                 }
             } catch (err) {
-                console.error("Failed to load product", err);
-                setError(`Failed to load product details. ${(err as Error).message}`);
+                setError(`Failed to load product details.`);
             } finally {
                 setLoading(false);
             }
@@ -161,7 +162,7 @@ export default function ProductDetailPage() {
     }
 
     return (
-        <div className="bg-brand-cream min-h-screen pb-10 pt-20">
+        <div className="bg-brand-cream min-h-screen pb-24 lg:pb-10 pt-20">
 
             {/* Breadcrumb - Minimalist */}
             <div className="max-w-[1400px] mx-auto px-6 py-3 text-[10px] text-gray-400 uppercase tracking-[0.2em] font-medium border-b border-brand-gold/10 mb-6">
@@ -172,13 +173,13 @@ export default function ProductDetailPage() {
                 <span className="text-brand-navy truncate max-w-[200px] inline-block align-bottom">{product.name}</span>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 h-[calc(100vh-140px)] min-h-[600px]">
+            <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:h-[calc(100vh-140px)] lg:min-h-[600px] h-auto">
 
                 {/* Left Column: Media Gallery (Constrained Height) */}
                 <div className="flex flex-col h-full">
                     {/* Main Viewer */}
                     {/* Main Viewer */}
-                    <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-full max-h-[75vh]">
+                    <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-auto aspect-square lg:h-full lg:max-h-[75vh]">
                         {showVideo && product.videoUrl ? (
                             <div className="w-full h-full bg-gray-900 relative">
                                 <video
@@ -343,17 +344,34 @@ export default function ProductDetailPage() {
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
+                        {/* Desktop Actions (Hidden on Mobile) */}
+                        <div className="hidden lg:grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => product && addToCart(product.id, quantity)}
-                                className="w-full bg-white border border-brand-gold text-brand-navy h-14 lg:h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                className="w-full bg-white border border-brand-gold text-brand-navy h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
                                 <span>Add to Cart</span>
                             </button>
                             <button
                                 onClick={handleBuyNow}
-                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-14 lg:h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
                                 <span className="relative z-10">Buy Now</span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
+                            </button>
+                        </div>
+
+                        {/* Mobile Sticky Actions */}
+                        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-brand-gold/10 p-4 flex gap-3 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.1)]">
+                            <button
+                                onClick={() => product && addToCart(product.id, quantity)}
+                                className="w-14 h-14 bg-brand-navy text-white flex items-center justify-center rounded-sm shrink-0"
+                            >
+                                <PiShoppingBag className="text-2xl" />
+                            </button>
+                            <button
+                                onClick={handleBuyNow}
+                                className="flex-grow bg-brand-navy text-white h-14 font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
+                            >
+                                Buy Now
                             </button>
                         </div>
 

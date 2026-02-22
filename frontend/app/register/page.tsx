@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { fetchAPI } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function RegisterPage() {
     const [name, setName] = useState('');
@@ -17,6 +18,7 @@ export default function RegisterPage() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isSendingOtp, setIsSendingOtp] = useState(false);
+    const { showToast } = useToast();
     const router = useRouter();
 
     const handleSendOtp = async () => {
@@ -32,7 +34,7 @@ export default function RegisterPage() {
                 body: JSON.stringify({ mobile })
             });
             setIsOtpSent(true);
-            alert('OTP sent to ' + mobile);
+            showToast('OTP sent to ' + mobile, 'success');
         } catch (err: any) {
             setError(err.message || 'Failed to send OTP');
         } finally {
@@ -55,7 +57,6 @@ export default function RegisterPage() {
             router.push('/login?registered=true');
 
         } catch (err: any) {
-            console.error('Registration failed', err);
             setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
         } finally {
             setIsLoading(false);

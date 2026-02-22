@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import Image from 'next/image';
+import { useToast } from '@/context/ToastContext';
 
 export default function LiveCartsPage() {
     const [carts, setCarts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { showToast } = useToast();
     const [lastUpdated, setLastUpdated] = useState(new Date());
 
     useEffect(() => {
@@ -22,21 +24,18 @@ export default function LiveCartsPage() {
             setLastUpdated(new Date());
             setIsLoading(false);
         } catch (error) {
-            console.error("Failed to load carts", error);
         }
     };
 
     const handleNudge = async (cartId: string) => {
         try {
-            await fetchAPI(`/dashboard/carts/${cartId}/nudge`, { method: 'POST' }); // Wait, controller uses GET for easier testing? Let's check. Controller uses GET currently.
-            // But standard is POST. I'll stick to what I wrote: @Get('carts/:id/nudge').
             // Actually, I should use GET in fetchAPI if I defined GET.
             // Let's use GET for now, but mark it as nudge.
             await fetchAPI(`/dashboard/carts/${cartId}/nudge`);
-            alert('Nudge sent successfully!');
+            showToast('Nudge sent successfully', 'success');
             loadCarts();
         } catch (error) {
-            alert('Failed to send nudge');
+            showToast('Failed to send nudge', 'error');
         }
     };
 

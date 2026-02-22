@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI, API_URL } from '@/lib/api';
 import { PiTrash, PiPencil, PiPlus, PiImage } from 'react-icons/pi';
+import { useToast } from '@/context/ToastContext';
 
 interface GalleryItem {
     id: string;
@@ -18,6 +19,7 @@ export default function AdminGallery() {
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<GalleryItem | null>(null);
+    const { showToast } = useToast();
 
     // Form State
     const [formData, setFormData] = useState({
@@ -65,8 +67,7 @@ export default function AdminGallery() {
             const result = await response.json();
             setFormData(prev => ({ ...prev, imageUrl: result.url }));
         } catch (error) {
-            console.error('Upload Error:', error);
-            alert(`Image upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            showToast('Image upload failed', 'error');
         } finally {
             setIsUploading(false);
         }
@@ -88,8 +89,9 @@ export default function AdminGallery() {
             }
             closeModal();
             loadGallery();
+            showToast(editingItem ? 'Item Updated' : 'Item Saved', 'success');
         } catch (error) {
-            alert('Failed to save item');
+            showToast('Failed to save item', 'error');
         }
     };
 
@@ -98,8 +100,9 @@ export default function AdminGallery() {
         try {
             await fetchAPI(`/gallery/${id}`, { method: 'DELETE' });
             loadGallery();
+            showToast('Item Deleted', 'success');
         } catch (error) {
-            alert('Failed to delete item');
+            showToast('Failed to delete item', 'error');
         }
     };
 

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
     const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery'>('banners');
@@ -11,7 +12,7 @@ export default function AdminCMS() {
     const [offers, setOffers] = useState<any[]>([]);
     const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
     const [isLoading, setIsLoading] = useState(true);
-    const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+    const { showToast } = useToast();
 
     // Dynamic Data States
     const [categories, setCategories] = useState<any[]>([]);
@@ -23,6 +24,7 @@ export default function AdminCMS() {
     // Form States
     const [newBanner, setNewBanner] = useState({ imageUrl: '', title: '', link: '' });
     const [isUploading, setIsUploading] = useState(false);
+    const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
     const [newOffer, setNewOffer] = useState({ title: '', description: '', tag: '', code: '', imageUrl: '' });
     const [newCategory, setNewCategory] = useState({ name: '', slug: '', imageUrl: '' });
     const [newPriceRange, setNewPriceRange] = useState({ label: '', minPrice: 0, maxPrice: 0, imageUrl: '' });
@@ -33,11 +35,6 @@ export default function AdminCMS() {
     useEffect(() => {
         loadContent();
     }, []);
-
-    const showStatus = (message: string, type: 'success' | 'error') => {
-        setStatus({ message, type });
-        setTimeout(() => setStatus(null), 3000);
-    };
 
     const loadContent = async () => {
         setIsLoading(true);
@@ -57,25 +54,25 @@ export default function AdminCMS() {
             const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes, galleryRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
-            else console.error('Failed to load banners', bannersRes.reason);
+            else showToast('Failed to load banners', 'error');
 
             if (offersRes.status === 'fulfilled') setOffers(offersRes.value || []);
-            else console.error('Failed to load offers', offersRes.reason);
+            else showToast('Failed to load offers', 'error');
 
             if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value || []);
-            else console.error('Failed to load categories', categoriesRes.reason);
+            else showToast('Failed to load categories', 'error');
 
             if (priceRangesRes.status === 'fulfilled') setPriceRanges(priceRangesRes.value || []);
-            else console.error('Failed to load price ranges', priceRangesRes.reason);
+            else showToast('Failed to load price ranges', 'error');
 
             if (tagsRes.status === 'fulfilled') setTags(tagsRes.value || []);
-            else console.error('Failed to load tags', tagsRes.reason);
+            else showToast('Failed to load tags', 'error');
 
             if (socialPostsRes.status === 'fulfilled') setSocialPosts(socialPostsRes.value || []);
-            else console.error('Failed to load social posts', socialPostsRes.reason);
+            else showToast('Failed to load social posts', 'error');
 
             if (galleryRes.status === 'fulfilled') setGalleryItems(galleryRes.value || []);
-            else console.error('Failed to load gallery items', galleryRes.reason);
+            else showToast('Failed to load gallery items', 'error');
 
             if (heroTextRes.status === 'fulfilled') {
                 const fetchedHeroText = heroTextRes.value;
@@ -99,7 +96,7 @@ export default function AdminCMS() {
 
         } catch (error) {
             console.error("Critical failure in loadContent", error);
-            showStatus('Partial content load failure - check console', 'error');
+            showToast('Partial content load failure - check console', 'error');
         } finally {
             setIsLoading(false);
         }
@@ -107,142 +104,142 @@ export default function AdminCMS() {
 
     // --- Banner Actions ---
     const handleAddBanner = async () => {
-        if (!newBanner.imageUrl) return showStatus('Image URL is required', 'error');
+        if (!newBanner.imageUrl) return showToast('Image URL is required', 'error');
         try {
             await fetchAPI('/banners', { method: 'POST', body: JSON.stringify(newBanner) });
-            showStatus('Banner Added', 'success');
+            showToast('Banner Added', 'success');
             setNewBanner({ imageUrl: '', title: '', link: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add banner', 'error'); }
+        } catch (e) { showToast('Failed to add banner', 'error'); }
     };
 
     const handleDeleteBanner = async (id: string) => {
         if (!confirm('Delete this banner?')) return;
         try {
             await fetchAPI(`/banners/${id}`, { method: 'DELETE' });
-            showStatus('Banner Deleted', 'success');
+            showToast('Banner Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete banner', 'error'); }
+        } catch (e) { showToast('Failed to delete banner', 'error'); }
     };
 
     // --- Offer Actions ---
     const handleAddOffer = async () => {
-        if (!newOffer.title) return showStatus('Title is required', 'error');
+        if (!newOffer.title) return showToast('Title is required', 'error');
         try {
             await fetchAPI('/offers', { method: 'POST', body: JSON.stringify(newOffer) });
-            showStatus('Offer Added', 'success');
+            showToast('Offer Added', 'success');
             setNewOffer({ title: '', description: '', tag: '', code: '', imageUrl: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add offer', 'error'); }
+        } catch (e) { showToast('Failed to add offer', 'error'); }
     };
 
     const handleDeleteOffer = async (id: string) => {
         if (!confirm('Delete this offer?')) return;
         try {
             await fetchAPI(`/offers/${id}`, { method: 'DELETE' });
-            showStatus('Offer Deleted', 'success');
+            showToast('Offer Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete offer', 'error'); }
+        } catch (e) { showToast('Failed to delete offer', 'error'); }
     };
 
     // --- Category Actions ---
     const handleAddCategory = async () => {
-        if (!newCategory.name) return showStatus('Name is required', 'error');
+        if (!newCategory.name) return showToast('Name is required', 'error');
         try {
             await fetchAPI('/categories', { method: 'POST', body: JSON.stringify(newCategory) });
-            showStatus('Category Added', 'success');
+            showToast('Category Added', 'success');
             setNewCategory({ name: '', slug: '', imageUrl: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add category', 'error'); }
+        } catch (e) { showToast('Failed to add category', 'error'); }
     };
 
     const handleDeleteCategory = async (id: string) => {
         if (!confirm('Delete this category?')) return;
         try {
             await fetchAPI(`/categories/${id}`, { method: 'DELETE' });
-            showStatus('Category Deleted', 'success');
+            showToast('Category Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete category', 'error'); }
+        } catch (e) { showToast('Failed to delete category', 'error'); }
     };
 
     // --- Price Range Actions ---
     const handleAddPriceRange = async () => {
-        if (!newPriceRange.label) return showStatus('Label is required', 'error');
+        if (!newPriceRange.label) return showToast('Label is required', 'error');
         try {
             await fetchAPI('/marketing/price-ranges', { method: 'POST', body: JSON.stringify(newPriceRange) });
-            showStatus('Price Range Added', 'success');
+            showToast('Price Range Added', 'success');
             setNewPriceRange({ label: '', minPrice: 0, maxPrice: 0, imageUrl: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add price range', 'error'); }
+        } catch (e) { showToast('Failed to add price range', 'error'); }
     };
 
     const handleDeletePriceRange = async (id: string) => {
         if (!confirm('Delete this price range?')) return;
         try {
             await fetchAPI(`/marketing/price-ranges/${id}`, { method: 'DELETE' });
-            showStatus('Price Range Deleted', 'success');
+            showToast('Price Range Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete price range', 'error'); }
+        } catch (e) { showToast('Failed to delete price range', 'error'); }
     };
 
     // --- Tag Actions ---
     const handleAddTag = async () => {
-        if (!newTag.name) return showStatus('Name is required', 'error');
+        if (!newTag.name) return showToast('Name is required', 'error');
         try {
             await fetchAPI('/marketing/tags', { method: 'POST', body: JSON.stringify(newTag) });
-            showStatus('Tag Added', 'success');
+            showToast('Tag Added', 'success');
             setNewTag({ name: '', slug: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add tag', 'error'); }
+        } catch (e) { showToast('Failed to add tag', 'error'); }
     };
 
     const handleDeleteTag = async (id: string) => {
         if (!confirm('Delete this tag?')) return;
         try {
             await fetchAPI(`/marketing/tags/${id}`, { method: 'DELETE' });
-            showStatus('Tag Deleted', 'success');
+            showToast('Tag Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete tag', 'error'); }
+        } catch (e) { showToast('Failed to delete tag', 'error'); }
     };
 
     // --- Social Post Actions ---
     const handleAddSocialPost = async () => {
-        if (!newSocialPost.imageUrl) return showStatus('Image URL is required', 'error');
+        if (!newSocialPost.imageUrl) return showToast('Image URL is required', 'error');
         try {
             await fetchAPI('/marketing/social-posts', { method: 'POST', body: JSON.stringify(newSocialPost) });
-            showStatus('Post Added', 'success');
+            showToast('Post Added', 'success');
             setNewSocialPost({ imageUrl: '', caption: '', link: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add post', 'error'); }
+        } catch (e) { showToast('Failed to add post', 'error'); }
     };
 
     const handleDeleteSocialPost = async (id: string) => {
         if (!confirm('Delete this post?')) return;
         try {
             await fetchAPI(`/marketing/social-posts/${id}`, { method: 'DELETE' });
-            showStatus('Post Deleted', 'success');
+            showToast('Post Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete post', 'error'); }
+        } catch (e) { showToast('Failed to delete post', 'error'); }
     };
 
     // --- Gallery Actions ---
     const handleAddGalleryItem = async () => {
-        if (!newGalleryItem.imageUrl) return showStatus('Image URL is required', 'error');
+        if (!newGalleryItem.imageUrl) return showToast('Image URL is required', 'error');
         try {
             await fetchAPI('/gallery', { method: 'POST', body: JSON.stringify(newGalleryItem) });
-            showStatus('Gallery Item Added', 'success');
+            showToast('Gallery Item Added', 'success');
             setNewGalleryItem({ title: '', subtitle: '', imageUrl: '', link: '' });
             loadContent();
-        } catch (e) { showStatus('Failed to add gallery item', 'error'); }
+        } catch (e) { showToast('Failed to add gallery item', 'error'); }
     };
 
     const handleDeleteGalleryItem = async (id: string) => {
         if (!confirm('Delete this item?')) return;
         try {
             await fetchAPI(`/gallery/${id}`, { method: 'DELETE' });
-            showStatus('Item Deleted', 'success');
+            showToast('Item Deleted', 'success');
             loadContent();
-        } catch (e) { showStatus('Failed to delete item', 'error'); }
+        } catch (e) { showToast('Failed to delete item', 'error'); }
     };
 
     // --- Text Actions ---
@@ -254,8 +251,8 @@ export default function AdminCMS() {
                 method: 'POST',
                 body: JSON.stringify({ key: 'homepage_hero_text', value: JSON.stringify(textData) })
             });
-            showStatus('Hero Text Updated', 'success');
-        } catch (e) { showStatus('Failed to update text', 'error'); }
+            showToast('Hero Text Updated', 'success');
+        } catch (e) { showToast('Failed to update text', 'error'); }
     };
 
     const handleUpdateSpotlight = async () => {
@@ -270,24 +267,29 @@ export default function AdminCMS() {
                 method: 'POST',
                 body: JSON.stringify({ key: 'spotlight', value: spotlightData })
             });
-            showStatus('Spotlight Config Updated', 'success');
-        } catch (e) { showStatus('Failed to update spotlight', 'error'); }
+            showToast('Spotlight Config Updated', 'success');
+        } catch (e) { showToast('Failed to update spotlight', 'error'); }
     };
 
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start animate-fade-in min-h-[600px]">
-            {/* Status Notification */}
-            {status && (
-                <div className={`fixed top-8 right-8 z-[100] px-6 py-4 rounded shadow-2xl border flex items-center gap-3 transition-all transform animate-slide-up ${status.type === 'success' ? 'bg-white border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
-                    <div className={`w-2 h-2 rounded-full ${status.type === 'success' ? 'bg-green-500' : 'bg-red-500'} animate-pulse`} />
-                    <span className="text-sm font-bold tracking-wide">{status.message}</span>
-                </div>
-            )}
+
+            {/* Mobile Sidebar Toggle */}
+            <button
+                onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+                className="md:hidden fixed bottom-6 right-6 z-50 bg-brand-navy text-white p-4 rounded-full shadow-2xl border border-brand-gold/20 flex items-center gap-2"
+            >
+                <PiLayout className="text-xl" />
+                <span className="text-[10px] uppercase font-black tracking-widest">UI MENU</span>
+            </button>
 
             {/* Sidebar Navigation */}
-            <aside className="w-full md:w-64 flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-1 sticky top-8">
-                <div className="px-4 py-4 mb-2 border-b border-gray-50">
+            <aside className={`w-full md:w-64 flex-shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 p-2 space-y-1 md:sticky md:top-8 transition-all duration-300 ${isMobileNavOpen ? 'block' : 'hidden md:block'}`}>
+                <div className="flex justify-between items-center px-4 py-4 mb-2 border-b border-gray-50">
                     <h3 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold">Home UI Sections</h3>
+                    <button onClick={() => setIsMobileNavOpen(false)} className="md:hidden text-gray-400 hover:text-brand-navy">
+                        <PiX size={16} />
+                    </button>
                 </div>
 
                 {/* Group 1: Billboard */}
@@ -302,7 +304,10 @@ export default function AdminCMS() {
                 ].map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => setActiveSection(item.id as any)}
+                        onClick={() => {
+                            setActiveSection(item.id as any);
+                            setIsMobileNavOpen(false);
+                        }}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
                             ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
                             : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
@@ -345,7 +350,10 @@ export default function AdminCMS() {
                 ].map((item) => (
                     <button
                         key={item.id}
-                        onClick={() => setActiveSection(item.id as any)}
+                        onClick={() => {
+                            setActiveSection(item.id as any);
+                            setIsMobileNavOpen(false);
+                        }}
                         className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
                             ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
                             : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
@@ -395,13 +403,13 @@ export default function AdminCMS() {
                                                         if (file) {
                                                             const formData = new FormData();
                                                             formData.append('file', file);
-                                                            showStatus('Uploading...', 'success');
+                                                            showToast('Uploading...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => {
                                                                     setNewCategory(prev => ({ ...prev, imageUrl: res.url }));
-                                                                    showStatus('Image Uploaded', 'success');
+                                                                    showToast('Image Uploaded', 'success');
                                                                 })
-                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                                .catch(() => showToast('Upload Failed', 'error'));
                                                         }
                                                     }}
                                                 />
@@ -454,7 +462,7 @@ export default function AdminCMS() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                                 {categories.map(cat => (
                                     <div key={cat.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
                                         <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
@@ -499,27 +507,27 @@ export default function AdminCMS() {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
                                                             if (file.size > 5 * 1024 * 1024) {
-                                                                alert('File is too large! Max 5MB allowed.');
+                                                                showToast('File is too large! Max 5MB allowed.', 'error');
                                                                 return;
                                                             }
                                                             setIsUploading(true);
                                                             const formData = new FormData();
                                                             formData.append('file', file);
 
-                                                            showStatus('Uploading...', 'success');
+                                                            showToast('Uploading...', 'success');
 
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => {
                                                                     if (res.url) {
                                                                         setNewBanner(prev => ({ ...prev, imageUrl: res.url }));
-                                                                        showStatus('Image Uploaded!', 'success');
+                                                                        showToast('Image Uploaded!', 'success');
                                                                     } else {
-                                                                        showStatus('Upload failed: No URL returned', 'error');
+                                                                        showToast('Upload failed: No URL returned', 'error');
                                                                     }
                                                                 })
                                                                 .catch(err => {
                                                                     console.error(err);
-                                                                    showStatus('Upload Failed', 'error');
+                                                                    showToast('Upload Failed', 'error');
                                                                 })
                                                                 .finally(() => setIsUploading(false));
                                                         }
@@ -638,18 +646,18 @@ export default function AdminCMS() {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
                                                             if (file.size > 10 * 1024 * 1024) {
-                                                                alert('File is too large! Max 10MB allowed for gallery.');
+                                                                showToast('File is too large! Max 10MB allowed.', 'error');
                                                                 return;
                                                             }
                                                             const formData = new FormData();
                                                             formData.append('file', file);
-                                                            showStatus('Uploading...', 'success');
+                                                            showToast('Uploading...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => {
                                                                     setNewGalleryItem(prev => ({ ...prev, imageUrl: res.url }));
-                                                                    showStatus('Media Uploaded', 'success');
+                                                                    showToast('Media Uploaded', 'success');
                                                                 })
-                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                                .catch(() => showToast('Upload Failed', 'error'));
                                                         }
                                                     }}
                                                 />
@@ -811,18 +819,18 @@ export default function AdminCMS() {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
                                                             if (file.size > 5 * 1024 * 1024) {
-                                                                alert('File is too large! Max 5MB allowed.');
+                                                                showToast('File is too large! Max 5MB allowed.', 'error');
                                                                 return;
                                                             }
                                                             const formData = new FormData();
                                                             formData.append('file', file);
-                                                            showStatus('Uploading...', 'success');
+                                                            showToast('Uploading...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => {
                                                                     setNewOffer(prev => ({ ...prev, imageUrl: res.url }));
-                                                                    showStatus('Image Uploaded', 'success');
+                                                                    showToast('Image Uploaded', 'success');
                                                                 })
-                                                                .catch(() => showStatus('Upload Failed', 'error'));
+                                                                .catch(() => showToast('Upload Failed', 'error'));
                                                         }
                                                     }}
                                                 />
@@ -930,14 +938,14 @@ export default function AdminCMS() {
                                                 const file = e.target.files?.[0];
                                                 if (file) {
                                                     if (file.size > 5 * 1024 * 1024) {
-                                                        alert('File is too large! Max 5MB allowed.');
+                                                        showToast('File is too large! Max 5MB allowed.', 'error');
                                                         return;
                                                     }
                                                     const formData = new FormData();
                                                     formData.append('file', file);
                                                     fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                         .then(res => setNewCategory({ ...newCategory, imageUrl: res.url }))
-                                                        .catch(() => showStatus('Upload Failed', 'error'));
+                                                        .catch(() => showToast('Upload Failed', 'error'));
                                                 }
                                             }}
                                             className="w-full text-[10px] text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-brand-navy hover:file:bg-brand-gold hover:file:text-white transition-all cursor-pointer"

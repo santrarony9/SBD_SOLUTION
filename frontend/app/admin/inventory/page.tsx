@@ -5,6 +5,7 @@ import { fetchAPI } from '@/lib/api';
 import { PiPackage, PiVault, PiGraph, PiWarning, PiPlus, PiArrowsLeftRight, PiPencilSimple } from 'react-icons/pi';
 import AdminAddProduct from '@/components/AdminAddProduct';
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 export default function InventoryDashboard() {
     const [products, setProducts] = useState<any[]>([]);
@@ -12,6 +13,7 @@ export default function InventoryDashboard() {
     const [vaults, setVaults] = useState<any[]>([]);
     const [materials, setMaterials] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { showToast } = useToast();
 
     // Modal State
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -35,7 +37,6 @@ export default function InventoryDashboard() {
             setValuation(valData);
             setVaults(vaultData);
         } catch (err) {
-            console.error("Failed to load inventory data", err);
         } finally {
             setIsLoading(false);
         }
@@ -48,8 +49,9 @@ export default function InventoryDashboard() {
                 body: JSON.stringify({ productId, quantity, action, reason: 'Manual Adjustment' })
             });
             loadData();
+            showToast('Stock Adjusted', 'success');
         } catch (err) {
-            alert('Stock adjustment failed');
+            showToast('Stock adjustment failed', 'error');
         }
     };
 

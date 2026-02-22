@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { PiUsers, PiTrophy, PiStar, PiNotebook, PiUserCircle, PiArrowUpRight } from 'react-icons/pi';
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 export default function CRMDashboard() {
+    const { showToast } = useToast();
     const [customers, setCustomers] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState<any>(null);
@@ -21,7 +23,6 @@ export default function CRMDashboard() {
             const data = await fetchAPI('/crm/customers');
             setCustomers(data);
         } catch (err) {
-            console.error("Failed to load CRM data", err);
         } finally {
             setIsLoading(false);
         }
@@ -33,10 +34,10 @@ export default function CRMDashboard() {
                 method: 'POST',
                 body: JSON.stringify({ notes: noteText })
             });
-            alert('Note saved!');
+            showToast('Note Saved', 'success');
             loadCustomers();
         } catch (err) {
-            alert('Failed to save note');
+            showToast('Failed to save note', 'error');
         }
     };
 

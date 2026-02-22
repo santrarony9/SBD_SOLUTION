@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { PiRocket, PiCheckCircle, PiMagnifyingGlass, PiFunnel, PiCaretLeft, PiCaretRight } from "react-icons/pi";
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 interface Order {
     id: string;
@@ -28,6 +29,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [pushingId, setPushingId] = useState<string | null>(null);
+    const { showToast } = useToast();
 
     // Filters & Pagination
     const [search, setSearch] = useState('');
@@ -86,8 +88,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             a.click();
             a.remove();
         } catch (error) {
-            console.error("Failed to download invoice", error);
-            alert("Error downloading invoice");
+            showToast("Error downloading invoice", "error");
         }
     };
 
@@ -98,8 +99,9 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                 body: JSON.stringify({ status: newStatus })
             });
             loadOrders(); // Refresh
+            showToast('Order Status Updated', 'success');
         } catch (error) {
-            alert('Failed to update status');
+            showToast('Failed to update status', 'error');
         }
     };
 
@@ -109,15 +111,15 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             const res = await fetchAPI(`/orders/${id}/shiprocket`, { method: 'POST' });
             // The backend now returns { success: true, awb: ..., trackingUrl: ... }
             if (res.success || res.awb) {
-                alert(`Order Shipped! AWB: ${res.awb || res.shiprocketOrder?.awb_code}`);
+                showToast(`Order Shipped! AWB: ${res.awb || res.shiprocketOrder?.awb_code}`, 'success');
                 await loadOrders();
             } else {
-                alert("Shipment initiated but no AWB returned yet. Check status.");
+                showToast("Shipment initiated. Check status.", "info");
                 await loadOrders();
             }
         } catch (error) {
             console.error("Ship order failed", error);
-            alert("Failed to ship order. Check console/logs.");
+            showToast("Failed to ship order. Check logs.", "error");
         } finally {
             setPushingId(null);
         }
@@ -134,11 +136,10 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             if (data.labelUrl) {
                 window.open(data.labelUrl, '_blank');
             } else {
-                alert('Label not available yet.');
+                showToast('Label not available yet', 'info');
             }
         } catch (error) {
-            console.error("Failed to get label", error);
-            alert("Failed to fetch label.");
+            showToast("Failed to fetch label", "error");
         }
     };
 
@@ -262,9 +263,9 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                             headers: { 'Authorization': `Bearer ${token}` }
                                         });
                                         const data = await res.json();
-                                        alert(data.message);
+                                        showToast(data.message, 'info');
                                     } catch (e) {
-                                        alert('Connection Test Failed');
+                                        showToast('Connection Test Failed', 'error');
                                     }
                                 }}
                                 className="text-[10px] font-bold uppercase tracking-widest text-brand-navy/60 border border-brand-navy/10 px-3 py-1.5 rounded hover:bg-brand-navy hover:text-white transition-all"

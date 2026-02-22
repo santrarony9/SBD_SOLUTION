@@ -5,6 +5,7 @@ import { fetchAPI } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
+import { useToast } from '@/context/ToastContext';
 
 interface Order {
     id: string;
@@ -28,6 +29,7 @@ interface Order {
 export default function OrderHistoryPage() {
     const [orders, setOrders] = useState<Order[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const { showToast } = useToast();
 
     useEffect(() => {
         const loadOrders = async () => {
@@ -53,7 +55,7 @@ export default function OrderHistoryPage() {
             // However, since we don't have a user-facing 'cancel' endpoint yet, we'll direct them to support 
             // OR if we want to be proactive, we'd add 'POST /orders/:id/cancel' in backend.
             // For now, let's use the support alert as a safe fallback to prevent unauthorized status changes if endpoints aren't secured for user status updates.
-            alert('To ensure security, please contact our Concierge to cancel your order.\n\nSupport: +91 99999 99999');
+            showToast('Please contact our Concierge at +91 99999 99999 to cancel your order.', 'info');
         } catch (error) {
             console.error("Cancellation failed", error);
         }
@@ -165,7 +167,7 @@ export default function OrderHistoryPage() {
                                     )}
                                     {order.status === 'DELIVERED' && (
                                         <button
-                                            onClick={() => alert('Please contact support to initiate a return.\n\nSupport: +91 99999 99999')}
+                                            onClick={() => showToast('Please contact support at +91 99999 99999 to initiate a return.', 'info')}
                                             className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-navy hover:text-brand-gold hover:underline transition-all"
                                         >
                                             Return / Exchange

@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI, API_URL } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
+import { FiDownload } from 'react-icons/fi';
 
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'; // Removed local definition
 
@@ -13,7 +15,6 @@ interface ProductFormProps {
 }
 
 export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialData }: ProductFormProps) {
-    console.log('AdminAddProduct Rendered - Version 2.0'); // DEBUG: Force Rebuild
     const [formData, setFormData] = useState({
         name: '',
         category: 'Rings',
@@ -33,6 +34,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         stockCount: '' // Added for Inventory Management
     });
     const [tempImages, setTempImages] = useState<string[]>([]);
+    const { showToast } = useToast();
     const [isUploading, setIsUploading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [isGeneratingAI, setIsGeneratingAI] = useState(false);
@@ -95,7 +97,6 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             }
 
             const result = await response.json();
-            console.log('Upload Result:', result);
 
             if (!result.url) {
                 throw new Error('Server returned success but no URL. Check Cloudinary config.');
@@ -109,12 +110,9 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 const newImages = [...tempImages];
                 newImages[index] = result.url;
                 setTempImages(newImages);
-            } else {
-                console.warn('Unknown upload type:', type);
             }
         } catch (error) {
-            console.error('Upload Error:', error);
-            alert('Upload failed: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            showToast('Upload failed', 'error');
         } finally {
             setIsUploading(false);
         }
@@ -122,7 +120,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
 
     const handleAIGenerate = async () => {
         if (!formData.name || !formData.goldWeight) {
-            alert('Please enter Name, Category and Weight first to generate a description.');
+            showToast('Enter Name, Category and Weight first', 'info');
             return;
         }
         setIsGeneratingAI(true);
@@ -133,9 +131,10 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             });
             if (response.description) {
                 setFormData(prev => ({ ...prev, description: response.description }));
+                showToast('Description generated', 'success');
             }
         } catch (error) {
-            alert('Failed to generate description. Check if API Key is set.');
+            showToast('Failed to generate description', 'error');
         } finally {
             setIsGeneratingAI(false);
         }
@@ -148,14 +147,14 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         // Validation: Min 3 Images
         const validImages = tempImages.filter(img => img);
         if (validImages.length < 3) {
-            alert('Please upload at least 3 product images.');
+            showToast('Please upload at least 3 product images', 'info');
             setLoading(false);
             return;
         }
 
         // Validation: Stock Quantity
         if (!formData.stockCount || parseInt(formData.stockCount) < 0) {
-            alert('Please enter a valid Stock Quantity.');
+            showToast('Please enter a valid Stock Quantity', 'error');
             setLoading(false);
             return;
         }
@@ -198,14 +197,33 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 body: JSON.stringify(payload)
             });
 
-            alert(`Product ${initialData ? 'Updated' : 'Added'} Successfully! 💎`);
+            showToast(`Product ${initialData ? 'Updated' : 'Added'} Successfully! 💎`, 'success');
             onClose();
             onSuccess();
         } catch (error) {
-            console.error(error);
-            alert(error instanceof Error ? error.message : 'Failed to save product');
+            showToast(error instanceof Error ? error.message : 'Failed to save product', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    // Helper to download full-resolution image
+    const handleDownload = async (url: string, index: number | string) => {
+        try {
+            const response = await fetch(url);
+            const blob = await response.blob();
+            const blobUrl = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = `product-image-${index}-${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(blobUrl);
+        } catch (error) {
+            console.error('Download failed:', error);
+            // Fallback for cross-origin issues: open in new tab
+            window.open(url, '_blank');
         }
     };
 
@@ -431,6 +449,16 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                 <img src={formData.coverImage} className="w-full h-full object-contain" alt="Cover" />
                                                 <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white font-bold text-xs opacity-0 group-hover/preview:opacity-100 transition-opacity">Change Cover</div>
                                                 <button type="button" onClick={(e) => { e.preventDefault(); setFormData({ ...formData, coverImage: '' }) }} className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 z-20">✕</button>
+
+                                                {/* Download Button */}
+                                                <button
+                                                    type="button"
+                                                    onClick={(e) => { e.preventDefault(); handleDownload(formData.coverImage, 'cover'); }}
+                                                    className="absolute bottom-2 right-2 bg-brand-gold text-brand-navy p-2 rounded-lg shadow-lg hover:bg-white hover:scale-110 transition-all z-20"
+                                                    title="Download Full Resolution"
+                                                >
+                                                    <FiDownload size={14} />
+                                                </button>
                                             </div>
                                         ) : (
                                             <>
@@ -450,7 +478,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         Recommended: 1000x1000px | Max: 5MB
                                     </span>
                                 </div>
-                                <div className="grid grid-cols-5 gap-4">
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                     {[0, 1, 2, 3, 4].map((index) => (
                                         <div key={index} className="relative aspect-square group">
                                             {/* File Input (Only if no image) */}
@@ -462,7 +490,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
                                                         if (file && file.size > 5 * 1024 * 1024) {
-                                                            alert('File is too large! Max 5MB allowed.');
+                                                            showToast('File is too large! Max 5MB allowed.', 'error');
                                                             return;
                                                         }
                                                         handleMediaUpload(file, `image-${index}`);
@@ -492,6 +520,16 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                             </button>
                                                         </div>
                                                         <div className="absolute top-1 right-1 bg-green-500 w-2 h-2 rounded-full shadow z-10"></div>
+
+                                                        {/* Download Button - Red Area Requested */}
+                                                        <button
+                                                            type="button"
+                                                            onClick={(e) => { e.preventDefault(); handleDownload(tempImages[index], index); }}
+                                                            className="absolute bottom-1 right-1 bg-red-500 text-white p-1.5 rounded-md shadow-lg hover:bg-red-600 hover:scale-105 transition-all z-30"
+                                                            title="Download Full Resolution"
+                                                        >
+                                                            <FiDownload size={12} />
+                                                        </button>
                                                     </>
                                                 ) : (
                                                     <span className="text-xl text-gray-200 font-serif group-hover:text-brand-gold">{index + 1}</span>
