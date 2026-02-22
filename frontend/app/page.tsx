@@ -102,7 +102,7 @@ export default async function Home() {
   const priceRanges = await getPriceRanges();
   const tags = await getTags();
 
-  const featuredProducts = allProducts.slice(0, 4);
+  const featuredProducts = allProducts.slice(0, 12);
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
   const heroTitle = heroText?.title ?? "Elegance is Eternal";
   const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
