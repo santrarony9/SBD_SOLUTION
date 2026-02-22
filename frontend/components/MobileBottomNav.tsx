@@ -15,14 +15,21 @@ export default function MobileBottomNav() {
     if (isTransactional) return null;
 
     const navItems = [
-        { label: 'Home', icon: PiHouse, href: '/' },
+        {
+            label: 'Home', icon: PiHouse, href: '/', onClick: (e: React.MouseEvent) => {
+                if (pathname === '/') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        },
         { label: 'Shop', icon: PiHandbag, href: '/shop' },
         { label: 'Wishlist', icon: PiHeart, href: '/wishlist' },
         { label: 'Cart', icon: PiShoppingBag, href: '/cart', badge: items.length },
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[70] bg-white/80 backdrop-blur-xl border-t border-brand-gold/10 pb-6 pt-3 px-6 safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[999] bg-white/90 backdrop-blur-2xl border-t border-brand-gold/10 pb-[env(safe-area-inset-bottom,24px)] pt-3 px-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
             <div className="flex justify-between items-center max-w-md mx-auto">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
@@ -32,6 +39,7 @@ export default function MobileBottomNav() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            onClick={item.onClick}
                             className="relative flex flex-col items-center gap-1 group flex-1"
                         >
                             <motion.div
