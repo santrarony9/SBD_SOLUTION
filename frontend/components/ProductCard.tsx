@@ -75,13 +75,14 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300" />
 
                 <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
-                    <button
+                    <motion.button
+                        whileTap={{ scale: 0.95 }}
                         onClick={handleAddToCart}
                         className="w-full bg-brand-navy text-white py-2.5 text-[9px] uppercase font-black tracking-[0.25em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
                     >
                         <PiBasket className="w-3.5 h-3.5" />
                         Quick Add
-                    </button>
+                    </motion.button>
                 </div>
             </Link>
 

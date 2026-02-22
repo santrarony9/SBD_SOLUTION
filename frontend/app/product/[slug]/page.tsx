@@ -11,6 +11,7 @@ import DropHintModal from '@/components/DropHintModal';
 import { formatPrice } from '@/lib/utils';
 import { PiShoppingBag } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Product {
     id: string;
@@ -176,47 +177,61 @@ export default function ProductDetailPage() {
             <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:h-[calc(100vh-140px)] lg:min-h-[600px] h-auto">
 
                 {/* Left Column: Media Gallery (Constrained Height) */}
-                <div className="flex flex-col h-full">
-                    {/* Main Viewer */}
+                <div className="flex flex-col h-full lg:sticky lg:top-24">
                     {/* Main Viewer */}
                     <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-auto aspect-square lg:h-full lg:max-h-[75vh]">
-                        {showVideo && product.videoUrl ? (
-                            <div className="w-full h-full bg-gray-900 relative">
-                                <video
-                                    src={product.videoUrl}
-                                    className="w-full h-full object-cover"
-                                    controls
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    poster={product.images?.[0] || ''}
-                                />
-                                <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-navy text-[9px] font-bold uppercase px-2 py-1 tracking-[0.2em] shadow-sm">
-                                    360° View
+                        <AnimatePresence mode="wait">
+                            {showVideo && product.videoUrl ? (
+                                <motion.div
+                                    key="video"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    className="w-full h-full bg-gray-900 relative"
+                                >
+                                    <video
+                                        src={product.videoUrl}
+                                        className="w-full h-full object-contain"
+                                        controls
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        poster={product.images?.[0] || ''}
+                                    />
+                                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-navy text-[9px] font-bold uppercase px-2 py-1 tracking-[0.2em] shadow-sm">
+                                        360° View
+                                    </div>
+                                </motion.div>
+                            ) : activeImage ? (
+                                <motion.div
+                                    key={activeImage}
+                                    initial={{ opacity: 0, scale: 1.1 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    exit={{ opacity: 0, scale: 0.9 }}
+                                    transition={{ duration: 0.4 }}
+                                    className="relative w-full h-full cursor-zoom-in"
+                                >
+                                    <Image
+                                        src={activeImage}
+                                        alt={product.name}
+                                        fill
+                                        className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
+                                        priority
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                </motion.div>
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center bg-gray-50 text-brand-gold/20 font-serif text-4xl">
+                                    SBD
                                 </div>
-                            </div>
-                        ) : activeImage ? (
-                            <div className="relative w-full h-full">
-                                <Image
-                                    src={activeImage}
-                                    alt={product.name}
-                                    fill
-                                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                    priority
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            </div>
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center bg-gray-50 text-brand-gold/20 font-serif text-4xl">
-                                SBD
-                            </div>
-                        )}
+                            )}
+                        </AnimatePresence>
 
                         {!showVideo && (
                             <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                                 <span className="bg-white/90 backdrop-blur-md text-[9px] uppercase font-bold px-3 py-1.5 tracking-[0.2em] shadow-sm text-brand-navy">
-                                    Zoom
+                                    Tap to Zoom
                                 </span>
                             </div>
                         )}

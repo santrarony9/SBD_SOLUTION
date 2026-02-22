@@ -33,42 +33,41 @@ export default function MobileBottomNav() {
             <div className="flex justify-between items-center max-w-md mx-auto">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
-                    const Icon = item.icon;
 
                     return (
                         <Link
                             key={item.href}
                             href={item.href}
                             onClick={item.onClick}
-                            className="relative flex flex-col items-center gap-1 group flex-1"
+                            className="group flex flex-col items-center justify-center relative py-1 flex-1"
                         >
                             <motion.div
-                                whileTap={{ scale: 0.9 }}
-                                className={`
-                                    p-2 rounded-2xl transition-all duration-300
-                                    ${isActive ? 'bg-brand-navy text-brand-gold' : 'text-brand-navy/60'}
-                                `}
+                                whileTap={{ scale: 0.9, y: 2 }}
+                                className="flex flex-col items-center justify-center p-2 rounded-xl transition-colors"
                             >
-                                <Icon className="w-6 h-6" />
+                                <item.icon className={`w-5 h-5 transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-60'}`} />
+                                <span className={`text-[8px] mt-1.5 uppercase tracking-[0.2em] font-black transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-40'}`}>
+                                    {item.label}
+                                </span>
                                 {item.badge !== undefined && item.badge > 0 && (
-                                    <span className="absolute top-1 right-1 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                                    <span className="absolute top-0 right-0 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
                                         {item.badge}
                                     </span>
                                 )}
                             </motion.div>
-                            <span className={`text-[10px] font-bold uppercase tracking-widest ${isActive ? 'text-brand-navy' : 'text-brand-navy/40'}`}>
-                                {item.label}
-                            </span>
+
+                            {/* Active Indicator */}
                             {isActive && (
                                 <motion.div
-                                    layoutId="bottomNavDot"
-                                    className="absolute -bottom-1 w-1 h-1 bg-brand-gold rounded-full"
+                                    layoutId="activeTab"
+                                    className="absolute -top-1 w-1 h-1 bg-brand-gold rounded-full"
+                                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                                 />
                             )}
                         </Link>
                     );
                 })}
             </div>
-        </div>
+        </div >
     );
 }

@@ -231,3 +231,17 @@ html {
 .animate-pulse-slow {
   animation: pulse-slow 3s ease-in-out infinite;
 }
+
+/* Haptic Feedback Utility */
+.haptic-touch {
+  transition: transform 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.haptic-touch:active {
+  transform: scale(0.96) !important;
+}
+
+/* Smooth Image Reveal */
+.img-reveal {
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}

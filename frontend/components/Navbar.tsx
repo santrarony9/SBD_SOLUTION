@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PiList, PiX, PiShieldCheck, PiSignOut, PiHeart, PiShoppingBag } from "react-icons/pi";
+import { PiList, PiX, PiShieldCheck, PiSignOut, PiHeart, PiShoppingBag, PiMagnifyingGlass } from "react-icons/pi";
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
+import MobileSearchOverlay from './MobileSearchOverlay';
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
     const { user, isAuthenticated, logout } = useAuth();
@@ -41,13 +43,19 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between items-center relative h-12">
 
-                    {/* Left: Mobile Menu Toggle */}
-                    <div className="flex items-center md:hidden">
+                    {/* Mobile Left: Search & Menu */}
+                    <div className="flex items-center md:hidden gap-4">
                         <button
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
                         >
                             {isMobileMenuOpen ? <PiX className="h-6 w-6" /> : <PiList className="h-6 w-6" />}
+                        </button>
+                        <button
+                            onClick={() => setIsSearchOpen(true)}
+                            className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
+                        >
+                            <PiMagnifyingGlass className="h-5 w-5" />
                         </button>
                     </div>
 
@@ -71,6 +79,14 @@ export default function Navbar() {
                     {/* Right: Actions */}
                     <div className="hidden md:flex space-x-6 items-center">
                         <div className={`flex items-center space-x-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-8 transition-colors duration-300`}>
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className={`${textColor} hover:text-brand-gold transition-colors duration-300`}
+                                title="Search"
+                            >
+                                <PiMagnifyingGlass className="h-5 w-5" />
+                            </button>
+
                             {isAuthenticated ? (
                                 <>
                                     <Link href="/account" className={`text-xs ${textColor} uppercase tracking-widest font-bold hover:text-brand-gold transition-colors duration-300`} title="Account">
@@ -119,6 +135,8 @@ export default function Navbar() {
                     </div>
                 </div>
             </div>
+
+            <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             {/* Mobile Menu Overlay */}
             <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-40 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>

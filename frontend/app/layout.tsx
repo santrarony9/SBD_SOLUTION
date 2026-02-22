@@ -59,7 +59,13 @@ export async function generateMetadata(): Promise<Metadata> {
         icons: {
           icon: '/favicon.png',
           apple: '/favicon.png',
-        }
+        },
+        manifest: '/manifest.webmanifest',
+        appleWebApp: {
+          capable: true,
+          statusBarStyle: 'default',
+          title: 'Spark Blue Diamond',
+        },
       };
     }
   } catch (e) {
@@ -75,7 +81,8 @@ export async function generateMetadata(): Promise<Metadata> {
     icons: {
       icon: '/favicon.png',
       apple: '/favicon.png',
-    }
+    },
+    manifest: '/manifest.webmanifest',
   };
 }
 
