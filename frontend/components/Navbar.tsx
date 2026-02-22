@@ -7,6 +7,7 @@ import { PiList, PiX, PiShieldCheck, PiSignOut, PiHeart, PiShoppingBag, PiMagnif
 import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import MobileSearchOverlay from './MobileSearchOverlay';
+import { motion } from 'framer-motion';
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -39,24 +40,26 @@ export default function Navbar() {
     const logoColor = scrolled ? 'text-brand-navy' : 'text-white';
 
     return (
-        <nav className={`fixed w-full z-50 transition-all duration-500 ease-in-out ${navClasses}`}>
+        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-50'} transition-all duration-500 ease-in-out ${navClasses}`}>
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between items-center relative h-12">
 
                     {/* Mobile Left: Search & Menu */}
                     <div className="flex items-center md:hidden gap-4">
-                        <button
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                             className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
                         >
                             {isMobileMenuOpen ? <PiX className="h-6 w-6" /> : <PiList className="h-6 w-6" />}
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                            whileTap={{ scale: 0.9 }}
                             onClick={() => setIsSearchOpen(true)}
                             className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
                         >
                             <PiMagnifyingGlass className="h-5 w-5" />
-                        </button>
+                        </motion.button>
                     </div>
 
                     {/* Desktop Left Links */}
@@ -125,12 +128,14 @@ export default function Navbar() {
                     {/* Mobile Right: Cart */}
                     <div className="flex items-center md:hidden">
                         <Link href="/cart" className={`${textColor} hover:text-brand-gold relative transition-colors`}>
-                            <PiShoppingBag className="h-6 w-6" />
-                            {items.length > 0 && (
-                                <span className="absolute -top-1 -right-1 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                                    {items.length}
-                                </span>
-                            )}
+                            <motion.div whileTap={{ scale: 0.9 }}>
+                                <PiShoppingBag className="h-6 w-6" />
+                                {items.length > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                                        {items.length}
+                                    </span>
+                                )}
+                            </motion.div>
                         </Link>
                     </div>
                 </div>
@@ -139,7 +144,7 @@ export default function Navbar() {
             <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             {/* Mobile Menu Overlay */}
-            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-40 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-50 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full justify-center items-center space-y-8 p-8 relative">
                     <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 right-8 text-brand-navy p-2 hover:bg-brand-gold/10 rounded-full transition-colors">
                         <PiX className="h-8 w-8" />
@@ -169,7 +174,9 @@ export default function Navbar() {
 function NavLink({ href, label, textColor }: { href: string, label: string, textColor: string }) {
     return (
         <Link href={href} className={`${textColor} group relative text-[11px] tracking-[0.2em] uppercase font-bold hover:text-brand-gold transition-colors duration-300`}>
-            {label}
+            <motion.span whileTap={{ scale: 0.95 }} className="block">
+                {label}
+            </motion.span>
             <span className="absolute -bottom-2 left-1/2 w-0 h-[1px] bg-brand-gold transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
         </Link>
     );
@@ -178,7 +185,9 @@ function NavLink({ href, label, textColor }: { href: string, label: string, text
 function MobileNavLink({ href, label, onClick }: { href: string, label: string, onClick: () => void }) {
     return (
         <Link href={href} onClick={onClick} className="text-2xl font-serif text-brand-navy hover:text-brand-gold transition-colors duration-300">
-            {label}
+            <motion.div whileTap={{ scale: 0.9 }}>
+                {label}
+            </motion.div>
         </Link>
     );
 }

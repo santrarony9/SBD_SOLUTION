@@ -74,7 +74,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 {/* Quick Action Overlay - Removed the dark wash to prevent "melting" */}
                 <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300" />
 
-                <div className="absolute bottom-0 left-0 right-0 opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
+                <div className="absolute bottom-0 left-0 right-0 md:opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={handleAddToCart}
