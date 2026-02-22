@@ -10,8 +10,9 @@ export default function MobileBottomNav() {
     const pathname = usePathname();
     const { items } = useCart();
 
-    // Hide bottom nav on admin pages
-    if (pathname?.startsWith('/admin')) return null;
+    // Hide bottom nav on admin and transactional pages to avoid blocking CTA buttons
+    const isTransactional = pathname?.includes('/product/') || pathname === '/cart' || pathname === '/checkout' || pathname?.startsWith('/admin');
+    if (isTransactional) return null;
 
     const navItems = [
         { label: 'Home', icon: PiHouse, href: '/' },
@@ -21,14 +22,18 @@ export default function MobileBottomNav() {
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] bg-white/80 backdrop-blur-xl border-t border-brand-gold/10 pb-6 pt-3 px-6 safe-area-bottom">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[70] bg-white/80 backdrop-blur-xl border-t border-brand-gold/10 pb-6 pt-3 px-6 safe-area-bottom">
             <div className="flex justify-between items-center max-w-md mx-auto">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
                     const Icon = item.icon;
 
                     return (
-                        <Link key={item.href} href={item.href} className="relative flex flex-col items-center gap-1 group">
+                        <Link
+                            key={item.href}
+                            href={item.href}
+                            className="relative flex flex-col items-center gap-1 group flex-1"
+                        >
                             <motion.div
                                 whileTap={{ scale: 0.9 }}
                                 className={`

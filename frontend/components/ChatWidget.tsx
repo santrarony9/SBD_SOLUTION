@@ -105,16 +105,26 @@ export default function ChatWidget() {
 
   if (!isOpen) {
     return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-[9999] w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:scale-110 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 flex items-center justify-center group border border-brand-gold/30 backdrop-blur-md"
-      >
-        <div className="absolute inset-0 rounded-full border border-white/5 group-hover:border-brand-navy/5 animate-pulse-slow"></div>
-        <PiChatCircleText className="w-7 h-7" />
-        {/* Animated pulse ring */}
-        <span className="absolute inset-0 rounded-full bg-brand-gold/20 animate-ping opacity-20 group-hover:opacity-0 transition-opacity"></span>
-        <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-      </button>
+      <div className="fixed bottom-28 md:bottom-8 right-4 md:right-8 z-[80] flex items-center group">
+        {/* Hover Label */}
+        <span className="bg-brand-navy text-brand-gold text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-l-full border-y border-l border-brand-gold/30 shadow-xl opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 hidden md:block">
+          Chat with Concierge
+        </span>
+
+        <button
+          onClick={() => setIsOpen(true)}
+          className="w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:scale-110 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 flex items-center justify-center border border-brand-gold/30 backdrop-blur-md animate-float"
+        >
+          <div className="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
+          <PiChatCircleText className="w-8 h-8" />
+
+          {/* Status Indicator */}
+          <span className="absolute top-1 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-brand-navy"></span>
+
+          {/* Pulsing ring */}
+          <span className="absolute inset-0 rounded-full bg-brand-gold/20 animate-ping opacity-20"></span>
+        </button>
+      </div>
     );
   }
 

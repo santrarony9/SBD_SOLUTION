@@ -8,7 +8,9 @@ export default function Footer() {
 
                 {/* 1. Brand & Ethos */}
                 <div className="md:col-span-1">
-                    <h2 className="text-xl font-serif text-white mb-4">Spark Blue Diamond</h2>
+                    <Link href="/" className="group">
+                        <h2 className="text-xl font-serif text-white mb-1 transition-colors group-hover:text-brand-gold">Spark Blue Diamond</h2>
+                    </Link>
                     <p className="text-brand-gold text-[10px] uppercase tracking-[0.2em] mb-4 font-bold">Established 2020</p>
                     <p className="text-gray-400 text-xs leading-relaxed mb-6">
                         Curating the world's most exquisite lab-grown diamonds and hallmarked gold jewellery since 2020.

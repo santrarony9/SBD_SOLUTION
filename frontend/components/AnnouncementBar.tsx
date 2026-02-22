@@ -27,9 +27,12 @@ export default function AnnouncementBar() {
     if (!setting || !setting.isActive) return null;
 
     const content = (
-        <div className="bg-brand-gold text-brand-navy py-2 px-4 text-center text-[10px] md:text-xs font-bold uppercase tracking-[0.2em] relative z-[60]">
-            {setting.text}
-            {setting.link && <span className="ml-2 underline font-serif italic">Explore Now</span>}
+        <div className="bg-brand-gold text-brand-navy py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.25em] relative z-[60] overflow-hidden group">
+            {/* Shimmer Effect */}
+            <div className="absolute inset-0 animate-shimmer pointer-events-none"></div>
+
+            <span className="relative z-10">{setting.text}</span>
+            {setting.link && <span className="ml-2 underline font-serif italic relative z-10 group-hover:text-white transition-colors">Explore Now</span>}
         </div>
     );
 
