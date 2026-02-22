@@ -80,9 +80,11 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                         alt={banner.title || "Royal Diamond Collection"}
                         fill
                         priority={index === 0}
+                        fetchPriority={index === 0 ? "high" : "low"}
                         className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
                             }`}
                         style={{ objectPosition: 'center center' }}
+                        quality={90}
                     />
                     {/* Sophisticated Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90 mix-blend-multiply" />
@@ -102,7 +104,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                 </div>
 
                 {/* Main Hero Text (Static Global Setting) */}
-                <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl">
+                <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
                     {heroText.title.includes('Eternal') ? (
                         <>
                             {heroText.title.split('Eternal')[0]}

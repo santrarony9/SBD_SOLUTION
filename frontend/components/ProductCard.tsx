@@ -55,7 +55,8 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         alt={product.name}
                         fill
                         className="object-contain transition-opacity duration-700 ease-in-out group-hover:opacity-0"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 20vw"
+                        quality={85}
                     />
 
                     {/* Cover Image (Reveals on Hover) */}

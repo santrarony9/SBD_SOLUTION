@@ -95,7 +95,7 @@ export class ProductsService {
         return this.prisma.product.delete({ where: { id } });
     }
 
-    async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number }) {
+    async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number, skip?: number, take?: number }) {
         const where: any = { isActive: true };
 
         if (filters?.category) {
@@ -106,15 +106,35 @@ export class ProductsService {
             where.tags = { has: filters.tag };
         }
 
-        // Price filtering is tricky because price is calculated dynamically.
-        // For MVP, we filter by 'category' and 'tag' at DB level.
-        // Price filtering might need to happen after fetching, or we store estimated price.
-        // Given existing structure, we filter after fetch if price filter exists.
+        // 1. Batch fetch products with pagination (at DB level)
+        const products = await this.prisma.product.findMany({
+            where,
+            skip: filters?.skip || 0,
+            take: filters?.take || 50, // Default limit for safety
+            orderBy: { createdAt: 'desc' }
+        });
 
-        const products = await this.prisma.product.findMany({ where });
+        if (products.length === 0) return [];
 
-        const enriched = await Promise.all(products.map(p => this.enrichWithPrice(p)));
+        // 2. Batch fetch global rates to solve N+1 Problem
+        const [goldRates, diamondRates, charges] = await Promise.all([
+            this.prisma.goldPrice.findMany(),
+            this.prisma.diamondPrice.findMany(),
+            this.prisma.charge.findMany({ where: { isActive: true } })
+        ]);
 
+        const goldRateMap = new Map(goldRates.map(r => [r.purity, r.pricePer10g]));
+        const diamondRateMap = new Map(diamondRates.map(r => [r.clarity, r.pricePerCarat]));
+
+        // 3. Enrich products using cached rates
+        const enriched = products.map(product => {
+            const goldPricePer10g = goldRateMap.get(product.goldPurity) || 0;
+            const diamondPricePerCarat = diamondRateMap.get(product.diamondClarity) || 0;
+
+            return this.calculatePricing(product, goldPricePer10g, diamondPricePerCarat, charges);
+        });
+
+        // 4. Client-side price filtering (since pricing is dynamic)
         if (filters?.minPrice || filters?.maxPrice) {
             return enriched.filter(p => {
                 const price = p.pricing?.finalPrice || 0;
@@ -130,117 +150,68 @@ export class ProductsService {
     async findOne(slugOrId: string) {
         let product;
 
-        // Check if valid MongoDB ObjectId (24 hex characters)
         if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
-            product = await this.prisma.product.findUnique({
-                where: { id: slugOrId },
-            });
+            product = await this.prisma.product.findUnique({ where: { id: slugOrId } });
         }
 
-        // If not valid ID or not found by ID, search by slug
         if (!product) {
-            product = await this.prisma.product.findFirst({
-                where: { slug: slugOrId },
-            });
+            product = await this.prisma.product.findFirst({ where: { slug: slugOrId } });
         }
 
         if (!product) throw new NotFoundException('Product not found');
 
-        return this.enrichWithPrice(product);
+        // Fetch rates for single enrichment
+        const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
+        const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
+        const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
+
+        return this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges);
     }
 
     // ------------------------------------------
-    // CORE PRICING LOGIC
+    // OPTIMIZED PRICING LOGIC (Pure Function style)
     // ------------------------------------------
-    private async enrichWithPrice(product: any) {
+    private calculatePricing(product: any, goldRate: number, diamondRate: number, charges: any[]) {
         try {
-            // 1. Fetch Rates
-            const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
-            const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
-            const charges = await this.prisma.charge.findMany({ where: { isActive: true } }) || [];
-
-            // Defaults if rates missing (should not happen in prod ideally)
-            const goldPricePer10g = goldRate?.pricePer10g || 0;
-            const diamondPricePerCarat = diamondRate?.pricePerCarat || 0;
-
-            // 2. Calculate Components
-            const goldValue = (goldPricePer10g / 10) * product.goldWeight;
-            const diamondValue = diamondPricePerCarat * product.diamondCarat;
-
-            // 3. Calculate Charges
-            // ApplyOn: GOLD, DIAMOND, FINAL, etc.
-            // We need to handle each charge type.
-
+            const goldValue = (goldRate / 10) * product.goldWeight;
+            const diamondValue = diamondRate * product.diamondCarat;
             const subTotal = goldValue + diamondValue;
+
             let makingCharges = 0;
             let otherCharges = 0;
 
-            // First pass: Calculate Making/Other (non-tax usually)
             for (const charge of charges) {
-                if (charge.name.toUpperCase().includes('GST')) continue; // Skip GST for now
+                if (charge.name.toUpperCase().includes('GST')) continue;
 
-                let chargeAmount = 0;
-
-                // For simplicity assuming ApplyOn 'GOLD' means based on gold weight or value
-                // The prompt says: Charge Type: Flat, Per gram, Per carat, Percentage.
-                // Apply on: Gold, Diamond, Subtotal, Final amount.
-
-                if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) {
-                    chargeAmount = charge.amount * product.goldWeight;
-                } else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) {
-                    chargeAmount = charge.amount * product.diamondCarat;
-                } else if (charge.type === 'FLAT') {
-                    chargeAmount = charge.amount;
-                } else if (charge.type === 'PERCENTAGE') {
-                    // % of what? 
-                    if (charge.applyOn === ApplyOn.GOLD_VALUE) chargeAmount = (goldValue * charge.amount) / 100;
-                    else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) chargeAmount = (diamondValue * charge.amount) / 100;
-                    else if (charge.applyOn === ApplyOn.SUBTOTAL) chargeAmount = (subTotal * charge.amount) / 100;
+                let amt = 0;
+                if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) amt = charge.amount * product.goldWeight;
+                else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) amt = charge.amount * product.diamondCarat;
+                else if (charge.type === 'FLAT') amt = charge.amount;
+                else if (charge.type === 'PERCENTAGE') {
+                    if (charge.applyOn === ApplyOn.GOLD_VALUE) amt = (goldValue * charge.amount) / 100;
+                    else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) amt = (diamondValue * charge.amount) / 100;
+                    else if (charge.applyOn === ApplyOn.SUBTOTAL) amt = (subTotal * charge.amount) / 100;
                 }
 
-                if (charge.name.toLowerCase().includes('making')) {
-                    makingCharges += chargeAmount;
-                } else if (charge.name.toLowerCase().includes('other')) {
-                    otherCharges += chargeAmount;
-                } else {
-                    // Default to other if not making or tax
-                    otherCharges += chargeAmount;
-                }
+                if (charge.name.toLowerCase().includes('making')) makingCharges += amt;
+                else otherCharges += amt;
             }
 
-            let gst = 0;
-            const taxableAmount = subTotal + makingCharges + otherCharges;
-
-            // Second pass: GST
+            const taxable = subTotal + makingCharges + otherCharges;
             const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
-            if (gstCharge) {
-                // usually percentage of taxable
-                if (gstCharge.type === 'PERCENTAGE') {
-                    gst = (taxableAmount * gstCharge.amount) / 100;
-                }
-            }
-
-            const finalPrice = taxableAmount + gst;
+            const gst = (gstCharge && gstCharge.type === 'PERCENTAGE') ? (taxable * gstCharge.amount) / 100 : 0;
 
             return {
                 ...product,
                 pricing: {
                     validAsOf: new Date(),
-                    goldRate: goldPricePer10g,
-                    diamondRate: diamondPricePerCarat,
-                    components: {
-                        goldValue,
-                        diamondValue,
-                        makingCharges,
-                        otherCharges,
-                        gst
-                    },
-                    finalPrice
+                    goldRate,
+                    diamondRate,
+                    components: { goldValue, diamondValue, makingCharges, otherCharges, gst },
+                    finalPrice: taxable + gst
                 }
             };
-        } catch (error) {
-            console.error('Error calculating price for product:', product.id, error);
-            // Return product without pricing info rather than crashing
+        } catch (e) {
             return { ...product, pricing: null };
         }
     }

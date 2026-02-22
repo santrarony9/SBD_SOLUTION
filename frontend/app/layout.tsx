@@ -20,13 +20,42 @@ const inter = Inter({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
+  const defaultMeta = {
+    title: "Spark Blue Diamond | Premium Jewellery & Certified Diamonds",
+    description: "Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold. Bespoke craftsmanship and transparent pricing since 1995.",
+    keywords: ["luxury jewellery", "diamond rings", "gold necklaces", "certified diamonds", "custom jewellery India"],
+    themeColor: "#0F172A", // Brand Navy
+  };
+
   try {
     const data = await fetchAPI('/store/settings/seo');
     if (data && data.value) {
       return {
-        title: data.value.title || "Spark Blue Diamond",
-        description: data.value.description || "Premium Jewellery",
-        keywords: data.value.keywords || "jewellery, diamond, gold",
+        title: data.value.title || defaultMeta.title,
+        description: data.value.description || defaultMeta.description,
+        keywords: data.value.keywords || defaultMeta.keywords,
+        themeColor: defaultMeta.themeColor,
+        openGraph: {
+          title: data.value.title || defaultMeta.title,
+          description: data.value.description || defaultMeta.description,
+          url: 'https://sparkbluediamond.com',
+          siteName: 'Spark Blue Diamond',
+          images: [
+            {
+              url: 'https://res.cloudinary.com/dd2ajeyom/image/upload/v1739982000/sbd-og-image.jpg',
+              width: 1200,
+              height: 630,
+            },
+          ],
+          locale: 'en_US',
+          type: 'website',
+        },
+        twitter: {
+          card: 'summary_large_image',
+          title: data.value.title || defaultMeta.title,
+          description: data.value.description || defaultMeta.description,
+          images: ['https://res.cloudinary.com/dd2ajeyom/image/upload/v1739982000/sbd-og-image.jpg'],
+        },
         icons: {
           icon: '/favicon.png',
           apple: '/favicon.png',
@@ -34,12 +63,15 @@ export async function generateMetadata(): Promise<Metadata> {
       };
     }
   } catch (e) {
-    // Graceful fallback if backend is down during build
+    // Fallback to default below
   }
 
   return {
-    title: "Spark Blue Diamond | Premium Jewellery",
-    description: "IGI Certified Diamond & Hallmarked Gold Jewellery",
+    ...defaultMeta,
+    openGraph: {
+      type: 'website',
+      siteName: 'Spark Blue Diamond',
+    },
     icons: {
       icon: '/favicon.png',
       apple: '/favicon.png',
