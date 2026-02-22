@@ -67,10 +67,12 @@ function ShopContent() {
         name: p.name,
         slug: p.slug,
         image: p.images && p.images.length > 0 ? p.images[0] : null,
+        images: p.images || [],
+        coverImage: (p as any).coverImage,
         price: p.pricing?.finalPrice || p.price || 0,
         category: p.category || `${p.goldPurity}K Gold`,
         goldPurity: p.goldPurity,
-        goldWeight: (p as any).goldWeight, // Backend field name might differ slightly, cast to be safe
+        goldWeight: (p as any).goldWeight,
         diamondCarat: (p as any).diamondCarat,
         diamondClarity: p.diamondClarity
     });
@@ -270,9 +272,10 @@ function ShopContent() {
                 {/* Product Grid */}
                 <div className="col-span-1 md:col-span-9">
                     {loading ? (
-                        <div className="flex flex-col items-center justify-center py-32 space-y-4">
-                            <div className="w-16 h-16 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
-                            <p className="text-xs uppercase tracking-[0.2em] text-brand-navy animate-pulse">Loading Collections</p>
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 md:gap-x-6 md:gap-y-12">
+                            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                                <ProductSkeleton key={i} />
+                            ))}
                         </div>
                     ) : error ? (
                         <div className="text-center py-20 text-red-500 font-light">
@@ -364,57 +367,47 @@ function ShopContent() {
                             </div>
 
                             <div className="space-y-8">
-                                {/* Reusing Component Logic for Category */}
-                                <div>
-                                    <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Category</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
-                                            <button
-                                                key={cat}
-                                                onClick={() => toggleCategory(cat)}
-                                                className={`px-4 py-2 border rounded-sm text-xs uppercase tracking-wider ${selectedCategories.includes(cat.toLowerCase())
-                                                    ? 'bg-brand-navy text-white border-brand-navy'
-                                                    : 'bg-white text-gray-600 border-gray-200'
-                                                    }`}
-                                            >
-                                                {cat}
-                                            </button>
-                                        ))}
-                                    </div>
+                                <div className="mt-10 pt-6 border-t border-gray-100">
+                                    <button
+                                        onClick={() => setIsFilterOpen(false)}
+                                        className="w-full bg-brand-navy text-white text-sm font-bold uppercase tracking-widest py-4 hover:bg-gold-gradient hover:text-brand-navy transition-all"
+                                    >
+                                        Show {filteredAndSortedProducts.length} Results
+                                    </button>
                                 </div>
-
-                                {/* Metal Logic (Placeholder for now) */}
-                                <div>
-                                    <h4 className="text-sm font-bold uppercase tracking-widest text-brand-navy mb-4">Metal</h4>
-                                    <div className="flex flex-wrap gap-2">
-                                        {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
-                                            <button
-                                                key={metal}
-                                                onClick={() => toggleMetal(metal)}
-                                                className={`px-4 py-2 border rounded-sm text-xs uppercase tracking-wider ${selectedMetals.includes(metal)
-                                                    ? 'bg-brand-navy text-white border-brand-navy'
-                                                    : 'bg-white text-gray-600 border-gray-200'
-                                                    }`}
-                                            >
-                                                {metal}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="mt-10 pt-6 border-t border-gray-100">
-                                <button
-                                    onClick={() => setIsFilterOpen(false)}
-                                    className="w-full bg-brand-navy text-white text-sm font-bold uppercase tracking-widest py-4 hover:bg-gold-gradient hover:text-brand-navy transition-all"
-                                >
-                                    Show {filteredAndSortedProducts.length} Results
-                                </button>
                             </div>
                         </div>
                     </div>
                 )}
+            </div>
+        </div>
+    );
+}
 
+import SkeletonLoader, { ProductSkeleton, BannerSkeleton } from '@/components/SkeletonLoader';
+
+function ShopSkeleton() {
+    return (
+        <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">
+            <div className="relative h-[40vh] min-h-[300px] mb-16 bg-brand-navy overflow-hidden">
+                <BannerSkeleton />
+            </div>
+
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 grid grid-cols-1 md:grid-cols-12 gap-12">
+                <div className="hidden md:block col-span-3 space-y-12">
+                    <div className="space-y-4">
+                        <SkeletonLoader variant="text" className="w-1/2 h-6" />
+                        {[1, 2, 3, 4, 5].map(i => <SkeletonLoader key={i} variant="text" className="w-1/3 h-4" />)}
+                    </div>
+                </div>
+
+                <div className="col-span-1 md:col-span-9">
+                    <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-x-3 gap-y-8 md:gap-x-6 md:gap-y-12">
+                        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                            <ProductSkeleton key={i} />
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -422,11 +415,7 @@ function ShopContent() {
 
 export default function ShopPage() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-brand-cream flex items-center justify-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-gold"></div>
-            </div>
-        }>
+        <Suspense fallback={<ShopSkeleton />}>
             <ShopContent />
         </Suspense>
     );

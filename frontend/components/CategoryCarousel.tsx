@@ -59,12 +59,16 @@ export default function CategoryCarousel({ category, products }: CategoryCarouse
 
                 <div
                     ref={scrollRef}
-                    className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    className="flex gap-8 overflow-x-auto pb-8 scrollbar-hide snap-x snap-mandatory overscroll-x-contain touch-pan-x"
+                    style={{
+                        scrollbarWidth: 'none',
+                        msOverflowStyle: 'none',
+                        WebkitOverflowScrolling: 'touch'
+                    }}
                 >
                     {products.map((product) => (
                         <div key={product.id} className="min-w-[280px] md:min-w-[320px] snap-start">
-                            <ProductCard product={{ ...product, image: product.imageUrl || product.image }} />
+                            <ProductCard product={{ ...product, image: product.imageUrl || product.image || (product.images && product.images[0]) }} />
                         </div>
                     ))}
                     {/* View More Card */}

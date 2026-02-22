@@ -244,7 +244,7 @@ export default async function Home() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredProducts.map((p: any) => (
-              <ProductCard key={p.id} product={{ ...p, slug: p.slug || p.id, image: p.imageUrl }} />
+              <ProductCard key={p.id} product={{ ...p, slug: p.slug || p.id, image: p.images?.[0] || p.imageUrl }} />
             ))}
           </div>
         </div>

@@ -22,7 +22,9 @@ export default function AdminCMS() {
     const [galleryItems, setGalleryItems] = useState<any[]>([]);
 
     // Form States
-    const [newBanner, setNewBanner] = useState({ imageUrl: '', title: '', link: '' });
+    const [newBanner, setNewBanner] = useState({ imageUrl: '', mobileImageUrl: '', title: '', link: '' });
+    const [isEditingBanner, setIsEditingBanner] = useState(false);
+    const [editingBannerId, setEditingBannerId] = useState<string | null>(null);
     const [isUploading, setIsUploading] = useState(false);
     const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
     const [newOffer, setNewOffer] = useState({ title: '', description: '', tag: '', code: '', imageUrl: '' });
@@ -106,11 +108,38 @@ export default function AdminCMS() {
     const handleAddBanner = async () => {
         if (!newBanner.imageUrl) return showToast('Image URL is required', 'error');
         try {
-            await fetchAPI('/banners', { method: 'POST', body: JSON.stringify(newBanner) });
-            showToast('Banner Added', 'success');
-            setNewBanner({ imageUrl: '', title: '', link: '' });
+            if (isEditingBanner && editingBannerId) {
+                await fetchAPI(`/banners/${editingBannerId}`, { method: 'PUT', body: JSON.stringify(newBanner) });
+                showToast('Banner Updated', 'success');
+            } else {
+                await fetchAPI('/banners', { method: 'POST', body: JSON.stringify(newBanner) });
+                showToast('Banner Added', 'success');
+            }
+            setNewBanner({ imageUrl: '', mobileImageUrl: '', title: '', link: '' });
+            setIsEditingBanner(false);
+            setEditingBannerId(null);
             loadContent();
-        } catch (e) { showToast('Failed to add banner', 'error'); }
+        } catch (e) { showToast(isEditingBanner ? 'Failed to update banner' : 'Failed to add banner', 'error'); }
+    };
+
+    const handleEditBanner = (banner: any) => {
+        setNewBanner({
+            imageUrl: banner.imageUrl || '',
+            mobileImageUrl: banner.mobileImageUrl || '',
+            title: banner.title || '',
+            link: banner.link || ''
+        });
+        setEditingBannerId(banner.id);
+        setIsEditingBanner(true);
+        setActiveSection('banners');
+        // Scroll to form
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    const handleCancelEdit = () => {
+        setNewBanner({ imageUrl: '', mobileImageUrl: '', title: '', link: '' });
+        setIsEditingBanner(false);
+        setEditingBannerId(null);
     };
 
     const handleDeleteBanner = async (id: string) => {
@@ -484,89 +513,106 @@ export default function AdminCMS() {
                     {activeSection === 'banners' && (
                         <div className="space-y-10">
                             <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-4 flex items-center gap-2">
-                                    <PiPlus className="text-brand-gold" /> Add New Banner
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        {isEditingBanner ? <PiLayout className="text-brand-gold" /> : <PiPlus className="text-brand-gold" />}
+                                        {isEditingBanner ? 'Edit Banner' : 'Add New Banner'}
+                                    </div>
+                                    {isEditingBanner && (
+                                        <button onClick={handleCancelEdit} className="text-[10px] text-gray-500 hover:text-red-500 font-bold uppercase tracking-widest bg-white px-3 py-1 rounded-lg border border-gray-100 shadow-sm transition-all">
+                                            Cancel Editing
+                                        </button>
+                                    )}
                                 </h3>
-                                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    {/* Desktop Image */}
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-end">
-                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image Source</label>
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Desktop Banner</label>
                                             <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
-                                                Rec: 1920x1080px | Max 5MB
+                                                Rec: 1920x1080px
                                             </span>
                                         </div>
 
                                         {!newBanner.imageUrl ? (
-                                            <label className={`relative block w-full h-32 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-300 hover:border-brand-navy hover:bg-gray-50'}`}>
+                                            <label className={`relative block w-full h-40 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-200 hover:border-brand-navy hover:bg-white'}`}>
                                                 <input
                                                     type="file"
                                                     accept="image/*"
                                                     className="absolute inset-0 opacity-0 cursor-pointer"
-                                                    disabled={isUploading}
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
-                                                            if (file.size > 5 * 1024 * 1024) {
-                                                                showToast('File is too large! Max 5MB allowed.', 'error');
-                                                                return;
-                                                            }
                                                             setIsUploading(true);
                                                             const formData = new FormData();
                                                             formData.append('file', file);
-
-                                                            showToast('Uploading...', 'success');
-
+                                                            showToast('Uploading Desktop...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
-                                                                .then(res => {
-                                                                    if (res.url) {
-                                                                        setNewBanner(prev => ({ ...prev, imageUrl: res.url }));
-                                                                        showToast('Image Uploaded!', 'success');
-                                                                    } else {
-                                                                        showToast('Upload failed: No URL returned', 'error');
-                                                                    }
-                                                                })
-                                                                .catch(err => {
-                                                                    console.error(err);
-                                                                    showToast('Upload Failed', 'error');
-                                                                })
+                                                                .then(res => setNewBanner(prev => ({ ...prev, imageUrl: res.url })))
                                                                 .finally(() => setIsUploading(false));
                                                         }
                                                     }}
                                                 />
-                                                <div className="flex flex-col items-center justify-center h-full">
-                                                    {isUploading ? (
-                                                        <>
-                                                            <div className="w-5 h-5 border-2 border-brand-gold border-t-transparent rounded-full animate-spin mb-2"></div>
-                                                            <span className="text-[10px] font-bold text-brand-gold">UPLOADING...</span>
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <span className="text-xl text-gray-300 mb-1">📷</span>
-                                                            <span className="text-[10px] font-bold text-gray-400">CLICK TO UPLOAD</span>
-                                                        </>
-                                                    )}
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiImage className="text-2xl mb-1" />
+                                                    <span className="text-[10px] font-bold">SELECT DESKTOP IMAGE</span>
                                                 </div>
                                             </label>
                                         ) : (
-                                            <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-                                                <img src={newBanner.imageUrl} alt="Preview" className="w-full h-full object-cover" />
-
-                                                {/* Overlay Actions */}
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-3">
-                                                    <button
-                                                        onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))}
-                                                        className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors transform hover:scale-110"
-                                                        title="Remove Image"
-                                                    >
-                                                        <span className="text-xs font-bold">✕</span>
-                                                    </button>
-                                                </div>
-                                                <div className="absolute top-2 right-2 bg-green-500 text-white text-[9px] font-bold px-2 py-0.5 rounded shadow">
-                                                    UPLOADED
+                                            <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
+                                                <img src={newBanner.imageUrl} alt="Desktop Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))} className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform"><PiTrash /></button>
                                                 </div>
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Mobile Image */}
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Mobile Banner</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Rec: 1080x1350px (Portrait)
+                                            </span>
+                                        </div>
+
+                                        {!newBanner.mobileImageUrl ? (
+                                            <label className={`relative block w-full h-40 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-200 hover:border-brand-navy hover:bg-white'}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            setIsUploading(true);
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showToast('Uploading Mobile...', 'success');
+                                                            fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                .then(res => setNewBanner(prev => ({ ...prev, mobileImageUrl: res.url })))
+                                                                .finally(() => setIsUploading(false));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiImage className="text-2xl mb-1" />
+                                                    <span className="text-[10px] font-bold">SELECT MOBILE IMAGE</span>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
+                                                <img src={newBanner.mobileImageUrl} alt="Mobile Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, mobileImageUrl: '' }))} className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform"><PiTrash /></button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Banner Title</label>
                                         <input
@@ -574,7 +620,7 @@ export default function AdminCMS() {
                                             placeholder="e.g. Royal Wedding Collection"
                                             value={newBanner.title}
                                             onChange={(e) => setNewBanner({ ...newBanner, title: e.target.value })}
-                                            className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            className="w-full border-b border-gray-100 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors font-serif italic"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -584,38 +630,74 @@ export default function AdminCMS() {
                                             placeholder="/shop/weddings"
                                             value={newBanner.link}
                                             onChange={(e) => setNewBanner({ ...newBanner, link: e.target.value })}
-                                            className="w-full border-b border-gray-200 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            className="w-full border-b border-gray-100 py-3 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
                                         />
                                     </div>
                                 </div>
-                                <div className="mt-6 flex justify-end">
+
+                                <div className="mt-8 flex justify-end gap-4">
+                                    {isEditingBanner && (
+                                        <button
+                                            onClick={handleCancelEdit}
+                                            className="px-8 py-3 rounded-xl font-bold uppercase tracking-widest text-[9px] text-gray-500 hover:bg-gray-100 transition-all border border-gray-100"
+                                        >
+                                            Cancel
+                                        </button>
+                                    )}
                                     <button
                                         onClick={handleAddBanner}
-                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                        className="bg-brand-navy text-white px-10 py-3 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-xl shadow-brand-navy/20 flex items-center gap-2"
                                     >
-                                        Add Banner
+                                        <PiCheck className="text-brand-gold text-lg" />
+                                        {isEditingBanner ? 'Update Master Banner' : 'Publish New Banner'}
                                     </button>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {banners.map(banner => (
-                                    <div key={banner.id} className="group relative bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-brand-navy/5 transition-all duration-500 aspect-[16/9]">
-                                        <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-6">
-                                            <div className="flex justify-between items-end">
-                                                <div>
-                                                    <p className="text-white font-serif text-lg leading-tight">{banner.title}</p>
-                                                    <p className="text-brand-gold text-[10px] uppercase tracking-widest mt-1">{banner.targetUrl}</p>
+                                    <div key={banner.id} className="group relative bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-brand-navy/10 transition-all duration-700">
+                                        <div className="relative aspect-[16/9] overflow-hidden">
+                                            <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                            {banner.mobileImageUrl && (
+                                                <div className="absolute top-4 right-4 bg-brand-gold text-brand-navy px-3 py-1 rounded-full text-[9px] font-black tracking-widest shadow-lg flex items-center gap-1.5">
+                                                    <PiLayout size={12} /> DUAL SIZE READY
                                                 </div>
-                                                <button onClick={() => handleDeleteBanner(banner.id)} className="bg-white/10 backdrop-blur-md text-white p-3 rounded-full hover:bg-red-500 transition-colors border border-white/20">
-                                                    <PiTrash />
+                                            )}
+                                        </div>
+                                        <div className="p-6 flex justify-between items-center bg-white border-t border-gray-50">
+                                            <div className="space-y-1">
+                                                <p className="text-brand-navy font-serif font-bold text-lg leading-tight">{banner.title || 'Untitled Banner'}</p>
+                                                <p className="text-gray-400 text-[10px] uppercase tracking-widest">{banner.link || 'No destination link'}</p>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => handleEditBanner(banner)}
+                                                    className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
+                                                    title="Edit Banner"
+                                                >
+                                                    <PiLayout size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeleteBanner(banner.id)}
+                                                    className="w-10 h-10 flex items-center justify-center bg-red-50 text-white rounded-xl hover:bg-red-600 transition-all shadow-lg shadow-red-500/10"
+                                                    title="Delete Banner"
+                                                >
+                                                    <PiTrash size={18} />
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
-                                {banners.length === 0 && <div className="md:col-span-2 py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No banners active</div>}
+                                {banners.length === 0 && (
+                                    <div className="md:col-span-2 py-32 text-center border-3 border-dashed border-gray-100 rounded-[3rem]">
+                                        <div className="bg-gray-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                                            <PiImage className="text-4xl text-gray-200" />
+                                        </div>
+                                        <p className="text-gray-400 font-serif italic text-lg">Your billboard is currently empty.</p>
+                                        <p className="text-gray-300 text-[10px] uppercase font-bold tracking-[0.2em] mt-2">Publish your first collection banner above</p>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}

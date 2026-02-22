@@ -8,6 +8,7 @@ import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 interface Banner {
     id: string;
     imageUrl: string;
+    mobileImageUrl?: string;
     title?: string;
     link?: string;
 }
@@ -24,6 +25,7 @@ interface HeroSliderProps {
 
 export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isMobile, setIsMobile] = useState(false);
 
     // Fallback if no banners
     const activeBanners = (banners && Array.isArray(banners) && banners.length > 0) ? banners : [{
@@ -32,6 +34,16 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         title: 'Est. 1995',
         link: '/shop'
     }];
+
+    // Screen size detection
+    useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     // Auto-slide effect
     useEffect(() => {
@@ -64,7 +76,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                         }`}
                 >
                     <Image
-                        src={banner.imageUrl}
+                        src={(isMobile && banner.mobileImageUrl) ? banner.mobileImageUrl : banner.imageUrl}
                         alt={banner.title || "Royal Diamond Collection"}
                         fill
                         priority={index === 0}

@@ -107,37 +107,44 @@ export default function ChatWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 md:bottom-6 right-6 z-[9999] w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-2xl hover:scale-105 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-300 flex items-center justify-center group border border-brand-gold/20"
+        className="fixed bottom-20 md:bottom-8 right-4 md:right-8 z-[9999] w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:scale-110 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 flex items-center justify-center group border border-brand-gold/30 backdrop-blur-md"
       >
-        <div className="absolute inset-0 rounded-full border border-white/10 group-hover:border-brand-navy/10 animate-pulse-slow"></div>
+        <div className="absolute inset-0 rounded-full border border-white/5 group-hover:border-brand-navy/5 animate-pulse-slow"></div>
         <PiChatCircleText className="w-7 h-7" />
-        {/* Notification Dot if needed */}
-        <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
+        {/* Animated pulse ring */}
+        <span className="absolute inset-0 rounded-full bg-brand-gold/20 animate-ping opacity-20 group-hover:opacity-0 transition-opacity"></span>
+        <span className="absolute top-1 right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
       </button>
     );
   }
 
   return (
-    <div className="fixed bottom-24 md:bottom-6 right-6 z-[9999] flex flex-col items-end animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-0 md:inset-auto md:bottom-8 md:right-8 z-[9999] flex flex-col items-end animate-in fade-in zoom-in-95 duration-300 pointer-events-none">
+      {/* Mobile Backdrop - Semi-transparent */}
+      <div className="md:hidden absolute inset-0 bg-brand-navy/20 backdrop-blur-sm pointer-events-auto" onClick={() => setIsOpen(false)}></div>
+
       {/* Chat Window */}
-      <div className="w-[350px] sm:w-[380px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-brand-charcoal/10 flex flex-col h-[500px]">
+      <div className="w-full h-full md:w-[400px] md:h-[600px] md:max-h-[80vh] bg-white md:rounded-2xl shadow-2xl overflow-hidden border-t md:border border-brand-charcoal/10 flex flex-col pointer-events-auto relative mt-auto">
         {/* Header */}
-        <div className="bg-brand-navy p-4 flex justify-between items-center text-white shrink-0 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gold-gradient opacity-5"></div>
-          <div className="flex items-center gap-3 relative z-10">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-brand-gold backdrop-blur-sm border border-white/10">
-              <PiSparkle className="w-5 h-5" />
+        <div className="bg-brand-navy p-5 flex justify-between items-center text-white shrink-0 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gold-gradient opacity-10"></div>
+          <div className="flex items-center gap-4 relative z-10">
+            <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-brand-gold backdrop-blur-md border border-white/10 shadow-inner">
+              <PiSparkle className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h3 className="font-serif text-sm font-medium tracking-wide text-brand-gold">SBD Concierge</h3>
-              <p className="text-[9px] text-white/60 uppercase tracking-widest font-sans">AI Powered • Always Online</p>
+              <h3 className="font-serif text-base font-medium tracking-wider text-brand-gold">Royal Concierge</h3>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
+                <p className="text-[10px] text-white/70 uppercase tracking-[0.2em] font-sans">Artificial Intelligence • Online</p>
+              </div>
             </div>
           </div>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-white/60 hover:text-white transition-colors relative z-10 hover:bg-white/10 p-1 rounded-full"
+            className="text-white/40 hover:text-white transition-all relative z-10 hover:bg-white/10 p-2 rounded-full"
           >
-            <PiX className="w-5 h-5" />
+            <PiX className="w-6 h-6" />
           </button>
         </div>
 
