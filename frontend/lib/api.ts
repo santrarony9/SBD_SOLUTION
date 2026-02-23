@@ -40,6 +40,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
             const headers: Record<string, string> = {
                 ...((options.headers as Record<string, string>) || {}),
+                'X-Client-Version': '1.0.1',
             };
 
             if (!(options.body instanceof FormData)) {
