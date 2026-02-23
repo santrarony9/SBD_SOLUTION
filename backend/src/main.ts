@@ -32,7 +32,7 @@ async function bootstrap() {
   const logBufferService = app.get(LogBufferService);
   const httpAdapterHost = app.get(HttpAdapterHost);
 
-  console.log(`[BOOTSTRAP] Starting Backend v2.2 with Fortified Security...`);
+  console.log(`[BOOTSTRAP] Starting Backend v2.3 with Advanced Traffic Coordination...`);
 
   // 1. Security Headers
   app.use(helmet({
@@ -59,7 +59,7 @@ async function bootstrap() {
   app.enableCors({
     origin: FRONTEND_URL === '*' ? true : FRONTEND_URL.split(','),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
+    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With, X-Client-Version, Cache-Control, Pragma',
     credentials: true,
   });
   return app;
