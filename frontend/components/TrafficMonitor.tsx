@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
 interface TrafficMetrics {
     currentRpm: number;
@@ -13,10 +14,18 @@ interface TrafficMetrics {
 }
 
 export default function TrafficMonitor() {
+    const { user } = useAuth();
     const [metrics, setMetrics] = useState<TrafficMetrics | null>(null);
     const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
+    // Only render if user email is admin@sparkblue.com
+    if (user?.email !== 'admin@sparkblue.com') {
+        return null;
+    }
+
     useEffect(() => {
+        // Only fetch if it's the specific admin
+        if (user?.email !== 'admin@sparkblue.com') return;
         const fetchMetrics = async () => {
             try {
                 const data = await fetchAPI('/diagnostics/traffic');
