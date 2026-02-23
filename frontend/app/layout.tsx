@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: '/manifest.webmanifest',
     appleWebApp: {
       capable: true,
-      statusBarStyle: 'default',
+      statusBarStyle: 'default' as const,
       title: 'Spark Blue Diamond',
     },
   };
