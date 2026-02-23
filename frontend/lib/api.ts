@@ -4,7 +4,7 @@ const isServer = typeof window === 'undefined';
 
 export const API_URL = isServer
     ? (process.env.INTERNAL_API_URL || 'https://spark-blue-backend.onrender.com/api')
-    : (envUrl || '/api');
+    : (process.env.NEXT_PUBLIC_API_URL || '/api');
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     // Determine the full URL

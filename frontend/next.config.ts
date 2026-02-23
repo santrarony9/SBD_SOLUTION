@@ -32,11 +32,12 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://spark-blue-backend.onrender.com/api';
+    // Force the direct Render URL to bypass any Vercel environment variable misconfigurations
+    const backendUrl = 'https://spark-blue-backend.onrender.com';
     return [
       {
         source: '/api/:path*',
-        destination: `${apiUrl}/:path*`,
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
