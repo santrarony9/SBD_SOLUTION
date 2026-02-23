@@ -40,7 +40,7 @@ async function bootstrap() {
   }));
 
   // Enable trust proxy for Render/Vercel
-  (app.getHttpAdapter().getInstance() as any).set('trust proxy', 1);
+  (app.getHttpAdapter().getInstance() as any).set('trust proxy', true);
 
   /* Temporarily disabled to debug production connectivity issues
   app.use(rateLimit({

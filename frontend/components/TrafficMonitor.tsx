@@ -26,20 +26,28 @@ export default function TrafficMonitor() {
     useEffect(() => {
         // Only fetch if it's the specific admin
         if (user?.email !== 'admin@sparkblue.com') return;
+
+        let isMounted = true;
         const fetchMetrics = async () => {
             try {
                 const data = await fetchAPI('/diagnostics/traffic');
-                setMetrics(data);
-                setLastUpdated(new Date());
-            } catch (err) {
+                if (isMounted) {
+                    setMetrics(data);
+                    setLastUpdated(new Date());
+                }
+            } catch (err: any) {
                 console.error('Failed to fetch traffic metrics', err);
+                // If it's a 429, we might want to slow down even more, but the 30s interval should help
             }
         };
 
         fetchMetrics();
-        const interval = setInterval(fetchMetrics, 5000); // Update every 5 seconds for "real-time" feel
-        return () => clearInterval(interval);
-    }, []);
+        const interval = setInterval(fetchMetrics, 30000); // Update every 30 seconds instead of 5
+        return () => {
+            isMounted = false;
+            clearInterval(interval);
+        };
+    }, [user?.email]);
 
     if (!metrics) return null;
 
