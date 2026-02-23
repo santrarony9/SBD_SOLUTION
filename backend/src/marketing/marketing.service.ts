@@ -154,14 +154,98 @@ export class MarketingService {
 
                 return recommendations.map((rec: any) => {
                     const product = candidates.find(c => c.id === rec.id);
-                    return product ? { ...product, imageUrl: product.images[0], matchReason: rec.matchReason } : null;
+                    if (!product) return null;
+
+                    // Calculate Price again for exact return
+                    const goldRate = goldRates.find(r => r.purity === product.goldPurity)?.pricePer10g || 0;
+                    const diamondRate = diamondRates.find(r => r.clarity === product.diamondClarity)?.pricePerCarat || 0;
+                    const subTotal = ((goldRate / 10) * product.goldWeight) + (diamondRate * product.diamondCarat);
+                    let overhead = 0;
+                    charges.forEach(charge => {
+                        if (charge.type === 'FLAT') overhead += charge.amount;
+                        else if (charge.type === 'PERCENTAGE' && charge.applyOn === ApplyOn.SUBTOTAL) overhead += (subTotal * charge.amount) / 100;
+                    });
+
+                    return {
+                        ...product,
+                        price: Math.round(subTotal + overhead),
+                        imageUrl: product.images[0],
+                        matchReason: rec.matchReason
+                    };
                 }).filter(Boolean);
             }
 
-            return candidates.slice(0, 3).map(c => ({ ...c, imageUrl: c.images[0], matchReason: "Selected based on your preferences." }));
+            return candidates.slice(0, 3).map(c => {
+                // Return basic estimate if AI fails
+                const goldRate = goldRates.find(r => r.purity === c.goldPurity)?.pricePer10g || 0;
+                const diamondRate = diamondRates.find(r => r.clarity === c.diamondClarity)?.pricePerCarat || 0;
+                const subTotal = ((goldRate / 10) * c.goldWeight) + (diamondRate * c.diamondCarat);
+                return { ...c, price: Math.round(subTotal * 1.2), imageUrl: c.images[0], matchReason: "Selected based on your preferences." };
+            });
 
         } catch (error) {
             this.logger.error("Gift Recommendation Error", error);
+            return [];
+        }
+    }
+
+    // --- Activity Tracking & Recently Viewed ---
+    async trackActivity(data: { ipAddress: string, productId?: string, activity: string, metadata?: any }) {
+        try {
+            return await this.prisma.userActivity.create({
+                data: {
+                    ipAddress: data.ipAddress,
+                    activity: data.activity,
+                    metadata: data.metadata || { productId: data.productId },
+                    // If we have a product, we might want to store it more explicitly in metadata for search
+                }
+            });
+        } catch (error) {
+            this.logger.error("Track Activity Error", error);
+        }
+    }
+
+    async getRecentlyViewed(ipAddress: string) {
+        try {
+            // Find recent PRODUCT_VIEW activities for this IP
+            const activities = await this.prisma.userActivity.findMany({
+                where: {
+                    ipAddress,
+                    activity: 'PRODUCT_VIEW'
+                },
+                take: 10,
+                orderBy: { createdAt: 'desc' },
+                select: { metadata: true }
+            });
+
+            // Extract unique product IDs from metadata
+            const productIds = Array.from(new Set(
+                activities
+                    .map((a: any) => a.metadata?.productId)
+                    .filter(Boolean)
+            )).slice(0, 5); // Limit to 5 unique recent items
+
+            if (productIds.length === 0) return [];
+
+            // Fetch product details
+            return this.prisma.product.findMany({
+                where: {
+                    id: { in: productIds as string[] },
+                    isActive: true
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    slug: true,
+                    images: true,
+                    goldWeight: true,
+                    goldPurity: true,
+                    diamondCarat: true,
+                    diamondClarity: true
+                }
+            });
+        } catch (error) {
+            this.logger.error("Get Recently Viewed Error", error);
             return [];
         }
     }

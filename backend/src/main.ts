@@ -6,6 +6,8 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { LogBufferService } from './diagnostics/log-buffer.service';
 import * as fs from 'fs';
 import * as path from 'path';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
 
 // Manual .env loading since @nestjs/config is missing
 const envPath = path.resolve(__dirname, '../../.env');
@@ -21,6 +23,7 @@ if (fs.existsSync(envPath)) {
 }
 
 const PORT = process.env.PORT || 3001;
+const FRONTEND_URL = process.env.FRONTEND_URL || '*';
 let cachedApp: any;
 
 async function bootstrap() {
@@ -29,15 +32,31 @@ async function bootstrap() {
   const logBufferService = app.get(LogBufferService);
   const httpAdapterHost = app.get(HttpAdapterHost);
 
-  console.log(`[BOOTSTRAP] Starting Backend v2.1 with Team Routes...`);
+  console.log(`[BOOTSTRAP] Starting Backend v2.2 with Fortified Security...`);
+
+  // 1. Security Headers
+  app.use(helmet({
+    contentSecurityPolicy: false, // Disable CSP if frontend/backend are separate or tricky, but keep other protections
+  }));
+
+  // 2. Global Rate Limiting
+  app.use(rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: 'Too many requests from this IP, please try again after 15 minutes',
+    standardHeaders: true,
+    legacyHeaders: false,
+  }));
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
   app.setGlobalPrefix('api');
+
+  // 3. Restricted CORS
   app.enableCors({
-    origin: '*',
+    origin: FRONTEND_URL === '*' ? true : FRONTEND_URL.split(','),
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With',
-    credentials: false,
+    credentials: true,
   });
   return app;
 }

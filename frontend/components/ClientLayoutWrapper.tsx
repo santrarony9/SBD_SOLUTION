@@ -8,6 +8,8 @@ import ExitIntentPopup from "@/components/ExitIntentPopup";
 import { motion, AnimatePresence } from 'framer-motion';
 import ChatWidget from "@/components/ChatWidget";
 import MobileBottomNav from "@/components/MobileBottomNav";
+import CartDrawer from "@/components/CartDrawer";
+import { useCart } from "@/context/CartContext";
 
 export default function ClientLayoutWrapper({
     children,
@@ -15,6 +17,7 @@ export default function ClientLayoutWrapper({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
+    const { isCartOpen, closeCart } = useCart();
     const isAdminPath = pathname?.startsWith('/admin');
 
     if (isAdminPath) {
@@ -40,6 +43,7 @@ export default function ClientLayoutWrapper({
             </AnimatePresence>
             <ChatWidget />
             <MobileBottomNav />
+            <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
             <Footer />
         </>
     );

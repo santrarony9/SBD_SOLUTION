@@ -9,7 +9,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle } from 'react-icons/pi';
+import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle, PiShoppingBag, PiShieldCheck } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 
 export default function CheckoutPage() {
@@ -18,6 +18,11 @@ export default function CheckoutPage() {
     const { showToast } = useToast();
     const router = useRouter();
 
+    const [activeStep, setActiveStep] = useState(1);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    // ... (rest of states: shippingAddress, paymentMethod, promoCode, appliedPromo, showGST, billingAddress)
     const [shippingAddress, setShippingAddress] = useState({
         fullName: user?.name || '',
         street: '',
@@ -29,44 +34,46 @@ export default function CheckoutPage() {
     });
 
     const [paymentMethod, setPaymentMethod] = useState('CCAVENUE');
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    // Promo Code State
     const [promoCode, setPromoCode] = useState('');
     const [appliedPromo, setAppliedPromo] = useState<{ code: string; value: number; type: string } | null>(null);
     const [promoLoading, setPromoLoading] = useState(false);
     const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-
-    // ... (Existing GST/Billing state - Keeping minimalistic for this view but functional)
     const [showGST, setShowGST] = useState(false);
     const [billingAddress, setBillingAddress] = useState({
         businessName: '',
         gstin: ''
     });
 
-    // Address Handling
+    // Handlers
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setShippingAddress({ ...shippingAddress, [e.target.name]: e.target.value });
+    };
+
+    const validateShipping = () => {
+        if (!shippingAddress.fullName || !shippingAddress.street || !shippingAddress.phone || !shippingAddress.zip) {
+            setError("Please fill in all required shipping details.");
+            return false;
+        }
+        setError(null);
+        return true;
+    };
+
+    const handleNextStep = () => {
+        if (activeStep === 1) {
+            if (validateShipping()) setActiveStep(2);
+        } else if (activeStep === 2) {
+            setActiveStep(3);
+        }
     };
 
     const handleApplyPromo = async () => {
         if (!promoCode.trim()) return;
         setPromoLoading(true);
         setPromoMessage(null);
-
         try {
-            const res = await fetchAPI('/promos/validate', {
-                method: 'POST',
-                body: JSON.stringify({ code: promoCode })
-            });
-
+            const res = await fetchAPI('/promos/validate', { method: 'POST', body: JSON.stringify({ code: promoCode }) });
             if (res && res.code) {
-                setAppliedPromo({
-                    code: res.code,
-                    value: res.discountValue,
-                    type: res.discountType
-                });
+                setAppliedPromo({ code: res.code, value: res.discountValue, type: res.discountType });
                 setPromoMessage({ type: 'success', text: `Coupon '${res.code}' applied!` });
             } else {
                 setAppliedPromo(null);
@@ -86,59 +93,41 @@ export default function CheckoutPage() {
         setPromoMessage(null);
     };
 
-    // Calculate Totals
     const calculateDiscount = () => {
         if (!appliedPromo) return 0;
-        if (appliedPromo.type === 'PERCENTAGE') {
-            return (cartTotal * appliedPromo.value) / 100;
-        }
-        return appliedPromo.value; // FLAT
+        if (appliedPromo.type === 'PERCENTAGE') return (cartTotal * appliedPromo.value) / 100;
+        return appliedPromo.value;
     };
 
     const discountAmount = calculateDiscount();
     const finalTotal = Math.max(0, cartTotal - discountAmount);
-    const taxAmount = showGST ? finalTotal * 0.03 : 0; // GST on discounted price (standard practice, verify if needed on gross)
+    const taxAmount = showGST ? finalTotal * 0.03 : 0;
     const grandTotal = finalTotal + taxAmount;
 
-    const handlePlaceOrder = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handlePlaceOrder = async () => {
         setIsLoading(true);
         setError(null);
-
-        // Validation
-        if (!shippingAddress.fullName || !shippingAddress.street || !shippingAddress.phone || !shippingAddress.zip) {
-            setError("Please fill in all required shipping details.");
-            setIsLoading(false);
-            return;
-        }
-
         try {
-            // 1. Create Order
             const orderPayload = {
                 shippingAddress,
-                billingAddress: shippingAddress, // simplified for now
+                billingAddress: shippingAddress,
                 paymentMethod,
-                totalAmount: grandTotal, // Send FINAL amount
+                totalAmount: grandTotal,
                 items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
                 isB2B: showGST,
                 customerGSTIN: showGST ? billingAddress.gstin : undefined,
                 businessName: showGST ? billingAddress.businessName : undefined,
-                // Promo Data
                 promoCode: appliedPromo ? appliedPromo.code : null,
                 discountAmount: discountAmount
             };
 
-            const order = await fetchAPI('/orders', {
-                method: 'POST',
-                body: JSON.stringify(orderPayload)
-            });
+            const order = await fetchAPI('/orders', { method: 'POST', body: JSON.stringify(orderPayload) });
 
             if (order && order.id) {
                 if (paymentMethod === 'CCAVENUE') {
-                    // Initiate Payment
                     const paymentPayload = {
                         orderId: order.id,
-                        amount: order.totalAmount, // vital security check on backend
+                        amount: order.totalAmount,
                         user: {
                             name: shippingAddress.fullName,
                             address: shippingAddress.street,
@@ -151,255 +140,264 @@ export default function CheckoutPage() {
                         }
                     };
 
-                    const paymentRes = await fetchAPI('/ccavenue/initiate', {
-                        method: 'POST',
-                        body: JSON.stringify(paymentPayload)
-                    });
+                    const paymentRes = await fetchAPI('/ccavenue/initiate', { method: 'POST', body: JSON.stringify(paymentPayload) });
 
                     if (paymentRes.encRequest && paymentRes.access_code && paymentRes.url) {
-                        // Create hidden form
                         const form = document.createElement('form');
                         form.method = 'POST';
                         form.action = paymentRes.url;
-
-                        const encInput = document.createElement('input');
-                        encInput.type = 'hidden';
-                        encInput.name = 'encRequest';
-                        encInput.value = paymentRes.encRequest;
-                        form.appendChild(encInput);
-
-                        const accessCodeInput = document.createElement('input');
-                        accessCodeInput.type = 'hidden';
-                        accessCodeInput.name = 'access_code';
-                        accessCodeInput.value = paymentRes.access_code;
-                        form.appendChild(accessCodeInput);
-
+                        const encInput = document.createElement('input'); encInput.type = 'hidden'; encInput.name = 'encRequest'; encInput.value = paymentRes.encRequest; form.appendChild(encInput);
+                        const accessCodeInput = document.createElement('input'); accessCodeInput.type = 'hidden'; accessCodeInput.name = 'access_code'; accessCodeInput.value = paymentRes.access_code; form.appendChild(accessCodeInput);
                         document.body.appendChild(form);
-
-                        // Clear cart
                         await clearCart();
-
-                        // Submit
                         form.submit();
-                    } else {
-                        throw new Error('Invalid payment initialization response from server.');
-                    }
+                    } else { throw new Error('Invalid payment initialization response.'); }
                 } else {
                     showToast("Payment method disabled", "info");
                     setIsLoading(false);
                 }
-            } else {
-                throw new Error("Failed to create order. Please try again.");
-            }
+            } else { throw new Error("Failed to create order."); }
         } catch (err: any) {
-            setError(err.message || 'Payment System Unavailable. Please check your connection.');
+            setError(err.message || 'Payment System Unavailable.');
             setIsLoading(false);
         }
     };
 
     if (items.length === 0 && !isLoading) {
         return (
-            <div className="min-h-[60vh] flex flex-col items-center justify-center">
-                <h2 className="text-3xl font-serif text-brand-navy mb-4">Your Bag is Empty</h2>
-                <Link href="/collections" className="btn-primary">Continue Shopping</Link>
+            <div className="min-h-[60vh] flex flex-col items-center justify-center p-6 text-center">
+                <div className="w-16 h-16 bg-brand-gold/10 rounded-full flex items-center justify-center mb-6">
+                    <PiShoppingBag className="text-3xl text-brand-gold" />
+                </div>
+                <h2 className="text-2xl font-serif text-brand-navy mb-4">Your Bag is Empty</h2>
+                <p className="text-gray-500 mb-8 max-w-xs">Looks like you haven't added anything to your collection yet.</p>
+                <Link href="/shop" className="bg-brand-navy text-white px-8 py-3 uppercase tracking-widest text-[10px] font-bold">Start Shopping</Link>
             </div>
         );
     }
 
     return (
-        <section className="bg-brand-cream/30 py-12 min-h-screen">
-            <div className="container mx-auto px-4 max-w-6xl">
-                <header className="mb-12 text-center">
-                    <h1 className="fluid-h2 font-serif text-brand-navy mb-4">Checkout</h1>
-                    <div className="flex items-center justify-center space-x-2 text-sm text-gray-500">
-                        <Link href="/cart" className="text-gray-500 hover:text-brand-gold transition-colors font-medium">Cart</Link>
-                        <span>/</span>
-                        <Link href="#shipping" className="text-brand-gold font-bold hover:text-brand-navy transition-colors">Details</Link>
-                        <span>/</span>
-                        <Link href="#payment" className="text-brand-navy font-bold hover:text-brand-gold transition-colors">Payment</Link>
-                    </div>
+        <section className="bg-brand-cream/30 py-8 md:py-16 min-h-screen">
+            <div className="max-w-4xl mx-auto px-4">
+                <header className="mb-10 text-center">
+                    <h1 className="text-3xl font-serif text-brand-navy mb-2">Secure Checkout</h1>
+                    <p className="text-[10px] uppercase tracking-[0.2em] text-gray-400 font-black">Fast • Secure • Certified</p>
                 </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    {/* Left Column: Form */}
-                    <div className="lg:col-span-2 space-y-8">
-                        {/* Shipping Address */}
-                        <div id="shipping" className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl scroll-mt-24">
-                            <h2 className="text-2xl font-serif text-brand-navy mb-6 flex items-center">
-                                <PiCheckCircle className="mr-3 text-brand-gold" />
-                                Shipping Details
-                            </h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="col-span-2">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Full Name</label>
-                                    <input type="text" name="fullName" value={shippingAddress.fullName} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="John Doe" required />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Phone</label>
-                                    <input type="tel" name="phone" value={shippingAddress.phone} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="+91 98765 43210" required />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Pincode</label>
-                                    <input type="text" name="zip" value={shippingAddress.zip} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="110001" required />
-                                </div>
-                                <div className="col-span-2">
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Full Address</label>
-                                    <input type="text" name="street" value={shippingAddress.street} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="Flat No, Building, Street" required />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">City</label>
-                                    <input type="text" name="city" value={shippingAddress.city} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="New Delhi" required />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">State</label>
-                                    <input type="text" name="state" value={shippingAddress.state} onChange={handleInputChange} className="w-full p-4 bg-gray-50 border border-gray-200 focus:border-brand-gold focus:ring-0 outline-none transition-all" placeholder="Delhi" required />
-                                </div>
+                <div className="grid grid-cols-1 gap-6">
+                    {/* Step 1: Shipping */}
+                    <div className={`bg-white shadow-sm border ${activeStep === 1 ? 'border-brand-gold' : 'border-gray-100'} overflow-hidden transition-all duration-500`}>
+                        <button
+                            onClick={() => activeStep > 1 && setActiveStep(1)}
+                            className={`w-full flex items-center justify-between p-6 text-left ${activeStep === 1 ? 'bg-brand-gold/5' : ''}`}
+                        >
+                            <div className="flex items-center gap-4">
+                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeStep > 1 ? 'bg-green-500 text-white' : activeStep === 1 ? 'bg-brand-navy text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                    {activeStep > 1 ? <PiCheckCircle /> : '1'}
+                                </span>
+                                <h2 className="text-lg font-serif text-brand-navy">Shipping Details</h2>
                             </div>
-                        </div>
+                            {activeStep > 1 && <span className="text-[10px] uppercase tracking-widest text-brand-gold font-bold">Edit</span>}
+                        </button>
 
-                        {/* Payment Method */}
-                        <div id="payment" className="bg-white p-8 shadow-sm border border-brand-charcoal/5 rounded-xl scroll-mt-24">
-                            <h2 className="text-2xl font-serif text-brand-navy mb-6 flex items-center">
-                                <PiCreditCard className="mr-3 text-brand-gold" />
-                                Payment Method
-                            </h2>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <button
-                                    type="button"
-                                    onClick={() => setPaymentMethod('CCAVENUE')}
-                                    className={`relative p-6 border rounded-lg text-left transition-all ${paymentMethod === 'CCAVENUE' ? 'border-brand-gold bg-brand-gold/5 ring-1 ring-brand-gold' : 'border-gray-200 hover:border-gray-300'}`}
+                        <AnimatePresence>
+                            {activeStep === 1 && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="px-6 pb-8"
                                 >
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className="font-serif text-lg text-brand-navy font-medium">Online Payment</span>
-                                        {paymentMethod === 'CCAVENUE' && <div className="w-4 h-4 rounded-full bg-brand-gold border-2 border-white shadow-sm"></div>}
-                                    </div>
-                                    <p className="text-sm text-gray-500 mb-4">Credit/Debit Cards, NetBanking, UPI</p>
-                                    <div className="flex gap-2 opacity-50">
-                                        <div className="bg-gray-200 h-6 w-10"></div>
-                                        <div className="bg-gray-200 h-6 w-10"></div>
-                                        <div className="bg-gray-200 h-6 w-10"></div>
-                                    </div>
-                                </button>
-
-                                <button
-                                    type="button"
-                                    onClick={() => setPaymentMethod('PHONEPE')}
-                                    className={`relative p-6 border rounded-lg text-left transition-all opacity-50 cursor-not-allowed border-gray-100 bg-gray-50`}
-                                    disabled
-                                >
-                                    <div className="flex justify-between items-center mb-4">
-                                        <span className="font-serif text-lg text-gray-400 font-medium">PhonePe / GPay</span>
-                                    </div>
-                                    <p className="text-sm text-gray-400 mb-4">Temporarily Unavailable</p>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Right Column: Order Summary */}
-                    <div className="lg:col-span-1">
-                        <div className="bg-brand-navy text-white p-8 rounded-xl sticky top-8 shadow-xl shadow-brand-navy/20">
-                            <h3 className="text-xl font-serif mb-6 border-b border-white/10 pb-4">Order Summary</h3>
-
-                            <div className="space-y-4 mb-6">
-                                <div className="flex justify-between text-white/70">
-                                    <span>Subtotal ({items.length} items)</span>
-                                    <span>{formatPrice(cartTotal)}</span>
-                                </div>
-                                <div className="flex justify-between text-white/70">
-                                    <span>Shipping</span>
-                                    <span className="text-brand-gold">Free</span>
-                                </div>
-
-                                {appliedPromo && (
-                                    <div className="flex justify-between text-brand-gold">
-                                        <span>Discount ({appliedPromo.code})</span>
-                                        <span>- {formatPrice(discountAmount)}</span>
-                                    </div>
-                                )}
-
-                                {showGST && (
-                                    <div className="flex justify-between text-white/70 text-xs mt-2 pt-2 border-t border-white/10">
-                                        <span>GST (3%)</span>
-                                        <span>{formatPrice(taxAmount)}</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Promo Code Input */}
-                            <div className="mb-6">
-                                {appliedPromo ? (
-                                    <div className="flex justify-between items-center bg-brand-gold/20 p-3 rounded border border-brand-gold/30">
-                                        <div className="flex items-center text-brand-gold text-xs font-bold uppercase tracking-wider">
-                                            <PiCheckCircle className="mr-2 text-lg" />
-                                            {appliedPromo.code} Applied
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                        <div className="col-span-2">
+                                            <input type="text" name="fullName" value={shippingAddress.fullName} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="Full Name" required />
                                         </div>
-                                        <button onClick={removePromo} className="text-white/50 hover:text-white text-xs underline">Remove</button>
+                                        <input type="tel" name="phone" value={shippingAddress.phone} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="Mobile Number" required />
+                                        <input type="text" name="zip" value={shippingAddress.zip} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="Pincode" required />
+                                        <div className="col-span-2">
+                                            <input type="text" name="street" value={shippingAddress.street} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="Flat / House No. / Building / Colony" required />
+                                        </div>
+                                        <input type="text" name="city" value={shippingAddress.city} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="City" required />
+                                        <input type="text" name="state" value={shippingAddress.state} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="State" required />
                                     </div>
-                                ) : (
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            placeholder="Coupon Code"
-                                            value={promoCode}
-                                            onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                            className="w-full bg-white/10 border border-white/10 p-3 text-white placeholder-white/40 focus:outline-none focus:border-brand-gold text-sm uppercase"
-                                        />
-                                        <button
-                                            onClick={handleApplyPromo}
-                                            disabled={promoLoading || !promoCode}
-                                            className="px-4 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider transition-colors disabled:opacity-50"
-                                        >
-                                            {promoLoading ? '...' : 'Apply'}
-                                        </button>
-                                    </div>
-                                )}
-                                {promoMessage && (
-                                    <p className={`text-[10px] mt-2 ${promoMessage.type === 'success' ? 'text-brand-gold' : 'text-red-300'}`}>
-                                        {promoMessage.text}
-                                    </p>
-                                )}
-                            </div>
-
-                            <div className="flex justify-between items-center text-2xl font-serif mb-8 pt-4 border-t border-white/10">
-                                <span>Total</span>
-                                <span>{formatPrice(grandTotal)}</span>
-                            </div>
-
-                            {error && (
-                                <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center text-red-200 text-sm">
-                                    <PiWarningCircle className="mr-2 text-xl flex-shrink-0" />
-                                    {error}
-                                </div>
+                                    <button onClick={handleNextStep} className="w-full mt-6 bg-brand-navy text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-brand-gold transition-all">
+                                        Continue to Payment
+                                    </button>
+                                </motion.div>
                             )}
-
-                            <button
-                                onClick={handlePlaceOrder}
-                                disabled={isLoading}
-                                className={`w-full py-4 bg-brand-gold text-brand-navy font-bold uppercase tracking-widest hover:bg-white hover:text-brand-navy transition-all duration-300 relative overflow-hidden ${isLoading ? 'opacity-80 cursor-wait' : ''}`}
-                            >
-                                {isLoading ? (
-                                    <span className="flex items-center justify-center">
-                                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-brand-navy" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                        </svg>
-                                        Processing...
-                                    </span>
-                                ) : (
-                                    "Place Order"
-                                )}
-                            </button>
-
-                            <div className="mt-4 flex justify-center space-x-2 text-white/30">
-                                <PiCheckCircle />
-                                <span className="text-xs">Secure SSL Encrypted Transaction</span>
-                            </div>
-                        </div>
+                        </AnimatePresence>
                     </div>
+
+                    {/* Step 2: Payment */}
+                    <div className={`bg-white shadow-sm border ${activeStep === 2 ? 'border-brand-gold' : 'border-gray-100'} overflow-hidden transition-all duration-500`}>
+                        <button
+                            onClick={() => activeStep > 2 && setActiveStep(2)}
+                            disabled={activeStep < 2}
+                            className={`w-full flex items-center justify-between p-6 text-left ${activeStep === 2 ? 'bg-brand-gold/5' : ''} ${activeStep < 2 ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            <div className="flex items-center gap-4">
+                                <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeStep > 2 ? 'bg-green-500 text-white' : activeStep === 2 ? 'bg-brand-navy text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                    {activeStep > 2 ? <PiCheckCircle /> : '2'}
+                                </span>
+                                <h2 className="text-lg font-serif text-brand-navy">Payment Method</h2>
+                            </div>
+                            {activeStep > 2 && <span className="text-[10px] uppercase tracking-widest text-brand-gold font-bold">Edit</span>}
+                        </button>
+
+                        <AnimatePresence>
+                            {activeStep === 2 && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="px-6 pb-8"
+                                >
+                                    <div className="grid grid-cols-1 gap-3 mt-2">
+                                        <button
+                                            onClick={() => setPaymentMethod('CCAVENUE')}
+                                            className={`flex items-center justify-between p-4 border transition-all ${paymentMethod === 'CCAVENUE' ? 'border-brand-gold bg-brand-gold/5 ring-1 ring-brand-gold' : 'border-gray-100'}`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <PiCreditCard className="text-xl text-brand-navy" />
+                                                <div className="text-left">
+                                                    <p className="text-sm font-bold text-brand-navy uppercase tracking-widest">Online Payment</p>
+                                                    <p className="text-[10px] text-gray-400">Cards, UPI, NetBanking</p>
+                                                </div>
+                                            </div>
+                                            {paymentMethod === 'CCAVENUE' && <div className="w-2.5 h-2.5 rounded-full bg-brand-gold" />}
+                                        </button>
+                                        <div className="p-4 border border-gray-100 opacity-40 grayscale flex items-center justify-between cursor-not-allowed">
+                                            <div className="flex items-center gap-3">
+                                                <PiBank className="text-xl text-gray-400" />
+                                                <div className="text-left">
+                                                    <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">PhonePe / GPay</p>
+                                                    <p className="text-[10px] text-gray-400">Coming Soon</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button onClick={handleNextStep} className="w-full mt-6 bg-brand-navy text-white py-4 text-xs font-bold uppercase tracking-[0.2em] hover:bg-brand-gold transition-all">
+                                        Review Order
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+
+                    {/* Step 3: Review */}
+                    <div className={`bg-white shadow-sm border ${activeStep === 3 ? 'border-brand-gold' : 'border-gray-100'} overflow-hidden transition-all duration-500`}>
+                        <div className={`w-full flex items-center gap-4 p-6 ${activeStep === 3 ? 'bg-brand-gold/5' : activeStep < 3 ? 'opacity-50' : ''}`}>
+                            <span className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${activeStep === 3 ? 'bg-brand-navy text-white' : 'bg-gray-100 text-gray-400'}`}>
+                                3
+                            </span>
+                            <h2 className="text-lg font-serif text-brand-navy">Review & Place Order</h2>
+                        </div>
+
+                        <AnimatePresence>
+                            {activeStep === 3 && (
+                                <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="px-6 pb-8"
+                                >
+                                    <div className="space-y-4 mb-8">
+                                        <div className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-gold mb-2 border-b border-brand-gold/10 pb-2">Your Curated Collection</div>
+                                        {items.map((item, idx) => (
+                                            <motion.div
+                                                key={item.productId}
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                transition={{ delay: idx * 0.1 }}
+                                                className="flex gap-4 items-center py-3 border-b border-gray-50 last:border-0"
+                                            >
+                                                <div className="relative w-16 h-16 bg-brand-cream/30 rounded-full flex-shrink-0 border border-brand-gold/5 p-1">
+                                                    <Image src={item.product.images[0] || '/placeholder.jpg'} alt={item.product.name} fill className="object-contain p-1" />
+                                                </div>
+                                                <div className="flex-grow">
+                                                    <p className="text-[11px] font-serif italic text-brand-navy line-clamp-1">{item.product.name}</p>
+                                                    <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Quantity: {item.quantity}</p>
+                                                </div>
+                                                <p className="text-xs font-sans font-medium text-brand-navy">₹{formatPrice(item.product.price * item.quantity)}</p>
+                                            </motion.div>
+                                        ))}
+                                    </div>
+
+                                    {/* Order Totals Bar - Receipt Style */}
+                                    <div className="bg-[#FDFAF7] border border-brand-gold/10 p-8 mb-8 relative">
+                                        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-gold/0 via-brand-gold to-brand-gold/0 opacity-20" />
+
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500">
+                                                <span>Subtotal</span>
+                                                <span className="font-sans text-brand-navy">₹{formatPrice(cartTotal)}</span>
+                                            </div>
+
+                                            {appliedPromo && (
+                                                <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
+                                                    <span>Boutique Credit ({appliedPromo.code})</span>
+                                                    <span>-₹{formatPrice(discountAmount)}</span>
+                                                </div>
+                                            )}
+
+                                            <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500">
+                                                <span>Insured Shipping</span>
+                                                <span className="text-brand-gold font-black">Complimentary</span>
+                                            </div>
+
+                                            {taxAmount > 0 && (
+                                                <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500">
+                                                    <span>GST (3%)</span>
+                                                    <span className="font-sans text-brand-navy">₹{formatPrice(taxAmount)}</span>
+                                                </div>
+                                            )}
+
+                                            <div className="pt-6 border-t border-brand-gold/10 mt-4">
+                                                <div className="flex justify-between items-baseline">
+                                                    <span className="text-[10px] uppercase font-black tracking-[0.4em] text-brand-navy">Grand Total</span>
+                                                    <div className="text-right">
+                                                        <span className="text-3xl font-sans font-extralight text-brand-gold">
+                                                            ₹{formatPrice(grandTotal)}
+                                                        </span>
+                                                        <p className="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Secure Transaction via CCAvenue</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {error && (
+                                        <div className="mb-6 p-4 bg-red-50 p-3 border border-red-100 text-red-500 text-[10px] uppercase font-bold flex items-center gap-2">
+                                            <PiWarningCircle className="text-lg" />
+                                            {error}
+                                        </div>
+                                    )}
+
+                                    <button
+                                        onClick={handlePlaceOrder}
+                                        disabled={isLoading}
+                                        className="w-full bg-brand-gold text-brand-navy py-5 text-sm font-black uppercase tracking-[0.3em] shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
+                                    >
+                                        {isLoading ? 'Processing...' : `Pay ${formatPrice(grandTotal)}`}
+                                    </button>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                <div className="mt-8 flex flex-col items-center justify-center gap-3 text-gray-400">
+                    <div className="flex gap-4">
+                        <PiShieldCheck className="text-2xl text-green-500/50" />
+                        <span className="text-[9px] uppercase tracking-widest font-bold">Safe & Secure 256-bit Encryption</span>
+                    </div>
+                    <p className="text-[8px] uppercase tracking-widest leading-relaxed text-center opacity-60">
+                        By placing your order, you agree to Spark Blue Diamond's<br />
+                        <Link href="/terms" className="underline">Terms of Service</Link> and <Link href="/privacy" className="underline">Privacy Policy</Link>
+                    </p>
                 </div>
             </div>
         </section>
     );
 }
+

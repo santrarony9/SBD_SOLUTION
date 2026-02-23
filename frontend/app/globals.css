@@ -113,6 +113,28 @@ html {
   animation: fadeInUp 0.8s ease-out forwards;
 }
 
+/* Scroll Progress Bar */
+@keyframes scrollProgress {
+  from {
+    width: 0%;
+  }
+
+  to {
+    width: 100%;
+  }
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(to right, #D4AF37, #F9F6EE);
+  z-index: 10001;
+  animation: scrollProgress linear;
+  animation-timeline: scroll();
+}
+
 .animate-delay-100 {
   animation-delay: 100ms;
 }
@@ -241,7 +263,85 @@ html {
   transform: scale(0.96) !important;
 }
 
-/* Smooth Image Reveal */
-.img-reveal {
-  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+
+/* Image Zoom & Reveal */
+.zoom-image-container {
+  overflow: hidden;
+  position: relative;
+}
+
+.zoom-image-container img {
+  transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.zoom-hover:hover img {
+  transform: scale(1.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(198, 168, 124, 0.2);
+  border-radius: 10px;
+}
+
+/* Luxe Reveal Utilities */
+.luxe-reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  filter: blur(5px);
+  transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.luxe-reveal-active {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+
+/* Gold Glow for Primary Actions */
+.btn-gold-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-gold-glow::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(198, 168, 124, 0.4) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+}
+
+.btn-gold-glow:hover::after {
+  opacity: 1;
+}
+
+@keyframes cartPop {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.4);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-cart-pop {
+  animation: cartPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }

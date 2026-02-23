@@ -146,6 +146,19 @@ export default function ProductDetailPage() {
         loadProduct();
     }, [slug]);
 
+    // Track View
+    useEffect(() => {
+        if (product && product.id) {
+            fetchAPI('/marketing/activity', {
+                method: 'POST',
+                body: JSON.stringify({
+                    productId: product.id,
+                    activity: 'PRODUCT_VIEW'
+                })
+            }).catch(err => console.error("Tracking Error:", err));
+        }
+    }, [product]);
+
     if (loading) {
         return (
             <div className="min-h-screen bg-brand-cream flex items-center justify-center">
@@ -174,10 +187,10 @@ export default function ProductDetailPage() {
                 <span className="text-brand-navy truncate max-w-[200px] inline-block align-bottom">{product.name}</span>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-10 lg:h-[calc(100vh-140px)] lg:min-h-[600px] h-auto">
+            <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 relative">
 
-                {/* Left Column: Media Gallery (Constrained Height) */}
-                <div className="flex flex-col h-full lg:sticky lg:top-24">
+                {/* Left Column: Media Gallery (Sticky on Desktop) */}
+                <div className="lg:sticky lg:top-32 lg:h-[calc(100vh-160px)] flex flex-col">
                     {/* Main Viewer */}
                     <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-auto aspect-square lg:h-full lg:max-h-[75vh]">
                         <AnimatePresence mode="wait">
@@ -210,13 +223,13 @@ export default function ProductDetailPage() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.4 }}
-                                    className="relative w-full h-full cursor-zoom-in"
+                                    className="relative w-full h-full cursor-zoom-in zoom-image-container zoom-hover"
                                 >
                                     <Image
                                         src={activeImage}
                                         alt={product.name}
                                         fill
-                                        className="object-contain transition-transform duration-700 ease-out group-hover:scale-105"
+                                        className="object-contain transition-all duration-700 ease-out"
                                         priority
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -271,8 +284,8 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                {/* Right Column: Product Details (Scrollable if needed) */}
-                <div className="flex flex-col h-full overflow-y-auto pr-2 custom-scrollbar">
+                {/* Right Column: Product Details (Scrollable) */}
+                <div className="flex flex-col h-full py-4">
 
                     {/* Header */}
                     <div className="mb-4 border-b border-brand-charcoal/5 pb-4">
@@ -284,11 +297,14 @@ export default function ProductDetailPage() {
 
                     {/* Price Block */}
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex items-baseline gap-3">
-                            <span className="text-3xl font-sans font-light text-brand-gold">
+                        <div className="flex items-baseline gap-4 mb-2">
+                            <span className="text-4xl lg:text-5xl font-sans font-extralight text-brand-gold">
                                 {product.pricing?.finalPrice ? `₹${formatPrice(product.pricing.finalPrice)}` : 'Price on Request'}
                             </span>
-                            <span className="text-[9px] text-brand-navy/60 uppercase tracking-widest font-bold">Inc. taxes</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <span className="text-[10px] text-brand-navy/40 uppercase tracking-[0.3em] font-black">Including all taxes</span>
+                            <div className="h-px w-8 bg-brand-gold/20"></div>
                         </div>
 
                         {/* Trust Badges - Clickable for Certificate */}
@@ -363,12 +379,12 @@ export default function ProductDetailPage() {
                         <div className="hidden lg:grid grid-cols-2 gap-3">
                             <button
                                 onClick={() => product && addToCart(product.id, quantity)}
-                                className="w-full bg-white border border-brand-gold text-brand-navy h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                className="w-full bg-white border border-brand-gold text-brand-navy h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group btn-gold-glow">
                                 <span>Add to Cart</span>
                             </button>
                             <button
                                 onClick={handleBuyNow}
-                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group">
+                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group btn-gold-glow">
                                 <span className="relative z-10">Buy Now</span>
                                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
                             </button>

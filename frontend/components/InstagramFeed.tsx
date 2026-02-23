@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PiInstagramLogo } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
+import SkeletonLoader from './SkeletonLoader';
 
 interface SocialPost {
     id: string;
@@ -32,7 +33,21 @@ export default function InstagramFeed() {
         loadPosts();
     }, []);
 
-    if (loading || posts.length === 0) return null;
+    if (loading) {
+        return (
+            <section className="py-20 bg-white overflow-hidden">
+                <div className="max-w-[1400px] mx-auto px-6">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        {[...Array(6)].map((_, i) => (
+                            <SkeletonLoader key={i} className="aspect-square w-full" />
+                        ))}
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    if (posts.length === 0) return null;
 
     return (
         <section className="py-20 bg-white overflow-hidden">
@@ -48,7 +63,7 @@ export default function InstagramFeed() {
                         href="https://instagram.com"
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors relative group"
+                        className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-brand-navy hover:text-brand-gold transition-colors relative group btn-gold-glow px-4 py-2"
                     >
                         <PiInstagramLogo className="text-lg" />
                         Follow Us

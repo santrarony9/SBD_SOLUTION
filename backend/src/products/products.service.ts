@@ -56,7 +56,8 @@ export class ProductsService {
                 return response.text();
             } catch (fallbackError: any) {
                 console.error("AI Generation Failed (Fallback also failed):", fallbackError);
-                return `AI Error: ${fallbackError.message}`;
+                // Final STATIC Luxury Fallback
+                return `Exquisite ${promptData.name} crafted with the finest ${promptData.goldPurity}K gold weighing ${promptData.goldWeight}g, featuring brilliant ${promptData.diamondCarat}ct diamonds of ${promptData.diamondClarity} clarity. A masterpiece of timeless elegance and superior craftsmanship from Spark Blue Diamond.`;
             }
         }
     }

@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { MarketingService } from './marketing.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { WhatsappService } from '../whatsapp/whatsapp.service';
@@ -111,5 +112,20 @@ export class MarketingController {
     @Post('gift-recommendations')
     async getGiftRecommendations(@Body() body: { recipient: string, occasion: string, budget: string, style: string }) {
         return this.marketingService.getGiftRecommendations(body);
+    }
+
+    @Post('activity')
+    async trackActivity(@Body() body: { productId: string, activity: string, metadata?: any }, @Req() req: Request) {
+        const ip = req.ip || req.headers['x-forwarded-for']?.toString() || 'unknown';
+        return this.marketingService.trackActivity({
+            ...body,
+            ipAddress: ip
+        });
+    }
+
+    @Get('recently-viewed')
+    async getRecentlyViewed(@Req() req: Request) {
+        const ip = req.ip || req.headers['x-forwarded-for']?.toString() || 'unknown';
+        return this.marketingService.getRecentlyViewed(ip);
     }
 }

@@ -6,6 +6,7 @@ import { fetchAPI } from "@/lib/api";
 import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
+import { ComparisonProvider } from '@/context/ComparisonContext';
 import ChatWidget from "@/components/ChatWidget";
 
 const playfair = Playfair_Display({
@@ -96,12 +97,15 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
       >
+        <div className="scroll-progress" />
         <ToastProvider>
           <AuthProvider>
             <CartProvider>
-              <ClientLayoutWrapper>
-                {children}
-              </ClientLayoutWrapper>
+              <ComparisonProvider>
+                <ClientLayoutWrapper>
+                  {children}
+                </ClientLayoutWrapper>
+              </ComparisonProvider>
             </CartProvider>
           </AuthProvider>
         </ToastProvider>

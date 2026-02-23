@@ -8,6 +8,8 @@ import { useAuth } from '@/context/AuthContext';
 import { useCart } from '@/context/CartContext';
 import MobileSearchOverlay from './MobileSearchOverlay';
 import { motion } from 'framer-motion';
+import { useComparison } from '@/context/ComparisonContext';
+import { PiArrowsLeftRight } from 'react-icons/pi';
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -15,7 +17,8 @@ export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();
     const { user, isAuthenticated, logout } = useAuth();
-    const { items } = useCart();
+    const { items, isCartOpen, openCart } = useCart();
+    const { comparisonItems } = useComparison();
 
     const isHome = pathname === '/';
 
@@ -29,15 +32,13 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = scrolled
-        ? 'bg-white/95 backdrop-blur-md shadow-sm py-3 border-b border-brand-gold/10'
+        ? 'bg-white/70 backdrop-blur-xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.05)] py-3 border-b border-brand-gold/5'
         : isHome
             ? 'bg-transparent py-6'
-            : 'bg-brand-navy py-4 shadow-md';
+            : 'bg-brand-navy py-4 shadow-xl shadow-brand-navy/10';
 
     const textColor = scrolled ? 'text-brand-navy' : 'text-white';
-
-    // Logo should be gold on dark backgrounds (unscrolled home or mobile menu), navy otherwise
-    const logoColor = scrolled ? 'text-brand-navy' : 'text-white';
+    const accentColor = scrolled ? 'text-brand-gold' : 'text-brand-gold';
 
     return (
         <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-50'} transition-all duration-500 ease-in-out ${navClasses}`}>
@@ -70,13 +71,19 @@ export default function Navbar() {
                     </div>
 
                     {/* Center: Logo */}
-                    <div className={`flex-shrink-0 flex flex-col items-center justify-center absolute left-1/2 transform -translate-x-1/2 transition-all duration-500 ${scrolled ? 'scale-90' : 'scale-100'}`}>
-                        <Link href="/" className={`font-serif text-2xl md:text-3xl tracking-[0.25em] ${logoColor} font-bold transition-colors duration-500 hover:text-brand-gold`}>
-                            SPARK BLUE
+                    <div className={`flex-shrink-0 flex flex-col items-center justify-center absolute left-1/2 transform -translate-x-1/2 transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
+                        <Link href="/" className={`font-serif text-2xl md:text-4xl tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em]`}>
+                            SPARK <span className="text-brand-gold">BLUE</span>
                         </Link>
-                        <span className={`text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.4em] text-brand-gold transition-opacity duration-300 ${scrolled ? 'opacity-0 h-0 overflow-hidden' : 'opacity-100'}`}>
-                            Diamond
-                        </span>
+                        {!scrolled && (
+                            <motion.span
+                                initial={{ opacity: 0, y: -5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.6em] text-brand-gold font-black mt-1"
+                            >
+                                Diamond
+                            </motion.span>
+                        )}
                     </div>
 
                     {/* Right: Actions */}
@@ -114,20 +121,40 @@ export default function Navbar() {
                                 <PiHeart className="h-5 w-5" />
                             </Link>
 
-                            <Link href="/cart" className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-2`}>
-                                <PiShoppingBag className="h-5 w-5" />
-                                {items.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center animate-pulse-slow">
-                                        {items.length}
+                            <Link href="/compare" className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-2`} title="Compare">
+                                <PiArrowsLeftRight className="h-5 w-5" />
+                                {comparisonItems.length > 0 && (
+                                    <span className="absolute -top-2 -right-2 bg-brand-navy text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-brand-gold/30">
+                                        {comparisonItems.length}
                                     </span>
                                 )}
                             </Link>
+
+                            <button
+                                onClick={openCart}
+                                className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-2 group`}
+                            >
+                                <PiShoppingBag className="h-5 w-5" />
+                                {items.length > 0 && (
+                                    <motion.span
+                                        key={items.length}
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="absolute -top-2 -right-2 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(198,168,124,0.5)]"
+                                    >
+                                        {items.length}
+                                    </motion.span>
+                                )}
+                            </button>
                         </div>
                     </div>
 
                     {/* Mobile Right: Cart */}
                     <div className="flex items-center md:hidden">
-                        <Link href="/cart" className={`${textColor} hover:text-brand-gold relative transition-colors`}>
+                        <button
+                            onClick={openCart}
+                            className={`${textColor} hover:text-brand-gold relative transition-colors`}
+                        >
                             <motion.div whileTap={{ scale: 0.9 }}>
                                 <PiShoppingBag className="h-6 w-6" />
                                 {items.length > 0 && (
@@ -136,7 +163,7 @@ export default function Navbar() {
                                     </span>
                                 )}
                             </motion.div>
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -144,27 +171,58 @@ export default function Navbar() {
             <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             {/* Mobile Menu Overlay */}
-            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-50 transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-50 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 <div className="flex flex-col h-full justify-center items-center space-y-8 p-8 relative">
                     <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 right-8 text-brand-navy p-2 hover:bg-brand-gold/10 rounded-full transition-colors">
                         <PiX className="h-8 w-8" />
                     </button>
 
-                    <MobileNavLink href="/" label="Home" onClick={() => setIsMobileMenuOpen(false)} />
-                    <MobileNavLink href="/shop" label="Collections" onClick={() => setIsMobileMenuOpen(false)} />
-                    <MobileNavLink href="/about" label="Heritage" onClick={() => setIsMobileMenuOpen(false)} />
-                    <MobileNavLink href="/wishlist" label="Wishlist" onClick={() => setIsMobileMenuOpen(false)} />
+                    <motion.div
+                        initial="closed"
+                        animate={isMobileMenuOpen ? "open" : "closed"}
+                        variants={{
+                            open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+                            closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+                        }}
+                        className="flex flex-col items-center space-y-6"
+                    >
+                        {[
+                            { href: "/", label: "Home" },
+                            { href: "/shop", label: "Collections" },
+                            { href: "/about", label: "Heritage" },
+                            { href: "/wishlist", label: "Wishlist" },
+                            { href: "/compare", label: `Compare (${comparisonItems.length})` }
+                        ].map((link) => (
+                            <motion.div
+                                key={link.label}
+                                variants={{
+                                    open: { opacity: 1, y: 0 },
+                                    closed: { opacity: 0, y: 20 }
+                                }}
+                            >
+                                <MobileNavLink href={link.href} label={link.label} onClick={() => setIsMobileMenuOpen(false)} />
+                            </motion.div>
+                        ))}
 
-                    <div className="w-16 h-px bg-brand-gold/20 my-4"></div>
+                        <motion.div
+                            variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
+                            className="w-16 h-px bg-brand-gold/20 my-4"
+                        />
 
-                    {isAuthenticated ? (
-                        <>
-                            <MobileNavLink href="/account" label="My Account" onClick={() => setIsMobileMenuOpen(false)} />
-                            <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.3em] font-black pt-4 hover:text-red-500 transition-colors">Logout</button>
-                        </>
-                    ) : (
-                        <MobileNavLink href="/login" label="Login" onClick={() => setIsMobileMenuOpen(false)} />
-                    )}
+                        {isAuthenticated ? (
+                            <motion.div
+                                variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
+                                className="flex flex-col items-center space-y-6"
+                            >
+                                <MobileNavLink href="/account" label="My Account" onClick={() => setIsMobileMenuOpen(false)} />
+                                <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.3em] font-black pt-4 hover:text-red-500 transition-colors">Logout</button>
+                            </motion.div>
+                        ) : (
+                            <motion.div variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}>
+                                <MobileNavLink href="/login" label="Login" onClick={() => setIsMobileMenuOpen(false)} />
+                            </motion.div>
+                        )}
+                    </motion.div>
                 </div>
             </div>
         </nav>

@@ -11,11 +11,17 @@ interface CartItem {
     productId: string;
     quantity: number;
     product: {
+        id: string;
         name: string;
-        price: number; // Snapshot or calculated
+        price: number;
         images: string[];
         slug: string;
         category?: string;
+        goldPurity?: number;
+        diamondCarat?: number;
+        pricing: {
+            finalPrice: number;
+        };
     };
     calculatedPrice?: number;
 }
@@ -28,6 +34,9 @@ interface CartContextType {
     updateQuantity: (itemId: string, quantity: number) => Promise<void>;
     clearCart: () => Promise<void>;
     isLoading: boolean;
+    isCartOpen: boolean;
+    openCart: () => void;
+    closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -38,6 +47,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [items, setItems] = useState<CartItem[]>([]);
     const [cartTotal, setCartTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
+    const [isCartOpen, setIsCartOpen] = useState(false);
+
+    const openCart = () => setIsCartOpen(true);
+    const closeCart = () => setIsCartOpen(false);
 
     // Fetch Cart on Load/Login
     useEffect(() => {
@@ -88,6 +101,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     body: JSON.stringify({ productId, quantity })
                 });
                 await fetchServerCart();
+                openCart();
                 showToast("Added to your collection", "success");
             } catch (error) {
                 console.error("Add to cart failed", error);
@@ -103,11 +117,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
                         productId: product.id,
                         quantity,
                         product: {
+                            id: product.id,
                             name: product.name,
                             price: product.pricing?.finalPrice || product.price || 0,
                             images: product.images,
                             slug: product.slug,
-                            category: product.category
+                            category: product.category,
+                            goldPurity: product.goldPurity,
+                            diamondCarat: product.diamondCarat,
+                            pricing: {
+                                finalPrice: product.pricing?.finalPrice || product.price || 0
+                            }
                         }
                     };
 
@@ -115,6 +135,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     setItems(newItems);
                     calculateLocalTotal(newItems);
                     localStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
+                    openCart();
                     showToast("Added to your guest collection", "success");
                 }
             } catch (err) {
@@ -132,6 +153,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
             } catch (error) {
                 console.error("Remove failed", error);
             }
+        } else {
+            const newItems = items.filter(i => i.id !== itemId);
+            setItems(newItems);
+            calculateLocalTotal(newItems);
+            localStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
+            showToast("Item removed", "info");
         }
     };
 
@@ -185,7 +212,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading }}>
+        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading, isCartOpen, openCart, closeCart }}>
             {children}
         </CartContext.Provider>
     );

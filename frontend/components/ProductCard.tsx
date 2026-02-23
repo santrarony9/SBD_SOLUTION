@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { PiBasket } from 'react-icons/pi';
 import { formatPrice } from '@/lib/utils';
+import { useComparison } from '@/context/ComparisonContext';
+import { PiCheckBold } from 'react-icons/pi';
 
 interface ProductProps {
     id: string;
@@ -25,6 +27,9 @@ import { motion } from 'framer-motion';
 
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addToCart } = useCart();
+    const { addToComparison, removeFromComparison, isInComparison } = useComparison();
+
+    const isCompared = isInComparison(product.id);
 
     // Normalize image source
     const displayImage = product.image || (product.images && product.images[0]) || '/placeholder.jpg';
@@ -84,6 +89,17 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         Quick Add
                     </motion.button>
                 </div>
+
+                {/* Compare Checkbox */}
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        isCompared ? removeFromComparison(product.id) : addToComparison(product.id);
+                    }}
+                    className={`absolute top-2 left-2 z-30 w-6 h-6 rounded-full border transition-all flex items-center justify-center ${isCompared ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/80 border-gray-200 text-transparent opacity-0 group-hover:opacity-100 hover:border-brand-gold'}`}
+                >
+                    <PiCheckBold className={`w-3 h-3 ${isCompared ? 'opacity-100' : 'opacity-0'}`} />
+                </button>
             </Link>
 
             {/* Product Details */}

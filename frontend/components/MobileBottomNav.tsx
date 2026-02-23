@@ -2,13 +2,15 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { PiHouse, PiHandbag, PiHeart, PiShoppingBag } from 'react-icons/pi';
 import { useCart } from '@/context/CartContext';
+import { useComparison } from '@/context/ComparisonContext';
 import { motion } from 'framer-motion';
+import { PiHouse, PiHandbag, PiHeart, PiShoppingBag, PiArrowsLeftRight } from 'react-icons/pi';
 
 export default function MobileBottomNav() {
     const pathname = usePathname();
     const { items } = useCart();
+    const { comparisonItems } = useComparison();
 
     // Hide bottom nav on admin and transactional pages to avoid blocking CTA buttons
     const isTransactional = pathname?.includes('/product/') || pathname === '/cart' || pathname === '/checkout' || pathname?.startsWith('/admin');
@@ -24,6 +26,7 @@ export default function MobileBottomNav() {
             }
         },
         { label: 'Shop', icon: PiHandbag, href: '/shop' },
+        { label: 'Compare', icon: PiArrowsLeftRight, href: '/compare', badge: comparisonItems.length },
         { label: 'Wishlist', icon: PiHeart, href: '/wishlist' },
         { label: 'Cart', icon: PiShoppingBag, href: '/cart', badge: items.length },
     ];

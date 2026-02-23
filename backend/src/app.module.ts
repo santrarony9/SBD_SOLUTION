@@ -20,6 +20,7 @@ import { OffersModule } from './offers/offers.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { CartCleanupService } from './scheduler/cart-cleanup.service';
+import { CartRecoveryService } from './scheduler/cart-recovery.service';
 import { PromosModule } from './promos/promos.module';
 import { StoreModule } from './store/store.module';
 import { BannerModule } from './banner/banner.module';
@@ -75,7 +76,7 @@ import { ConfigModule } from '@nestjs/config'; // Added ConfigModule import
     CcavenueModule
   ],
   controllers: [AppController],
-  providers: [AppService, CartCleanupService],
+  providers: [AppService, CartCleanupService, CartRecoveryService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
