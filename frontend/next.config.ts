@@ -32,7 +32,7 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '/api';
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://api.sparkbluediamond.com/api';
     return [
       {
         source: '/api/:path*',

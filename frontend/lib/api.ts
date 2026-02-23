@@ -3,7 +3,7 @@ const envUrl = process.env.NEXT_PUBLIC_API_URL;
 const isServer = typeof window === 'undefined';
 
 export const API_URL = isServer
-    ? (process.env.INTERNAL_API_URL || 'https://sparkbluediamond.com/api')
+    ? (process.env.INTERNAL_API_URL || 'https://api.sparkbluediamond.com/api')
     : (envUrl || '/api');
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
