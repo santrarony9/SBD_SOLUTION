@@ -42,7 +42,7 @@ async function bootstrap() {
   // Enable trust proxy for Render/Vercel
   (app.getHttpAdapter().getInstance() as any).set('trust proxy', 1);
 
-  // 2. Global Rate Limiting - Relaxed for production stability
+  /* Temporarily disabled to debug production connectivity issues
   app.use(rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 1000, // Increased from 100 to 1000 to avoid blocking users
@@ -50,6 +50,7 @@ async function bootstrap() {
     standardHeaders: true,
     legacyHeaders: false,
   }));
+  */
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
   app.setGlobalPrefix('api');
