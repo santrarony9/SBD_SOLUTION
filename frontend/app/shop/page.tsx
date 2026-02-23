@@ -38,19 +38,21 @@ function ShopContent() {
     const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile Filter State
 
-    useEffect(() => {
-        async function loadProducts() {
-            try {
-                const data = await fetchAPI('/products');
-                setProducts(data);
-            } catch (err) {
-                console.error("Failed to load products", err);
-                setError('Failed to load products. Please try again later.');
-            } finally {
-                setLoading(false);
-            }
+    const loadProducts = async () => {
+        setLoading(true);
+        setError('');
+        try {
+            const data = await fetchAPI('/products');
+            setProducts(data);
+        } catch (err: any) {
+            console.error("Failed to load products", err);
+            setError(`Failed to load products: ${err.message || 'Please try again later.'}`);
+        } finally {
+            setLoading(false);
         }
+    };
 
+    useEffect(() => {
         loadProducts();
     }, []);
 

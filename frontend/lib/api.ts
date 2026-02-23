@@ -8,9 +8,15 @@ export const API_URL = isServer
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     // Determine the full URL
-    const fullUrl = endpoint.startsWith('http')
+    let fullUrl = endpoint.startsWith('http')
         ? endpoint
         : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+    // Add cache-busting timestamp for client-side GET requests
+    if (!isServer && (!options.method || options.method.toUpperCase() === 'GET')) {
+        const separator = fullUrl.includes('?') ? '&' : '?';
+        fullUrl = `${fullUrl}${separator}_t=${Date.now()}`;
+    }
 
     if (!isServer && process.env.NODE_ENV === 'development') {
         console.log(`[API] Fetching: ${fullUrl}`);
