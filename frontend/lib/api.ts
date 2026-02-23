@@ -8,22 +8,29 @@ export const API_URL = isServer
 
 // In-memory request deduplication to prevent 429 bursts
 const pendingRequests = new Map<string, Promise<any>>();
+let global429Cooldown: number = 0;
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-    // 1. Determine the full URL
+    // 1. Safety Check: If we are in a 429 cooldown, wait or fail early
+    if (!isServer && Date.now() < global429Cooldown) {
+        const remaining = Math.ceil((global429Cooldown - Date.now()) / 1000);
+        throw new Error(`System cooling down due to rate limits. Please wait ${remaining}s.`);
+    }
+
+    // 2. Determine the full URL
     let fullUrl = endpoint.startsWith('http')
         ? endpoint
         : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
-    // 2. Add stable minute-level cache-busting for GET requests
-    // This allows browser/CDN caching for 60s while still preventing permanent stale states.
+    // 3. Add stable minute-level cache-busting for GET requests
+    // Using '_cb' instead of '_t' to bypass potential specific proxy rules for '_t'
     if (!isServer && (!options.method || options.method.toUpperCase() === 'GET')) {
         const minuteTimestamp = Math.floor(Date.now() / 60000);
         const separator = fullUrl.includes('?') ? '&' : '?';
-        fullUrl = `${fullUrl}${separator}_t=${minuteTimestamp}`;
+        fullUrl = `${fullUrl}${separator}_cb=${minuteTimestamp}`;
     }
 
-    // 3. Request Deduplication: If already fetching this URL with same method/body, return existing promise
+    // 4. Request Deduplication: If already fetching this URL with same method/body, return existing promise
     const dedupeKey = `${options.method || 'GET'}:${fullUrl}:${options.body ? JSON.stringify(options.body) : ''}`;
     if (!isServer && pendingRequests.has(dedupeKey)) {
         return pendingRequests.get(dedupeKey);
@@ -32,7 +39,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const requestPromise = (async () => {
         try {
             if (!isServer && process.env.NODE_ENV === 'development') {
-                console.log(`[API] Fetching: ${fullUrl}`);
+                console.log(`[API] Fetching (V=1.0.2): ${fullUrl}`);
             }
 
             // Get token from storage (Client only)
@@ -40,7 +47,9 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
             const headers: Record<string, string> = {
                 ...((options.headers as Record<string, string>) || {}),
-                'X-Client-Version': '1.0.1',
+                'X-Client-Version': '1.0.2',
+                'Cache-Control': 'no-cache', // Signal to proxies not to cache
+                'Pragma': 'no-cache'
             };
 
             if (!(options.body instanceof FormData)) {
@@ -57,24 +66,21 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
                 headers,
             });
 
-            /*
-            if (typeof window !== 'undefined' && API_URL.includes('localhost')) {
-                console.warn(`[API DEBUG] Hitting local API: ${API_URL}${endpoint}. If you are on Vercel, this is likely wrong!`);
-            }
-            */
-
             if (!res.ok) {
                 if (res.status === 401 && typeof window !== 'undefined') {
                     console.error('[API] Unauthorized - Clearing session...');
                     localStorage.removeItem('token');
                     localStorage.removeItem('user');
-                    // Force reload to trigger AuthContext update and redirect to login
                     window.location.href = '/login?error=session_expired';
                     return;
                 }
 
                 if (res.status === 429) {
-                    throw new Error(`Too many requests. Please wait a minute before trying again.`);
+                    // Set a 5-second global cooldown to prevent immediate retries
+                    if (!isServer) {
+                        global429Cooldown = Date.now() + 5000;
+                    }
+                    throw new Error(`Too many requests. System is cooling down for 5 seconds.`);
                 }
 
                 let errorMessage = `API Error: ${res.status} ${res.statusText} (${fullUrl})`;
@@ -100,11 +106,14 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
                 return {};
             }
         } finally {
-            // Always cleanup the dedupe map so next request can proceed
+            // Always cleanup the dedupe map
             pendingRequests.delete(dedupeKey);
         }
     })();
 
-    pendingRequests.set(dedupeKey, requestPromise);
+    if (!isServer) {
+        pendingRequests.set(dedupeKey, requestPromise);
+    }
+
     return requestPromise;
 }
