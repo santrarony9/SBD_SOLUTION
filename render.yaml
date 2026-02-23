@@ -28,4 +28,7 @@ services:
         sync: false
       - key: CCAVENUE_WORKING_KEY
         sync: false
+      - key: REDIS_URL
+        sync: false
+        placeholder: "redis://default:password@host:port"
     autoDeploy: true
