@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import Link from 'next/link';
 import { fetchAPI } from '@/lib/api';
+import SmartPlaceholder from './SmartPlaceholder';
 
 export default function MotionGallery() {
     const [galleryItems, setGalleryItems] = useState<any[]>([]);
@@ -56,13 +57,17 @@ export default function MotionGallery() {
     if (galleryItems.length === 0) {
         return (
             <section className="py-24 bg-white relative">
-                <div className="text-center mb-16 px-4">
-                    <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3 animate-fade-in-up">Curated For You</span>
-                    <h2 className="text-3xl md:text-5xl font-serif text-brand-navy animate-fade-in-up animate-delay-100">Top Picks</h2>
-                </div>
-                <div className="flex flex-col items-center justify-center h-[300px] border border-dashed border-gray-200 mx-6 rounded-2xl bg-gray-50">
-                    <p className="text-brand-navy font-serif text-xl mb-2">Curated Collection Coming Soon</p>
-                    <p className="text-gray-500 text-sm">Stay tuned for our exclusive motion gallery.</p>
+                <div className="max-w-7xl mx-auto px-6">
+                    <div className="text-center mb-12">
+                        <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-3">Curated For You</span>
+                        <h2 className="text-3xl md:text-5xl font-serif text-brand-navy">Top Picks</h2>
+                    </div>
+                    <SmartPlaceholder
+                        label="Motion Gallery Portfolio"
+                        description="Add featured collection images to your Gallery CMS to showcase them in this premium 3D carousel."
+                        width={1200}
+                        height={600}
+                    />
                 </div>
             </section>
         );

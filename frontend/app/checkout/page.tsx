@@ -11,11 +11,13 @@ import { formatPrice } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle, PiShoppingBag, PiShieldCheck } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
     const { user } = useAuth();
     const { showToast } = useToast();
+    const { formatPrice: globalFormatPrice, currency, exchangeRates } = useCurrency();
     const router = useRouter();
 
     const [activeStep, setActiveStep] = useState(1);
@@ -50,8 +52,19 @@ export default function CheckoutPage() {
     };
 
     const validateShipping = () => {
-        if (!shippingAddress.fullName || !shippingAddress.street || !shippingAddress.phone || !shippingAddress.zip) {
+        const phoneRegex = /^[0-9]{10}$/;
+        const zipRegex = /^[0-9]{6}$/;
+
+        if (!shippingAddress.fullName || !shippingAddress.street || !shippingAddress.city || !shippingAddress.state) {
             setError("Please fill in all required shipping details.");
+            return false;
+        }
+        if (!phoneRegex.test(shippingAddress.phone.replace(/\D/g, ''))) {
+            setError("Please enter a valid 10-digit mobile number.");
+            return false;
+        }
+        if (!zipRegex.test(shippingAddress.zip)) {
+            setError("Please enter a valid 6-digit pincode.");
             return false;
         }
         setError(null);
@@ -102,7 +115,12 @@ export default function CheckoutPage() {
     const discountAmount = calculateDiscount();
     const finalTotal = Math.max(0, cartTotal - discountAmount);
     const taxAmount = showGST ? finalTotal * 0.03 : 0;
-    const grandTotal = finalTotal + taxAmount;
+    const grandTotalINR = finalTotal + taxAmount;
+
+    // Converted totals for order creation
+    const conversionRate = exchangeRates[currency];
+    const convertedGrandTotal = Number((grandTotalINR * conversionRate).toFixed(2));
+    const convertedDiscount = Number((discountAmount * conversionRate).toFixed(2));
 
     const handlePlaceOrder = async () => {
         setIsLoading(true);
@@ -112,13 +130,14 @@ export default function CheckoutPage() {
                 shippingAddress,
                 billingAddress: shippingAddress,
                 paymentMethod,
-                totalAmount: grandTotal,
+                totalAmount: convertedGrandTotal,
+                currency: currency,
                 items: items.map(i => ({ productId: i.productId, quantity: i.quantity })),
                 isB2B: showGST,
                 customerGSTIN: showGST ? billingAddress.gstin : undefined,
                 businessName: showGST ? billingAddress.businessName : undefined,
                 promoCode: appliedPromo ? appliedPromo.code : null,
-                discountAmount: discountAmount
+                discountAmount: convertedDiscount
             };
 
             const order = await fetchAPI('/orders', { method: 'POST', body: JSON.stringify(orderPayload) });
@@ -318,7 +337,7 @@ export default function CheckoutPage() {
                                                     <p className="text-[11px] font-serif italic text-brand-navy line-clamp-1">{item.product.name}</p>
                                                     <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Quantity: {item.quantity}</p>
                                                 </div>
-                                                <p className="text-xs font-sans font-medium text-brand-navy">₹{formatPrice(item.product.price * item.quantity)}</p>
+                                                <p className="text-xs font-sans font-medium text-brand-navy">{globalFormatPrice(item.product.pricing.finalPrice * item.quantity)}</p>
                                             </motion.div>
                                         ))}
                                     </div>
@@ -330,13 +349,13 @@ export default function CheckoutPage() {
                                         <div className="space-y-3">
                                             <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500">
                                                 <span>Subtotal</span>
-                                                <span className="font-sans text-brand-navy">₹{formatPrice(cartTotal)}</span>
+                                                <span className="font-sans text-brand-navy">{globalFormatPrice(cartTotal)}</span>
                                             </div>
 
                                             {appliedPromo && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
                                                     <span>Boutique Credit ({appliedPromo.code})</span>
-                                                    <span>-₹{formatPrice(discountAmount)}</span>
+                                                    <span>-{globalFormatPrice(discountAmount)}</span>
                                                 </div>
                                             )}
 
@@ -348,7 +367,7 @@ export default function CheckoutPage() {
                                             {taxAmount > 0 && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-gray-500">
                                                     <span>GST (3%)</span>
-                                                    <span className="font-sans text-brand-navy">₹{formatPrice(taxAmount)}</span>
+                                                    <span className="font-sans text-brand-navy">{globalFormatPrice(taxAmount)}</span>
                                                 </div>
                                             )}
 
@@ -357,9 +376,9 @@ export default function CheckoutPage() {
                                                     <span className="text-[10px] uppercase font-black tracking-[0.4em] text-brand-navy">Grand Total</span>
                                                     <div className="text-right">
                                                         <span className="text-3xl font-sans font-extralight text-brand-gold">
-                                                            ₹{formatPrice(grandTotal)}
+                                                            {globalFormatPrice(grandTotalINR)}
                                                         </span>
-                                                        <p className="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Secure Transaction via CCAvenue</p>
+                                                        <p className="text-[8px] text-gray-400 uppercase tracking-widest mt-1">Secure Transaction via CCAvenue ({currency})</p>
                                                     </div>
                                                 </div>
                                             </div>
@@ -378,7 +397,7 @@ export default function CheckoutPage() {
                                         disabled={isLoading}
                                         className="w-full bg-brand-gold text-brand-navy py-5 text-sm font-black uppercase tracking-[0.3em] shadow-xl shadow-brand-gold/20 hover:scale-[1.02] active:scale-95 transition-all"
                                     >
-                                        {isLoading ? 'Processing...' : `Pay ${formatPrice(grandTotal)}`}
+                                        {isLoading ? 'Processing...' : `Pay ${globalFormatPrice(grandTotalINR)}`}
                                     </button>
                                 </motion.div>
                             )}

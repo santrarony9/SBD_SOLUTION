@@ -94,17 +94,27 @@ async function getTags() {
 }
 
 export default async function Home() {
-  const allProducts = await getFeaturedProducts();
-  const offers = await getOffers();
-  const banners = await getBanners();
-  const featuredReviews = await getFeaturedReviews();
-  const spotlightSetting = await getSpotlight();
-  const heroText = await getHeroText();
-
-  // Dynamic Data
-  const categories = await getCategories();
-  const priceRanges = await getPriceRanges();
-  const tags = await getTags();
+  const [
+    allProducts,
+    offers,
+    banners,
+    featuredReviews,
+    spotlightSetting,
+    heroText,
+    categories,
+    priceRanges,
+    tags
+  ] = await Promise.all([
+    getFeaturedProducts(),
+    getOffers(),
+    getBanners(),
+    getFeaturedReviews(),
+    getSpotlight(),
+    getHeroText(),
+    getCategories(),
+    getPriceRanges(),
+    getTags()
+  ]);
 
   // Defensive Guards
   const featuredProducts = Array.isArray(allProducts) ? allProducts.slice(0, 12) : [];
@@ -204,29 +214,40 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {Array.isArray(priceRanges) && priceRanges.map((range: any, idx: number) => (
-              <div
-                key={range.id || idx}
-                className="group h-full"
-              >
-                <Link href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-4 md:p-6 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_4px_20px_-5px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]">
-                  {/* Hover Background */}
-                  <div className="absolute inset-0 bg-brand-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out-expo z-0"></div>
+            {Array.isArray(priceRanges) && priceRanges.length > 0 ? (
+              priceRanges.map((range: any, idx: number) => (
+                <div
+                  key={range.id || idx}
+                  className="group h-full"
+                >
+                  <Link href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-4 md:p-6 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_4px_20px_-5px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]">
+                    {/* Hover Background */}
+                    <div className="absolute inset-0 bg-brand-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out-expo z-0"></div>
 
-                  {/* Content */}
-                  <div className="relative z-10 flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105">
-                    <span className="block text-xl md:text-2xl font-serif text-brand-navy group-hover:text-white transition-colors duration-500 mb-1 leading-tight">
-                      {range.label.replace(' - ', ' \u2014 ')}
-                    </span>
-                    <span className="text-[9px] uppercase tracking-widest text-brand-gold font-bold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-100">View Collection</span>
-                  </div>
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105">
+                      <span className="block text-xl md:text-2xl font-serif text-brand-navy group-hover:text-white transition-colors duration-500 mb-1 leading-tight">
+                        {range.label?.replace(' - ', ' \u2014 ') || 'Browse Range'}
+                      </span>
+                      <span className="text-[9px] uppercase tracking-widest text-brand-gold font-bold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-100">View Collection</span>
+                    </div>
 
-                  {/* Corner Accents */}
-                  <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </Link>
+                    {/* Corner Accents */}
+                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  </Link>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full">
+                <SmartPlaceholder
+                  label="Price Range Categories"
+                  description="Define price segments (e.g., Under 25k, 50k - 1Lac) in the Marketing panel to categorize your collections."
+                  width={1200}
+                  height={300}
+                />
               </div>
-            ))}
+            )}
           </div>
         </div>
       </section>

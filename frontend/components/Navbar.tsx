@@ -9,7 +9,8 @@ import { useCart } from '@/context/CartContext';
 import MobileSearchOverlay from './MobileSearchOverlay';
 import { motion } from 'framer-motion';
 import { useComparison } from '@/context/ComparisonContext';
-import { PiArrowsLeftRight } from 'react-icons/pi';
+import { useCurrency } from '@/context/CurrencyContext';
+import { PiArrowsLeftRight, PiGlobe } from 'react-icons/pi';
 
 export default function Navbar() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function Navbar() {
     const { user, isAuthenticated, logout } = useAuth();
     const { items, isCartOpen, openCart } = useCart();
     const { comparisonItems } = useComparison();
+    const { currency, setCurrency } = useCurrency();
 
     const isHome = pathname === '/';
 
@@ -32,18 +34,21 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = scrolled
-        ? 'bg-white/70 backdrop-blur-xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.05)] py-3 border-b border-brand-gold/5'
+        ? 'bg-white/80 backdrop-blur-2xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
         : isHome
-            ? 'bg-transparent py-6'
-            : 'bg-brand-navy py-4 shadow-xl shadow-brand-navy/10';
+            ? 'bg-transparent py-4 md:py-6'
+            : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
 
     const textColor = scrolled ? 'text-brand-navy' : 'text-white';
-    const accentColor = scrolled ? 'text-brand-gold' : 'text-brand-gold';
+    const accentColor = 'text-brand-gold';
 
     return (
-        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-50'} transition-all duration-500 ease-in-out ${navClasses} pt-[env(safe-area-inset-top,0px)]`}>
-            <div className="max-w-7xl mx-auto px-6">
-                <div className="flex justify-between items-center relative h-12">
+        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-[100]'} transition-all duration-500 ease-in-out ${navClasses}`}>
+            {/* Safe Area Top Padding - ensures content is below status bars/notches */}
+            <div className="h-[env(safe-area-inset-top,0px)] w-full" />
+
+            <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <div className="flex justify-between items-center relative h-10 md:h-12">
 
                     {/* Mobile Left: Search & Menu */}
                     <div className="flex items-center md:hidden gap-4">
@@ -89,6 +94,27 @@ export default function Navbar() {
                     {/* Right: Actions */}
                     <div className="hidden md:flex space-x-6 items-center">
                         <div className={`flex items-center space-x-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-8 transition-colors duration-300`}>
+                            {/* Currency Switcher */}
+                            <div className="relative group mr-2">
+                                <button className={`flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-black ${textColor} hover:text-brand-gold transition-all`}>
+                                    <PiGlobe className="w-4 h-4" />
+                                    <span>{currency}</span>
+                                </button>
+                                <div className="absolute top-full right-0 mt-4 bg-brand-navy border border-brand-gold/20 shadow-2xl py-3 px-4 w-32 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[1000] backdrop-blur-xl">
+                                    <div className="flex flex-col gap-2">
+                                        {(['INR', 'USD', 'AED', 'GBP', 'EUR'] as const).map((curr) => (
+                                            <button
+                                                key={curr}
+                                                onClick={() => setCurrency(curr)}
+                                                className={`text-[9px] uppercase tracking-widest font-bold text-left hover:text-brand-gold transition-colors ${currency === curr ? 'text-brand-gold' : 'text-white/60'}`}
+                                            >
+                                                {curr}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
                             <button
                                 onClick={() => setIsSearchOpen(true)}
                                 className={`${textColor} hover:text-brand-gold transition-colors duration-300`}
@@ -222,6 +248,21 @@ export default function Navbar() {
                                 <MobileNavLink href="/login" label="Login" onClick={() => setIsMobileMenuOpen(false)} />
                             </motion.div>
                         )}
+
+                        <motion.div
+                            variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
+                            className="flex flex-wrap justify-center gap-4 pt-8"
+                        >
+                            {(['INR', 'USD', 'AED', 'GBP', 'EUR'] as const).map((curr) => (
+                                <button
+                                    key={curr}
+                                    onClick={() => setCurrency(curr)}
+                                    className={`px-3 py-1.5 border rounded-none text-[9px] uppercase tracking-widest font-black transition-all ${currency === curr ? 'bg-brand-navy border-brand-navy text-brand-gold' : 'bg-transparent border-gray-100 text-gray-400'}`}
+                                >
+                                    {curr}
+                                </button>
+                            ))}
+                        </motion.div>
                     </motion.div>
                 </div>
             </div>

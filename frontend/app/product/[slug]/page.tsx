@@ -8,10 +8,13 @@ import ProductReviews from "@/components/ProductReviews";
 import { fetchAPI } from '@/lib/api';
 import TrustBadges from '@/components/TrustBadges';
 import DropHintModal from '@/components/DropHintModal';
+import ConciergeModal from '@/components/ConciergeModal';
 import { formatPrice } from '@/lib/utils';
 import { PiShoppingBag } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck } from 'react-icons/pi';
 
 interface Product {
     id: string;
@@ -43,6 +46,7 @@ export default function ProductDetailPage() {
     const slug = params?.slug as string;
     const { addToCart } = useCart();
     const { showToast } = useToast();
+    const { formatPrice, currency } = useCurrency();
 
     // State
     const [product, setProduct] = useState<Product | null>(null);
@@ -59,6 +63,7 @@ export default function ProductDetailPage() {
     const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
     const [showCertificate, setShowCertificate] = useState(false);
     const [showDropHint, setShowDropHint] = useState(false);
+    const [showConcierge, setShowConcierge] = useState(false);
 
 
     // Share State
@@ -299,7 +304,7 @@ export default function ProductDetailPage() {
                     <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div className="flex items-baseline gap-4 mb-2">
                             <span className="text-4xl lg:text-5xl font-sans font-extralight text-brand-gold">
-                                {product.pricing?.finalPrice ? `₹${formatPrice(product.pricing.finalPrice)}` : 'Price on Request'}
+                                {product.pricing?.finalPrice ? formatPrice(product.pricing.finalPrice) : 'Price on Request'}
                             </span>
                         </div>
                         <div className="flex items-center gap-2">
@@ -343,11 +348,31 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Description - Truncated Concept */}
-                    <div className="mb-8 flex-grow">
+                    <div className="mb-6 flex-grow">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-navy mb-2 border-l-2 border-brand-gold pl-2">The Story</h3>
                         <p className="text-gray-600 font-light leading-relaxed text-sm selection:bg-brand-gold/20 line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">
                             {product.description}
                         </p>
+                    </div>
+
+                    {/* VIP Concierge Button */}
+                    <div className="mb-8 p-6 bg-brand-navy border border-brand-gold/20 rounded-sm relative overflow-hidden group">
+                        <div className="absolute inset-0 bg-gold-gradient opacity-0 group-hover:opacity-5 transition-opacity duration-700"></div>
+                        <div className="relative z-10 flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div className="text-center md:text-left">
+                                <span className="text-brand-gold text-[9px] font-black uppercase tracking-[0.3em] block mb-1">Elite Services</span>
+                                <h4 className="text-white font-serif text-lg mb-1 italic">VIP Concierge Consultation</h4>
+                                <p className="text-white/40 text-[10px] uppercase tracking-widest font-bold">In-person viewing or Virtual 1-on-1</p>
+                            </div>
+                            <button
+                                onClick={() => setShowConcierge(true)}
+                                className="px-6 py-3 bg-brand-gold text-brand-navy text-[10px] font-black uppercase tracking-[0.2em] hover:bg-white transition-all flex items-center gap-3 group/btn"
+                            >
+                                <PiCalendarCheck className="w-4 h-4" />
+                                <span>Book Inquiry</span>
+                                <PiArrowRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
+                            </button>
+                        </div>
                     </div>
 
                     {/* Actions - Sticky Bottom on Mobile */}
@@ -455,23 +480,23 @@ export default function ProductDetailPage() {
                             <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-20 relative">
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Gold Value</span>
-                                    <span>₹{formatPrice(product.pricing?.components?.goldValue)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.goldValue)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Diamond Value</span>
-                                    <span>₹{formatPrice(product.pricing?.components?.diamondValue)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.diamondValue)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Making Charges</span>
-                                    <span>₹{formatPrice(product.pricing?.components?.makingCharges)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.makingCharges)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>GST (3%)</span>
-                                    <span>₹{formatPrice(product.pricing?.components?.gst)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.gst)}</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-brand-navy border-t border-gray-200 pt-3 mt-2">
                                     <span>Total</span>
-                                    <span>₹{formatPrice(product.pricing?.finalPrice)}</span>
+                                    <span>{formatPrice(product.pricing?.finalPrice)}</span>
                                 </div>
                             </div>
                         </div>
@@ -579,6 +604,12 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
             )}
+
+            <ConciergeModal
+                isOpen={showConcierge}
+                onClose={() => setShowConcierge(false)}
+                productName={product.name}
+            />
 
             <DropHintModal
                 isOpen={showDropHint}

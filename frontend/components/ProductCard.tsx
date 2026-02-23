@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartContext';
 import { PiBasket } from 'react-icons/pi';
 import { formatPrice } from '@/lib/utils';
 import { useComparison } from '@/context/ComparisonContext';
+import { useCurrency } from '@/context/CurrencyContext';
 import { PiCheckBold } from 'react-icons/pi';
 
 interface ProductProps {
@@ -28,6 +29,7 @@ import { motion } from 'framer-motion';
 export default function ProductCard({ product }: { product: ProductProps }) {
     const { addToCart } = useCart();
     const { addToComparison, removeFromComparison, isInComparison } = useComparison();
+    const { formatPrice: globalFormatPrice } = useCurrency();
 
     const isCompared = isInComparison(product.id);
 
@@ -130,7 +132,7 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
                 <div className="flex flex-col items-center">
                     <span className="text-base font-bold font-sans text-brand-navy tracking-tight">
-                        ₹{formatPrice(product.price || (product as any).pricing?.finalPrice || 0)}
+                        {globalFormatPrice(product.price || (product as any).pricing?.finalPrice || 0)}
                     </span>
                     <div className="w-0 group-hover:w-10 h-[1px] bg-brand-gold/50 transition-all duration-500 mt-0.5"></div>
                 </div>

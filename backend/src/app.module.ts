@@ -82,7 +82,7 @@ import { ConfigModule } from '@nestjs/config'; // Added ConfigModule import
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(LoggingMiddleware)
+      .apply(LoggingMiddleware, TrafficMiddleware)
       .forRoutes('*');
   }
 }

@@ -53,7 +53,8 @@ export default function TrafficMonitor() {
 
     // Calculate percentage for the gauge
     // Based on 500 RPM capacity
-    const percentage = Math.min(Math.round((metrics.currentRpm / metrics.threshold) * 80), 100);
+    const threshold = metrics.threshold || 500;
+    const percentage = Math.min(Math.round((metrics.currentRpm / threshold) * 80), 100);
 
     const statusColors = {
         Healthy: { text: 'text-green-600', bg: 'bg-green-500', lightBg: 'bg-green-50', border: 'border-green-100' },

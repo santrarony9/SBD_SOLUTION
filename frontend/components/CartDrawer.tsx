@@ -6,9 +6,11 @@ import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
+import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const { items, removeFromCart, updateQuantity } = useCart();
+    const { formatPrice: globalFormatPrice } = useCurrency();
 
     const subtotal = items.reduce((acc, item) => acc + (item.product.pricing.finalPrice * item.quantity), 0);
 
@@ -111,7 +113,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                                     </button>
                                                 </div>
                                                 <p className="text-sm font-sans font-medium text-brand-gold">
-                                                    ₹{formatPrice(item.product.pricing.finalPrice * item.quantity)}
+                                                    {globalFormatPrice(item.product.pricing.finalPrice * item.quantity)}
                                                 </p>
                                             </div>
                                         </div>
@@ -126,7 +128,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                 <div className="flex justify-between items-center">
                                     <span className="text-[10px] uppercase font-black tracking-[0.3em] text-gray-400">Estimated Total</span>
                                     <span className="text-xl font-sans font-light text-brand-navy italic">
-                                        ₹{formatPrice(subtotal)}
+                                        {globalFormatPrice(subtotal)}
                                     </span>
                                 </div>
                                 <p className="text-[9px] text-gray-400 uppercase tracking-widest leading-relaxed">

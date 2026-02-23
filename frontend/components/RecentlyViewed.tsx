@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
+import { useCurrency } from '@/context/CurrencyContext';
 import { motion } from 'framer-motion';
 import SkeletonLoader from './SkeletonLoader';
 
@@ -22,6 +23,7 @@ interface Product {
 export default function RecentlyViewed() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
+    const { formatPrice: globalFormatPrice } = useCurrency();
 
     useEffect(() => {
         async function loadRecentlyViewed() {
@@ -107,7 +109,7 @@ export default function RecentlyViewed() {
                                         <span>{product.diamondCarat} CT</span>
                                     </div>
                                     <p className="text-xs font-bold text-brand-navy mt-1">
-                                        ₹{formatPrice((product as any).price || 0)}
+                                        {globalFormatPrice((product as any).price || (product as any).pricing?.finalPrice || 0)}
                                     </p>
                                 </div>
                             </Link>

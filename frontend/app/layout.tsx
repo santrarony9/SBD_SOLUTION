@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { ComparisonProvider } from '@/context/ComparisonContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 import ChatWidget from "@/components/ChatWidget";
 
 const playfair = Playfair_Display({
@@ -77,9 +78,11 @@ export default function RootLayout({
           <AuthProvider>
             <CartProvider>
               <ComparisonProvider>
-                <ClientLayoutWrapper>
-                  {children}
-                </ClientLayoutWrapper>
+                <CurrencyProvider>
+                  <ClientLayoutWrapper>
+                    {children}
+                  </ClientLayoutWrapper>
+                </CurrencyProvider>
               </ComparisonProvider>
             </CartProvider>
           </AuthProvider>

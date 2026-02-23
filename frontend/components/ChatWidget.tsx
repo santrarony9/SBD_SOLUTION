@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { PiChatCircleText, PiX, PiPaperPlaneRight, PiSparkle } from "react-icons/pi";
+import { PiX, PiPaperPlaneRight, PiSparkle, PiDotsSixVertical } from "react-icons/pi";
+import { motion, useDragControls } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 
@@ -112,36 +113,52 @@ export default function ChatWidget() {
 
   if (!isOpen) {
     return (
-      <div className="fixed bottom-28 md:bottom-8 right-4 md:right-8 z-[80] flex items-center group">
+      <motion.div
+        drag
+        dragMomentum={false}
+        initial={{ x: 0, y: 0 }}
+        className="fixed bottom-28 md:bottom-12 right-6 md:right-12 z-[1000] flex items-center group cursor-move touch-none"
+      >
         {/* Hover Label */}
-        <span className="bg-brand-navy text-brand-gold text-[9px] font-black uppercase tracking-[0.2em] px-4 py-2 rounded-l-full border-y border-l border-brand-gold/30 shadow-xl opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 hidden md:block">
-          Chat with Concierge
+        <span className="bg-brand-navy/90 backdrop-blur-md text-brand-gold text-[9px] font-black uppercase tracking-[0.2em] px-4 py-3 rounded-l-2xl border-y border-l border-brand-gold/30 shadow-2xl opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 hidden md:block select-none pointer-events-none">
+          Royal Concierge
         </span>
 
         <button
           onClick={() => setIsOpen(true)}
-          className="w-14 h-14 rounded-full bg-brand-navy text-brand-gold shadow-[0_8px_30px_rgb(0,0,0,0.3)] hover:scale-110 hover:bg-gold-gradient hover:text-brand-navy transition-all duration-500 flex items-center justify-center border border-brand-gold/30 backdrop-blur-md animate-float"
+          className="w-16 h-16 rounded-full bg-brand-navy text-brand-gold shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 flex flex-col items-center justify-center border-2 border-brand-gold/40 backdrop-blur-lg group relative overflow-hidden"
         >
-          <div className="absolute inset-0 rounded-full border border-white/5 animate-pulse-slow"></div>
-          <PiChatCircleText className="w-8 h-8" />
+          {/* Animated Background Glow */}
+          <div className="absolute inset-0 bg-gold-gradient opacity-0 group-hover:opacity-20 transition-opacity duration-700" />
 
-          {/* Status Indicator */}
-          <span className="absolute top-1 right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-brand-navy"></span>
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-brand-gold/30">
+            <PiDotsSixVertical className="w-4 h-4" />
+          </div>
 
-          {/* Pulsing ring */}
-          <span className="absolute inset-0 rounded-full bg-brand-gold/20 animate-ping opacity-20"></span>
+          {/* Custom Royal Icon (Simplified Crown/Star) */}
+          <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 relative z-10 text-brand-gold drop-shadow-[0_2px_5px_rgba(198,168,124,0.5)]">
+            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
+          </svg>
+
+          {/* Status Glow Indicator */}
+          <span className="absolute top-3 right-3 w-3 h-3 bg-green-500 rounded-full border-2 border-brand-navy shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
         </button>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="fixed inset-0 md:inset-auto md:bottom-8 md:right-8 z-[9999] flex flex-col items-end animate-in fade-in zoom-in-95 duration-300 pointer-events-none">
-      {/* Mobile Backdrop - Semi-transparent */}
-      <div className="md:hidden absolute inset-0 bg-brand-navy/20 backdrop-blur-sm pointer-events-auto" onClick={() => setIsOpen(false)}></div>
+    <div className="fixed inset-0 md:inset-auto md:bottom-12 md:right-12 z-[11000] flex flex-col items-end animate-in fade-in zoom-in-95 duration-300 pointer-events-none">
+      {/* Mobile Backdrop */}
+      <div className="md:hidden absolute inset-0 bg-brand-navy/60 backdrop-blur-md pointer-events-auto" onClick={() => setIsOpen(false)}></div>
 
-      {/* Chat Window */}
-      <div className="w-full h-full md:w-[400px] md:h-[600px] md:max-h-[80vh] bg-white md:rounded-2xl shadow-2xl overflow-hidden border-t md:border border-brand-charcoal/10 flex flex-col pointer-events-auto relative mt-auto">
+      {/* Draggable Chat Window (Desktop) */}
+      <motion.div
+        drag={typeof window !== 'undefined' && window.innerWidth > 768}
+        dragMomentum={false}
+        className="w-full h-full md:w-[420px] md:h-[650px] md:max-h-[85vh] bg-white md:rounded-3xl shadow-[0_30px_90px_-20px_rgba(0,0,0,0.5)] overflow-hidden border border-brand-gold/10 flex flex-col pointer-events-auto relative mt-auto touch-none"
+      >
         {/* Header */}
         <div className="bg-brand-navy p-5 flex justify-between items-center text-white shrink-0 relative overflow-hidden">
           <div className="absolute inset-0 bg-gold-gradient opacity-10"></div>
@@ -278,7 +295,7 @@ export default function ChatWidget() {
             <p className="text-[8px] text-gray-400 uppercase tracking-widest">Powered by SBD Core AI</p>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
