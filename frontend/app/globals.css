@@ -30,6 +30,7 @@ body {
   /* Soft background for premium feel */
   font-family: var(--font-inter), sans-serif;
   overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
 }
 
 h1,

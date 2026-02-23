@@ -41,7 +41,7 @@ export default function Navbar() {
     const accentColor = scrolled ? 'text-brand-gold' : 'text-brand-gold';
 
     return (
-        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-50'} transition-all duration-500 ease-in-out ${navClasses}`}>
+        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-50'} transition-all duration-500 ease-in-out ${navClasses} pt-[env(safe-area-inset-top,0px)]`}>
             <div className="max-w-7xl mx-auto px-6">
                 <div className="flex justify-between items-center relative h-12">
 

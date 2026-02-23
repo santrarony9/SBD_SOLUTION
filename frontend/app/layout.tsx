@@ -28,8 +28,11 @@ export async function generateMetadata(): Promise<Metadata> {
     manifest: '/manifest.webmanifest',
     appleWebApp: {
       capable: true,
-      statusBarStyle: 'default' as const,
+      statusBarStyle: 'black-translucent' as const,
       title: 'Spark Blue Diamond',
+    },
+    icons: {
+      apple: '/favicon.png', // Fallback to favicon for apple touch icon
     },
   };
 
@@ -52,6 +55,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export const viewport = {
   themeColor: "#0F172A",
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({
