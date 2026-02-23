@@ -23,11 +23,11 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
     // 3. Add stable minute-level cache-busting for GET requests
-    // Using '_cb' instead of '_t' to bypass potential specific proxy rules for '_t'
+    // Using '_v' for v1.0.3 to ensure we bypass any stale cache of previous '_cb' or '_t'
     if (!isServer && (!options.method || options.method.toUpperCase() === 'GET')) {
         const minuteTimestamp = Math.floor(Date.now() / 60000);
         const separator = fullUrl.includes('?') ? '&' : '?';
-        fullUrl = `${fullUrl}${separator}_cb=${minuteTimestamp}`;
+        fullUrl = `${fullUrl}${separator}_v=${minuteTimestamp}`;
     }
 
     // 4. Request Deduplication: If already fetching this URL with same method/body, return existing promise
@@ -38,8 +38,8 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
     const requestPromise = (async () => {
         try {
-            if (!isServer && process.env.NODE_ENV === 'development') {
-                console.log(`[API] Fetching (V=1.0.2): ${fullUrl}`);
+            if (!isServer) {
+                console.log(`[SBD-API] Requesting (v1.0.3): ${fullUrl}`);
             }
 
             // Get token from storage (Client only)
