@@ -127,7 +127,14 @@ export default function ProductDetailPage() {
             if (!slug) return;
 
             try {
-                const data = await fetchAPI(`/products/${slug}`);
+                const apiPath = `/products/${slug}`;
+                console.log(`[PDP] Fetching product: ${apiPath}`);
+                const data = await fetchAPI(apiPath);
+
+                if (!data || Object.keys(data).length === 0) {
+                    throw new Error("Product data is empty or invalid.");
+                }
+
                 setProduct(data);
 
                 // Set initial image
@@ -135,14 +142,12 @@ export default function ProductDetailPage() {
                     setActiveImage(data.images[0]);
                 }
 
-                // Prioritize video ONLY if explicitly desired, but standard UX is usually image first. 
-                // However, user logic was "Prioritize video first".
-                // We will set showVideo=true if video exists.
                 if (data.videoUrl) {
                     setShowVideo(true);
                 }
-            } catch (err) {
-                setError(`Failed to load product details.`);
+            } catch (err: any) {
+                console.error("[PDP] Load Error:", err);
+                setError(err.message || `Failed to load product details.`);
             } finally {
                 setLoading(false);
             }
