@@ -39,10 +39,13 @@ async function bootstrap() {
     contentSecurityPolicy: false, // Disable CSP if frontend/backend are separate or tricky, but keep other protections
   }));
 
-  // 2. Global Rate Limiting
+  // Enable trust proxy for Render/Vercel
+  (app.getHttpAdapter().getInstance() as any).set('trust proxy', 1);
+
+  // 2. Global Rate Limiting - Relaxed for production stability
   app.use(rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 1000, // Increased from 100 to 1000 to avoid blocking users
     message: 'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,

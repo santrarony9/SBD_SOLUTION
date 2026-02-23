@@ -23,7 +23,9 @@ export default function InstagramFeed() {
         async function loadPosts() {
             try {
                 const data = await fetchAPI('/marketing/social-posts');
-                setPosts(data.slice(0, 6)); // Limit to 6
+                if (data && Array.isArray(data)) {
+                    setPosts(data.slice(0, 6)); // Limit to 6
+                }
             } catch (err) {
                 console.error("Failed to load social posts", err);
             } finally {

@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
@@ -11,10 +12,15 @@ export default function MobileBottomNav() {
     const pathname = usePathname();
     const { items } = useCart();
     const { comparisonItems } = useComparison();
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     // Hide bottom nav on admin and transactional pages to avoid blocking CTA buttons
     const isTransactional = pathname?.includes('/product/') || pathname === '/cart' || pathname === '/checkout' || pathname?.startsWith('/admin');
-    if (isTransactional) return null;
+    if (!isMounted || isTransactional) return null;
 
     const navItems = [
         {

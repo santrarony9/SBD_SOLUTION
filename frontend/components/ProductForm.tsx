@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
 import { PiUploadSimple, PiX } from 'react-icons/pi';
 
 interface ProductFormProps {
@@ -42,7 +42,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
 
         try {
             const token = localStorage.getItem('token');
-            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/media/upload`, {
+            const res = await fetch(`${API_URL}/media/upload`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`

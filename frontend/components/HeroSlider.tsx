@@ -105,19 +105,19 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
 
                 {/* Main Hero Text (Static Global Setting) */}
                 <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
-                    {heroText.title.includes('Eternal') ? (
+                    {heroText?.title?.includes('Eternal') ? (
                         <>
                             {heroText.title.split('Eternal')[0]}
                             <span className="text-brand-gold italic pr-2">Eternal</span>
                             {heroText.title.split('Eternal')[1]}
                         </>
                     ) : (
-                        heroText.title
+                        heroText?.title || "Royal Diamond Collection"
                     )}
                 </h1>
 
                 <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
-                    {heroText.subtitle}
+                    {heroText?.subtitle || "Exquisite craftsmanship since 1995"}
                 </p>
 
                 <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full md:w-auto px-6 md:px-0">

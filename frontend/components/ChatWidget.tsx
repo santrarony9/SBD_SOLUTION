@@ -18,7 +18,12 @@ export default function ChatWidget() {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -103,6 +108,8 @@ export default function ChatWidget() {
     });
   };
 
+  if (!isMounted) return null;
+
   if (!isOpen) {
     return (
       <div className="fixed bottom-28 md:bottom-8 right-4 md:right-8 z-[80] flex items-center group">
@@ -171,7 +178,7 @@ export default function ChatWidget() {
                 <div className="break-words">
                   {renderContent(msg.content)}
                 </div>
-                <span className="text-[9px] opacity-40 mt-1 block w-full text-right font-mono tracking-tighter">
+                <span className="text-[9px] opacity-40 mt-1 block w-full text-right font-mono tracking-tighter" suppressHydrationWarning>
                   {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>

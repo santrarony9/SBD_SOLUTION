@@ -1,21 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Link from 'next/link';
+import { fetchAPI } from '@/lib/api';
 
 export default function AnnouncementBar() {
     const [setting, setSetting] = useState<any>(null);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         const fetchSetting = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/store/settings/announcement`);
-                if (res.ok) {
-                    const text = await res.text();
-                    if (text) {
-                        const data = JSON.parse(text);
-                        setSetting(data.value);
-                    }
+                const data = await fetchAPI('/store/settings/announcement');
+                if (data && data.value) {
+                    setSetting(data.value);
                 }
             } catch (e) {
                 console.error("AnnouncementBar fetch failed", e);
@@ -24,7 +22,7 @@ export default function AnnouncementBar() {
         fetchSetting();
     }, []);
 
-    if (!setting || !setting.isActive) return null;
+    if (!isMounted || !setting || !setting.isActive) return null;
 
     const content = (
         <div className="bg-brand-gold text-brand-navy py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.25em] relative z-[60] overflow-hidden group">

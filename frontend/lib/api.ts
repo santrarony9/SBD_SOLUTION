@@ -12,6 +12,10 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         ? endpoint
         : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
+    if (!isServer && process.env.NODE_ENV === 'development') {
+        console.log(`[API] Fetching: ${fullUrl}`);
+    }
+
     // Get token from storage (Client only)
     const token = !isServer ? localStorage.getItem('token') : null;
 

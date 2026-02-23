@@ -2,22 +2,21 @@
 
 import { useEffect, useState } from 'react';
 import { PiX } from 'react-icons/pi';
+import { fetchAPI } from '@/lib/api';
 
 export default function ExitIntentPopup() {
     const [setting, setSetting] = useState<any>(null);
     const [isVisible, setIsVisible] = useState(false);
     const [hasShown, setHasShown] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
+        setIsMounted(true);
         const fetchSetting = async () => {
             try {
-                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || '/api'}/store/settings/exit_intent`);
-                if (res.ok) {
-                    const text = await res.text();
-                    if (text) {
-                        const data = JSON.parse(text);
-                        setSetting(data.value);
-                    }
+                const data = await fetchAPI('/store/settings/exit_intent');
+                if (data && data.value) {
+                    setSetting(data.value);
                 }
             } catch (e) {
                 console.error("ExitIntent fetch failed", e);
@@ -47,7 +46,7 @@ export default function ExitIntentPopup() {
         document.body.style.overflow = 'auto';
     };
 
-    if (!isVisible || !setting) return null;
+    if (!isMounted || !isVisible || !setting) return null;
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-brand-navy/60 backdrop-blur-sm animate-fade-in">
