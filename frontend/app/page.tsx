@@ -11,6 +11,7 @@ import MotionGallery from '@/components/MotionGallery';
 import ShopByCategory from '@/components/ShopByCategory';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import GiftFinder from '@/components/GiftFinder';
+import SmartPlaceholder from '@/components/SmartPlaceholder';
 // Removed motion import to fix Server Component render error
 
 export const dynamic = 'force-dynamic';
@@ -202,13 +203,13 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4">Shop by Price</h2>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {Array.isArray(priceRanges) && priceRanges.map((range: any, idx: number) => (
               <div
                 key={range.id || idx}
                 className="group h-full"
               >
-                <Link href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-6 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_4px_20px_-5px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col items-center justify-center min-h-[140px]">
+                <Link href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-4 md:p-6 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_4px_20px_-5px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]">
                   {/* Hover Background */}
                   <div className="absolute inset-0 bg-brand-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out-expo z-0"></div>
 
@@ -284,7 +285,7 @@ export default async function Home() {
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
             {Array.isArray(featuredProducts) && featuredProducts.map((p: any, idx: number) => (
               <div
                 key={p.id || idx}
@@ -311,9 +312,9 @@ export default async function Home() {
               <div
                 key={offer.id || idx}
               >
-                <Link href={offer.link || '/shop'} className="block h-full group relative overflow-hidden border border-brand-gold/30 p-8 md:p-12 flex flex-col justify-center items-start bg-white/5 backdrop-blur-sm min-h-[300px]">
+                <Link href={offer.link || '/shop'} className="block h-full group relative overflow-hidden border border-brand-gold/30 p-6 md:p-12 flex flex-col justify-center items-start bg-white/5 backdrop-blur-sm min-h-[220px] md:min-h-[300px]">
                   {/* Background Image Layer */}
-                  {offer.imageUrl && (
+                  {offer.imageUrl ? (
                     <div className="absolute inset-0 z-0">
                       <Image
                         src={offer.imageUrl}
@@ -323,6 +324,14 @@ export default async function Home() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-r from-brand-navy via-brand-navy/90 to-brand-navy/30 mix-blend-multiply" />
                     </div>
+                  ) : (
+                    <SmartPlaceholder
+                      label="Offer Banner"
+                      width={800}
+                      height={400}
+                      description="Luxury aesthetics, jewelry lifestyle shot."
+                      className="absolute inset-0 opacity-10"
+                    />
                   )}
 
                   <div className="relative z-10 w-full text-balance">
