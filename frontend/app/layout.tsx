@@ -10,6 +10,8 @@ import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import ChatWidget from "@/components/ChatWidget";
 
+import JsonLd from "@/components/JsonLd";
+
 const playfair = Playfair_Display({
   variable: "--font-playfair-display",
   subsets: ["latin"],
@@ -19,6 +21,7 @@ const playfair = Playfair_Display({
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  weight: ["400", "500", "700"], // Added common weights
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,13 +30,32 @@ export async function generateMetadata(): Promise<Metadata> {
     description: "Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold. Bespoke craftsmanship and transparent pricing since 1995.",
     keywords: ["luxury jewellery", "diamond rings", "gold necklaces", "certified diamonds", "custom jewellery India"],
     manifest: '/manifest.webmanifest',
+    metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sparkbluediamond.com'),
+    alternates: {
+      canonical: '/',
+    },
+    openGraph: {
+      title: 'Spark Blue Diamond',
+      description: 'Premium Certified Diamonds & Gold Jewellery',
+      url: '/',
+      siteName: 'Spark Blue Diamond',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+        },
+      ],
+      locale: 'en_IN',
+      type: 'website',
+    },
     appleWebApp: {
       capable: true,
       statusBarStyle: 'black-translucent' as const,
       title: 'Spark Blue Diamond',
     },
     icons: {
-      apple: '/favicon.png', // Fallback to favicon for apple touch icon
+      apple: '/favicon.png',
     },
   };
 
@@ -68,8 +90,49 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Global Organization & Website Schema
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "JewelryStore",
+    "name": "Spark Blue Diamond",
+    "alternateName": "SBD",
+    "url": "https://sparkbluediamond.com",
+    "logo": "https://sparkbluediamond.com/logo.png",
+    "sameAs": [
+      "https://www.instagram.com/sparkbluediamond",
+      "https://www.facebook.com/sparkbluediamond"
+    ],
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Mumbai",
+      "addressCountry": "IN"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "telephone": "+91-XXXXXXXXXX",
+      "contactType": "customer service"
+    },
+    "priceRange": "$$$"
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Spark Blue Diamond",
+    "url": "https://sparkbluediamond.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://sparkbluediamond.com/shop?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <html lang="en" className="scroll-smooth">
+      <head>
+        <JsonLd data={organizationSchema} />
+        <JsonLd data={websiteSchema} />
+      </head>
       <body
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
       >

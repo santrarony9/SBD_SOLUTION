@@ -228,6 +228,12 @@ export default function CheckoutPage() {
                                     className="px-6 pb-8"
                                 >
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                        {error && (
+                                            <div className="col-span-2 p-3 bg-red-50 border border-red-100 text-red-600 text-[10px] uppercase font-bold flex items-center gap-2 animate-shake">
+                                                <PiWarningCircle className="text-lg" />
+                                                {error}
+                                            </div>
+                                        )}
                                         <div className="col-span-2">
                                             <input type="text" name="fullName" value={shippingAddress.fullName} onChange={handleInputChange} className="w-full p-3.5 bg-gray-50 border border-gray-100 text-sm focus:border-brand-gold outline-none" placeholder="Full Name" required />
                                         </div>

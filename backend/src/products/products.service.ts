@@ -5,11 +5,16 @@ import { ApplyOn } from '@prisma/client';
 
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+import { RedisService } from '../redis/redis.service';
+
 @Injectable()
 export class ProductsService {
     private genAI: GoogleGenerativeAI;
 
-    constructor(private prisma: PrismaService) {
+    constructor(
+        private prisma: PrismaService,
+        private redis: RedisService
+    ) {
         if (process.env.GEMINI_API_KEY) {
             this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
         }
@@ -74,7 +79,9 @@ export class ProductsService {
                 data.sku = `SBD-${prefix}-${timestamp}-${random}`;
             }
 
-            return await this.prisma.product.create({ data });
+            const product = await this.prisma.product.create({ data });
+            await this.redis.delByPattern('products:*');
+            return product;
         } catch (error) {
             console.error('Failed to create product:', error);
             throw error; // Re-throw to let global filter handle it, but log first
@@ -84,19 +91,29 @@ export class ProductsService {
     async updateProduct(id: string, data: any) {
         // Ensure product exists
         await this.findOne(id);
-        return this.prisma.product.update({
+        const updated = await this.prisma.product.update({
             where: { id },
             data,
         });
+        await this.redis.delByPattern('products:*');
+        return updated;
     }
 
     async deleteProduct(id: string) {
         await this.findOne(id); // Ensure existence
         // Soft delete could be better, but hard delete for now as per mvp
-        return this.prisma.product.delete({ where: { id } });
+        const deleted = await this.prisma.product.delete({ where: { id } });
+        await this.redis.delByPattern('products:*');
+        return deleted;
     }
 
     async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number, skip?: number, take?: number }) {
+        const cacheKey = `products:all:${JSON.stringify(filters || {})}`;
+        const cached = await this.redis.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
         const where: any = { isActive: true };
 
         if (filters?.category) {
@@ -136,8 +153,9 @@ export class ProductsService {
         });
 
         // 4. Client-side price filtering (since pricing is dynamic)
+        let result = enriched;
         if (filters?.minPrice || filters?.maxPrice) {
-            return enriched.filter(p => {
+            result = enriched.filter(p => {
                 const price = p.pricing?.finalPrice || 0;
                 if (filters.minPrice && price < filters.minPrice) return false;
                 if (filters.maxPrice && price > filters.maxPrice) return false;
@@ -145,10 +163,17 @@ export class ProductsService {
             });
         }
 
-        return enriched;
+        await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
+        return result;
     }
 
     async findOne(slugOrId: string) {
+        const cacheKey = `products:one:${slugOrId}`;
+        const cached = await this.redis.get(cacheKey);
+        if (cached) {
+            return JSON.parse(cached);
+        }
+
         let product;
 
         if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
@@ -166,7 +191,9 @@ export class ProductsService {
         const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
         const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
 
-        return this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges);
+        const result = this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges);
+        await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
+        return result;
     }
 
     // ------------------------------------------

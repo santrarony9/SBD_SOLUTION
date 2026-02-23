@@ -15,6 +15,7 @@ import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck } from 'react-icons/pi';
+import JsonLd from "@/components/JsonLd";
 
 interface Product {
     id: string;
@@ -185,8 +186,74 @@ export default function ProductDetailPage() {
         );
     }
 
+    const breadcrumbSchema = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://sparkbluediamond.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Collections",
+                "item": "https://sparkbluediamond.com/shop"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": product.name,
+                "item": `https://sparkbluediamond.com/product/${slug}`
+            }
+        ]
+    };
+
+    const productSchema = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name,
+        "image": product.images || [],
+        "description": product.description,
+        "sku": slug.split('-')[0].toUpperCase(),
+        "brand": {
+            "@type": "Brand",
+            "name": "Spark Blue Diamond"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": `https://sparkbluediamond.com/product/${slug}`,
+            "priceCurrency": currency || "INR",
+            "price": product.pricing?.finalPrice || 0,
+            "availability": "https://schema.org/InStock",
+            "itemCondition": "https://schema.org/NewCondition"
+        },
+        "material": `${product.goldPurity}K Gold`,
+        "additionalProperty": [
+            {
+                "@type": "PropertyValue",
+                "name": "Diamond Clarity",
+                "value": product.diamondClarity
+            },
+            {
+                "@type": "PropertyValue",
+                "name": "Diamond Carat",
+                "value": product.diamondCarat
+            },
+            {
+                "@type": "PropertyValue",
+                "name": "Gold Weight",
+                "value": `${product.goldWeight}g`
+            }
+        ]
+    };
+
     return (
         <div className="bg-brand-cream min-h-screen pb-24 lg:pb-10 pt-20">
+            <JsonLd data={breadcrumbSchema} />
+            <JsonLd data={productSchema} />
 
             {/* Breadcrumb - Minimalist */}
             <div className="max-w-[1400px] mx-auto px-6 py-3 text-[10px] text-gray-400 uppercase tracking-[0.2em] font-medium border-b border-brand-gold/10 mb-6">

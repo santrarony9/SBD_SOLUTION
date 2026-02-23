@@ -27,16 +27,18 @@ export default function ClientLayoutWrapper({
     return (
         <>
             <ExitIntentPopup />
-            <AnnouncementBar />
-            <Navbar />
+            <div className="fixed top-0 left-0 w-full z-[1000] flex flex-col">
+                <AnnouncementBar />
+                <Navbar />
+            </div>
             <AnimatePresence mode="wait">
                 <motion.main
                     key={pathname}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3, ease: "easeInOut" }}
-                    className="min-h-screen"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="min-h-screen pt-[100px] md:pt-[140px]" // Optimized padding for new header height
                 >
                     {children}
                 </motion.main>

@@ -36,55 +36,49 @@ export default function Navbar() {
     const navClasses = scrolled
         ? 'bg-white/80 backdrop-blur-2xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
         : isHome
-            ? 'bg-transparent py-4 md:py-6'
+            ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
             : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
 
-    const textColor = scrolled ? 'text-brand-navy' : 'text-white';
+    const textColor = scrolled ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
     const accentColor = 'text-brand-gold';
 
     return (
-        <nav className={`fixed w-full ${isSearchOpen || isMobileMenuOpen ? 'z-[1100]' : 'z-[100]'} transition-all duration-500 ease-in-out ${navClasses}`}>
-            {/* Safe Area Top Padding - ensures content is below status bars/notches */}
-            <div className="h-[env(safe-area-inset-top,0px)] w-full" />
+        <nav className={`w-full transition-all duration-500 ease-in-out ${navClasses}`}>
 
             <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <div className="flex justify-between items-center relative h-10 md:h-12">
+                <div className="grid grid-cols-3 items-center relative h-12 md:h-16">
 
-                    {/* Mobile Left: Search & Menu */}
-                    <div className="flex items-center md:hidden gap-4">
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
-                        >
-                            {isMobileMenuOpen ? <PiX className="h-6 w-6" /> : <PiList className="h-6 w-6" />}
-                        </motion.button>
-                        <motion.button
-                            whileTap={{ scale: 0.9 }}
-                            onClick={() => setIsSearchOpen(true)}
-                            className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
-                        >
-                            <PiMagnifyingGlass className="h-5 w-5" />
-                        </motion.button>
-                    </div>
+                    {/* Left: Desktop Links / Mobile Menu Toggle */}
+                    <div className="flex items-center justify-start gap-4">
+                        {/* Mobile Toggle */}
+                        <div className="flex items-center md:hidden">
+                            <motion.button
+                                whileTap={{ scale: 0.9 }}
+                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                                className={`${textColor} hover:text-brand-gold focus:outline-none transition-colors duration-300`}
+                            >
+                                {isMobileMenuOpen ? <PiX className="h-6 w-6" /> : <PiList className="h-6 w-6" />}
+                            </motion.button>
+                        </div>
 
-                    {/* Desktop Left Links */}
-                    <div className="hidden md:flex space-x-10 items-center">
-                        <NavLink href="/" label="Home" textColor={textColor} />
-                        <NavLink href="/shop" label="Collections" textColor={textColor} />
-                        <NavLink href="/about" label="Heritage" textColor={textColor} />
+                        {/* Desktop Links */}
+                        <div className="hidden md:flex space-x-8 items-center">
+                            <NavLink href="/" label="Home" textColor={textColor} />
+                            <NavLink href="/shop" label="Collections" textColor={textColor} />
+                            <NavLink href="/about" label="Heritage" textColor={textColor} />
+                        </div>
                     </div>
 
                     {/* Center: Logo */}
-                    <div className={`flex-shrink-0 flex flex-col items-center justify-center absolute left-1/2 transform -translate-x-1/2 transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
-                        <Link href="/" className={`font-serif text-2xl md:text-4xl tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em]`}>
+                    <div className={`flex flex-col items-center justify-center transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
+                        <Link href="/" className={`font-serif text-xl md:text-3xl tracking-[0.2em] md:tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em]`}>
                             SPARK <span className="text-brand-gold">BLUE</span>
                         </Link>
                         {!scrolled && (
                             <motion.span
                                 initial={{ opacity: 0, y: -5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-[0.5rem] md:text-[0.6rem] uppercase tracking-[0.6em] text-brand-gold font-black mt-1"
+                                className="text-[0.4rem] md:text-[0.6rem] uppercase tracking-[0.4em] md:tracking-[0.6em] text-brand-gold font-black mt-0.5"
                             >
                                 Diamond
                             </motion.span>
@@ -92,13 +86,14 @@ export default function Navbar() {
                     </div>
 
                     {/* Right: Actions */}
-                    <div className="hidden md:flex space-x-6 items-center">
-                        <div className={`flex items-center space-x-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-8 transition-colors duration-300`}>
-                            {/* Currency Switcher */}
-                            <div className="relative group mr-2">
-                                <button className={`flex items-center gap-1.5 text-[10px] uppercase tracking-widest font-black ${textColor} hover:text-brand-gold transition-all`}>
+                    <div className="flex justify-end items-center gap-3 md:gap-6">
+                        {/* Desktop Only Actions */}
+                        <div className={`hidden md:flex items-center gap-3 md:gap-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-4 md:pl-8 transition-colors duration-300`}>
+                            {/* Currency Switcher (Desktop) */}
+                            <div className="relative group">
+                                <button className={`flex items-center gap-1 text-[8px] md:text-[10px] uppercase tracking-widest font-black ${textColor} hover:text-brand-gold transition-all`}>
                                     <PiGlobe className="w-4 h-4" />
-                                    <span>{currency}</span>
+                                    <span className="hidden sm:inline">{currency}</span>
                                 </button>
                                 <div className="absolute top-full right-0 mt-4 bg-brand-navy border border-brand-gold/20 shadow-2xl py-3 px-4 w-32 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-[1000] backdrop-blur-xl">
                                     <div className="flex flex-col gap-2">
@@ -147,26 +142,37 @@ export default function Navbar() {
                                 <PiHeart className="h-5 w-5" />
                             </Link>
 
-                            <Link href="/compare" className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-2`} title="Compare">
+                            <Link href="/compare" className={`hidden lg:flex ${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-1 md:ml-2`} title="Compare">
                                 <PiArrowsLeftRight className="h-5 w-5" />
                                 {comparisonItems.length > 0 && (
-                                    <span className="absolute -top-2 -right-2 bg-brand-navy text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-brand-gold/30">
+                                    <span className="absolute -top-2 -right-2 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border border-brand-gold/30">
                                         {comparisonItems.length}
                                     </span>
                                 )}
                             </Link>
+                        </div>
+
+                        {/* Mobile & Desktop Shared Actions (Cart & Mobile Search) */}
+                        <div className="flex items-center gap-4">
+                            <button
+                                onClick={() => setIsSearchOpen(true)}
+                                className={`md:hidden ${textColor} hover:text-brand-gold transition-colors duration-300`}
+                                title="Search"
+                            >
+                                <PiMagnifyingGlass className="h-5 w-5" />
+                            </button>
 
                             <button
                                 onClick={openCart}
-                                className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative ml-2 group`}
+                                className={`${textColor} hover:text-brand-gold transition-colors duration-300 relative group`}
                             >
-                                <PiShoppingBag className="h-5 w-5" />
+                                <PiShoppingBag className="h-5 w-5 md:h-6 md:w-6" />
                                 {items.length > 0 && (
                                     <motion.span
                                         key={items.length}
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className="absolute -top-2 -right-2 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(198,168,124,0.5)]"
+                                        className="absolute -top-1 -right-1 md:-top-2 md:-right-2 bg-brand-gold text-white text-[8px] md:text-[9px] font-bold w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(198,168,124,0.5)]"
                                     >
                                         {items.length}
                                     </motion.span>
@@ -174,96 +180,102 @@ export default function Navbar() {
                             </button>
                         </div>
                     </div>
-
-                    {/* Mobile Right: Cart */}
-                    <div className="flex items-center md:hidden">
-                        <button
-                            onClick={openCart}
-                            className={`${textColor} hover:text-brand-gold relative transition-colors`}
-                        >
-                            <motion.div whileTap={{ scale: 0.9 }}>
-                                <PiShoppingBag className="h-6 w-6" />
-                                {items.length > 0 && (
-                                    <span className="absolute -top-1 -right-1 bg-brand-gold text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
-                                        {items.length}
-                                    </span>
-                                )}
-                            </motion.div>
-                        </button>
-                    </div>
                 </div>
             </div>
 
             <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             {/* Mobile Menu Overlay */}
-            <div className={`md:hidden fixed inset-0 bg-white/98 backdrop-blur-2xl z-50 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                <div className="flex flex-col h-full justify-center items-center space-y-8 p-8 relative">
-                    <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-8 right-8 text-brand-navy p-2 hover:bg-brand-gold/10 rounded-full transition-colors">
+            <div className={`md:hidden fixed inset-0 bg-brand-navy z-[1001] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                {/* Abstract Background for Menu */}
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
+                    <div className="absolute top-0 left-0 w-64 h-64 bg-brand-gold rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
+                </div>
+
+                <div className="flex flex-col h-full items-center p-8 relative overflow-y-auto">
+                    <button onClick={() => setIsMobileMenuOpen(false)} className="absolute top-6 right-6 text-white/50 p-2 hover:text-brand-gold transition-colors">
                         <PiX className="h-8 w-8" />
                     </button>
 
-                    <motion.div
-                        initial="closed"
-                        animate={isMobileMenuOpen ? "open" : "closed"}
-                        variants={{
-                            open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
-                            closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
-                        }}
-                        className="flex flex-col items-center space-y-6"
-                    >
-                        {[
-                            { href: "/", label: "Home" },
-                            { href: "/shop", label: "Collections" },
-                            { href: "/about", label: "Heritage" },
-                            { href: "/wishlist", label: "Wishlist" },
-                            { href: "/compare", label: `Compare (${comparisonItems.length})` }
-                        ].map((link) => (
-                            <motion.div
-                                key={link.label}
-                                variants={{
-                                    open: { opacity: 1, y: 0 },
-                                    closed: { opacity: 0, y: 20 }
-                                }}
-                            >
-                                <MobileNavLink href={link.href} label={link.label} onClick={() => setIsMobileMenuOpen(false)} />
-                            </motion.div>
-                        ))}
+                    <div className="mt-16 flex flex-col items-center w-full space-y-10">
+                        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl tracking-[0.2em] text-white font-bold">
+                            SPARK <span className="text-brand-gold">BLUE</span>
+                        </Link>
 
                         <motion.div
-                            variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
-                            className="w-16 h-px bg-brand-gold/20 my-4"
-                        />
+                            initial="closed"
+                            animate={isMobileMenuOpen ? "open" : "closed"}
+                            variants={{
+                                open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+                                closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
+                            }}
+                            className="flex flex-col items-center space-y-8 w-full"
+                        >
+                            {[
+                                { href: "/", label: "Home" },
+                                { href: "/shop", label: "Collections" },
+                                { href: "/about", label: "Heritage" },
+                                { href: "/wishlist", label: "My Wishlist" },
+                                { href: "/compare", label: `Jewellery Compare (${comparisonItems.length})` }
+                            ].map((link) => (
+                                <motion.div
+                                    key={link.label}
+                                    variants={{
+                                        open: { opacity: 1, y: 0 },
+                                        closed: { opacity: 0, y: 20 }
+                                    }}
+                                    className="w-full text-center"
+                                >
+                                    <MobileNavLink href={link.href} label={link.label} onClick={() => setIsMobileMenuOpen(false)} />
+                                </motion.div>
+                            ))}
 
-                        {isAuthenticated ? (
+                            <motion.div
+                                variants={{ open: { opacity: 1 }, closed: { opacity: 0 } }}
+                                className="w-12 h-[1px] bg-brand-gold/30 my-2"
+                            />
+
+                            {isAuthenticated ? (
+                                <motion.div
+                                    variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
+                                    className="flex flex-col items-center space-y-8 w-full"
+                                >
+                                    <MobileNavLink href="/account" label="Account Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
+                                    {user?.role === 'ADMIN' && (
+                                        <MobileNavLink href="/admin" label="Admin Master" onClick={() => setIsMobileMenuOpen(false)} />
+                                    )}
+                                    <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.4em] font-black pt-4 hover:text-red-500 transition-colors">Sign Out</button>
+                                </motion.div>
+                            ) : (
+                                <motion.div variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}>
+                                    <MobileNavLink href="/login" label="Client Login" onClick={() => setIsMobileMenuOpen(false)} />
+                                </motion.div>
+                            )}
+
+                            {/* Currency Selection in Menu */}
                             <motion.div
                                 variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
-                                className="flex flex-col items-center space-y-6"
+                                className="pt-10 w-full"
                             >
-                                <MobileNavLink href="/account" label="My Account" onClick={() => setIsMobileMenuOpen(false)} />
-                                <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.3em] font-black pt-4 hover:text-red-500 transition-colors">Logout</button>
+                                <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold mb-4">Select Currency</p>
+                                <div className="flex flex-wrap justify-center gap-2">
+                                    {(['INR', 'USD', 'AED', 'GBP', 'EUR'] as const).map((curr) => (
+                                        <button
+                                            key={curr}
+                                            onClick={() => setCurrency(curr)}
+                                            className={`px-4 py-2 border rounded-none text-[10px] uppercase tracking-widest font-black transition-all ${currency === curr ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/5 border-white/10 text-white/60 hover:border-brand-gold/50'}`}
+                                        >
+                                            {curr}
+                                        </button>
+                                    ))}
+                                </div>
                             </motion.div>
-                        ) : (
-                            <motion.div variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}>
-                                <MobileNavLink href="/login" label="Login" onClick={() => setIsMobileMenuOpen(false)} />
-                            </motion.div>
-                        )}
-
-                        <motion.div
-                            variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
-                            className="flex flex-wrap justify-center gap-4 pt-8"
-                        >
-                            {(['INR', 'USD', 'AED', 'GBP', 'EUR'] as const).map((curr) => (
-                                <button
-                                    key={curr}
-                                    onClick={() => setCurrency(curr)}
-                                    className={`px-3 py-1.5 border rounded-none text-[9px] uppercase tracking-widest font-black transition-all ${currency === curr ? 'bg-brand-navy border-brand-navy text-brand-gold' : 'bg-transparent border-gray-100 text-gray-400'}`}
-                                >
-                                    {curr}
-                                </button>
-                            ))}
                         </motion.div>
-                    </motion.div>
+                    </div>
+
+                    <div className="mt-auto pt-16 text-center">
+                        <p className="text-[8px] uppercase tracking-[0.4em] text-white/20 font-bold">Standard of Excellence since 1995</p>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -282,8 +294,15 @@ function NavLink({ href, label, textColor }: { href: string, label: string, text
 }
 
 function MobileNavLink({ href, label, onClick }: { href: string, label: string, onClick: () => void }) {
+    const pathname = usePathname();
+    const isActive = pathname === href;
+
     return (
-        <Link href={href} onClick={onClick} className="text-2xl font-serif text-brand-navy hover:text-brand-gold transition-colors duration-300">
+        <Link
+            href={href}
+            onClick={onClick}
+            className={`text-3xl font-serif transition-all duration-300 py-2 block ${isActive ? 'text-brand-gold font-bold translate-x-2' : 'text-white'}`}
+        >
             <motion.div whileTap={{ scale: 0.9 }}>
                 {label}
             </motion.div>

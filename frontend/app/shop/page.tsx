@@ -369,10 +369,54 @@ function ShopContent() {
                             </div>
 
                             <div className="space-y-8">
+                                {/* Category Filter */}
+                                <div>
+                                    <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold mb-6 border-b border-brand-gold/10 pb-2">Category</h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
+                                            <button
+                                                key={cat}
+                                                onClick={() => toggleCategory(cat)}
+                                                className={`px-4 py-3 text-[10px] uppercase tracking-widest font-bold border rounded-sm transition-all ${selectedCategories.includes(cat.toLowerCase()) ? 'bg-brand-navy border-brand-navy text-white shadow-lg' : 'bg-white border-gray-100 text-gray-500'}`}
+                                            >
+                                                {cat}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Metal Filter */}
+                                <div>
+                                    <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold mb-6 border-b border-brand-gold/10 pb-2">Metal</h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                            <button
+                                                key={metal}
+                                                onClick={() => toggleMetal(metal)}
+                                                className={`px-4 py-3 text-[10px] uppercase tracking-widest font-bold border rounded-sm transition-all ${selectedMetals.includes(metal) ? 'bg-brand-navy border-brand-navy text-white shadow-lg' : 'bg-white border-gray-100 text-gray-500'}`}
+                                            >
+                                                {metal}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {(selectedCategories.length > 0 || selectedMetals.length > 0) && (
+                                    <button
+                                        onClick={() => {
+                                            setSelectedCategories([]);
+                                            setSelectedMetals([]);
+                                        }}
+                                        className="w-full py-4 text-[10px] uppercase tracking-[0.2em] font-black text-red-500 bg-red-50 border border-red-100"
+                                    >
+                                        Clear All Filters
+                                    </button>
+                                )}
+
                                 <div className="mt-10 pt-6 border-t border-gray-100">
                                     <button
                                         onClick={() => setIsFilterOpen(false)}
-                                        className="w-full bg-brand-navy text-white text-sm font-bold uppercase tracking-widest py-4 hover:bg-gold-gradient hover:text-brand-navy transition-all"
+                                        className="w-full bg-brand-navy text-white text-sm font-bold uppercase tracking-widest py-4 hover:bg-gold-gradient hover:text-brand-navy transition-all shadow-xl"
                                     >
                                         Show {filteredAndSortedProducts.length} Results
                                     </button>

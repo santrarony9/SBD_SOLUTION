@@ -40,10 +40,13 @@ import { GalleryModule } from './gallery/gallery.module';
 import { CcavenueModule } from './ccavenue/ccavenue.module';
 import { ConfigModule } from '@nestjs/config'; // Added ConfigModule import
 
+import { RedisModule } from './redis/redis.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Added ConfigModule
     ScheduleModule.forRoot(),
+    RedisModule,
     GalleryModule,
     ChatModule,
     WhatsappModule,
