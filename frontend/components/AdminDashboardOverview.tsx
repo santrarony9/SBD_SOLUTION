@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
 import { formatPrice } from '@/lib/utils';
+import TrafficMonitor from './TrafficMonitor';
 
 interface DashboardStats {
     totalRevenue: number;
@@ -44,6 +45,9 @@ export default function AdminDashboardOverview() {
 
     return (
         <div className="space-y-8 animate-fade-in-up">
+            {/* Traffic Health Monitor */}
+            <TrafficMonitor />
+
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {cards.map((card, idx) => (

@@ -1,16 +1,23 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Controller, Get, Post, Body, Header, Query } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as bcrypt from 'bcryptjs';
 import { Role } from '@prisma/client';
 
 import { LogBufferService } from './log-buffer.service';
+import { TrafficService } from './traffic.service';
 
 @Controller('diagnostics')
 export class DiagnosticsController {
     constructor(
-        private prisma: PrismaService,
-        private logBuffer: LogBufferService
+        private readonly prisma: PrismaService,
+        private readonly logBuffer: LogBufferService,
+        private readonly traffic: TrafficService,
     ) { }
+
+    @Get('traffic')
+    getTraffic() {
+        return this.traffic.getMetrics();
+    }
 
     @Get('ping')
     ping() {

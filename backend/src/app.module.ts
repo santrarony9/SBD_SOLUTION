@@ -1,5 +1,6 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { LoggingMiddleware } from './common/middleware/logging.middleware';
+import { TrafficMiddleware } from './common/middleware/traffic.middleware';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
