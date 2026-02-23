@@ -105,7 +105,8 @@ export default async function Home() {
   const priceRanges = await getPriceRanges();
   const tags = await getTags();
 
-  const featuredProducts = allProducts.slice(0, 12);
+  // Defensive Guards
+  const featuredProducts = Array.isArray(allProducts) ? allProducts.slice(0, 12) : [];
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
   const heroTitle = heroText?.title ?? "Elegance is Eternal";
   const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
@@ -179,8 +180,10 @@ export default async function Home() {
       <MotionGallery />
 
       {/* 4. Category Discovery Carousels (Horizontal) */}
-      {categories && categories.length > 0 && categories.map((cat: any) => {
-        const catProducts = allProducts.filter((p: any) => p.category === cat.slug || p.category?.slug === cat.slug);
+      {Array.isArray(categories) && categories.length > 0 && categories.map((cat: any) => {
+        const catProducts = Array.isArray(allProducts)
+          ? allProducts.filter((p: any) => p.category === cat.slug || p.category?.slug === cat.slug)
+          : [];
         if (catProducts.length === 0) return null;
         return (
           <motion.div
@@ -214,7 +217,7 @@ export default async function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {priceRanges && priceRanges.map((range: any, idx: number) => (
+            {Array.isArray(priceRanges) && priceRanges.map((range: any, idx: number) => (
               <motion.div
                 key={range.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -254,7 +257,7 @@ export default async function Home() {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em]">Trending Now</span>
           <div className="flex flex-wrap justify-center gap-4 mt-6">
-            {tags && tags.map((tag: any, idx: number) => (
+            {Array.isArray(tags) && tags.map((tag: any, idx: number) => (
               <motion.div
                 key={tag.id}
                 initial={{ opacity: 0, scale: 0.8 }}
@@ -311,7 +314,7 @@ export default async function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {featuredProducts.map((p: any, idx: number) => (
+            {Array.isArray(featuredProducts) && featuredProducts.map((p: any, idx: number) => (
               <motion.div
                 key={p.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -339,7 +342,7 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-serif text-white mt-4">Royal Privileges</h2>
           </motion.div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {offers.length > 0 ? offers.map((offer: any, idx: number) => (
+            {Array.isArray(offers) && offers.length > 0 ? offers.map((offer: any, idx: number) => (
               <motion.div
                 key={offer.id}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -387,7 +390,7 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4">Voices of Royalty</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {featuredReviews.length > 0 ? featuredReviews.map((review: any, idx: number) => (
+            {Array.isArray(featuredReviews) && featuredReviews.length > 0 ? featuredReviews.map((review: any, idx: number) => (
               <motion.div
                 key={review.id}
                 initial={{ opacity: 0, y: 20 }}

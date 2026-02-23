@@ -1,18 +1,24 @@
 
 const envUrl = process.env.NEXT_PUBLIC_API_URL;
-export const API_URL = envUrl
-    ? (envUrl.endsWith('/api') ? envUrl : `${envUrl}/api`)
-    : '/api';
+const isServer = typeof window === 'undefined';
+
+export const API_URL = isServer
+    ? (process.env.INTERNAL_API_URL || envUrl || 'https://sparkbluediamond.com/api')
+    : (envUrl || '/api');
 
 export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
-    // Get token from storage
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    // Determine the full URL
+    const fullUrl = endpoint.startsWith('http')
+        ? endpoint
+        : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+
+    // Get token from storage (Client only)
+    const token = !isServer ? localStorage.getItem('token') : null;
 
     const headers: Record<string, string> = {
         ...((options.headers as Record<string, string>) || {}),
     };
 
-    // Only set Content-Type to JSON if the body is NOT FormData
     if (!(options.body instanceof FormData)) {
         headers['Content-Type'] = 'application/json';
     }
@@ -21,9 +27,9 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const res = await fetch(`${API_URL}${endpoint}`, {
+    const res = await fetch(fullUrl, {
         ...options,
-        cache: 'no-store', // Disable caching to prevent stale data
+        cache: 'no-store',
         headers,
     });
 
