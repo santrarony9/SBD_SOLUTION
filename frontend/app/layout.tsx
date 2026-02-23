@@ -32,6 +32,22 @@ export async function generateMetadata(): Promise<Metadata> {
       title: 'Spark Blue Diamond',
     },
   };
+
+  try {
+    const data = await fetchAPI('/store/settings/seo');
+    if (data && data.value) {
+      return {
+        ...defaultMeta,
+        title: data.value.title || defaultMeta.title,
+        description: data.value.description || defaultMeta.description,
+        keywords: data.value.keywords || defaultMeta.keywords,
+      };
+    }
+  } catch (e) {
+    // Fallback
+  }
+
+  return defaultMeta;
 }
 
 export const viewport = {
