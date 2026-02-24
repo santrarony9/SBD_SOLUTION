@@ -93,6 +93,21 @@ async function getTags() {
   } catch (e) { return []; }
 }
 
+async function getPromiseCards() {
+  try {
+    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards');
+    if (!setting?.value) return null;
+    try {
+      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+    } catch (parseError) {
+      console.error("Failed to parse promise cards setting", parseError);
+      return null;
+    }
+  } catch (e) {
+    return null;
+  }
+}
+
 export default async function Home() {
   const [
     allProducts,
@@ -103,7 +118,8 @@ export default async function Home() {
     heroText,
     categories,
     priceRanges,
-    tags
+    tags,
+    promiseCards
   ] = await Promise.all([
     getFeaturedProducts(),
     getOffers(),
@@ -113,7 +129,8 @@ export default async function Home() {
     getHeroText(),
     getCategories(),
     getPriceRanges(),
-    getTags()
+    getTags(),
+    getPromiseCards()
   ]);
 
   // Defensive Guards
@@ -274,7 +291,7 @@ export default async function Home() {
       </section>
 
       {/* 5.5. Sparkblue Promise (New Design replacing Gift Finder) */}
-      <SparkbluePromise />
+      <SparkbluePromise cards={promiseCards?.cards || promiseCards} />
 
       {/* 5. New Arrivals */}
       <section className="py-24 bg-white">

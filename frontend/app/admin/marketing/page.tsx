@@ -18,6 +18,14 @@ export default function MarketingDashboard() {
     const [seo, setSeo] = useState({ title: '', description: '' });
     const [spotlight, setSpotlight] = useState({ category: 'Solitaire Rings', isActive: true });
 
+    // Sparkblue Promise State
+    const [promiseCards, setPromiseCards] = useState([
+        { title: "FOR YOUR LOVE", image: "/promise_for_love.png", link: "/shop?category=engagement-rings" },
+        { title: "FOR HER", image: "/promise_for_her.png", link: "/shop?category=necklaces" },
+        { title: "FOR MOM", image: "/promise_for_mom.png", link: "/shop?category=earrings" },
+        { title: "FOR ME", image: "/promise_for_me.png", link: "/shop?category=bracelets" }
+    ]);
+
     // Banners State
     const [banners, setBanners] = useState<any[]>([]);
 
@@ -52,6 +60,9 @@ export default function MarketingDashboard() {
                 if (s.key === 'seo_metadata') setSeo(s.value);
                 if (s.key === 'exit_intent') setExitIntent(s.value);
                 if (s.key === 'spotlight') setSpotlight(s.value);
+                if (s.key === 'sparkblue_promise_cards') {
+                    setPromiseCards(typeof s.value === 'string' ? JSON.parse(s.value) : s.value);
+                }
             });
         } catch (err) { }
     };
@@ -254,6 +265,62 @@ export default function MarketingDashboard() {
                             <button onClick={() => saveSetting('seo_metadata', seo)} className="text-brand-gold text-xs font-bold hover:underline">UPDATE SEO</button>
                         </div>
                     </div>
+
+                    {/* Feature 11: Sparkblue Promise Cards */}
+                    <div className="bg-white p-6 shadow rounded-lg md:col-span-2">
+                        <h3 className="font-bold text-gray-700 uppercase text-xs tracking-wider mb-4">✨ Sparkblue Promise Section</h3>
+                        <p className="text-xs text-gray-500 mb-4">Manage the 4 cards shown in the "Find Your Perfect Spark" section on the homepage.</p>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            {promiseCards.map((card, idx) => (
+                                <div key={idx} className="border p-4 rounded bg-gray-50 flex flex-col gap-3">
+                                    <div className="w-full h-32 bg-gray-200 rounded overflow-hidden relative border">
+                                        <img src={card.image} className="object-contain w-full h-full" alt={`Promise Card ${idx + 1}`} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Title</label>
+                                        <input
+                                            className="w-full border p-2 rounded text-xs"
+                                            value={card.title}
+                                            onChange={(e) => {
+                                                const newCards = [...promiseCards];
+                                                newCards[idx].title = e.target.value;
+                                                setPromiseCards(newCards);
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Image URL</label>
+                                        <input
+                                            className="w-full border p-2 rounded text-xs"
+                                            value={card.image}
+                                            onChange={(e) => {
+                                                const newCards = [...promiseCards];
+                                                newCards[idx].image = e.target.value;
+                                                setPromiseCards(newCards);
+                                            }}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Link URL</label>
+                                        <input
+                                            className="w-full border p-2 rounded text-xs"
+                                            value={card.link}
+                                            onChange={(e) => {
+                                                const newCards = [...promiseCards];
+                                                newCards[idx].link = e.target.value;
+                                                setPromiseCards(newCards);
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="mt-4 text-right">
+                            <button onClick={() => saveSetting('sparkblue_promise_cards', promiseCards)} className="bg-brand-navy text-white px-6 py-2 rounded text-xs font-bold hover:bg-brand-gold hover:text-brand-navy transition-colors uppercase">Save Promise Cards</button>
+                        </div>
+                    </div>
+
                 </div>
             )}
 
