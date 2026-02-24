@@ -4,7 +4,7 @@ const isServer = typeof window === 'undefined';
 
 export const API_URL = isServer
     ? (process.env.INTERNAL_API_URL || 'https://api.sparkbluediamond.com/api')
-    : '/external-api';
+    : (process.env.NEXT_PUBLIC_API_URL || 'https://api.sparkbluediamond.com/api');
 
 // In-memory request deduplication to prevent 429 bursts
 const pendingRequests = new Map<string, Promise<any>>();
