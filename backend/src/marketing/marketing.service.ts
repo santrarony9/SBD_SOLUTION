@@ -2,13 +2,17 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ApplyOn } from '@prisma/client';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class MarketingService {
     private readonly logger = new Logger(MarketingService.name);
     private genAI: GoogleGenerativeAI;
 
-    constructor(private prisma: PrismaService) {
+    constructor(
+        private prisma: PrismaService,
+        private productsService: ProductsService
+    ) {
         const apiKey = process.env.GEMINI_API_KEY;
         if (apiKey) {
             this.genAI = new GoogleGenerativeAI(apiKey);
@@ -227,23 +231,12 @@ export class MarketingService {
 
             if (productIds.length === 0) return [];
 
-            // Fetch product details
-            return this.prisma.product.findMany({
-                where: {
-                    id: { in: productIds as string[] },
-                    isActive: true
-                },
-                select: {
-                    id: true,
-                    name: true,
-                    slug: true,
-                    images: true,
-                    goldWeight: true,
-                    goldPurity: true,
-                    diamondCarat: true,
-                    diamondClarity: true
-                }
-            });
+            // Fetch product details with dynamic pricing using ProductsService
+            const enrichedProducts = await Promise.all(
+                productIds.map(id => this.productsService.findOne(id as string).catch(() => null))
+            );
+
+            return enrichedProducts.filter(Boolean);
         } catch (error) {
             this.logger.error("Get Recently Viewed Error", error);
             return [];
