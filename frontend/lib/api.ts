@@ -2,9 +2,8 @@
 const envUrl = process.env.NEXT_PUBLIC_API_URL;
 const isServer = typeof window === 'undefined';
 
-export const API_URL = isServer
-    ? (process.env.INTERNAL_API_URL || 'https://api.sparkbluediamond.com/api')
-    : (process.env.NEXT_PUBLIC_API_URL || 'https://api.sparkbluediamond.com/api');
+// Hardcoded to new VPS to prevent Vercel environment variables from overriding it with the old Render URL
+export const API_URL = 'https://api.sparkbluediamond.com/api';
 
 // In-memory request deduplication to prevent 429 bursts
 const pendingRequests = new Map<string, Promise<any>>();
