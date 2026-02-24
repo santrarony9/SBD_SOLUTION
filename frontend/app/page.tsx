@@ -10,7 +10,7 @@ import CategoryCarousel from '@/components/CategoryCarousel';
 import MotionGallery from '@/components/MotionGallery';
 import ShopByCategory from '@/components/ShopByCategory';
 import RecentlyViewed from '@/components/RecentlyViewed';
-import GiftFinder from '@/components/GiftFinder';
+import SparkbluePromise from '@/components/SparkbluePromise';
 import SmartPlaceholder from '@/components/SmartPlaceholder';
 // Removed motion import to fix Server Component render error
 
@@ -273,25 +273,8 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5.5. AI Gift Finder - Personalization */}
-      <section id="gift-finder" className="py-24 bg-brand-navy relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-gold rounded-full blur-[120px] -mr-64 -mt-64"></div>
-          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-brand-gold rounded-full blur-[120px] -ml-64 -mb-64"></div>
-        </div>
-
-        <div className="max-w-7xl mx-auto px-6 relative z-10">
-          <div
-            className="text-center mb-16"
-          >
-            <span className="text-brand-gold text-xs font-bold uppercase tracking-[0.3em] inline-block mb-4">Personalized Discovery</span>
-            <h2 className="text-3xl md:text-5xl font-serif text-white">Find the Perfect Gift</h2>
-            <p className="text-gray-400 mt-4 max-w-xl mx-auto font-light">Answer 4 quick questions and let our AI Stylist curate a selection tailored to your needs.</p>
-          </div>
-
-          <GiftFinder />
-        </div>
-      </section>
+      {/* 5.5. Sparkblue Promise (New Design replacing Gift Finder) */}
+      <SparkbluePromise />
 
       {/* 5. New Arrivals */}
       <section className="py-24 bg-white">
