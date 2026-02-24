@@ -129,7 +129,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={staggerContainer}
-                    className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 pt-6 md:pt-10"
+                    className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 pt-6 md:pt-10"
                 >
                     {displayCards.map((card, idx) => (
                         <Link href={card.link} key={idx} className="group relative flex flex-col items-center w-full mt-8 md:mt-0">
