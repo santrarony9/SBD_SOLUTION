@@ -18,22 +18,22 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
     const defaultCards = [
         {
             title: "FOR YOUR LOVE",
-            image: "/placeholder-couple-1.jpg", // Replace with actual image path
+            image: "/promise_for_love_1771930776132.png", // Newly generated image
             link: "/shop?category=engagement-rings"
         },
         {
             title: "FOR HER",
-            image: "/placeholder-couple-2.jpg", // Replace with actual image path
+            image: "/promise_for_her_1771930935081.png", // Newly generated image
             link: "/shop?category=necklaces"
         },
         {
             title: "FOR MOM",
-            image: "/placeholder-family.jpg", // Replace with actual image path
+            image: "/promise_for_mom_1771930572121.png", // Newly generated image
             link: "/shop?category=earrings"
         },
         {
             title: "FOR ME",
-            image: "/placeholder-single.jpg", // Replace with actual image path
+            image: "/promise_for_me_1771931102018.png", // Newly generated image
             link: "/shop?category=bracelets"
         }
     ];
