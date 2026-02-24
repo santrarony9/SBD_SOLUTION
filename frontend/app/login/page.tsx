@@ -26,21 +26,33 @@ export default function LoginPage() {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        console.log('[Login] Attempting password login...', { email, roleSelection: loginMethod });
         try {
+            console.log('[Login] Calling fetchAPI to /auth/login...');
             const data = await fetchAPI('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
             });
+            console.log('[Login] fetchAPI returned data:', data);
+
+            if (!data.access_token || !data.user) {
+                console.error('[Login] Missing token or user in response!', data);
+                setError('Invalid server response format. Contact Admin.');
+                return;
+            }
+
+            console.log('[Login] Calling AuthContext login()');
             login(data.access_token, data.user);
         } catch (err: any) {
-            console.error('Login failed', err);
+            console.error('[Login] Encountered error during login process:', err);
             // Show more specific error if available
             if (err.message.includes('401')) {
                 setError('Invalid email or password');
             } else {
-                setError(`Connection Error: Failed to fetch from ${API_URL}. Please ensure the backend is running at ${API_URL}`);
+                setError(`${err.message} (${API_URL})`);
             }
         } finally {
+            console.log('[Login] Finished attempting login process. Setting isLoading=false');
             setIsLoading(false);
         }
     };
