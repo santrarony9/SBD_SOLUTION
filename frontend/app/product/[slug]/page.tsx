@@ -168,7 +168,7 @@ export default function ProductDetailPage() {
                 })
             }).catch(err => console.error("Tracking Error:", err));
         }
-    }, [product]);
+    }, [product?.id]);
 
     if (loading) {
         return (
