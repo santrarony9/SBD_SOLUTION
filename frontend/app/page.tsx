@@ -198,7 +198,7 @@ export default async function Home() {
       </section>
 
       {/* 3.5. Motion Gallery (3D Cover Flow) */}
-      {/* <MotionGallery /> */}
+      <MotionGallery />
 
       {/* 4. Category Discovery Carousels (Horizontal) */}
       {Array.isArray(categories) && categories.length > 0 && categories.map((cat: any) => {
