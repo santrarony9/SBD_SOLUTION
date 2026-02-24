@@ -123,7 +123,7 @@ export default function Navbar() {
                                     <Link href="/account" className={`text-xs ${textColor} uppercase tracking-widest font-bold hover:text-brand-gold transition-colors duration-300`} title="Account">
                                         {user?.name?.split(' ')[0]}
                                     </Link>
-                                    {user?.role === 'ADMIN' && (
+                                    {['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'].includes(user?.role || '') && (
                                         <Link href="/admin" className={`${textColor} hover:text-brand-gold transition-colors duration-300`} title="Admin Panel">
                                             <PiShieldCheck className="h-5 w-5" />
                                         </Link>
@@ -241,7 +241,7 @@ export default function Navbar() {
                                     className="flex flex-col items-center space-y-8 w-full"
                                 >
                                     <MobileNavLink href="/account" label="Account Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
-                                    {user?.role === 'ADMIN' && (
+                                    {['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'].includes(user?.role || '') && (
                                         <MobileNavLink href="/admin" label="Admin Master" onClick={() => setIsMobileMenuOpen(false)} />
                                     )}
                                     <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.4em] font-black pt-4 hover:text-red-500 transition-colors">Sign Out</button>

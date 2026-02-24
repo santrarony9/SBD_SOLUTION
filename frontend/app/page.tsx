@@ -49,7 +49,8 @@ async function getHeroText() {
     const setting = await fetchAPI('/store/settings/homepage_hero_text');
     if (!setting?.value) return null;
     try {
-      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+      const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+      return parsed && typeof parsed === 'object' ? parsed : null;
     } catch (parseError) {
       console.error("Failed to parse hero text setting", parseError);
       return null;
@@ -98,7 +99,8 @@ async function getPromiseCards() {
     const setting = await fetchAPI('/store/settings/sparkblue_promise_cards');
     if (!setting?.value) return null;
     try {
-      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+      const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+      return Array.isArray(parsed) ? parsed : null;
     } catch (parseError) {
       console.error("Failed to parse promise cards setting", parseError);
       return null;
@@ -290,8 +292,7 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5.5. Sparkblue Promise (New Design replacing Gift Finder) */}
-      <SparkbluePromise cards={promiseCards?.cards || promiseCards} />
+      <SparkbluePromise cards={promiseCards as any} />
 
       {/* 5. New Arrivals */}
       <section className="py-24 bg-white">
