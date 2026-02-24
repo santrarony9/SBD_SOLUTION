@@ -11,7 +11,8 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
     useEffect(() => {
         if (!isLoading) {
-            if (!user || user.role !== 'ADMIN') {
+            const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'];
+            if (!user || !adminRoles.includes(user.role)) {
                 router.push('/login');
             } else {
                 setAuthorized(true);

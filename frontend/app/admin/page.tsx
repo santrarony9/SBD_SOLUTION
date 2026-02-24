@@ -156,7 +156,7 @@ export default function AdminDashboard() {
 
                             <SidebarLink icon={<PiArrowLeft className="w-5 h-5" />} label="Affiliate Center" href="/admin/marketing" />
                             <SidebarLink icon={<PiChartLineUp className="w-5 h-5" />} label="Supply Chain" href="/admin/inventory" />
-                            {user?.role === 'ADMIN' && (
+                            {(user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN') && (
                                 <SidebarLink
                                     active={activeTab === 'team'}
                                     onClick={() => setActiveTab('team')}
@@ -255,10 +255,10 @@ export default function AdminDashboard() {
                                                                     <span className="text-gray-400 text-xs font-light">₹</span>
                                                                     <input
                                                                         type="number"
-                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
+                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
                                                                             }`}
                                                                         defaultValue={rate?.pricePer10g || 0}
-                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                         onBlur={(e) => updateGoldRate(purity, Number(e.target.value))}
                                                                     />
                                                                 </div>
@@ -289,10 +289,10 @@ export default function AdminDashboard() {
                                                                     <span className="text-gray-400 text-xs font-light">₹</span>
                                                                     <input
                                                                         type="number"
-                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
+                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
                                                                             }`}
                                                                         defaultValue={rate?.pricePerCarat || 0}
-                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                         onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
                                                                     />
                                                                 </div>
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
                                                                 className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-brand-charcoal disabled:opacity-50"
                                                                 defaultValue={charge?.type || 'PER_GRAM'}
                                                                 onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
-                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                             >
                                                                 <option value="FLAT">Flat Amount</option>
                                                                 <option value="PER_GRAM">Per Gram (Gold)</option>
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
                                                                     type="number"
                                                                     className="w-24 bg-white border border-gray-200 rounded px-3 py-1.5 text-right outline-none font-mono font-bold text-brand-charcoal focus:border-brand-gold focus:ring-1 focus:ring-brand-gold transition-all disabled:opacity-50"
                                                                     defaultValue={charge?.amount || 0}
-                                                                    disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                    disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                     onBlur={(e) => updateCharge(chargeName, { amount: Number(e.target.value) })}
                                                                 />
                                                             </div>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
                                                         <td className="px-6 py-4 text-center">
                                                             <button
                                                                 onClick={() => updateCharge(chargeName, { isActive: !charge?.isActive })}
-                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                                 className={`px-4 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest transition-all border ${charge?.isActive ? 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100' : 'bg-gray-50 text-gray-400 border-gray-200 hover:bg-gray-100'} disabled:opacity-50 disabled:cursor-not-allowed`}
                                                             >
                                                                 {charge?.isActive ? 'Active' : 'Disabled'}

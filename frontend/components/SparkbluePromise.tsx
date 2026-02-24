@@ -162,7 +162,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                 </div>
 
                                 {/* Title Below Image */}
-                                <h4 className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 text-white text-[11px] sm:text-xs md:text-base font-serif uppercase tracking-[0.1em] z-20 font-bold text-center w-full px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
+                                <h4 className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 text-white text-[11px] sm:text-xs md:text-sm lg:text-base font-serif uppercase tracking-[0.1em] z-20 font-bold text-center w-full px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
                                     {card.title}
                                 </h4>
                             </motion.div>
