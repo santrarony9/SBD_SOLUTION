@@ -33,7 +33,7 @@ const nextConfig: NextConfig = {
   },
   async rewrites() {
     // Using a different prefix than /api to avoid conflicts with Vercel's default behavior
-    const backendUrl = 'https://spark-blue-backend.onrender.com';
+    const backendUrl = process.env.INTERNAL_API_URL || 'https://api.sparkbluediamond.com';
     return [
       {
         source: '/external-api/:path*',
