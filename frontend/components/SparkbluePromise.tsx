@@ -68,9 +68,9 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
 
                     {/* Left: Brand Promise */}
                     <motion.div variants={fadeInUp} className="flex flex-col max-w-lg">
-                        <h2 className="text-3xl md:text-4xl font-serif tracking-[0.2em] text-[#d4af37] mb-2 uppercase flex gap-4">
-                            <span className="text-[#fbbd61]">S P A R K B L U E</span>
-                            <span className="text-[#1a2238]">P R O M I S E</span>
+                        <h2 className="text-3xl md:text-4xl font-serif tracking-[0.2em] text-[#d4af37] mb-2 uppercase flex flex-wrap gap-2 md:gap-4">
+                            <span className="text-[#fbbd61] whitespace-nowrap">S P A R K B L U E</span>
+                            <span className="text-[#1a2238] whitespace-nowrap">P R O M I S E</span>
                         </h2>
                         <p className="text-[#1a2238] font-medium tracking-wide">
                             Crafted with precision. Delivered with trust.
@@ -162,7 +162,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                 </div>
 
                                 {/* Title Below Image */}
-                                <h4 className="absolute bottom-[-20px] text-white text-base md:text-xl font-serif uppercase tracking-[0.15em] z-10 font-bold whitespace-nowrap drop-shadow-md">
+                                <h4 className="absolute bottom-[-10px] left-1/2 -translate-x-1/2 text-white text-[11px] sm:text-xs md:text-base font-serif uppercase tracking-[0.1em] z-20 font-bold text-center w-full px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
                                     {card.title}
                                 </h4>
                             </motion.div>

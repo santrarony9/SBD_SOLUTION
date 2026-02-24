@@ -94,10 +94,10 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
             {/* Static Content Overlay */}
             <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
                 {/* Dynamic Kicker from Banner */}
-                <div className="h-8 overflow-hidden mb-6">
+                <div className="mb-4 md:mb-6 w-full px-4">
                     <h2
                         key={currentIndex} // Re-animate on change
-                        className="text-brand-gold/90 font-serif italic text-lg md:text-2xl tracking-[0.3em] uppercase font-medium animate-fade-in-up"
+                        className="text-brand-gold/90 font-serif italic text-sm md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-medium animate-fade-in-up text-balance"
                     >
                         {currentBanner.title}
                     </h2>

@@ -34,7 +34,7 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = scrolled
-        ? 'bg-white/80 backdrop-blur-2xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
+        ? 'bg-white/95 backdrop-blur-3xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
         : isHome
             ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
             : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
@@ -71,8 +71,8 @@ export default function Navbar() {
 
                     {/* Center: Logo */}
                     <div className={`flex flex-col items-center justify-center transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
-                        <Link href="/" className={`font-serif text-xl md:text-3xl tracking-[0.2em] md:tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em]`}>
-                            SPARK <span className="text-brand-gold">BLUE</span>
+                        <Link href="/" className={`font-serif text-xl md:text-3xl tracking-[0.2em] md:tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em] whitespace-nowrap flex items-center`}>
+                            SPARK <span className="text-brand-gold ml-2">BLUE</span>
                         </Link>
                         {!scrolled && (
                             <motion.span
