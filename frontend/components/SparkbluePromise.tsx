@@ -63,7 +63,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={staggerContainer}
-                    className="flex flex-col md:flex-row justify-between items-start md:items-center mb-24 gap-12 md:gap-0"
+                    className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 md:mb-16 gap-8 md:gap-0"
                 >
 
                     {/* Left: Brand Promise */}
@@ -112,7 +112,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={fadeInUp}
-                    className="text-center mb-24"
+                    className="text-center mb-12 md:mb-16"
                 >
                     <h3 className="text-3xl md:text-5xl font-serif mb-4 flex justify-center gap-3 uppercase items-baseline flex-wrap">
                         <span className="text-[#1a2238]">FIND YOUR</span>
