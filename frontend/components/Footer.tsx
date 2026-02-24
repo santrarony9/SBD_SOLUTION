@@ -9,7 +9,7 @@ export default function Footer() {
             {/* Subtle Texture Overlay */}
             <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]" />
 
-            <div className="max-w-7xl mx-auto px-6 pt-16 pb-24 lg:pb-10 relative z-10">
+            <div className="max-w-7xl mx-auto px-6 pt-16 pb-36 lg:pb-10 relative z-10">
                 <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-5 gap-10 mb-12">
 
                     {/* 1. Brand & Heritage */}

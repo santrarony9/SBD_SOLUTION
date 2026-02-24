@@ -33,13 +33,15 @@ export default function Navbar() {
     }, []);
 
     // Dynamic styles based on scroll & page
-    const navClasses = scrolled
-        ? 'bg-white/95 backdrop-blur-3xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
-        : isHome
-            ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
-            : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
+    const navClasses = isMobileMenuOpen
+        ? 'bg-brand-navy text-white pb-safe border-b border-brand-gold/10' // Solid background, no blur, to prevent CSS containing block
+        : scrolled
+            ? 'bg-white/95 backdrop-blur-3xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
+            : isHome
+                ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
+                : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
 
-    const textColor = scrolled ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
+    const textColor = scrolled && !isMobileMenuOpen ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
     const accentColor = 'text-brand-gold';
 
     return (
