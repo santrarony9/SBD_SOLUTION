@@ -38,7 +38,7 @@ export default function MobileBottomNav() {
     ];
 
     return (
-        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[999] bg-white/90 backdrop-blur-2xl border-t border-brand-gold/10 pb-[env(safe-area-inset-bottom,24px)] pt-3 px-6 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
+        <div className="md:hidden fixed bottom-0 left-0 right-0 z-[999] bg-white/90 backdrop-blur-2xl border-t border-brand-gold/10 pb-[env(safe-area-inset-bottom,12px)] pt-2 px-2 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)]">
             <div className="flex justify-between items-center max-w-md mx-auto">
                 {navItems.map((item) => {
                     const isActive = pathname === item.href;
@@ -51,15 +51,15 @@ export default function MobileBottomNav() {
                             className="group flex flex-col items-center justify-center relative py-1 flex-1"
                         >
                             <motion.div
-                                whileTap={{ scale: 0.9, y: 2 }}
-                                className="flex flex-col items-center justify-center p-2 rounded-xl transition-colors"
+                                whileTap={{ scale: 0.9, y: 1 }}
+                                className="flex flex-col items-center justify-center p-1 rounded-xl transition-colors"
                             >
-                                <item.icon className={`w-5 h-5 transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-60'}`} />
-                                <span className={`text-[8px] mt-1.5 uppercase tracking-[0.2em] font-black transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-40'}`}>
+                                <item.icon className={`w-4 h-4 md:w-5 md:h-5 transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-60'}`} />
+                                <span className={`text-[9px] mt-1 uppercase tracking-[0.1em] font-black transition-all duration-300 ${isActive ? 'text-brand-gold' : 'text-gray-400 opacity-40'}`}>
                                     {item.label}
                                 </span>
                                 {item.badge !== undefined && item.badge > 0 && (
-                                    <span className="absolute top-0 right-0 bg-brand-gold text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white">
+                                    <span className="absolute -top-1 right-2 bg-brand-gold text-white text-[8px] font-bold w-3.5 h-3.5 rounded-full flex items-center justify-center border border-white">
                                         {item.badge}
                                     </span>
                                 )}

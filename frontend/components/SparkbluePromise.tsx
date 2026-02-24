@@ -129,14 +129,14 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={staggerContainer}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 pt-10"
+                    className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 pt-6 md:pt-10"
                 >
                     {displayCards.map((card, idx) => (
-                        <Link href={card.link} key={idx} className="group relative flex flex-col items-center w-full">
-                            <motion.div variants={fadeInUp} className="w-full flex flex-col items-center">
+                        <Link href={card.link} key={idx} className="group relative flex flex-col items-center w-full mt-8 md:mt-0">
+                            <motion.div variants={fadeInUp} className="w-full flex flex-col items-center relative">
 
                                 {/* Gold Wavy Background Shape via SVG Block */}
-                                <div className="absolute bottom-12 w-[110%] h-[70%] z-0" style={{ pointerEvents: 'none' }}>
+                                <div className="absolute bottom-0 w-[110%] h-[80%] md:h-[70%] z-0" style={{ pointerEvents: 'none' }}>
                                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
                                         <path d="M0,30 Q25,10 50,30 T100,30 L100,100 L0,100 Z" fill="url(#goldGrad)" />
                                         <defs>
@@ -149,7 +149,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                 </div>
 
                                 {/* Image Container */}
-                                <div className="relative z-10 w-[85%] aspect-[3/4.5] overflow-visible mb-2 flex justify-center items-end">
+                                <div className="relative z-10 w-[90%] md:w-[85%] aspect-[3/4.5] overflow-visible mb-6 flex justify-center items-end">
                                     <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-full h-full relative">
                                         <Image
                                             src={card.image}
@@ -162,7 +162,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                 </div>
 
                                 {/* Title Below Image */}
-                                <h4 className="text-white text-xl md:text-[22px] font-serif uppercase tracking-[0.15em] z-10 mt-2 font-light">
+                                <h4 className="absolute bottom-[-20px] text-white text-base md:text-xl font-serif uppercase tracking-[0.15em] z-10 font-bold whitespace-nowrap drop-shadow-md">
                                     {card.title}
                                 </h4>
                             </motion.div>

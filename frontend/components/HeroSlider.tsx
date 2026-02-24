@@ -120,16 +120,16 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     {heroText?.subtitle || "Exquisite craftsmanship since 1995"}
                 </p>
 
-                <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full md:w-auto px-6 md:px-0">
+                <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">
                     <Link
                         href={currentBanner.link || "/shop"}
-                        className="bg-white text-brand-navy px-8 py-3 md:px-12 md:py-4 uppercase tracking-[0.25em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full md:w-auto"
+                        className="bg-white text-brand-navy px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full sm:w-auto"
                     >
                         Shop Collection
                     </Link>
                     <Link
                         href="/about"
-                        className="bg-transparent text-white px-8 py-3 md:px-12 md:py-4 uppercase tracking-[0.25em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full md:w-auto"
+                        className="bg-transparent text-white px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full sm:w-auto"
                     >
                         Our Heritage
                     </Link>
