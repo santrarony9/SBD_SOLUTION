@@ -14,7 +14,7 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'secretKey',
+      secret: process.env.JWT_SECRET || 'SUPER_SECRET_KEY_123',
       signOptions: { expiresIn: '60m' },
     }),
     SmsModule,
