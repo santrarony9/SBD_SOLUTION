@@ -6,12 +6,12 @@ import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { useComparison } from '@/context/ComparisonContext';
 import { motion } from 'framer-motion';
-import { PiHouse, PiHandbag, PiHeart, PiShoppingBag, PiArrowsLeftRight } from 'react-icons/pi';
+import { PiHouse, PiHandbag, PiHeart, PiShoppingBag, PiMagnifyingGlass } from 'react-icons/pi';
 
 export default function MobileBottomNav() {
     const pathname = usePathname();
     const { items } = useCart();
-    const { comparisonItems } = useComparison();
+    // const { comparisonItems } = useComparison(); // Can be removed or kept if needed.
     const [isMounted, setIsMounted] = useState(false);
 
     useEffect(() => {
@@ -32,7 +32,12 @@ export default function MobileBottomNav() {
             }
         },
         { label: 'Shop', icon: PiHandbag, href: '/shop' },
-        { label: 'Compare', icon: PiArrowsLeftRight, href: '/compare', badge: comparisonItems.length },
+        {
+            label: 'Search', icon: PiMagnifyingGlass, href: '#search', onClick: (e: React.MouseEvent) => {
+                e.preventDefault();
+                window.dispatchEvent(new Event('open-mobile-search'));
+            }
+        },
         { label: 'Wishlist', icon: PiHeart, href: '/wishlist' },
         { label: 'Cart', icon: PiShoppingBag, href: '/cart', badge: items.length },
     ];

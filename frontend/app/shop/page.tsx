@@ -193,15 +193,15 @@ function ShopContent() {
                 </div>
             </div>
 
-            {/* Mobile Category Scroll (Visible only on mobile/tablet) */}
-            <div className="md:hidden mb-8 px-6 overflow-x-auto scrollbar-hide">
-                <div className="flex space-x-3">
+            {/* Mobile Category Filter Grid (Visible only on mobile/tablet) */}
+            <div className="md:hidden mb-8 px-4">
+                <div className="flex flex-wrap gap-2 justify-center">
                     {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
                         <button
                             key={cat}
                             onClick={() => toggleCategory(cat)}
-                            className={`flex-shrink-0 px-4 py-2 border rounded-full text-[10px] uppercase tracking-widest font-bold whitespace-nowrap transition-colors ${selectedCategories.includes(cat.toLowerCase())
-                                ? 'bg-brand-navy border-brand-navy text-white'
+                            className={`px-3 py-2 border rounded-full text-[10px] uppercase tracking-widest font-bold transition-colors ${selectedCategories.includes(cat.toLowerCase())
+                                ? 'bg-brand-navy border-brand-navy text-white shadow-md'
                                 : 'bg-white border-gray-200 text-gray-500'
                                 }`}
                         >
@@ -334,7 +334,7 @@ function ShopContent() {
                 </div>
 
                 {/* Mobile Filter & Sort Bar */}
-                <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-brand-navy text-white rounded-full shadow-2xl px-6 py-3 flex items-center gap-6 border border-brand-gold/20">
+                <div className="md:hidden fixed bottom-24 left-1/2 -translate-x-1/2 z-40 bg-brand-navy text-white rounded-full shadow-2xl px-6 py-3 flex items-center gap-6 border border-brand-gold/20">
                     <button
                         onClick={() => setIsFilterOpen(true)}
                         className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest"

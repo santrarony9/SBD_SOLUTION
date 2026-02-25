@@ -7,7 +7,7 @@ import { PiBasket } from 'react-icons/pi';
 import { formatPrice } from '@/lib/utils';
 import { useComparison } from '@/context/ComparisonContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { PiCheckBold } from 'react-icons/pi';
+import { PiCheckBold, PiHeart } from 'react-icons/pi';
 
 interface ProductProps {
     id: string;
@@ -50,12 +50,12 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             transition={{ duration: 0.5 }}
             className="group relative flex flex-col h-full bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-brand-gold/15 rounded-none border border-transparent hover:border-brand-gold/10"
         >
-            {/* Image Container */}
-            <Link href={`/product/${product.slug}`} className="block relative aspect-square overflow-hidden bg-[#FDFDFD] p-1">
+            {/* Image & Action Container */}
+            <Link href={`/product/${product.slug}`} className="block relative flex flex-col overflow-hidden bg-[#FDFDFD] p-1">
                 <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    transition={{ duration: 0.7, ease: "easeOut" }}
-                    className="w-full h-full relative"
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="w-full aspect-square relative"
                 >
                     <Image
                         src={displayImage}
@@ -78,16 +78,16 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     )}
                 </motion.div>
 
-                {/* Quick Action Overlay - Removed the dark wash to prevent "melting" */}
-                <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300" />
+                {/* Quick Action Overlay (Absolute on Desktop, Static on Mobile) */}
+                <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300 pointer-events-none" />
 
-                <div className="absolute bottom-0 left-0 right-0 md:opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20">
+                <div className="md:absolute static bottom-0 left-0 right-0 md:opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20 mt-1 md:mt-0">
                     <motion.button
                         whileTap={{ scale: 0.95 }}
                         onClick={handleAddToCart}
-                        className="w-full bg-brand-navy text-white py-2.5 text-[9px] uppercase font-black tracking-[0.25em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
+                        className="w-full min-h-[48px] bg-brand-navy text-white py-3.5 text-[10px] uppercase font-black tracking-[0.25em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
                     >
-                        <PiBasket className="w-3.5 h-3.5" />
+                        <PiBasket className="w-4 h-4" />
                         Quick Add
                     </motion.button>
                 </div>
@@ -98,9 +98,21 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                         e.preventDefault();
                         isCompared ? removeFromComparison(product.id) : addToComparison(product.id);
                     }}
-                    className={`absolute top-2 left-2 z-30 w-6 h-6 rounded-full border transition-all flex items-center justify-center ${isCompared ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/80 border-gray-200 text-transparent opacity-0 group-hover:opacity-100 hover:border-brand-gold'}`}
+                    className={`absolute top-2 left-2 z-30 w-7 h-7 rounded-full border transition-all flex items-center justify-center ${isCompared ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/80 border-gray-200 text-transparent opacity-0 group-hover:opacity-100 hover:border-brand-gold'}`}
+                    title="Compare"
                 >
-                    <PiCheckBold className={`w-3 h-3 ${isCompared ? 'opacity-100' : 'opacity-0'}`} />
+                    <PiCheckBold className={`w-3.5 h-3.5 ${isCompared ? 'opacity-100' : 'opacity-0'}`} />
+                </button>
+
+                {/* Wishlist Button */}
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                    }}
+                    className={`absolute top-2 right-2 z-30 w-7 h-7 rounded-full border transition-all flex items-center justify-center bg-white/80 border-gray-200 text-gray-400 opacity-100 hover:text-red-500 hover:border-red-200 shadow-sm`}
+                    title="Add to Wishlist"
+                >
+                    <PiHeart className="w-4 h-4" />
                 </button>
             </Link>
 

@@ -31,7 +31,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const activeBanners = (banners && Array.isArray(banners) && banners.length > 0) ? banners : [{
         id: 'default',
         imageUrl: '/hero-jewellery.png',
-        title: 'Est. 1995',
+        title: 'Est. 2020',
         link: '/shop'
     }];
 
@@ -117,7 +117,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                 </h1>
 
                 <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
-                    {heroText?.subtitle || "Exquisite craftsmanship since 1995"}
+                    {heroText?.subtitle || "Exquisite craftsmanship since 2020"}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">

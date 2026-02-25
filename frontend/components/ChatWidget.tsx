@@ -5,6 +5,7 @@ import { PiX, PiPaperPlaneRight, PiSparkle, PiDotsSixVertical } from "react-icon
 import { motion, useDragControls } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
+import Image from 'next/image';
 
 interface Message {
   role: 'user' | 'model';
@@ -113,38 +114,24 @@ export default function ChatWidget() {
 
   if (!isOpen) {
     return (
-      <motion.div
-        drag
-        dragMomentum={false}
-        initial={{ x: 0, y: 0 }}
-        className="fixed bottom-28 md:bottom-12 right-6 md:right-12 z-[1000] flex items-center group cursor-move touch-none"
-      >
-        {/* Hover Label */}
-        <span className="bg-brand-navy/90 backdrop-blur-md text-brand-gold text-[9px] font-black uppercase tracking-[0.2em] px-4 py-3 rounded-l-2xl border-y border-l border-brand-gold/30 shadow-2xl opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500 hidden md:block select-none pointer-events-none">
-          Royal Concierge
-        </span>
-
+      <div className="fixed bottom-28 md:bottom-12 right-6 md:right-12 z-[1000] flex items-center justify-end group">
         <button
           onClick={() => setIsOpen(true)}
-          className="w-16 h-16 rounded-full bg-brand-navy text-brand-gold shadow-[0_15px_40px_rgba(0,0,0,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 flex flex-col items-center justify-center border-2 border-brand-gold/40 backdrop-blur-lg group relative overflow-hidden"
+          className="relative w-12 h-12 flex items-center justify-center group outline-none cursor-pointer"
+          title="Open Concierge Chat"
         >
-          {/* Animated Background Glow */}
-          <div className="absolute inset-0 bg-gold-gradient opacity-0 group-hover:opacity-20 transition-opacity duration-700" />
+          {/* Subtle Green Dot */}
+          <span className="absolute right-2 w-4 h-4 bg-green-500 rounded-full shadow-[0_0_10px_rgba(34,197,94,0.6)] border border-white/50 group-hover:scale-125 group-hover:bg-green-400 transition-all duration-300"></span>
 
-          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-brand-gold/30">
-            <PiDotsSixVertical className="w-4 h-4" />
-          </div>
+          {/* Pulsing ring behind the dot */}
+          <span className="absolute right-2 w-4 h-4 bg-green-400 rounded-full animate-ping opacity-75 pointer-events-none"></span>
 
-          {/* Custom Royal Icon (Simplified Crown/Star) */}
-          <svg viewBox="0 0 24 24" fill="none" className="w-8 h-8 relative z-10 text-brand-gold drop-shadow-[0_2px_5px_rgba(198,168,124,0.5)]">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" fill="currentColor" />
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="0.5" strokeDasharray="2 2" />
-          </svg>
-
-          {/* Status Glow Indicator */}
-          <span className="absolute top-3 right-3 w-3 h-3 bg-green-500 rounded-full border-2 border-brand-navy shadow-[0_0_10px_rgba(34,197,94,0.5)]"></span>
+          {/* Hover Label */}
+          <span className="absolute right-8 bg-brand-navy/90 backdrop-blur-md text-brand-gold text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded border border-brand-gold/30 shadow-lg opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 pointer-events-none whitespace-nowrap">
+            Concierge
+          </span>
         </button>
-      </motion.div>
+      </div>
     );
   }
 

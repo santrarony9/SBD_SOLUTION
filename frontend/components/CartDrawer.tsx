@@ -146,7 +146,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                     </Link>
                                     <button
                                         onClick={onClose}
-                                        className="w-full h-10 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-navy/60 hover:text-brand-navy transition-colors"
+                                        className="w-full h-12 text-[10px] uppercase font-bold tracking-[0.2em] text-brand-navy/60 hover:text-brand-navy transition-colors"
                                     >
                                         Continue Exploring
                                     </button>

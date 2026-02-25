@@ -128,7 +128,7 @@ export class ProductsService {
         const products = await this.prisma.product.findMany({
             where,
             skip: filters?.skip || 0,
-            take: filters?.take || 50, // Default limit for safety
+            take: filters?.take || 100, // Default limit for safety
             orderBy: { createdAt: 'desc' }
         });
 

@@ -1,16 +1,41 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout } from "react-icons/pi";
+import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
+
+    // Headless CMS States
+    const [royalStandard, setRoyalStandard] = useState({
+        cards: [
+            { title: "Certified Purity", desc: "Every nanogram of gold is BIS Hallmarked." },
+            { title: "Skin-Safe Alchemy", desc: "Crafted with hypoallergenic alloys." },
+            { title: "Conflict-Free Legacy", desc: "We source ethically." }
+        ]
+    });
+    const [brandStory, setBrandStory] = useState({
+        heading: "We believe that a diamond is more than a stone.",
+        buttonText: "Read Our Legacy",
+        buttonLink: "/about"
+    });
+    const [promiseCards, setPromiseCards] = useState([
+        { title: "FOR YOUR LOVE", image: "", link: "/shop?category=engagement-rings" },
+        { title: "FOR HER", image: "", link: "/shop?category=necklaces" },
+        { title: "FOR MOM", image: "", link: "/shop?category=earrings" },
+        { title: "FOR ME", image: "", link: "/shop?category=bracelets" }
+    ]);
+    const [footerConfig, setFooterConfig] = useState({
+        description: "Crafting timeless elegance since 2020. IGI certified excellence in every piece.",
+        social: { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" }
+    });
+
     const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
 
@@ -48,12 +73,16 @@ export default function AdminCMS() {
                 fetchAPI('/categories'),
                 fetchAPI('/marketing/price-ranges'),
                 fetchAPI('/marketing/tags'),
-                fetchAPI('/marketing/tags'),
+                fetchAPI('/marketing/tags'), // Duplicate? Removing one of these isn't crucial right now but noting it.
                 fetchAPI('/marketing/social-posts'),
-                fetchAPI('/gallery')
+                fetchAPI('/gallery'),
+                fetchAPI('/store/settings/home_royal_standard'),
+                fetchAPI('/store/settings/home_brand_story'),
+                fetchAPI('/store/settings/sparkblue_promise_cards'),
+                fetchAPI('/store/settings/footer_config')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes, galleryRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else showToast('Failed to load banners', 'error');
@@ -80,6 +109,22 @@ export default function AdminCMS() {
                 const fetchedHeroText = heroTextRes.value;
                 setHeroText(fetchedHeroText?.value ? (typeof fetchedHeroText.value === 'string' ? JSON.parse(fetchedHeroText.value) : fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
             }
+
+            // Parse Headless CMS Settings
+            const parseSetting = (res: any, setter: React.Dispatch<React.SetStateAction<any>>, defaultVal: any) => {
+                if (res.status === 'fulfilled' && res.value?.value) {
+                    try {
+                        const parsed = typeof res.value.value === 'string' ? JSON.parse(res.value.value) : res.value.value;
+                        setter(parsed);
+                    } catch (e) {
+                        console.error("Failed to parse setting", e);
+                    }
+                }
+            };
+            parseSetting(royalStdRes, setRoyalStandard, royalStandard);
+            parseSetting(brandStoryRes, setBrandStory, brandStory);
+            parseSetting(promiseCardsRes, setPromiseCards, promiseCards);
+            parseSetting(footerConfigRes, setFooterConfig, footerConfig);
 
             // Fetch Spotlight separately (fail silently if missing)
             try {
@@ -300,6 +345,19 @@ export default function AdminCMS() {
         } catch (e) { showToast('Failed to update spotlight', 'error'); }
     };
 
+    // --- Headless CMS Updates ---
+    const handleUpdateCMS = async (key: string, value: any, successMsg: string) => {
+        try {
+            await fetchAPI('/store/settings', {
+                method: 'POST',
+                body: JSON.stringify({ key, value: JSON.stringify(value) })
+            });
+            showToast(successMsg, 'success');
+        } catch (e) {
+            showToast('Failed to update settings', 'error');
+        }
+    };
+
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start animate-fade-in min-h-[600px]">
 
@@ -376,6 +434,32 @@ export default function AdminCMS() {
                     { id: 'social', label: 'Social Moments', icon: PiImage },
                     { id: 'price', label: 'Price Curations', icon: PiTag },
                     { id: 'tags', label: 'Trend Tags', icon: PiTag },
+                ].map((item) => (
+                    <button
+                        key={item.id}
+                        onClick={() => {
+                            setActiveSection(item.id as any);
+                            setIsMobileNavOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest rounded-xl transition-all duration-300 ${activeSection === item.id
+                            ? 'bg-brand-navy text-white shadow-lg shadow-brand-navy/20'
+                            : 'text-gray-500 hover:bg-gray-50 hover:text-brand-navy'
+                            }`}
+                    >
+                        <item.icon className={`text-base ${activeSection === item.id ? 'text-brand-gold' : ''}`} />
+                        {item.label}
+                    </button>
+                ))}
+
+                {/* Group 4: Static Features */}
+                <div className="px-4 py-2 mt-4">
+                    <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest">04 Static Features</span>
+                </div>
+                {[
+                    { id: 'royal-standard', label: 'Royal Standard', icon: PiCards },
+                    { id: 'brand-story', label: 'Brand Story', icon: PiTextT },
+                    { id: 'promise-cards', label: 'Promise Cards', icon: PiCards },
+                    { id: 'footer-config', label: 'Footer Info', icon: PiGlobe },
                 ].map((item) => (
                     <button
                         key={item.id}
@@ -543,12 +627,17 @@ export default function AdminCMS() {
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
+                                                            if (file.size > 7 * 1024 * 1024) {
+                                                                showToast('File is too large! Max 7MB allowed.', 'error');
+                                                                return;
+                                                            }
                                                             setIsUploading(true);
                                                             const formData = new FormData();
                                                             formData.append('file', file);
                                                             showToast('Uploading Desktop...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => setNewBanner(prev => ({ ...prev, imageUrl: res.url })))
+                                                                .catch(() => showToast('Failed to upload', 'error'))
                                                                 .finally(() => setIsUploading(false));
                                                         }
                                                     }}
@@ -586,12 +675,17 @@ export default function AdminCMS() {
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
                                                         if (file) {
+                                                            if (file.size > 7 * 1024 * 1024) {
+                                                                showToast('File is too large! Max 7MB allowed.', 'error');
+                                                                return;
+                                                            }
                                                             setIsUploading(true);
                                                             const formData = new FormData();
                                                             formData.append('file', file);
                                                             showToast('Uploading Mobile...', 'success');
                                                             fetchAPI('/media/upload', { method: 'POST', body: formData })
                                                                 .then(res => setNewBanner(prev => ({ ...prev, mobileImageUrl: res.url })))
+                                                                .catch(() => showToast('Failed to upload', 'error'))
                                                                 .finally(() => setIsUploading(false));
                                                         }
                                                     }}
@@ -1344,6 +1438,273 @@ export default function AdminCMS() {
                                         className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
                                     >
                                         Update Spotlight
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ROYAL STANDARD SECTION */}
+                    {activeSection === 'royal-standard' && (
+                        <div className="space-y-10 max-w-4xl">
+                            <div className="bg-gray-50/50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-8 flex items-center gap-2">
+                                    <PiCards className="text-brand-gold" /> The Royal Standard
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    {royalStandard.cards.map((card, idx) => (
+                                        <div key={idx} className="space-y-4 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                                            <div className="text-brand-gold font-serif text-2xl">0{idx + 1}.</div>
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Title</label>
+                                                <input
+                                                    type="text"
+                                                    value={card.title}
+                                                    onChange={(e) => {
+                                                        const newCards = [...royalStandard.cards];
+                                                        newCards[idx].title = e.target.value;
+                                                        setRoyalStandard({ cards: newCards });
+                                                    }}
+                                                    className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors font-bold text-brand-navy"
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Description</label>
+                                                <textarea
+                                                    value={card.desc}
+                                                    onChange={(e) => {
+                                                        const newCards = [...royalStandard.cards];
+                                                        newCards[idx].desc = e.target.value;
+                                                        setRoyalStandard({ cards: newCards });
+                                                    }}
+                                                    className="w-full border-b border-gray-200 py-2 text-sm text-gray-600 outline-none focus:border-brand-gold bg-transparent transition-colors resize-none h-24"
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={() => handleUpdateCMS('home_royal_standard', royalStandard, 'Royal Standard Updated')}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* BRAND STORY SECTION */}
+                    {activeSection === 'brand-story' && (
+                        <div className="space-y-10 max-w-3xl">
+                            <div className="bg-gray-50/50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-8 flex items-center gap-2">
+                                    <PiTextT className="text-brand-gold" /> Brand Story Settings
+                                </h3>
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Main Heading</label>
+                                        <textarea
+                                            value={brandStory.heading}
+                                            onChange={(e) => setBrandStory({ ...brandStory, heading: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-2xl font-serif text-brand-navy outline-none focus:border-brand-gold bg-transparent transition-colors resize-none h-24"
+                                        />
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Button Text</label>
+                                            <input
+                                                type="text"
+                                                value={brandStory.buttonText}
+                                                onChange={(e) => setBrandStory({ ...brandStory, buttonText: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Button Link</label>
+                                            <input
+                                                type="text"
+                                                value={brandStory.buttonLink}
+                                                onChange={(e) => setBrandStory({ ...brandStory, buttonLink: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={() => handleUpdateCMS('home_brand_story', brandStory, 'Brand Story Updated')}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* PROMISE CARDS SECTION */}
+                    {activeSection === 'promise-cards' && (
+                        <div className="space-y-10 max-w-5xl">
+                            <div className="bg-gray-50/50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-8 flex items-center gap-2">
+                                    <PiCards className="text-brand-gold" /> Sparkblue Promise Cards
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {promiseCards.map((card, idx) => (
+                                        <div key={idx} className="space-y-4 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Card Title</label>
+                                                <input
+                                                    type="text"
+                                                    value={card.title}
+                                                    onChange={(e) => {
+                                                        const newCards = [...promiseCards];
+                                                        newCards[idx].title = e.target.value;
+                                                        setPromiseCards(newCards);
+                                                    }}
+                                                    className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors font-bold text-brand-navy uppercase text-center"
+                                                    placeholder={`Card ${idx + 1}`}
+                                                />
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image / Video URL</label>
+                                                <input
+                                                    type="text"
+                                                    value={card.image}
+                                                    onChange={(e) => {
+                                                        const newCards = [...promiseCards];
+                                                        newCards[idx].image = e.target.value;
+                                                        setPromiseCards(newCards);
+                                                    }}
+                                                    className="w-full border-b border-gray-200 py-2 text-[10px] outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                                    placeholder="/path/to/image.png"
+                                                />
+                                                <div className="mt-2 text-center">
+                                                    <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                        Rec: 800x1200px (Portrait)
+                                                    </span>
+                                                </div>
+                                                <label className="mt-2 block w-full border border-dashed border-gray-300 rounded p-2 text-center cursor-pointer hover:border-brand-gold transition-all text-[9px] font-bold text-gray-500 uppercase">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*,video/*"
+                                                        className="hidden"
+                                                        onChange={(e) => {
+                                                            const file = e.target.files?.[0];
+                                                            if (file) {
+                                                                const formData = new FormData();
+                                                                formData.append('file', file);
+                                                                showToast(`Uploading Card ${idx + 1}...`, 'success');
+                                                                fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                    .then(res => {
+                                                                        const newCards = [...promiseCards];
+                                                                        newCards[idx].image = res.url;
+                                                                        setPromiseCards(newCards);
+                                                                        showToast(`Card ${idx + 1} Uploaded`, 'success');
+                                                                    })
+                                                                    .catch(() => showToast('Upload Failed', 'error'));
+                                                            }
+                                                        }}
+                                                    />
+                                                    Quick Upload
+                                                </label>
+                                                {card.image && (
+                                                    <div className="mt-2 aspect-[3/4.5] w-full bg-gray-50 rounded border border-gray-200 overflow-hidden relative group">
+                                                        {card.image.match(/\.(mp4|webm)$/i) ? (
+                                                            <video src={card.image} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                                                        ) : (
+                                                            <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
+                                                        )}
+                                                        <button
+                                                            onClick={() => {
+                                                                const newCards = [...promiseCards];
+                                                                newCards[idx].image = '';
+                                                                setPromiseCards(newCards);
+                                                            }}
+                                                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <PiX size={12} />
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Link</label>
+                                                <input
+                                                    type="text"
+                                                    value={card.link}
+                                                    onChange={(e) => {
+                                                        const newCards = [...promiseCards];
+                                                        newCards[idx].link = e.target.value;
+                                                        setPromiseCards(newCards);
+                                                    }}
+                                                    className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors text-center"
+                                                    placeholder="/shop?category=..."
+                                                />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={() => handleUpdateCMS('sparkblue_promise_cards', promiseCards, 'Promise Cards Updated')}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* FOOTER CONFIG SECTION */}
+                    {activeSection === 'footer-config' && (
+                        <div className="space-y-10 max-w-3xl">
+                            <div className="bg-gray-50/50 p-8 rounded-2xl border border-gray-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-8 flex items-center gap-2">
+                                    <PiGlobe className="text-brand-gold" /> Footer Settings
+                                </h3>
+                                <div className="space-y-8">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Footer Brand Description</label>
+                                        <textarea
+                                            value={footerConfig.description}
+                                            onChange={(e) => setFooterConfig({ ...footerConfig, description: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-3 text-sm text-gray-600 outline-none focus:border-brand-gold bg-transparent transition-colors resize-none h-20"
+                                        />
+                                    </div>
+
+                                    <div className="pt-4 border-t border-gray-200">
+                                        <h4 className="text-[10px] uppercase font-black text-brand-navy tracking-widest mb-4">Social Media Links</h4>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                            {['instagram', 'facebook', 'youtube', 'pinterest'].map((platform) => (
+                                                <div key={platform} className="space-y-2">
+                                                    <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider capitalize">{platform} URL</label>
+                                                    <input
+                                                        type="text"
+                                                        value={(footerConfig.social as any)[platform]}
+                                                        onChange={(e) => setFooterConfig({
+                                                            ...footerConfig,
+                                                            social: { ...footerConfig.social, [platform]: e.target.value }
+                                                        })}
+                                                        className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent transition-colors"
+                                                        placeholder="https://..."
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-8 flex justify-end">
+                                    <button
+                                        onClick={() => handleUpdateCMS('footer_config', footerConfig, 'Footer Updated')}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
+                                    >
+                                        Save Changes
                                     </button>
                                 </div>
                             </div>

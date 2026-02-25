@@ -2,8 +2,11 @@ import Link from 'next/link';
 import { PiInstagramLogo, PiFacebookLogo, PiWhatsappLogo, PiEnvelopeSimple, PiMapPin, PiGlobe, PiYoutubeLogo, PiPinterestLogo, PiEnvelope } from 'react-icons/pi';
 import { useCurrency } from '@/context/CurrencyContext';
 
-export default function Footer() {
+export default function Footer({ config }: { config?: any }) {
     const { currency, setCurrency } = useCurrency();
+    const description = config?.description || "Crafting timeless elegance since 2020. IGI certified excellence in every piece.";
+    const social = config?.social || { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" };
+
     return (
         <footer className="bg-gradient-to-b from-[#0A1128] to-[#010309] text-gray-400 border-t border-brand-gold/5 font-sans relative overflow-hidden">
             {/* Subtle Texture Overlay */}
@@ -21,14 +24,21 @@ export default function Footer() {
                             <p className="text-[9px] tracking-[0.4em] text-brand-gold/60 uppercase font-black mt-1">Diamond Heritage</p>
                         </Link>
                         <p className="text-gray-400 text-xs leading-relaxed mb-6 max-w-sm font-light">
-                            Crafting timeless elegance since 1995. IGI certified excellence in every piece.
+                            {description}
                         </p>
                         <div className="flex gap-5">
-                            {[PiInstagramLogo, PiFacebookLogo, PiYoutubeLogo, PiPinterestLogo].map((Icon, i) => (
-                                <a key={i} href="#" className="text-white/30 hover:text-brand-gold transition-all duration-300">
-                                    <Icon className="w-5 h-5" />
-                                </a>
-                            ))}
+                            <a href={social.instagram || "#"} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-brand-gold transition-all duration-300">
+                                <PiInstagramLogo className="w-5 h-5" />
+                            </a>
+                            <a href={social.facebook || "#"} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-brand-gold transition-all duration-300">
+                                <PiFacebookLogo className="w-5 h-5" />
+                            </a>
+                            <a href={social.youtube || "#"} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-brand-gold transition-all duration-300">
+                                <PiYoutubeLogo className="w-5 h-5" />
+                            </a>
+                            <a href={social.pinterest || "#"} target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-brand-gold transition-all duration-300">
+                                <PiPinterestLogo className="w-5 h-5" />
+                            </a>
                         </div>
                     </div>
 

@@ -13,8 +13,10 @@ import { useCart } from "@/context/CartContext";
 
 export default function ClientLayoutWrapper({
     children,
+    footerConfig
 }: {
     children: React.ReactNode;
+    footerConfig?: any;
 }) {
     const pathname = usePathname();
     const { isCartOpen, closeCart } = useCart();
@@ -46,7 +48,7 @@ export default function ClientLayoutWrapper({
             <ChatWidget />
             <MobileBottomNav />
             <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
-            <Footer />
+            <Footer config={footerConfig} />
         </>
     );
 }

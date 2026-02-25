@@ -110,6 +110,26 @@ async function getPromiseCards() {
   }
 }
 
+async function getRoyalStandard() {
+  try {
+    const setting = await fetchAPI('/store/settings/home_royal_standard');
+    if (!setting?.value) return null;
+    try {
+      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+    } catch (e) { return null; }
+  } catch (e) { return null; }
+}
+
+async function getBrandStory() {
+  try {
+    const setting = await fetchAPI('/store/settings/home_brand_story');
+    if (!setting?.value) return null;
+    try {
+      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+    } catch (e) { return null; }
+  } catch (e) { return null; }
+}
+
 export default async function Home() {
   const [
     allProducts,
@@ -121,7 +141,9 @@ export default async function Home() {
     categories,
     priceRanges,
     tags,
-    promiseCards
+    promiseCards,
+    royalStandardData,
+    brandStoryData
   ] = await Promise.all([
     getFeaturedProducts(),
     getOffers(),
@@ -132,14 +154,31 @@ export default async function Home() {
     getCategories(),
     getPriceRanges(),
     getTags(),
-    getPromiseCards()
+    getPromiseCards(),
+    getRoyalStandard(),
+    getBrandStory()
   ]);
 
   // Defensive Guards
   const featuredProducts = Array.isArray(allProducts) ? allProducts.slice(0, 12) : [];
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
   const heroTitle = heroText?.title ?? "Elegance is Eternal";
-  const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 1995.";
+  const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 2020.";
+
+  // Default CMS values
+  const royalStandard = royalStandardData || {
+    cards: [
+      { title: "Certified Purity", desc: "Every nanogram of gold is BIS Hallmarked. Our diamonds come with IGI certification." },
+      { title: "Skin-Safe Alchemy", desc: "Crafted with hypoallergenic alloys and free from nickel. 18K and 22K blends." },
+      { title: "Conflict-Free Legacy", desc: "We source ethically. Conflict-free diamonds and responsibly mined gold." }
+    ]
+  };
+
+  const brandStory = brandStoryData || {
+    heading: "We believe that a diamond is more than a stone.",
+    buttonText: "Read Our Legacy",
+    buttonLink: "/about"
+  };
 
   return (
     <div className="bg-brand-cream font-sans overflow-x-hidden">
@@ -166,7 +205,7 @@ export default async function Home() {
       </div>
 
       {/* 3. Royal Standards - The Science of Luxury */}
-      <section className="py-20 bg-brand-navy border-b border-white/5 relative overflow-hidden">
+      <section className="py-20 md:py-32 bg-brand-navy border-b border-white/5 relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-brand-gold/30 to-transparent"></div>
         <div className="max-w-7xl mx-auto px-6">
           <div
@@ -177,16 +216,12 @@ export default async function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-            {[
-              { id: "01.", title: "Certified Purity", desc: "Every nanogram of gold is BIS Hallmarked. Our diamonds come with IGI certification." },
-              { id: "02.", title: "Skin-Safe Alchemy", desc: "Crafted with hypoallergenic alloys and free from nickel. 18K and 22K blends." },
-              { id: "03.", title: "Conflict-Free Legacy", desc: "We source ethically. Conflict-free diamonds and responsibly mined gold." }
-            ].map((item, idx) => (
+            {(royalStandard.cards || []).map((item: any, idx: number) => (
               <div
-                key={item.id}
+                key={idx}
                 className="group p-6 border border-white/5 hover:border-brand-gold/30 transition-colors duration-500 bg-white/5 backdrop-blur-sm"
               >
-                <span className="text-4xl text-brand-gold mb-6 block font-serif">{item.id}</span>
+                <span className="text-4xl text-brand-gold mb-6 block font-serif">0{idx + 1}.</span>
                 <h3 className="text-xl text-white font-serif mb-4">{item.title}</h3>
                 <p className="text-gray-400 text-sm leading-relaxed font-light">
                   {item.desc}
@@ -220,7 +255,7 @@ export default async function Home() {
       })}
 
       {/* 5. Shop by Price (New - Premium Redesign) */}
-      <section className="py-24 bg-white relative overflow-hidden">
+      <section className="py-24 md:py-32 bg-white relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'radial-gradient(#D4AF37 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
 
@@ -415,11 +450,11 @@ export default async function Home() {
 
       {/* 8. Brand Story */}
       <section
-        className="py-24 bg-brand-navy text-white text-center"
+        className="py-24 md:py-32 bg-brand-navy text-white text-center"
       >
-        <h2 className="text-3xl md:text-5xl font-serif mb-8">We believe that a diamond is more than a stone.</h2>
-        <Link href="/about" className="inline-block border border-brand-gold text-brand-gold px-8 py-3 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold hover:text-brand-navy transition-all duration-500 rounded-none btn-gold-glow">
-          Read Our Legacy
+        <h2 className="text-3xl md:text-5xl font-serif mb-8 max-w-4xl mx-auto leading-tight">{brandStory.heading}</h2>
+        <Link href={brandStory.buttonLink || "/about"} className="inline-block border border-brand-gold text-brand-gold px-8 py-3 uppercase tracking-widest text-xs font-bold hover:bg-brand-gold hover:text-brand-navy transition-all duration-500 rounded-none btn-gold-glow">
+          {brandStory.buttonText || "Read Our Legacy"}
         </Link>
       </section>
 

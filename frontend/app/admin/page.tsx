@@ -21,10 +21,15 @@ export default function AdminDashboard() {
     const [refreshTrigger, setRefreshTrigger] = useState(0);
     const { user, logout } = useAuth();
 
-    // Masters State
     const [goldRates, setGoldRates] = useState<any[]>([]);
     const [diamondRates, setDiamondRates] = useState<any[]>([]);
     const [charges, setCharges] = useState<any[]>([]);
+    const [makingChargeTiers, setMakingChargeTiers] = useState<any[]>([
+        { id: '0_1g', label: '0g to 1g', type: 'FLAT', amount: 0 },
+        { id: '1_2g', label: '1g to 2g', type: 'FLAT', amount: 0 },
+        { id: '2_3g', label: '2g to 3g', type: 'FLAT', amount: 0 },
+        { id: '3g_plus', label: '3g and Above', type: 'FLAT', amount: 0 }
+    ]);
     const [isLoading, setIsLoading] = useState(true);
     const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
 
@@ -42,14 +47,21 @@ export default function AdminDashboard() {
 
     const loadMasters = async () => {
         try {
-            const [gold, diamond, allCharges] = await Promise.all([
+            const [gold, diamond, allCharges, storedTiers] = await Promise.all([
                 fetchAPI('/masters/gold'),
                 fetchAPI('/masters/diamond'),
-                fetchAPI('/masters/charges')
+                fetchAPI('/masters/charges'),
+                fetchAPI('/store/settings/making_charge_tiers')
             ]);
             setGoldRates(gold || []);
             setDiamondRates(diamond || []);
             setCharges(allCharges || []);
+
+            if (storedTiers?.value) {
+                try {
+                    setMakingChargeTiers(storedTiers.value);
+                } catch (e) { }
+            }
         } catch (error) {
             console.error("Failed to load masters", error);
         } finally {
@@ -98,6 +110,24 @@ export default function AdminDashboard() {
         } catch (error) {
             setStatus({ message: 'Update Failed', type: 'error' });
         }
+    };
+
+    const saveMakingChargeTiers = async (updatedTiers: any[]) => {
+        try {
+            await fetchAPI(`/store/settings`, {
+                method: 'POST',
+                body: JSON.stringify({ key: 'making_charge_tiers', value: updatedTiers })
+            });
+            setStatus({ message: `Making Charge Tiers Saved!`, type: 'success' });
+            setMakingChargeTiers(updatedTiers);
+        } catch (error) {
+            setStatus({ message: 'Update Failed', type: 'error' });
+        }
+    };
+
+    const updateSingleMakingChargeTier = (id: string, updates: any) => {
+        const newTiers = makingChargeTiers.map(t => t.id === id ? { ...t, ...updates } : t);
+        setMakingChargeTiers(newTiers);
     };
 
     return (
@@ -324,26 +354,25 @@ export default function AdminDashboard() {
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-gray-100">
-                                            {['Making Charge', 'Other Charge'].map((chargeName) => {
+                                            {['Other Charge'].map((chargeName) => {
                                                 const charge = charges.find(c => c.name === chargeName);
                                                 return (
                                                     <tr key={chargeName} className="hover:bg-brand-cream/30 transition-colors">
                                                         <td className="px-6 py-4">
                                                             <span className="font-bold text-brand-navy text-base">{chargeName}</span>
-                                                            <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">{chargeName === 'Other Charge' ? 'Hidden from public breakdown' : 'Visible in public invoice'}</p>
+                                                            <p className="text-[10px] text-gray-400 mt-0.5 uppercase tracking-wide">Hidden from public breakdown</p>
                                                         </td>
                                                         <td className="px-6 py-4 text-xs font-mono uppercase text-brand-gold font-bold">
-                                                            {charge?.type || 'PER_GRAM'}
+                                                            {charge?.type || 'FLAT'}
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <select
                                                                 className="bg-white border border-gray-200 rounded px-3 py-1.5 focus:border-brand-gold outline-none text-xs w-full transition-all text-brand-charcoal disabled:opacity-50"
-                                                                defaultValue={charge?.type || 'PER_GRAM'}
+                                                                defaultValue={charge?.type || 'FLAT'}
                                                                 onChange={(e) => updateCharge(chargeName, { type: e.target.value })}
                                                                 disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                             >
                                                                 <option value="FLAT">Flat Amount</option>
-                                                                <option value="PER_GRAM">Per Gram (Gold)</option>
                                                                 <option value="PERCENTAGE">Percentage (%)</option>
                                                             </select>
                                                         </td>
@@ -372,6 +401,72 @@ export default function AdminDashboard() {
                                             })}
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            {/* Tiered Making Charges Master */}
+                            <div className="bg-white rounded-lg shadow-lg border border-brand-gold/10 overflow-hidden ring-1 ring-black/5">
+                                <div className="p-6 bg-brand-navy flex justify-between items-center text-white border-b border-brand-gold/20">
+                                    <div>
+                                        <h3 className="font-serif text-xl flex items-center gap-2">
+                                            Tiered Making Charges
+                                            <span className="text-[10px] font-sans font-bold uppercase tracking-widest bg-brand-gold text-brand-navy px-2 py-0.5 rounded">Gold Weight</span>
+                                        </h3>
+                                        <p className="text-xs text-white/60 mt-1 font-light">Configure making charges dynamically based on the product's gold weight in grams.</p>
+                                    </div>
+                                    <button
+                                        onClick={() => saveMakingChargeTiers(makingChargeTiers)}
+                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                        className="bg-brand-gold hover:bg-yellow-500 text-brand-navy font-bold text-xs px-6 py-2 rounded shadow transition-colors disabled:opacity-50"
+                                    >
+                                        SAVE TIERS
+                                    </button>
+                                </div>
+                                <div className="overflow-x-auto p-4 sm:p-6 bg-gray-50">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+                                        {makingChargeTiers.map((tier) => (
+                                            <div key={tier.id} className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
+                                                <div className="absolute top-0 left-0 w-1 h-full bg-brand-gold rounded-l-lg opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                                                <div className="flex justify-between items-start mb-4">
+                                                    <h4 className="font-bold text-brand-navy text-lg">{tier.label}</h4>
+                                                    <div className="bg-gray-100 text-gray-500 text-[10px] px-2 py-1 rounded font-mono font-bold">TIER</div>
+                                                </div>
+
+                                                <div className="space-y-4">
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1.5">Charge Type</label>
+                                                        <select
+                                                            className="w-full bg-gray-50 border border-gray-200 rounded px-3 py-2 text-sm focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all"
+                                                            value={tier.type}
+                                                            onChange={(e) => updateSingleMakingChargeTier(tier.id, { type: e.target.value })}
+                                                            disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                        >
+                                                            <option value="FLAT">Flat Rate (₹)</option>
+                                                            <option value="PERCENTAGE">Percentage of Gold (%)</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div>
+                                                        <label className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1.5">
+                                                            {tier.type === 'FLAT' ? 'Flat Amount (₹)' : 'Percentage Rate (%)'}
+                                                        </label>
+                                                        <div className="relative">
+                                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
+                                                                {tier.type === 'FLAT' ? '₹' : '%'}
+                                                            </span>
+                                                            <input
+                                                                type="number"
+                                                                className="w-full bg-white border border-gray-200 rounded py-2 pl-8 pr-3 text-brand-charcoal font-mono font-bold focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all shadow-inner"
+                                                                value={tier.amount}
+                                                                onChange={(e) => updateSingleMakingChargeTier(tier.id, { amount: Number(e.target.value) })}
+                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                         </div>

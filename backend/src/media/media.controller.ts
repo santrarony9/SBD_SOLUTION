@@ -20,7 +20,7 @@ export class MediaController {
         @UploadedFile(
             new ParseFilePipe({
                 validators: [
-                    new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }), // 5MB
+                    new MaxFileSizeValidator({ maxSize: 7 * 1024 * 1024 }), // 7MB max cap
                     // new FileTypeValidator({ fileType: '.(png|jpeg|jpg|pdf|mp4)' }), // Optional: Strict type check
                 ],
             }),

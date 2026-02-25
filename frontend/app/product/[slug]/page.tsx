@@ -14,7 +14,7 @@ import { PiShoppingBag } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck } from 'react-icons/pi';
+import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, PiHeart } from 'react-icons/pi';
 import JsonLd from "@/components/JsonLd";
 
 interface Product {
@@ -120,6 +120,31 @@ export default function ProductDetailPage() {
         if (!product) return;
         const text = `Check out this amazing ${product.name} on Spark Blue Diamond! ${window.location.href}`;
         window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+        setShowShareMenu(false);
+    };
+
+    const shareToFacebook = () => {
+        if (!product) return;
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=600,height=400');
+        setShowShareMenu(false);
+    };
+
+    const shareToPinterest = () => {
+        if (!product) return;
+        const url = encodeURIComponent(window.location.href);
+        const description = encodeURIComponent(`Discover the exquisite ${product.name} at Spark Blue Diamond.`);
+        // Note: Pinterest requires an image URL, we pass the first product image if available, otherwise just URL.
+        const imageUrl = product.images?.[0] ? encodeURIComponent(product.images[0]) : '';
+        window.open(`https://pinterest.com/pin/create/button/?url=${url}&media=${imageUrl}&description=${description}`, '_blank', 'width=600,height=400');
+        setShowShareMenu(false);
+    };
+
+    const shareToX = () => {
+        if (!product) return;
+        const text = encodeURIComponent(`Check out this amazing ${product.name} on Spark Blue Diamond!`);
+        const url = encodeURIComponent(window.location.href);
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=400');
         setShowShareMenu(false);
     };
 
@@ -264,12 +289,12 @@ export default function ProductDetailPage() {
                 <span className="text-brand-navy truncate max-w-[200px] inline-block align-bottom">{product.name}</span>
             </div>
 
-            <div className="max-w-[1400px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 relative">
+            <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-2 lg:gap-16 relative">
 
                 {/* Left Column: Media Gallery (Sticky on Desktop) */}
                 <div className="lg:sticky lg:top-32 lg:h-[calc(100vh-160px)] flex flex-col">
                     {/* Main Viewer */}
-                    <div className="flex-grow bg-white rounded-sm overflow-hidden shadow-sm relative group border border-gray-100/50 h-auto aspect-square lg:h-full lg:max-h-[75vh]">
+                    <div className="flex-grow bg-[#FDFDFD] md:rounded-sm overflow-hidden md:shadow-sm relative group md:border border-gray-100/50 h-auto aspect-square lg:h-full lg:max-h-[75vh]">
                         <AnimatePresence mode="wait">
                             {showVideo && product.videoUrl ? (
                                 <motion.div
@@ -325,6 +350,15 @@ export default function ProductDetailPage() {
                                 </span>
                             </div>
                         )}
+
+                        {/* Wishlist Button */}
+                        <button
+                            onClick={(e) => { e.preventDefault(); }}
+                            className="absolute top-4 left-4 z-20 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md shadow-sm border border-gray-100 flex items-center justify-center text-gray-400 hover:text-red-500 transition-all"
+                            title="Add to Wishlist"
+                        >
+                            <PiHeart className="w-5 h-5" />
+                        </button>
                     </div>
 
                     {/* Thumbnails - Compact Row */}
@@ -362,7 +396,7 @@ export default function ProductDetailPage() {
                 </div>
 
                 {/* Right Column: Product Details (Scrollable) */}
-                <div className="flex flex-col h-full py-4">
+                <div className="flex flex-col h-full py-4 px-6 lg:px-0">
 
                     {/* Header */}
                     <div className="mb-4 border-b border-brand-charcoal/5 pb-4">
@@ -535,12 +569,43 @@ export default function ProductDetailPage() {
                                     Share
                                 </button>
                                 {showShareMenu && (
-                                    <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-gray-100 shadow-xl rounded-sm p-2 z-20 animate-fade-in-up">
-                                        <button onClick={shareToWhatsapp} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-2">
-                                            <span className="w-2 h-2 rounded-full bg-green-500"></span> WhatsApp
+                                    <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-gray-100 shadow-xl rounded-sm p-1 z-20 animate-fade-in-up">
+
+                                        <button onClick={shareToWhatsapp} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
+                                            <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M19.001 4.908A9.817 9.817 0 0 0 11.992 2C6.534 2 2.085 6.448 2.08 11.908c0 1.748.458 3.45 1.321 4.956L2 22l5.255-1.377a9.916 9.916 0 0 0 4.737 1.206h.005c5.46 0 9.908-4.448 9.913-9.913A9.872 9.872 0 0 0 19.001 4.908Zm-7.008 15.361h-.004a8.212 8.212 0 0 1-4.188-1.143l-.3-.178-3.111.816.834-3.033-.195-.311a8.136 8.136 0 0 1-1.258-4.385C3.774 7.373 7.514 3.63 11.998 3.63c2.204 0 4.276.858 5.835 2.418a8.228 8.228 0 0 1 2.414 5.836c-.004 4.542-3.744 8.283-8.24 8.384L12 20.269Zm4.524-6.182c-.248-.124-1.467-.724-1.693-.807-.226-.083-.391-.124-.555.124-.165.248-.638.807-.783.972-.144.165-.29.186-.538.062-.248-.124-1.047-.386-1.993-1.232-.736-.659-1.233-1.474-1.378-1.722-.144-.248-.016-.381.108-.505.112-.112.248-.289.371-.434.124-.144.165-.248.248-.413.083-.165.041-.31-.02-.434-.062-.124-.555-1.343-.76-1.839-.2-.485-.403-.42-.555-.427-.144-.007-.31-.007-.474-.007a.91.91 0 0 0-.66.31c-.226.248-.865.847-.865 2.065s.885 2.396 1.01 2.56C7.5 13.06 8.652 14.898 10.42 15.66c.42.18.748.288 1.006.368.423.133.808.114 1.114.069.344-.05.147-.434 1.187-.853.124-.419.124-.778.086-.853-.037-.074-.144-.116-.392-.24Z" /></svg>
+                                            </div>
+                                            WhatsApp
                                         </button>
-                                        <button onClick={copyToClipboard} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-2">
-                                            <span className="w-2 h-2 rounded-full bg-gray-400"></span> Copy Link
+
+                                        <button onClick={shareToFacebook} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
+                                            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02Z" /></svg>
+                                            </div>
+                                            Facebook
+                                        </button>
+
+                                        <button onClick={shareToPinterest} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
+                                            <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.608 0 12.017 0z" /></svg>
+                                            </div>
+                                            Pinterest
+                                        </button>
+
+                                        <button onClick={shareToX} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
+                                            <div className="w-6 h-6 rounded-full bg-gray-100 text-black flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
+                                            </div>
+                                            X (Twitter)
+                                        </button>
+
+                                        <div className="h-px w-full bg-gray-100 my-1"></div>
+
+                                        <button onClick={copyToClipboard} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
+                                            <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>
+                                            </div>
+                                            Copy Link
                                         </button>
                                     </div>
                                 )}

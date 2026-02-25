@@ -28,8 +28,15 @@ export default function Navbar() {
         const handleScroll = () => {
             setScrolled(window.scrollY > 20);
         };
+        const handleOpenSearch = () => {
+            setIsSearchOpen(true);
+        };
         window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
+        window.addEventListener('open-mobile-search', handleOpenSearch);
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            window.removeEventListener('open-mobile-search', handleOpenSearch);
+        };
     }, []);
 
     // Dynamic styles based on scroll & page
@@ -199,7 +206,7 @@ export default function Navbar() {
                         <PiX className="h-8 w-8" />
                     </button>
 
-                    <div className="mt-16 flex flex-col items-center w-full space-y-10">
+                    <div className="mt-8 flex flex-col items-center w-full space-y-6">
                         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="font-serif text-2xl tracking-[0.2em] text-white font-bold">
                             SPARK <span className="text-brand-gold">BLUE</span>
                         </Link>
@@ -211,7 +218,7 @@ export default function Navbar() {
                                 open: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
                                 closed: { transition: { staggerChildren: 0.05, staggerDirection: -1 } }
                             }}
-                            className="flex flex-col items-center space-y-8 w-full"
+                            className="flex flex-col items-center space-y-5 w-full"
                         >
                             {[
                                 { href: "/", label: "Home" },
@@ -240,13 +247,13 @@ export default function Navbar() {
                             {isAuthenticated ? (
                                 <motion.div
                                     variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
-                                    className="flex flex-col items-center space-y-8 w-full"
+                                    className="flex flex-col items-center space-y-5 w-full"
                                 >
                                     <MobileNavLink href="/account" label="Account Dashboard" onClick={() => setIsMobileMenuOpen(false)} />
                                     {['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'].includes(user?.role || '') && (
                                         <MobileNavLink href="/admin" label="Admin Master" onClick={() => setIsMobileMenuOpen(false)} />
                                     )}
-                                    <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.4em] font-black pt-4 hover:text-red-500 transition-colors">Sign Out</button>
+                                    <button onClick={logout} className="text-red-400 uppercase text-[10px] tracking-[0.4em] font-black pt-2 hover:text-red-500 transition-colors">Sign Out</button>
                                 </motion.div>
                             ) : (
                                 <motion.div variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}>
@@ -257,15 +264,15 @@ export default function Navbar() {
                             {/* Currency Selection in Menu */}
                             <motion.div
                                 variants={{ open: { opacity: 1, y: 0 }, closed: { opacity: 0, y: 20 } }}
-                                className="pt-10 w-full"
+                                className="pt-4 w-full"
                             >
-                                <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold mb-4">Select Currency</p>
+                                <p className="text-[9px] uppercase tracking-[0.3em] text-white/40 font-bold mb-3">Select Currency</p>
                                 <div className="flex flex-wrap justify-center gap-2">
                                     {(['INR', 'USD', 'AED', 'GBP', 'EUR'] as const).map((curr) => (
                                         <button
                                             key={curr}
                                             onClick={() => setCurrency(curr)}
-                                            className={`px-4 py-2 border rounded-none text-[10px] uppercase tracking-widest font-black transition-all ${currency === curr ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/5 border-white/10 text-white/60 hover:border-brand-gold/50'}`}
+                                            className={`px-3 py-1.5 border rounded-none text-[9px] uppercase tracking-widest font-black transition-all ${currency === curr ? 'bg-brand-gold border-brand-gold text-brand-navy' : 'bg-white/5 border-white/10 text-white/60 hover:border-brand-gold/50'}`}
                                         >
                                             {curr}
                                         </button>
@@ -275,8 +282,8 @@ export default function Navbar() {
                         </motion.div>
                     </div>
 
-                    <div className="mt-auto pt-16 text-center">
-                        <p className="text-[8px] uppercase tracking-[0.4em] text-white/20 font-bold">Standard of Excellence since 1995</p>
+                    <div className="mt-auto pt-8 text-center">
+                        <p className="text-[7px] uppercase tracking-[0.4em] text-white/20 font-bold">Standard of Excellence since 2020</p>
                     </div>
                 </div>
             </div>

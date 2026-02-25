@@ -489,8 +489,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                     className="absolute inset-0 opacity-0 cursor-pointer z-10"
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
-                                                        if (file && file.size > 5 * 1024 * 1024) {
-                                                            showToast('File is too large! Max 5MB allowed.', 'error');
+                                                        if (file && file.size > 7 * 1024 * 1024) {
+                                                            showToast('File is too large! Max 7MB allowed.', 'error');
                                                             return;
                                                         }
                                                         handleMediaUpload(file, `image-${index}`);

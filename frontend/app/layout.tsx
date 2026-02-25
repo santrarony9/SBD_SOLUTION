@@ -27,7 +27,7 @@ const inter = Inter({
 export async function generateMetadata(): Promise<Metadata> {
   const defaultMeta = {
     title: "Spark Blue Diamond | Premium Jewellery & Certified Diamonds",
-    description: "Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold. Bespoke craftsmanship and transparent pricing since 1995.",
+    description: "Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold. Bespoke craftsmanship and transparent pricing since 2020.",
     keywords: ["luxury jewellery", "diamond rings", "gold necklaces", "certified diamonds", "custom jewellery India"],
     manifest: '/manifest.webmanifest',
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sparkbluediamond.com'),
@@ -85,7 +85,7 @@ export const viewport = {
   viewportFit: 'cover',
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -127,6 +127,20 @@ export default function RootLayout({
     }
   };
 
+  // Fetch Footer Config
+  let footerConfig = {
+    description: "Crafting timeless elegance since 2020. IGI certified excellence in every piece.",
+    social: { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" }
+  };
+  try {
+    const res = await fetchAPI('/store/settings/footer_config');
+    if (res?.value) {
+      footerConfig = typeof res.value === 'string' ? JSON.parse(res.value) : res.value;
+    }
+  } catch (e) {
+    // defaults
+  }
+
   return (
     <html lang="en" className="scroll-smooth">
       <head>
@@ -142,7 +156,7 @@ export default function RootLayout({
             <CartProvider>
               <ComparisonProvider>
                 <CurrencyProvider>
-                  <ClientLayoutWrapper>
+                  <ClientLayoutWrapper footerConfig={footerConfig}>
                     {children}
                   </ClientLayoutWrapper>
                 </CurrencyProvider>
