@@ -578,7 +578,15 @@ export default function AdminCMS() {
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 md:gap-6">
                                 {categories.map(cat => (
                                     <div key={cat.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
-                                        <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <img
+                                            src={cat.imageUrl}
+                                            alt={cat.name}
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                target.src = 'https://placehold.co/200x200/1a2238/fbbd61?text=No+Image';
+                                            }}
+                                        />
                                         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                             <p className="text-white text-sm font-serif font-bold">{cat.name}</p>
                                             <p className="text-brand-gold text-[9px] font-mono tracking-widest mb-3">{cat.slug}</p>
@@ -753,8 +761,16 @@ export default function AdminCMS() {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 {banners.map(banner => (
                                     <div key={banner.id} className="group relative bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-brand-navy/10 transition-all duration-700">
-                                        <div className="relative aspect-[16/9] overflow-hidden">
-                                            <img src={banner.imageUrl} alt={banner.title} className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                        <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
+                                            <img
+                                                src={banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png'}
+                                                alt={banner.title}
+                                                className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                onError={(e) => {
+                                                    const target = e.target as HTMLImageElement;
+                                                    target.src = 'https://placehold.co/600x400/1a2238/fbbd61?text=Image+Not+Found';
+                                                }}
+                                            />
                                             {banner.mobileImageUrl && (
                                                 <div className="absolute top-4 right-4 bg-brand-gold text-brand-navy px-3 py-1 rounded-full text-[9px] font-black tracking-widest shadow-lg flex items-center gap-1.5">
                                                     <PiLayout size={12} /> DUAL SIZE READY

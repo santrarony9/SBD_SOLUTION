@@ -18,6 +18,7 @@ import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, 
 import JsonLd from "@/components/JsonLd";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import SimilarPriceRange from "@/components/SimilarPriceRange";
+import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
 
 interface Product {
     id: string;
@@ -33,6 +34,8 @@ interface Product {
     certificatePdf?: string;
     pricing: {
         finalPrice: number;
+        goldRate: number;
+        diamondRate: number;
         components: {
             goldValue: number;
             diamondValue: number;
@@ -422,17 +425,25 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Trust Badges - Clickable for Certificate */}
-                        <div className="flex gap-2">
-                            {product.certificatePdf && (
-                                <button onClick={() => setShowCertificate(true)} className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                                    IGI
-                                </button>
+                        <div className="flex flex-col gap-3">
+                            {isFestiveModeActive() && (
+                                <div className="inline-flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-sm border border-green-100 animate-pulse">
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{FESTIVE_CONFIG.theme.discountLabel}</span>
+                                    <span className="text-[8px] uppercase tracking-tighter opacity-70">(Holi Special)</span>
+                                </div>
                             )}
-                            <button className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy cursor-default">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                                BIS
-                            </button>
+                            <div className="flex gap-2">
+                                {product.certificatePdf && (
+                                    <button onClick={() => setShowCertificate(true)} className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                        IGI
+                                    </button>
+                                )}
+                                <button className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy cursor-default">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                    BIS
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -485,229 +496,182 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Actions - Sticky Bottom on Mobile */}
-                    <div className="bg-white/95 backdrop-blur-lg border-t border-gray-100 p-4 lg:p-0 lg:bg-transparent lg:border-none fixed bottom-0 left-0 right-0 z-50 lg:static lg:z-auto shadow-[0_-5px_20px_-10px_rgba(0,0,0,0.1)] lg:shadow-none space-y-3 mt-auto pt-4">
+                    {/* Actions Area */}
+                    <div className="mt-auto pt-8">
+                        {/* Desktop Only: Quantity & Primary Actions */}
+                        <div className="hidden lg:block space-y-4">
+                            <div className="flex items-center gap-4">
+                                <span className="text-[10px] uppercase font-bold tracking-widest text-brand-navy">Quantity</span>
+                                <div className="flex items-center border border-gray-200 rounded-sm h-12">
+                                    <button onClick={handleDecrement} className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors" disabled={quantity <= 1}>-</button>
+                                    <span className="w-16 h-full flex items-center justify-center text-sm font-sans font-medium text-brand-navy border-x border-gray-200">{quantity}</span>
+                                    <button onClick={handleIncrement} className="w-12 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors">+</button>
+                                </div>
+                            </div>
 
-                        {/* Quantity Selector */}
-                        <div className="flex items-center gap-4 mb-2">
-                            <div className="ml-auto flex items-center border border-gray-200 rounded-sm h-10">
+                            <div className="grid grid-cols-2 gap-4">
                                 <button
-                                    onClick={handleDecrement}
-                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors"
-                                    disabled={quantity <= 1}
+                                    onClick={() => product && addToCart(product.id, quantity)}
+                                    className="w-full bg-white border border-brand-gold text-brand-navy h-14 font-bold hover:bg-brand-gold/5 transition-all duration-300 uppercase tracking-[0.2em] text-xs shadow-sm"
                                 >
-                                    -
+                                    Add to Cart
                                 </button>
-                                <span className="w-12 h-full flex items-center justify-center text-sm font-sans font-medium text-brand-navy border-x border-gray-200">
-                                    {quantity}
-                                </span>
                                 <button
-                                    onClick={handleIncrement}
-                                    className="w-10 h-full flex items-center justify-center text-gray-500 hover:text-brand-navy hover:bg-gray-50 transition-colors"
+                                    onClick={handleBuyNow}
+                                    className="w-full bg-brand-navy text-white h-14 font-bold hover:bg-brand-navy/90 transition-all duration-300 uppercase tracking-[0.2em] text-xs shadow-xl"
                                 >
-                                    +
+                                    Buy Now
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-3 gap-3">
+                                <button onClick={() => setShowBreakup(!showBreakup)} className="h-10 border border-gray-100 text-brand-navy text-[9px] font-bold uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
+                                    Breakup
+                                </button>
+                                <button onClick={() => setShowDropHint(true)} className="h-10 border border-gray-100 text-brand-gold text-[9px] font-bold uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" /></svg>
+                                    Hint
+                                </button>
+                                <button onClick={handleShare} className="h-10 border border-gray-100 text-gray-500 text-[9px] font-bold uppercase tracking-widest hover:bg-gray-50 flex items-center justify-center gap-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5"><path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" /></svg>
+                                    Share
                                 </button>
                             </div>
                         </div>
 
-                        {/* Desktop Actions (Hidden on Mobile) */}
-                        <div className="hidden lg:grid grid-cols-2 gap-3">
+                        {/* Mobile Only: Floating Compact Action Bar */}
+                        <div className="lg:hidden fixed bottom-1 left-1 right-1 z-[100] bg-white rounded-2xl shadow-[0_10px_40px_-10px_rgba(0,0,0,0.3)] border border-gray-100 p-3 flex items-center gap-2">
                             <button
                                 onClick={() => product && addToCart(product.id, quantity)}
-                                className="w-full bg-white border border-brand-gold text-brand-navy h-12 font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group btn-gold-glow">
-                                <span>Add to Cart</span>
-                            </button>
-                            <button
-                                onClick={handleBuyNow}
-                                className="w-full bg-gradient-to-r from-brand-gold to-[#D4B98C] text-brand-navy h-12 font-bold hover:shadow-lg hover:shadow-brand-gold/20 transition-all duration-300 uppercase tracking-[0.2em] text-xs relative overflow-hidden group btn-gold-glow">
-                                <span className="relative z-10">Buy Now</span>
-                                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"></div>
-                            </button>
-                        </div>
-
-                        {/* Mobile Sticky Actions */}
-                        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-t border-brand-gold/10 p-4 flex gap-3 shadow-[0_-10px_30px_-10px_rgba(0,0,0,0.1)]">
-                            <button
-                                onClick={() => product && addToCart(product.id, quantity)}
-                                className="w-14 h-14 bg-brand-navy text-white flex items-center justify-center rounded-sm shrink-0"
+                                className="w-12 h-12 bg-gray-50 text-brand-navy flex items-center justify-center rounded-xl shrink-0"
+                                aria-label="Add to Cart"
                             >
-                                <PiShoppingBag className="text-2xl" />
+                                <PiShoppingBag className="text-xl" />
                             </button>
+
                             <button
                                 onClick={handleBuyNow}
-                                className="flex-grow bg-brand-navy text-white h-14 font-black uppercase tracking-[0.2em] text-[10px] shadow-xl"
+                                className="flex-grow h-12 bg-brand-navy text-white rounded-xl font-black uppercase tracking-[0.15em] text-[11px] shadow-lg active:scale-95 transition-transform"
                             >
                                 Buy Now
                             </button>
-                        </div>
 
-                        <div className="grid grid-cols-3 gap-3 pb-safe lg:pb-0 relative">
                             <button
                                 onClick={() => setShowBreakup(!showBreakup)}
-                                className="w-full h-10 border border-brand-navy/10 text-brand-navy font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
+                                className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center transition-colors ${showBreakup ? 'bg-brand-gold text-white' : 'bg-gray-50 text-gray-500'}`}
                             >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" />
-                                </svg>
-                                Details
+                                <span className="text-[8px] font-bold uppercase leading-none mb-0.5">Price</span>
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
                             </button>
-
-                            <button
-                                onClick={() => setShowDropHint(true)}
-                                className="w-full h-10 border border-dashed border-brand-gold/50 text-brand-gold font-bold hover:bg-brand-gold/10 transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
-                            >
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
-                                </svg>
-                                Hint
-                            </button>
-
-                            <div className="relative">
-                                <button
-                                    onClick={handleShare}
-                                    className="w-full h-10 border border-brand-navy/10 text-gray-500 font-bold hover:bg-brand-navy hover:text-white transition-all duration-300 uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-2"
-                                >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3.5 h-3.5">
-                                        <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
-                                    </svg>
-                                    Share
-                                </button>
-                                {showShareMenu && (
-                                    <div className="absolute bottom-full right-0 mb-2 w-48 bg-white border border-gray-100 shadow-xl rounded-sm p-1 z-20 animate-fade-in-up">
-
-                                        <button onClick={shareToWhatsapp} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M19.001 4.908A9.817 9.817 0 0 0 11.992 2C6.534 2 2.085 6.448 2.08 11.908c0 1.748.458 3.45 1.321 4.956L2 22l5.255-1.377a9.916 9.916 0 0 0 4.737 1.206h.005c5.46 0 9.908-4.448 9.913-9.913A9.872 9.872 0 0 0 19.001 4.908Zm-7.008 15.361h-.004a8.212 8.212 0 0 1-4.188-1.143l-.3-.178-3.111.816.834-3.033-.195-.311a8.136 8.136 0 0 1-1.258-4.385C3.774 7.373 7.514 3.63 11.998 3.63c2.204 0 4.276.858 5.835 2.418a8.228 8.228 0 0 1 2.414 5.836c-.004 4.542-3.744 8.283-8.24 8.384L12 20.269Zm4.524-6.182c-.248-.124-1.467-.724-1.693-.807-.226-.083-.391-.124-.555.124-.165.248-.638.807-.783.972-.144.165-.29.186-.538.062-.248-.124-1.047-.386-1.993-1.232-.736-.659-1.233-1.474-1.378-1.722-.144-.248-.016-.381.108-.505.112-.112.248-.289.371-.434.124-.144.165-.248.248-.413.083-.165.041-.31-.02-.434-.062-.124-.555-1.343-.76-1.839-.2-.485-.403-.42-.555-.427-.144-.007-.31-.007-.474-.007a.91.91 0 0 0-.66.31c-.226.248-.865.847-.865 2.065s.885 2.396 1.01 2.56C7.5 13.06 8.652 14.898 10.42 15.66c.42.18.748.288 1.006.368.423.133.808.114 1.114.069.344-.05.147-.434 1.187-.853.124-.419.124-.778.086-.853-.037-.074-.144-.116-.392-.24Z" /></svg>
-                                            </div>
-                                            WhatsApp
-                                        </button>
-
-                                        <button onClick={shareToFacebook} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12 2.04c-5.5 0-10 4.49-10 10.02 0 5 3.66 9.15 8.44 9.9v-7H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.89 3.78-3.89 1.09 0 2.23.19 2.23.19v2.47h-1.26c-1.24 0-1.63.77-1.63 1.56v1.88h2.78l-.45 2.9h-2.33v7a10 10 0 0 0 8.44-9.9c0-5.53-4.5-10.02-10-10.02Z" /></svg>
-                                            </div>
-                                            Facebook
-                                        </button>
-
-                                        <button onClick={shareToPinterest} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-red-100 text-red-600 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.367 18.608 0 12.017 0z" /></svg>
-                                            </div>
-                                            Pinterest
-                                        </button>
-
-                                        <button onClick={shareToX} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-gray-100 text-black flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
-                                            </div>
-                                            X (Twitter)
-                                        </button>
-
-                                        <div className="h-px w-full bg-gray-100 my-1"></div>
-
-                                        <button onClick={copyToClipboard} className="w-full text-left px-3 py-2 hover:bg-gray-50 text-xs font-sans text-brand-navy flex items-center gap-3 transition-colors">
-                                            <div className="w-6 h-6 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4"><path strokeLinecap="round" strokeLinejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" /></svg>
-                                            </div>
-                                            Copy Link
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Price Breakup Panel */}
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                            <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-4 relative">
-                                <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
-                                    <span>Gold Value</span>
-                                    <span>{formatPrice(product.pricing?.components?.goldValue || 0)}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
-                                    <span>Diamond Value</span>
-                                    <span>{formatPrice(product.pricing?.components?.diamondValue || 0)}</span>
-                                </div>
-                                <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
-                                    <span>Making Charges</span>
-                                    <span>{formatPrice(product.pricing?.components?.makingCharges || 0)}</span>
-                                </div>
-                                {product.pricing?.components?.otherCharges > 0 && (
-                                    <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
-                                        <span>Other Charges</span>
-                                        <span>{formatPrice(product.pricing?.components?.otherCharges)}</span>
-                                    </div>
-                                )}
-                                <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
-                                    <span>GST (3%)</span>
-                                    <span>{formatPrice(product.pricing?.components?.gst || 0)}</span>
-                                </div>
-                                <div className="flex justify-between font-bold text-brand-navy border-t border-gray-200 pt-3 mt-2">
-                                    <span>Total Value</span>
-                                    <span>{formatPrice(product.pricing?.finalPrice || 0)}</span>
-                                </div>
-                                <p className="text-[8px] text-gray-400 mt-2 italic">* Prices are based on current market rates and may vary slightly.</p>
-                            </div>
                         </div>
                     </div>
 
-                    {/* Shipping / Returns Footer */}
-                    <div className="mt-8 pt-6 border-t border-dashed border-gray-200 grid grid-cols-3 gap-2 text-[10px] text-gray-400 uppercase tracking-widest text-center">
-                        <div className="flex flex-col items-center gap-2">
-                            <span className="text-xl">🚚</span>
-                            <span>Insured Shipping</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <span className="text-xl">💎</span>
-                            <span>100% Certified</span>
-                        </div>
-                        <div className="flex flex-col items-center gap-2">
-                            <span className="text-xl">↩️</span>
-                            <span>15 Day Returns</span>
-                        </div>
-                    </div>
-
-                    <TrustBadges />
-
-                    {/* Delivery Estimator */}
-                    <div className="mt-8 bg-brand-cream/20 p-5 rounded-sm border border-brand-gold/10">
-                        <p className="text-[10px] uppercase tracking-widest text-brand-navy font-bold mb-3 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-brand-gold">
-                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-2.25 4.5v3.375m-9-3.375v3.375m9-3.375v3.375m-9-3.375v3.375m0-13.5v3.375m9-3.375v3.375M9 7.5h6" />
-                            </svg>
-                            Delivery Estimator
-                        </p>
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                placeholder="Enter Pincode"
-                                maxLength={6}
-                                className="w-full bg-white border border-gray-200 px-3 py-2 text-xs focus:border-brand-gold outline-none tracking-widest font-mono text-brand-navy"
-                                value={pincode}
-                                onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
-                            />
-                            <button
-                                onClick={checkDelivery}
-                                disabled={pincode.length !== 6 || isCheckingPincode}
-                                className="px-4 bg-brand-navy text-white text-[10px] uppercase font-bold tracking-widest hover:bg-gold-gradient hover:text-brand-navy transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isCheckingPincode ? 'Checking...' : 'Check'}
-                            </button>
-                        </div>
-                        {deliveryDate && (
-                            <div className="mt-3 text-xs text-brand-navy flex items-start gap-2 animate-fade-in-up">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-green-600 shrink-0 mt-0.5">
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                                </svg>
-                                <span>
-                                    Order within <span className="font-bold text-red-400">4 hrs 12 mins</span> to get it by <span className="font-bold border-b border-brand-gold">{deliveryDate}</span>.
-                                </span>
+                    {/* Price Breakup Panel */}
+                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                        <div className="bg-white p-5 rounded-xl border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-4 relative">
+                            <div className="flex justify-between text-gray-400 text-[10px] items-center pb-2 border-b border-gray-100/50 mb-2">
+                                <span className="uppercase tracking-widest font-bold">Calculation Rates</span>
+                                <span className="font-mono bg-white px-2 py-0.5 rounded text-[9px] shadow-sm">Updated Live</span>
                             </div>
-                        )}
+
+                            <div className="flex justify-between text-brand-navy/60 text-[11px] uppercase tracking-wider italic mb-2">
+                                <span>Gold Rate (10g)</span>
+                                <span className="font-bold">{formatPrice(product.pricing?.goldRate || 0)}</span>
+                            </div>
+                            <div className="flex justify-between text-brand-navy/60 text-[11px] uppercase tracking-wider italic mb-4">
+                                <span>Diamond Rate (ct)</span>
+                                <span className="font-bold">{formatPrice(product.pricing?.diamondRate || 0)}</span>
+                            </div>
+
+                            <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                                <span>Gold Value ({product.goldWeight}g)</span>
+                                <span>{formatPrice(product.pricing?.components?.goldValue || 0)}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                                <span>Diamond Value ({product.diamondCarat}ct)</span>
+                                <span>{formatPrice(product.pricing?.components?.diamondValue || 0)}</span>
+                            </div>
+                            <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                                <span>Making Charges</span>
+                                <span>{formatPrice(product.pricing?.components?.makingCharges || 0)}</span>
+                            </div>
+                            {product.pricing?.components?.otherCharges > 0 && (
+                                <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                                    <span>Other Charges</span>
+                                    <span>{formatPrice(product.pricing?.components?.otherCharges || 0)}</span>
+                                </div>
+                            )}
+                            <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                                <span>GST (3%)</span>
+                                <span>{formatPrice(product.pricing?.components?.gst || 0)}</span>
+                            </div>
+                            <div className="flex justify-between font-bold text-brand-navy border-t border-gray-100 pt-3 mt-2">
+                                <span className="text-xs uppercase tracking-widest">Total Value</span>
+                                <span className="text-sm">{formatPrice(product.pricing?.finalPrice || 0)}</span>
+                            </div>
+                            <p className="text-[9px] text-gray-400 mt-2 italic">* Values are subject to market fluctuations.</p>
+                        </div>
                     </div>
                 </div>
 
+                {/* Shipping / Returns Footer */}
+                <div className="mt-8 pt-6 border-t border-dashed border-gray-200 grid grid-cols-3 gap-2 text-[10px] text-gray-400 uppercase tracking-widest text-center">
+                    <div className="flex flex-col items-center gap-2">
+                        <span className="text-xl">🚚</span>
+                        <span>Insured Shipping</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                        <span className="text-xl">💎</span>
+                        <span>100% Certified</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-2">
+                        <span className="text-xl">↩️</span>
+                        <span>15 Day Returns</span>
+                    </div>
+                </div>
+
+                <TrustBadges />
+
+                {/* Delivery Estimator */}
+                <div className="mt-8 bg-brand-cream/20 p-5 rounded-sm border border-brand-gold/10">
+                    <p className="text-[10px] uppercase tracking-widest text-brand-navy font-bold mb-3 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-brand-gold">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.125-.504 1.125-1.125V14.25m-2.25 4.5v3.375m-9-3.375v3.375m9-3.375v3.375m-9-3.375v3.375m0-13.5v3.375m9-3.375v3.375M9 7.5h6" />
+                        </svg>
+                        Delivery Estimator
+                    </p>
+                    <div className="flex gap-2">
+                        <input
+                            type="text"
+                            placeholder="Enter Pincode"
+                            maxLength={6}
+                            className="w-full bg-white border border-gray-200 px-3 py-2 text-xs focus:border-brand-gold outline-none tracking-widest font-mono text-brand-navy"
+                            value={pincode}
+                            onChange={(e) => setPincode(e.target.value.replace(/\D/g, ''))}
+                        />
+                        <button
+                            onClick={checkDelivery}
+                            disabled={pincode.length !== 6 || isCheckingPincode}
+                            className="px-4 bg-brand-navy text-white text-[10px] uppercase font-bold tracking-widest hover:bg-gold-gradient hover:text-brand-navy transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isCheckingPincode ? 'Checking...' : 'Check'}
+                        </button>
+                    </div>
+                    {deliveryDate && (
+                        <div className="mt-3 text-xs text-brand-navy flex items-start gap-2 animate-fade-in-up">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-4 h-4 text-green-600 shrink-0 mt-0.5">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                            </svg>
+                            <span>
+                                Order within <span className="font-bold text-red-400">4 hrs 12 mins</span> to get it by <span className="font-bold border-b border-brand-gold">{deliveryDate}</span>.
+                            </span>
+                        </div>
+                    )}
+                </div>
             </div>
 
-            {/* Certificate Modal */}
+            {/* Footer Content & Modals */}
             {showCertificate && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white max-w-2xl w-full max-h-[90vh] overflow-y-auto rounded-sm relative shadow-2xl">
@@ -724,7 +688,7 @@ export default function ProductDetailPage() {
                             <p className="text-xs text-gray-400 uppercase tracking-widest mb-6">Guaranteed by IGI / GIA</p>
 
                             <div className="relative aspect-[1/1.4] w-full bg-gray-50 border-8 border-double border-brand-gold/20 mx-auto shadow-inner flex items-center justify-center overflow-hidden">
-                                {product.certificatePdf ? (
+                                {product?.certificatePdf ? (
                                     <iframe src={product.certificatePdf} className="w-full h-full" title="Certificate"></iframe>
                                 ) : (
                                     <div className="text-center p-10 opacity-50">
@@ -735,7 +699,6 @@ export default function ProductDetailPage() {
                                         <p className="text-xs text-gray-400 mt-2">A digital copy of the authentic certificate will be emailed to you upon purchase.</p>
                                     </div>
                                 )}
-                                {/* Watermark overlay */}
                                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-5 -rotate-45">
                                     <span className="text-9xl font-serif font-bold text-black uppercase">Specimen</span>
                                 </div>
@@ -755,24 +718,22 @@ export default function ProductDetailPage() {
             <ConciergeModal
                 isOpen={showConcierge}
                 onClose={() => setShowConcierge(false)}
-                productName={product.name}
+                productName={product?.name || ''}
             />
 
             <DropHintModal
                 isOpen={showDropHint}
                 onClose={() => setShowDropHint(false)}
-                productName={product.name}
-                productId={product.id}
+                productName={product?.name || ''}
+                productId={product?.id || ''}
             />
 
-            {/* Reviews Section - Kept Separate */}
             <div className="max-w-7xl mx-auto px-6 mt-24 pb-16">
-                <ProductReviews productId={product.id} />
+                <ProductReviews productId={product?.id || ''} />
             </div>
 
-            {/* Recommendation Sections */}
             <div className="bg-white">
-                <SimilarPriceRange currentPrice={product.pricing?.finalPrice || 0} currentProductId={product.id} />
+                <SimilarPriceRange currentPrice={product?.pricing?.finalPrice || 0} currentProductId={product?.id || ''} />
                 <RecentlyViewed />
             </div>
         </div>

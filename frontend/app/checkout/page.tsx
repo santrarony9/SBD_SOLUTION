@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle, PiShoppingBag, PiShieldCheck } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
+import { getFestiveDiscount } from '@/config/festive-config';
 
 export default function CheckoutPage() {
     const { items, cartTotal, clearCart } = useCart();
@@ -107,9 +108,22 @@ export default function CheckoutPage() {
     };
 
     const calculateDiscount = () => {
-        if (!appliedPromo) return 0;
-        if (appliedPromo.type === 'PERCENTAGE') return (cartTotal * appliedPromo.value) / 100;
-        return appliedPromo.value;
+        let totalDiscount = 0;
+
+        // Manual Promo Code
+        if (appliedPromo) {
+            if (appliedPromo.type === 'PERCENTAGE') {
+                totalDiscount += (cartTotal * appliedPromo.value) / 100;
+            } else {
+                totalDiscount += appliedPromo.value;
+            }
+        }
+
+        // Automatic Festive Discount
+        const festiveDiscount = getFestiveDiscount(cartTotal);
+        totalDiscount += festiveDiscount;
+
+        return totalDiscount;
     };
 
     const discountAmount = calculateDiscount();
@@ -361,7 +375,14 @@ export default function CheckoutPage() {
                                             {appliedPromo && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
                                                     <span>Boutique Credit ({appliedPromo.code})</span>
-                                                    <span>-{globalFormatPrice(discountAmount)}</span>
+                                                    <span>-{globalFormatPrice(calculateDiscount() - getFestiveDiscount(cartTotal))}</span>
+                                                </div>
+                                            )}
+
+                                            {getFestiveDiscount(cartTotal) > 0 && (
+                                                <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
+                                                    <span>Festive Gift (Automatic)</span>
+                                                    <span>-{globalFormatPrice(getFestiveDiscount(cartTotal))}</span>
                                                 </div>
                                             )}
 

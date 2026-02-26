@@ -136,7 +136,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                             <motion.div variants={fadeInUp} className="w-full flex flex-col items-center relative">
 
                                 {/* Gold Wavy Background Shape via SVG Block */}
-                                <div className="absolute bottom-0 w-[110%] h-[80%] md:h-[70%] z-0" style={{ pointerEvents: 'none' }}>
+                                <div className="absolute bottom-0 w-[102%] h-[20%] md:h-[15%] z-0" style={{ pointerEvents: 'none' }}>
                                     <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
                                         <path d="M0,30 Q25,10 50,30 T100,30 L100,100 L0,100 Z" fill="url(#goldGrad)" />
                                         <defs>

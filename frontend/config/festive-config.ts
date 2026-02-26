@@ -53,3 +53,17 @@ export const isFestiveModeActive = () => {
 
     return now >= start && now <= end;
 };
+
+/**
+ * Calculates the automatic festive discount based on the tiered rules.
+ * ₹500 flat for all, ₹1000 for orders ₹10,000 and above.
+ */
+export const getFestiveDiscount = (subtotal: number): number => {
+    if (!isFestiveModeActive()) return 0;
+
+    const { tieredDiscount } = FESTIVE_CONFIG.theme;
+    if (subtotal >= tieredDiscount.threshold) {
+        return tieredDiscount.aboveThreshold;
+    }
+    return tieredDiscount.flat;
+};

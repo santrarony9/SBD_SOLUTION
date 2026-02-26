@@ -198,7 +198,7 @@ export default function MarketingDashboard() {
                                 <div key={banner.id} className="flex items-center gap-4 border p-2 rounded text-xs">
                                     <span className="font-mono text-gray-400">#{idx + 1}</span>
                                     <div className="w-10 h-6 bg-gray-200 rounded overflow-hidden relative">
-                                        <img src={banner.imageUrl} className="object-cover w-full h-full" alt="banner" />
+                                        <img src={banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png'} className="object-cover w-full h-full" alt="banner" />
                                     </div>
                                     <span className="truncate flex-1">{banner.title || 'Untitled'}</span>
                                     <button onClick={async () => {

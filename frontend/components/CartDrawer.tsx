@@ -7,12 +7,15 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { useCurrency } from '@/context/CurrencyContext';
+import { getFestiveDiscount, isFestiveModeActive, FESTIVE_CONFIG } from '@/config/festive-config';
 
 export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
     const { items, removeFromCart, updateQuantity } = useCart();
     const { formatPrice: globalFormatPrice } = useCurrency();
 
     const subtotal = items.reduce((acc, item) => acc + (item.product.pricing.finalPrice * item.quantity), 0);
+    const festiveDiscount = getFestiveDiscount(subtotal);
+    const totalAfterDiscount = Math.max(0, subtotal - festiveDiscount);
 
     return (
         <AnimatePresence>
@@ -125,11 +128,32 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                         {/* Footer */}
                         {items.length > 0 && (
                             <div className="p-6 border-t border-gray-100 space-y-4 bg-brand-cream/10">
-                                <div className="flex justify-between items-center">
-                                    <span className="text-[10px] uppercase font-black tracking-[0.3em] text-gray-400">Estimated Total</span>
-                                    <span className="text-xl font-sans font-light text-brand-navy italic">
-                                        {globalFormatPrice(subtotal)}
-                                    </span>
+                                <div className="space-y-2">
+                                    <div className="flex justify-between items-center text-gray-400">
+                                        <span className="text-[10px] uppercase font-black tracking-[0.3em]">Subtotal</span>
+                                        <span className="text-sm font-sans font-medium line-through decoration-brand-gold/40">
+                                            {globalFormatPrice(subtotal)}
+                                        </span>
+                                    </div>
+
+                                    {festiveDiscount > 0 && (
+                                        <div className="flex justify-between items-center text-green-600 bg-green-50/50 p-2 rounded-sm border border-green-100/50">
+                                            <div className="flex flex-col">
+                                                <span className="text-[9px] uppercase font-black tracking-widest leading-none mb-1">Festive Gift Applied</span>
+                                                <span className="text-[8px] text-green-500/80 uppercase font-bold tracking-tighter">Automatic Holi Discount</span>
+                                            </div>
+                                            <span className="text-sm font-sans font-bold">
+                                                -{globalFormatPrice(festiveDiscount)}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-between items-center pt-2 border-t border-brand-gold/10">
+                                        <span className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-navy">Final Total</span>
+                                        <span className="text-2xl font-sans font-light text-brand-gold italic">
+                                            {globalFormatPrice(totalAfterDiscount)}
+                                        </span>
+                                    </div>
                                 </div>
                                 <p className="text-[9px] text-gray-400 uppercase tracking-widest leading-relaxed">
                                     Shipping, taxes, and discounts calculated at checkout.
