@@ -13,6 +13,8 @@ import { useCart } from "@/context/CartContext";
 import FestiveParticles from './FestiveParticles';
 import FestiveWelcome from './FestiveWelcome';
 import FestiveSocialProof from './FestiveSocialProof';
+import FestiveGlobalDecor from './FestiveGlobalDecor';
+import FestiveSplashTransition from './FestiveSplashTransition';
 import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
 import { useEffect } from 'react';
 
@@ -46,6 +48,8 @@ export default function ClientLayoutWrapper({
             <FestiveWelcome />
             <FestiveParticles />
             <FestiveSocialProof />
+            <FestiveGlobalDecor />
+            <FestiveSplashTransition />
             <div className="fixed top-0 left-0 w-full z-[1000] flex flex-col">
                 <AnnouncementBar />
                 <Navbar />
