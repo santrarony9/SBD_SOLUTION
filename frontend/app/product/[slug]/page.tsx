@@ -37,6 +37,7 @@ interface Product {
             goldValue: number;
             diamondValue: number;
             makingCharges: number;
+            otherCharges: number;
             gst: number;
         };
     };
