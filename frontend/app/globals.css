@@ -15,6 +15,22 @@
   /* Champagne */
   --brand-charcoal: #333333;
   --brand-cream: #FAFAF9;
+
+  /* Festive Colors - Holi */
+  --holi-pink: #ff0080;
+  --holi-purple: #7e00ff;
+  --holi-green: #7ed321;
+  --holi-yellow: #fbff00;
+}
+
+/* Festive Re-skinning Support */
+[data-theme='holi'] {
+  --brand-navy: #2D0056;
+  /* Deep Festive Purple instead of Navy */
+  --brand-gold: #ff0080;
+  /* Vibrant Pink instead of Gold for accents */
+  --brand-cream: #FFF5F9;
+  /* Slight pinkish tint for background */
 }
 
 @media (prefers-color-scheme: dark) {

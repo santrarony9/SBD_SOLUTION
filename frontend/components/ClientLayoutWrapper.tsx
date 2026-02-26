@@ -10,6 +10,11 @@ import ChatWidget from "@/components/ChatWidget";
 import MobileBottomNav from "@/components/MobileBottomNav";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/context/CartContext";
+import FestiveParticles from './FestiveParticles';
+import FestiveWelcome from './FestiveWelcome';
+import FestiveSocialProof from './FestiveSocialProof';
+import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import { useEffect } from 'react';
 
 export default function ClientLayoutWrapper({
     children,
@@ -22,6 +27,15 @@ export default function ClientLayoutWrapper({
     const { isCartOpen, closeCart } = useCart();
     const isAdminPath = pathname?.startsWith('/admin');
 
+    // Site-wide Festive Re-skinning
+    useEffect(() => {
+        if (isFestiveModeActive() && FESTIVE_CONFIG.features.siteReskin) {
+            document.documentElement.setAttribute('data-theme', FESTIVE_CONFIG.currentFestival.toLowerCase());
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }, []);
+
     if (isAdminPath) {
         return <main className="min-h-screen">{children}</main>;
     }
@@ -29,6 +43,9 @@ export default function ClientLayoutWrapper({
     return (
         <>
             <ExitIntentPopup />
+            <FestiveWelcome />
+            <FestiveParticles />
+            <FestiveSocialProof />
             <div className="fixed top-0 left-0 w-full z-[1000] flex flex-col">
                 <AnnouncementBar />
                 <Navbar />
