@@ -11,9 +11,8 @@ export const FESTIVE_CONFIG = {
     currentFestival: 'HOLI' as 'HOLI' | 'DIWALI' | 'EID' | 'CHRISTMAS' | 'NONE',
 
     // Automated Scheduling (Site returns to normal after endDate)
-    // Holi 2026 is around March 3-4, but for testing we'll set it to cover today.
     startDate: '2026-02-20',
-    endDate: '2026-03-10',
+    endDate: '2026-03-05',
 
     // Theme Customization
     theme: {
@@ -23,7 +22,12 @@ export const FESTIVE_CONFIG = {
         particleType: 'splash', // 'splash' for Holi, 'star' for Diwali, 'petal' for others
         greeting: 'Happy Holi! Celebrate with Colors & Diamonds.',
         couponCode: 'HOLI2026',
-        discountLabel: 'FLAT 15% OFF'
+        discountLabel: '₹500 OFF | ₹1000 OFF on ₹10k+',
+        tieredDiscount: {
+            flat: 500,
+            threshold: 10000,
+            aboveThreshold: 1000
+        }
     },
 
     // Advanced Features Toggle

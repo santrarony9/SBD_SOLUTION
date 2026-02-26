@@ -136,7 +136,7 @@ export default function FestiveWelcome() {
                     </h2>
 
                     <p className="text-gray-500 font-light text-sm md:text-base mb-10 text-balance">
-                        Step into the season of joy with up to 15% off on our exquisite Signature Diamond Collections.
+                        Step into the season of joy with ₹500 off on all orders, and ₹1000 off on orders above ₹10,000.
                     </p>
 
                     {/* Scratch Card Gamification */}
@@ -167,8 +167,8 @@ export default function FestiveWelcome() {
                         <button
                             onClick={closeWelcome}
                             className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-500 ${isScratched
-                                    ? 'bg-brand-navy text-white hover:bg-brand-gold hover:shadow-lg'
-                                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                ? 'bg-brand-navy text-white hover:bg-brand-gold hover:shadow-lg'
+                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                 }`}
                         >
                             {isScratched ? 'Shop Holi Collection' : 'Scratch Above to Unlock'}
