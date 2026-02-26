@@ -362,6 +362,38 @@ export default function CheckoutPage() {
                                         ))}
                                     </div>
 
+                                    {/* Promo Code Section */}
+                                    <div className="mb-8 p-6 bg-brand-cream/10 border border-brand-gold/10">
+                                        <div className="flex justify-between items-center mb-4">
+                                            <label className="text-[10px] uppercase font-black tracking-widest text-brand-navy">Have a Boutique Credit Code?</label>
+                                            {appliedPromo && (
+                                                <button onClick={removePromo} className="text-[10px] uppercase font-black tracking-widest text-red-500 hover:text-red-700 underline">Remove</button>
+                                            )}
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Enter Code"
+                                                value={promoCode}
+                                                onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                                                disabled={!!appliedPromo || promoLoading}
+                                                className="flex-grow p-3 bg-white border border-gray-100 text-sm font-sans focus:border-brand-gold outline-none disabled:bg-gray-50 disabled:text-gray-400 placeholder:text-[10px] placeholder:uppercase placeholder:tracking-widest"
+                                            />
+                                            <button
+                                                onClick={handleApplyPromo}
+                                                disabled={!!appliedPromo || promoLoading || !promoCode.trim()}
+                                                className="px-6 bg-brand-navy text-white text-[10px] font-black uppercase tracking-widest hover:bg-brand-gold transition-all disabled:hidden"
+                                            >
+                                                {promoLoading ? 'Verifying...' : 'Apply Code'}
+                                            </button>
+                                        </div>
+                                        {promoMessage && (
+                                            <p className={`text-[10px] font-bold uppercase mt-3 tracking-[0.2em] animate-fade-in ${promoMessage.type === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                                                {promoMessage.text}
+                                            </p>
+                                        )}
+                                    </div>
+
                                     {/* Order Totals Bar - Receipt Style */}
                                     <div className="bg-[#FDFAF7] border border-brand-gold/10 p-8 mb-8 relative">
                                         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand-gold/0 via-brand-gold to-brand-gold/0 opacity-20" />
