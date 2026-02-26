@@ -135,11 +135,14 @@ export class ProductsService {
         if (products.length === 0) return [];
 
         // 2. Batch fetch global rates to solve N+1 Problem
-        const [goldRates, diamondRates, charges] = await Promise.all([
+        const [goldRates, diamondRates, charges, tieredData] = await Promise.all([
             this.prisma.goldPrice.findMany(),
             this.prisma.diamondPrice.findMany(),
-            this.prisma.charge.findMany({ where: { isActive: true } })
+            this.prisma.charge.findMany({ where: { isActive: true } }),
+            this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } })
         ]);
+
+        const makingChargeTiers = (tieredData?.value as any[]) || [];
 
         const goldRateMap = new Map(goldRates.map(r => [r.purity, r.pricePer10g]));
         const diamondRateMap = new Map(diamondRates.map(r => [r.clarity, r.pricePerCarat]));
@@ -149,7 +152,7 @@ export class ProductsService {
             const goldPricePer10g = goldRateMap.get(product.goldPurity) || 0;
             const diamondPricePerCarat = diamondRateMap.get(product.diamondClarity) || 0;
 
-            return this.calculatePricing(product, goldPricePer10g, diamondPricePerCarat, charges);
+            return this.calculatePricing(product, goldPricePer10g, diamondPricePerCarat, charges, makingChargeTiers);
         });
 
         // 4. Client-side price filtering (since pricing is dynamic)
@@ -190,8 +193,10 @@ export class ProductsService {
         const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
         const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
         const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
+        const tieredData = await this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } });
+        const makingChargeTiers = (tieredData?.value as any[]) || [];
 
-        const result = this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges);
+        const result = this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges, makingChargeTiers);
         await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
         return result;
     }
@@ -199,7 +204,7 @@ export class ProductsService {
     // ------------------------------------------
     // OPTIMIZED PRICING LOGIC (Pure Function style)
     // ------------------------------------------
-    private calculatePricing(product: any, goldRate: number, diamondRate: number, charges: any[]) {
+    private calculatePricing(product: any, goldRate: number, diamondRate: number, charges: any[], makingChargeTiers: any[] = []) {
         try {
             const goldValue = (goldRate / 10) * product.goldWeight;
             const diamondValue = diamondRate * product.diamondCarat;
@@ -208,8 +213,24 @@ export class ProductsService {
             let makingCharges = 0;
             let otherCharges = 0;
 
+            // 1. Apply Tiered Making Charges first if tiers exist
+            const weight = product.goldWeight || 0;
+            let activeTier = makingChargeTiers.find((t: any) => t.id === '3g_plus');
+            if (weight >= 0 && weight < 1) activeTier = makingChargeTiers.find((t: any) => t.id === '0_1g');
+            else if (weight >= 1 && weight < 2) activeTier = makingChargeTiers.find((t: any) => t.id === '1_2g');
+            else if (weight >= 2 && weight < 3) activeTier = makingChargeTiers.find((t: any) => t.id === '2_3g');
+
+            if (activeTier) {
+                if (activeTier.type === 'FLAT') makingCharges = Number(activeTier.amount);
+                else if (activeTier.type === 'PERCENTAGE') makingCharges = (goldValue * Number(activeTier.amount)) / 100;
+            }
+
+            // 2. Apply other charges (legacy making charges are skipped if tiers handled them)
             for (const charge of charges) {
                 if (charge.name.toUpperCase().includes('GST')) continue;
+
+                // If tiered making is active, skip legacy making charges to avoid double charging
+                if (activeTier && charge.name.toLowerCase().includes('making')) continue;
 
                 let amt = 0;
                 if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) amt = charge.amount * product.goldWeight;
@@ -227,7 +248,7 @@ export class ProductsService {
 
             const taxable = subTotal + makingCharges + otherCharges;
             const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
-            const gst = (gstCharge && gstCharge.type === 'PERCENTAGE') ? (taxable * gstCharge.amount) / 100 : 0;
+            const gst = (gstCharge && gstCharge.type === 'PERCENTAGE') ? (taxable * gstCharge.amount) / 100 : (taxable * 3) / 100;
 
             return {
                 ...product,
