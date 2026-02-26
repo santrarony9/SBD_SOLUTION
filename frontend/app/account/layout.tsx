@@ -12,6 +12,7 @@ export default function AccountLayout({ children }: { children: React.ReactNode 
 
     const links = [
         { href: '/account', label: 'Dashboard Overview', icon: <PiCrownSimple className="w-6 h-6" /> },
+        { href: '/account/rewards', label: 'Loyalty Rewards', icon: <PiCrownSimple className="w-6 h-6" /> },
         { href: '/account/orders', label: 'My Orders', icon: <PiShoppingBag className="w-6 h-6" /> },
         { href: '/account/wishlist', label: 'Wishlist', icon: <PiHeart className="w-6 h-6" /> },
         { href: '/account/addresses', label: 'Address Book', icon: <PiMapPin className="w-6 h-6" /> },
