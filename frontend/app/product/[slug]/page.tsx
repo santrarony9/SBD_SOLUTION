@@ -428,7 +428,7 @@ export default function ProductDetailPage() {
                                     IGI
                                 </button>
                             )}
-                            <button onClick={() => setShowCertificate(true)} className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy hover:bg-brand-navy hover:text-white transition-colors">
+                            <button className="inline-flex items-center gap-1.5 px-2 py-1 bg-brand-navy/5 rounded-sm text-[9px] uppercase tracking-widest font-bold text-brand-navy cursor-default">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-3 h-3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                                 BIS
                             </button>
@@ -615,28 +615,35 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Price Breakup Panel */}
-                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-96 opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
-                            <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-20 relative">
+                        <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                            <div className="bg-white p-5 rounded-sm border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-4 relative">
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Gold Value</span>
-                                    <span>{formatPrice(product.pricing?.components?.goldValue)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.goldValue || 0)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Diamond Value</span>
-                                    <span>{formatPrice(product.pricing?.components?.diamondValue)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.diamondValue || 0)}</span>
                                 </div>
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>Making Charges</span>
-                                    <span>{formatPrice(product.pricing?.components?.makingCharges)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.makingCharges || 0)}</span>
                                 </div>
+                                {product.pricing?.components?.otherCharges > 0 && (
+                                    <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
+                                        <span>Other Charges</span>
+                                        <span>{formatPrice(product.pricing?.components?.otherCharges)}</span>
+                                    </div>
+                                )}
                                 <div className="flex justify-between text-gray-500 text-xs uppercase tracking-wider">
                                     <span>GST (3%)</span>
-                                    <span>{formatPrice(product.pricing?.components?.gst)}</span>
+                                    <span>{formatPrice(product.pricing?.components?.gst || 0)}</span>
                                 </div>
                                 <div className="flex justify-between font-bold text-brand-navy border-t border-gray-200 pt-3 mt-2">
-                                    <span>Total</span>
-                                    <span>{formatPrice(product.pricing?.finalPrice)}</span>
+                                    <span>Total Value</span>
+                                    <span>{formatPrice(product.pricing?.finalPrice || 0)}</span>
                                 </div>
+                                <p className="text-[8px] text-gray-400 mt-2 italic">* Prices are based on current market rates and may vary slightly.</p>
                             </div>
                         </div>
                     </div>

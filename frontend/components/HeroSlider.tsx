@@ -112,13 +112,23 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="mb-6 md:mb-8"
+                        className="mb-8 md:mb-10 flex flex-col items-center gap-3"
                     >
                         <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 text-white shadow-xl shadow-pink-500/20">
                             <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap">
                                 {FESTIVE_CONFIG.theme.greeting}
                             </span>
                         </div>
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-sm shadow-sm"
+                        >
+                            <span className="text-white text-[9px] md:text-xs font-black uppercase tracking-[0.2em]">
+                                Offer: {FESTIVE_CONFIG.theme.discountLabel}
+                            </span>
+                        </motion.div>
                     </motion.div>
                 )}
 
