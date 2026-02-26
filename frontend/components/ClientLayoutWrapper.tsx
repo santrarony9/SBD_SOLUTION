@@ -62,7 +62,7 @@ export default function ClientLayoutWrapper({
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.2 }}
-                        className="min-h-screen pt-[100px] md:pt-[140px]" // Optimized padding for new header height
+                        className={`min-h-screen ${pathname === '/' ? 'pt-0' : 'pt-[100px] md:pt-[140px]'}`}
                     >
                         {children}
                     </motion.main>

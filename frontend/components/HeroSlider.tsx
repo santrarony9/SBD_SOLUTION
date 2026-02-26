@@ -81,7 +81,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const currentBanner = activeBanners[currentIndex] || activeBanners[0];
 
     return (
-        <section className="relative h-screen flex items-center justify-center overflow-hidden bg-brand-navy">
+        <section className="relative h-[100dvh] flex items-center justify-center overflow-hidden bg-brand-navy">
             {/* Background Images Layer */}
             {activeBanners.map((banner, index) => (
                 <div
@@ -89,19 +89,36 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100 z-0' : 'opacity-0 -z-10'
                         }`}
                 >
-                    <Image
-                        src={(isMobile && banner.mobileImageUrl) ? banner.mobileImageUrl : (banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png')}
-                        alt={banner.title || "Royal Diamond Collection"}
-                        fill
-                        priority={index === 0}
-                        fetchPriority={index === 0 ? "high" : "low"}
-                        className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
-                            }`}
-                        style={{ objectPosition: 'center center' }}
-                        quality={90}
-                    />
+                    {/* Desktop Image */}
+                    <div className="hidden md:block absolute inset-0">
+                        <Image
+                            src={banner.imageUrl || '/hero-jewellery.png'}
+                            alt={banner.title || "Royal Diamond Collection"}
+                            fill
+                            priority={index === 0}
+                            className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
+                                }`}
+                            style={{ objectPosition: 'center center' }}
+                            quality={90}
+                        />
+                    </div>
+
+                    {/* Mobile Image */}
+                    <div className="block md:hidden absolute inset-0">
+                        <Image
+                            src={banner.mobileImageUrl || banner.imageUrl || '/hero-jewellery.png'}
+                            alt={banner.title || "Royal Diamond Collection"}
+                            fill
+                            priority={index === 0}
+                            className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
+                                }`}
+                            style={{ objectPosition: 'center center' }}
+                            quality={80}
+                        />
+                    </div>
+
                     {/* Sophisticated Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90 mix-blend-multiply z-0" />
                 </div>
             ))}
 
