@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { useAuth } from './AuthContext';
 import { fetchAPI } from '@/lib/api';
 import { useToast } from './ToastContext';
+import { useFestive } from './FestiveContext';
 
 // Types
 interface CartItem {
@@ -37,6 +38,7 @@ interface CartContextType {
     isCartOpen: boolean;
     openCart: () => void;
     closeCart: () => void;
+    festiveDiscount: number;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -48,6 +50,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [cartTotal, setCartTotal] = useState(0);
     const [isLoading, setIsLoading] = useState(false);
     const [isCartOpen, setIsCartOpen] = useState(false);
+    const { config, isFestiveActive } = useFestive();
+    const [festiveDiscount, setFestiveDiscount] = useState(0);
 
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
@@ -71,6 +75,28 @@ export function CartProvider({ children }: { children: ReactNode }) {
         const total = currentItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
         setCartTotal(total);
     };
+
+    // Calculate Dynamic Festive Discount
+    useEffect(() => {
+        if (isFestiveActive && config) {
+            const subtotal = items.reduce((sum, item) => {
+                const price = item.calculatedPrice || item.product.price || 0;
+                return sum + (price * item.quantity);
+            }, 0);
+
+            const { tieredDiscount } = config.theme;
+            if (subtotal > 0) {
+                const discount = subtotal >= tieredDiscount.threshold
+                    ? tieredDiscount.aboveThreshold
+                    : tieredDiscount.flat;
+                setFestiveDiscount(discount);
+            } else {
+                setFestiveDiscount(0);
+            }
+        } else {
+            setFestiveDiscount(0);
+        }
+    }, [items, isFestiveActive, config]);
 
     const fetchServerCart = async () => {
         try {
@@ -212,7 +238,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading, isCartOpen, openCart, closeCart }}>
+        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading, isCartOpen, openCart, closeCart, festiveDiscount }}>
             {children}
         </CartContext.Provider>
     );

@@ -18,7 +18,7 @@ import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, 
 import JsonLd from "@/components/JsonLd";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import SimilarPriceRange from "@/components/SimilarPriceRange";
-import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 interface Product {
     id: string;
@@ -56,6 +56,7 @@ export default function ProductDetailPage() {
     const { addToCart } = useCart();
     const { showToast } = useToast();
     const { formatPrice, currency } = useCurrency();
+    const { config, isFestiveActive } = useFestive();
 
     // State
     const [product, setProduct] = useState<Product | null>(null);
@@ -428,10 +429,10 @@ export default function ProductDetailPage() {
 
                         {/* Trust Badges - Clickable for Certificate */}
                         <div className="flex flex-col gap-3">
-                            {isFestiveModeActive() && (
+                            {isFestiveActive && (
                                 <div className="inline-flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-sm border border-green-100 animate-pulse">
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{FESTIVE_CONFIG.theme.discountLabel}</span>
-                                    <span className="text-[8px] uppercase tracking-tighter opacity-70">(Holi Special)</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{config?.theme.discountLabel}</span>
+                                    <span className="text-[8px] uppercase tracking-tighter opacity-70">({config?.currentFestival} Special)</span>
                                 </div>
                             )}
                             <div className="flex gap-2">

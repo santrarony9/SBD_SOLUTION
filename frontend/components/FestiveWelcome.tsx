@@ -2,18 +2,20 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { PiX, PiConfetti } from 'react-icons/pi';
-import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 export default function FestiveWelcome() {
     const [isVisible, setIsVisible] = useState(false);
     const [isScratched, setIsScratched] = useState(false);
     const [isMounted, setIsMounted] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const { config, isFestiveActive } = useFestive();
 
     useEffect(() => {
         setIsMounted(true);
-        const hasSeen = localStorage.getItem(`festive_welcome_${FESTIVE_CONFIG.currentFestival}`);
-        if (!hasSeen && isFestiveModeActive() && FESTIVE_CONFIG.features.welcomeModal) {
+        if (!config) return;
+        const hasSeen = localStorage.getItem(`festive_welcome_${config.currentFestival}`);
+        if (!hasSeen && isFestiveActive && config.features.welcomeModal) {
             // Show after 2 seconds for better UX
             const timer = setTimeout(() => {
                 setIsVisible(true);
@@ -21,7 +23,7 @@ export default function FestiveWelcome() {
             }, 2000);
             return () => clearTimeout(timer);
         }
-    }, []);
+    }, [isFestiveActive, config]);
 
     // Setup Scratch Logic
     useEffect(() => {
@@ -106,7 +108,7 @@ export default function FestiveWelcome() {
     const closeWelcome = () => {
         setIsVisible(false);
         document.body.style.overflow = 'auto';
-        localStorage.setItem(`festive_welcome_${FESTIVE_CONFIG.currentFestival}`, 'true');
+        localStorage.setItem(`festive_welcome_${config?.currentFestival}`, 'true');
     };
 
     if (!isMounted || !isVisible) return null;
@@ -132,7 +134,7 @@ export default function FestiveWelcome() {
                     </div>
 
                     <h2 className="fluid-h2 font-serif text-brand-navy mb-4 leading-tight">
-                        {FESTIVE_CONFIG.theme.greeting}
+                        {config?.theme.greeting}
                     </h2>
 
                     <p className="text-gray-500 font-light text-sm md:text-base mb-10 text-balance">
@@ -145,10 +147,10 @@ export default function FestiveWelcome() {
                         <div className={`text-center transition-all duration-700 ${isScratched ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
                             <span className="text-[10px] text-gray-400 uppercase block mb-1">Your Personal Holi Code</span>
                             <span className="text-2xl font-mono font-black text-brand-navy tracking-widest uppercase">
-                                {FESTIVE_CONFIG.theme.couponCode}
+                                {config?.theme.couponCode}
                             </span>
                             <div className="mt-2 text-brand-gold font-bold text-sm tracking-widest">
-                                {FESTIVE_CONFIG.theme.discountLabel}
+                                {config?.theme.discountLabel}
                             </div>
                         </div>
 
@@ -176,7 +178,7 @@ export default function FestiveWelcome() {
                     </div>
 
                     <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                        T&C Apply • Valid until {new Date(FESTIVE_CONFIG.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}
+                        T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
                     </p>
                 </div>
             </div>

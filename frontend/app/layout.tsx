@@ -8,6 +8,7 @@ import { CartProvider } from "@/context/CartContext";
 import { ToastProvider } from "@/context/ToastContext";
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
+import { FestiveProvider } from '@/context/FestiveContext';
 import ChatWidget from "@/components/ChatWidget";
 
 import JsonLd from "@/components/JsonLd";
@@ -153,15 +154,17 @@ export default async function RootLayout({
         <div className="scroll-progress" />
         <ToastProvider>
           <AuthProvider>
-            <CartProvider>
-              <ComparisonProvider>
-                <CurrencyProvider>
-                  <ClientLayoutWrapper footerConfig={footerConfig}>
-                    {children}
-                  </ClientLayoutWrapper>
-                </CurrencyProvider>
-              </ComparisonProvider>
-            </CartProvider>
+            <FestiveProvider>
+              <CartProvider>
+                <ComparisonProvider>
+                  <CurrencyProvider>
+                    <ClientLayoutWrapper footerConfig={footerConfig}>
+                      {children}
+                    </ClientLayoutWrapper>
+                  </CurrencyProvider>
+                </ComparisonProvider>
+              </CartProvider>
+            </FestiveProvider>
           </AuthProvider>
         </ToastProvider>
       </body>

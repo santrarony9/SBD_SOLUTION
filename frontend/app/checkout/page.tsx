@@ -12,10 +12,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PiCreditCard, PiBank, PiCurrencyInr, PiCheckCircle, PiWarningCircle, PiShoppingBag, PiShieldCheck } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
-import { getFestiveDiscount } from '@/config/festive-config';
 
 export default function CheckoutPage() {
-    const { items, cartTotal, clearCart } = useCart();
+    const { items, cartTotal, clearCart, festiveDiscount } = useCart();
     const { user } = useAuth();
     const { showToast } = useToast();
     const { formatPrice: globalFormatPrice, currency, exchangeRates } = useCurrency();
@@ -119,8 +118,7 @@ export default function CheckoutPage() {
             }
         }
 
-        // Automatic Festive Discount
-        const festiveDiscount = getFestiveDiscount(cartTotal);
+        // Automatic Festive Discount (Dynamic from Context)
         totalDiscount += festiveDiscount;
 
         return totalDiscount;
@@ -407,14 +405,14 @@ export default function CheckoutPage() {
                                             {appliedPromo && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
                                                     <span>Boutique Credit ({appliedPromo.code})</span>
-                                                    <span>-{globalFormatPrice(calculateDiscount() - getFestiveDiscount(cartTotal))}</span>
+                                                    <span>-{globalFormatPrice(calculateDiscount() - festiveDiscount)}</span>
                                                 </div>
                                             )}
 
-                                            {getFestiveDiscount(cartTotal) > 0 && (
+                                            {festiveDiscount > 0 && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
                                                     <span>Festive Gift (Automatic)</span>
-                                                    <span>-{globalFormatPrice(getFestiveDiscount(cartTotal))}</span>
+                                                    <span>-{globalFormatPrice(festiveDiscount)}</span>
                                                 </div>
                                             )}
 

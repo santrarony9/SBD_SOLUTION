@@ -5,7 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import { motion } from 'framer-motion';
-import { isFestiveModeActive, FESTIVE_CONFIG } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 interface Banner {
     id: string;
@@ -27,6 +27,7 @@ interface HeroSliderProps {
 
 export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
+    const { config, isFestiveActive } = useFestive();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
 
@@ -156,8 +157,8 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
 
             {/* Static Content Overlay */}
             <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
-                {/* Case: Holi Branding Banner (Phase 4) */}
-                {isFestiveModeActive() && (
+                {/* Case: Festive Branding Banner */}
+                {isFestiveActive && (
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -165,7 +166,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     >
                         <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 text-white shadow-xl shadow-pink-500/20">
                             <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap">
-                                {FESTIVE_CONFIG.theme.greeting}
+                                {config?.theme.greeting}
                             </span>
                         </div>
                         <motion.div
@@ -175,7 +176,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-sm shadow-sm"
                         >
                             <span className="text-white text-[9px] md:text-xs font-black uppercase tracking-[0.2em]">
-                                Offer: {FESTIVE_CONFIG.theme.discountLabel}
+                                Offer: {config?.theme.discountLabel}
                             </span>
                         </motion.div>
                     </motion.div>

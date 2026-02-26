@@ -1,15 +1,16 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 export default function FestiveParticles() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [shouldRender, setShouldRender] = useState(true);
     const [opacity, setOpacity] = useState(0.6);
+    const { config, isFestiveActive } = useFestive();
 
     useEffect(() => {
-        if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.fallingParticles) return;
+        if (!isFestiveActive || !config?.features.fallingParticles) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -124,7 +125,7 @@ export default function FestiveParticles() {
         };
     }, []);
 
-    if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.fallingParticles || !shouldRender) return null;
+    if (!isFestiveActive || !config?.features.fallingParticles || !shouldRender) return null;
 
     return (
         <canvas

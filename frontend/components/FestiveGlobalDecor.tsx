@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 const SplashSplat = ({ color, className }: { color: string; className: string }) => (
     <svg
@@ -18,7 +18,8 @@ const SplashSplat = ({ color, className }: { color: string; className: string })
 );
 
 export default function FestiveGlobalDecor() {
-    if (!isFestiveModeActive()) return null;
+    const { isFestiveActive } = useFestive();
+    if (!isFestiveActive) return null;
 
     return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">

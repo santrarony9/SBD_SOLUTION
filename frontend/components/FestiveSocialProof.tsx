@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect } from 'react';
 import { PiBagFill } from 'react-icons/pi';
-import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 import { fetchAPI } from '@/lib/api';
-
 
 export default function FestiveSocialProof() {
     const [orders, setOrders] = useState<any[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
+    const { config, isFestiveActive } = useFestive();
 
     useEffect(() => {
-        if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.socialProof) return;
+        if (!isFestiveActive || !config?.features.socialProof) return;
 
         const loadOrders = async () => {
             try {

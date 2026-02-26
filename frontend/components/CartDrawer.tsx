@@ -7,14 +7,14 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
 import { useCurrency } from '@/context/CurrencyContext';
-import { getFestiveDiscount, isFestiveModeActive, FESTIVE_CONFIG } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { items, removeFromCart, updateQuantity } = useCart();
+    const { items, removeFromCart, updateQuantity, festiveDiscount } = useCart();
     const { formatPrice: globalFormatPrice } = useCurrency();
+    const { config, isFestiveActive } = useFestive();
 
     const subtotal = items.reduce((acc, item) => acc + (item.product.pricing.finalPrice * item.quantity), 0);
-    const festiveDiscount = getFestiveDiscount(subtotal);
     const totalAfterDiscount = Math.max(0, subtotal - festiveDiscount);
 
     return (
@@ -140,7 +140,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                         <div className="flex justify-between items-center text-green-600 bg-green-50/50 p-2 rounded-sm border border-green-100/50">
                                             <div className="flex flex-col">
                                                 <span className="text-[9px] uppercase font-black tracking-widest leading-none mb-1">Festive Gift Applied</span>
-                                                <span className="text-[8px] text-green-500/80 uppercase font-bold tracking-tighter">Automatic Holi Discount</span>
+                                                <span className="text-[8px] text-green-500/80 uppercase font-bold tracking-tighter">Automatic {config?.currentFestival} Discount</span>
                                             </div>
                                             <span className="text-sm font-sans font-bold">
                                                 -{globalFormatPrice(festiveDiscount)}

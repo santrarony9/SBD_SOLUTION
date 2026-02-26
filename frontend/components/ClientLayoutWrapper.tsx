@@ -15,7 +15,8 @@ import FestiveWelcome from './FestiveWelcome';
 import FestiveSocialProof from './FestiveSocialProof';
 import FestiveGlobalDecor from './FestiveGlobalDecor';
 import FestiveSplashTransition from './FestiveSplashTransition';
-import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
+import FestiveStartupAnimation from './FestiveStartupAnimation';
+import { useFestive } from '@/context/FestiveContext';
 import { useEffect } from 'react';
 
 export default function ClientLayoutWrapper({
@@ -27,16 +28,17 @@ export default function ClientLayoutWrapper({
 }) {
     const pathname = usePathname();
     const { isCartOpen, closeCart } = useCart();
+    const { config, isFestiveActive } = useFestive();
     const isAdminPath = pathname?.startsWith('/admin');
 
     // Site-wide Festive Re-skinning
     useEffect(() => {
-        if (isFestiveModeActive() && FESTIVE_CONFIG.features.siteReskin) {
-            document.documentElement.setAttribute('data-theme', FESTIVE_CONFIG.currentFestival.toLowerCase());
+        if (isFestiveActive && config?.features.siteReskin) {
+            document.documentElement.setAttribute('data-theme', config.currentFestival.toLowerCase());
         } else {
             document.documentElement.removeAttribute('data-theme');
         }
-    }, []);
+    }, [isFestiveActive, config]);
 
     if (isAdminPath) {
         return <main className="min-h-screen">{children}</main>;
@@ -45,6 +47,7 @@ export default function ClientLayoutWrapper({
     return (
         <>
             <ExitIntentPopup />
+            <FestiveStartupAnimation />
             <FestiveWelcome />
             <FestiveParticles />
             <FestiveSocialProof />

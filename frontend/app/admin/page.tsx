@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart, PiTerminalWindow, PiImage } from "react-icons/pi";
+import { PiLayout, PiGear, PiCube, PiScroll, PiSignOut, PiArrowLeft, PiPresentationChart, PiChartLineUp, PiAddressBook, PiShoppingCart, PiTerminalWindow, PiImage, PiSparkle } from "react-icons/pi";
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI } from '@/lib/api';
 import AdminGuard from '@/components/AdminGuard';
@@ -13,6 +13,7 @@ import AdminDashboardOverview from '@/components/AdminDashboardOverview';
 import AdminCMS from '@/components/AdminCMS';
 import AdminTeamManager from '@/components/AdminTeamManager';
 import AdminGallery from '@/components/AdminGallery';
+import AdminFestiveControl from '@/components/AdminFestiveControl';
 import LogViewer from '@/components/LogViewer';
 
 
@@ -168,6 +169,12 @@ export default function AdminDashboard() {
                                 label="Gallery & Top Picks"
                             />
                             <SidebarLink
+                                active={activeTab === 'festive'}
+                                onClick={() => setActiveTab('festive')}
+                                icon={<PiSparkle className="w-5 h-5" />}
+                                label="Festive Mode"
+                            />
+                            <SidebarLink
                                 active={activeTab === 'products'}
                                 onClick={() => setActiveTab('products')}
                                 icon={<PiCube className="w-5 h-5" />}
@@ -238,7 +245,8 @@ export default function AdminDashboard() {
                                         activeTab === 'team' ? 'Team Access' :
                                             activeTab === 'masters' ? 'Master Config' :
                                                 activeTab === 'gallery' ? 'Visual Merchandising' :
-                                                    activeTab === 'products' ? 'Collection' : 'Order Console'}
+                                                    activeTab === 'festive' ? 'Festive Experience' :
+                                                        activeTab === 'products' ? 'Collection' : 'Order Console'}
                             </h1>
                         </div>
                     </header>
@@ -247,6 +255,7 @@ export default function AdminDashboard() {
                     {activeTab === 'cms' && <AdminCMS />}
                     {activeTab === 'team' && <AdminTeamManager />}
                     {activeTab === 'gallery' && <AdminGallery />}
+                    {activeTab === 'festive' && <AdminFestiveControl />}
 
                     {activeTab === 'masters' && (
                         <div className="space-y-12 max-w-6xl animate-fade-in relative">
@@ -442,17 +451,18 @@ export default function AdminDashboard() {
                                                             disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
                                                         >
                                                             <option value="FLAT">Flat Rate (₹)</option>
+                                                            <option value="PER_GRAM">Per Gram (₹)</option>
                                                             <option value="PERCENTAGE">Percentage of Gold (%)</option>
                                                         </select>
                                                     </div>
 
                                                     <div>
                                                         <label className="block text-[10px] uppercase tracking-wider text-gray-500 font-bold mb-1.5">
-                                                            {tier.type === 'FLAT' ? 'Flat Amount (₹)' : 'Percentage Rate (%)'}
+                                                            {tier.type === 'FLAT' ? 'Flat Amount (₹)' : tier.type === 'PER_GRAM' ? 'Per Gram Rate (₹)' : 'Percentage Rate (%)'}
                                                         </label>
                                                         <div className="relative">
                                                             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-bold">
-                                                                {tier.type === 'FLAT' ? '₹' : '%'}
+                                                                {tier.type === 'PERCENTAGE' ? '%' : '₹'}
                                                             </span>
                                                             <input
                                                                 type="number"

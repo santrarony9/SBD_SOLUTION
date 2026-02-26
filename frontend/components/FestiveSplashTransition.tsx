@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { isFestiveModeActive } from '@/config/festive-config';
+import { useFestive } from '@/context/FestiveContext';
 
 const splashColors = ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff'];
 
@@ -11,9 +11,10 @@ export default function FestiveSplashTransition() {
     const pathname = usePathname();
     const [isSplashing, setIsSplashing] = useState(false);
     const [lastPathname, setLastPathname] = useState(pathname);
+    const { isFestiveActive } = useFestive();
 
     useEffect(() => {
-        if (!isFestiveModeActive()) return;
+        if (!isFestiveActive) return;
 
         if (pathname !== lastPathname) {
             setIsSplashing(true);
@@ -28,7 +29,7 @@ export default function FestiveSplashTransition() {
         }
     }, [pathname, lastPathname]);
 
-    if (!isFestiveModeActive()) return null;
+    if (!isFestiveActive) return null;
 
     return (
         <AnimatePresence mode="wait">
