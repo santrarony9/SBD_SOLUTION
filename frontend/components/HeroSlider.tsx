@@ -39,34 +39,16 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Filter banners based on device
-    const safeBanners = Array.isArray(banners) ? banners : [];
-    let activeBanners = safeBanners;
-
-    // Only filter after mounting to avoid hydration mismatch
-    if (mounted) {
-        if (isMobile) {
-            // On mobile, show banners that have at least one image (prioritize mobile image, fallback to desktop)
-            activeBanners = safeBanners.filter(b => b.mobileImageUrl || b.imageUrl);
-        } else {
-            // On desktop, only show banners that have a desktop image
-            activeBanners = safeBanners.filter(b => b.imageUrl);
-        }
-    } else {
-        // Default to desktop banners for SSR
-        activeBanners = safeBanners.filter(b => b.imageUrl);
-    }
-
-    // Fallback if no banners match the current device
-    if (activeBanners.length === 0) {
-        activeBanners = [{
+    // Use all banners consistently to avoid hydration mismatch
+    const activeBanners = (banners && Array.isArray(banners) && banners.length > 0)
+        ? banners
+        : [{
             id: 'default',
             imageUrl: '/hero-jewellery.png',
             mobileImageUrl: '/hero-jewellery.png',
             title: 'Est. 2020',
             link: '/shop'
         }];
-    }
 
     // Auto-slide effect
     useEffect(() => {
