@@ -54,18 +54,20 @@ export default function ClientLayoutWrapper({
                 <AnnouncementBar />
                 <Navbar />
             </div>
-            <AnimatePresence mode="wait">
-                <motion.main
-                    key={pathname}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="min-h-screen pt-[100px] md:pt-[140px]" // Optimized padding for new header height
-                >
-                    {children}
-                </motion.main>
-            </AnimatePresence>
+            <div className="flex-grow">
+                <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
+                    <motion.main
+                        key={pathname}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="min-h-screen pt-[100px] md:pt-[140px]" // Optimized padding for new header height
+                    >
+                        {children}
+                    </motion.main>
+                </AnimatePresence>
+            </div>
             <ChatWidget />
             <MobileBottomNav />
             <CartDrawer isOpen={isCartOpen} onClose={closeCart} />

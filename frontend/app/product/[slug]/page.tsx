@@ -596,12 +596,6 @@ export default function ProductDetailPage() {
                                 <span>Making Charges</span>
                                 <span>{formatPrice(product.pricing?.components?.makingCharges || 0)}</span>
                             </div>
-                            {product.pricing?.components?.otherCharges > 0 && (
-                                <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
-                                    <span>Other Charges</span>
-                                    <span>{formatPrice(product.pricing?.components?.otherCharges || 0)}</span>
-                                </div>
-                            )}
                             <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
                                 <span>GST (3%)</span>
                                 <span>{formatPrice(product.pricing?.components?.gst || 0)}</span>

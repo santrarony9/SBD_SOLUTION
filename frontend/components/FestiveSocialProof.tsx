@@ -5,12 +5,6 @@ import { PiBagFill } from 'react-icons/pi';
 import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
 import { fetchAPI } from '@/lib/api';
 
-const MOCK_DATA = [
-    { name: 'Aarav', city: 'Mumbai', product: 'Signature Diamond Studs' },
-    { name: 'Meera', city: 'Delhi', product: 'Royal Gold Bracelet' },
-    { name: 'Ishaan', city: 'Bangalore', product: 'Festive Solitaire Ring' },
-    { name: 'Diya', city: 'Jaipur', product: 'Sparkling Rose Pendant' }
-];
 
 export default function FestiveSocialProof() {
     const [orders, setOrders] = useState<any[]>([]);
@@ -26,11 +20,11 @@ export default function FestiveSocialProof() {
                 if (data && Array.isArray(data) && data.length > 0) {
                     setOrders(data);
                 } else {
-                    setOrders(MOCK_DATA);
+                    setOrders([]);
                 }
             } catch (e) {
                 console.error("Failed to fetch real social proof:", e);
-                setOrders(MOCK_DATA);
+                setOrders([]);
             }
         };
 
