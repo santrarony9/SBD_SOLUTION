@@ -76,4 +76,9 @@ export class OrdersController {
     async testShiprocket() {
         return this.ordersService.testShiprocketAuth();
     }
+
+    @Get('public/recent')
+    async getPublicRecentOrders() {
+        return this.ordersService.getPublicRecentOrders();
+    }
 }

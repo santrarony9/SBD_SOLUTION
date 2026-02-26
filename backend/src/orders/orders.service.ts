@@ -441,4 +441,33 @@ export class OrdersService {
 
         return updatedOrder;
     }
+
+    /**
+     * Public endpoint to fetch anonymized recent orders for social proof.
+     */
+    async getPublicRecentOrders() {
+        const orders = await this.prisma.order.findMany({
+            where: {
+                paymentStatus: 'PAID',
+                status: { notIn: ['CANCELLED', 'RETURNED'] }
+            } as any,
+            orderBy: { createdAt: 'desc' },
+            take: 15,
+            include: {
+                items: {
+                    take: 1, // Only need the first item for the notification
+                    select: { name: true }
+                }
+            }
+        });
+
+        return orders.map(order => ({
+            id: order.id,
+            // Anonymize name: "Rony" -> "Rony S." OR just "Rony" if only one name
+            name: order.shippingAddress?.['firstName'] || 'Valued Customer',
+            city: order.shippingAddress?.['city'] || 'India',
+            product: order.items[0]?.name || 'Signature Piece',
+            createdAt: order.createdAt
+        }));
+    }
 }
