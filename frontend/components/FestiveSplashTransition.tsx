@@ -40,12 +40,12 @@ export default function FestiveSplashTransition() {
                             key={i}
                             initial={{ scale: 0, opacity: 0 }}
                             animate={{
-                                scale: [0, 1.5, 2.5],
-                                opacity: [0, 0.8, 0],
+                                scale: [0, 1.5, 3],
+                                opacity: [0, 0.6, 0],
                                 rotate: [0, 45, 90]
                             }}
                             transition={{
-                                duration: 1,
+                                duration: 1.2,
                                 ease: "easeOut",
                                 delay: i * 0.05
                             }}
@@ -54,7 +54,7 @@ export default function FestiveSplashTransition() {
                                 width: '100vw',
                                 height: '100vw',
                                 backgroundColor: color,
-                                filter: 'blur(30px)',
+                                filter: 'blur(40px)',
                                 mixBlendMode: 'screen',
                                 transformOrigin: 'center center'
                             }}
@@ -64,9 +64,9 @@ export default function FestiveSplashTransition() {
                     {/* Irregular Water Splash Path Animation */}
                     <motion.svg
                         initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: [0, 1.2, 1.5], opacity: [0, 1, 0] }}
-                        transition={{ duration: 0.8, ease: "circOut" }}
-                        viewBox="0 0 200 200"
+                        animate={{ scale: [0, 1.5, 2], opacity: [0, 0.5, 0] }}
+                        transition={{ duration: 1.2, ease: "circOut" }}
+                        viewBox="0 0 300 300"
                         className="w-full h-full absolute"
                     >
                         <motion.path
@@ -78,9 +78,9 @@ export default function FestiveSplashTransition() {
                                     "M30.7,-46.4C40.1,-39.2,49.2,-28.1,56.4,-14.7C63.7,-1.3,67.1,15.7,65.1,30.6C63.1,44.5,55.7,59,46.4,71.4Z"
                                 ]
                             }}
-                            transition={{ duration: 0.8, repeat: 0 }}
-                            transform="translate(100 100)"
-                            style={{ mixBlendMode: 'overlay' }}
+                            transition={{ duration: 1, repeat: 0 }}
+                            transform="translate(150 150)"
+                            style={{ mixBlendMode: 'overlay', filter: 'blur(20px)' }}
                         />
                     </motion.svg>
                 </div>
