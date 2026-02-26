@@ -23,6 +23,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         images: '',
         goldPurity: '18',
         goldWeight: '',
+        realWeight: '', // Added Gross Weight
         diamondCarat: '',
         diamondClarity: 'SI1',
         diamondColor: 'EF', // Added Diamond Color w/ default
@@ -49,6 +50,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 images: '',
                 goldPurity: initialData.goldPurity?.toString() || '18',
                 goldWeight: initialData.goldWeight?.toString() || '',
+                realWeight: initialData.realWeight?.toString() || '', // Hydrate Gross Weight
                 diamondCarat: initialData.diamondCarat?.toString() || '',
                 diamondClarity: initialData.diamondClarity || 'SI1',
                 diamondColor: initialData.diamondColor || 'EF', // Hydrate Edit
@@ -65,7 +67,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             setFormData({
                 name: '', category: 'Rings', price: '', images: '',
                 sku: '', // Reset SKU
-                goldPurity: '18', goldWeight: '', diamondCarat: '', diamondClarity: 'SI1', diamondColor: 'EF', // Reset
+                goldPurity: '18', goldWeight: '', realWeight: '', diamondCarat: '', diamondClarity: 'SI1', diamondColor: 'EF', // Reset
                 description: '',
                 videoUrl: '',
                 certificatePdf: '',
@@ -175,6 +177,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 description: formData.description,
                 goldPurity: parseInt(formData.goldPurity) || 0,
                 goldWeight: parseFloat(formData.goldWeight) || 0,
+                realWeight: parseFloat(formData.realWeight) || 0, // Pass Gross Weight
                 diamondCarat: parseFloat(formData.diamondCarat) || 0,
                 diamondClarity: formData.diamondClarity,
                 diamondColor: formData.diamondColor,
@@ -302,7 +305,6 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         <option value="16">16K</option>
                                         <option value="18">18K</option>
                                         <option value="22">22K</option>
-                                        <option value="22">22K</option>
                                         <option value="24">24K</option>
                                     </select>
                                 </div>
@@ -318,12 +320,22 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Gold Wt (g)</label>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Net Gold Wt (g)</label>
                                     <input
                                         type="number" step="0.01" required
                                         className="w-full border border-gray-200 rounded p-2 text-sm text-brand-navy focus:border-brand-gold outline-none"
                                         value={formData.goldWeight}
                                         onChange={e => setFormData({ ...formData, goldWeight: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Gross Wt (g)</label>
+                                    <input
+                                        type="number" step="0.01"
+                                        className="w-full border border-gray-200 rounded p-2 text-sm text-brand-navy focus:border-brand-gold outline-none"
+                                        value={formData.realWeight}
+                                        onChange={e => setFormData({ ...formData, realWeight: e.target.value })}
+                                        placeholder="Total weight"
                                     />
                                 </div>
                                 <div>

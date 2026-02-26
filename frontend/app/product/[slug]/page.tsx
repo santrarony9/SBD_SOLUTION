@@ -28,8 +28,10 @@ interface Product {
     images: string[];
     goldPurity: number;
     goldWeight: number;
+    realWeight?: number; // Added Gross Weight
     diamondCarat: number;
     diamondClarity: string;
+    diamondColor?: string; // Added Diamond Color
     videoUrl?: string;
     certificatePdf?: string;
     pricing: {
@@ -450,20 +452,20 @@ export default function ProductDetailPage() {
                     {/* Specifications - Compact 4-Column Grid */}
                     <div className="grid grid-cols-4 gap-2 mb-6">
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
-                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Gold</p>
+                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Purity</p>
                             <p className="text-brand-navy font-sans text-sm">{product.goldPurity}K</p>
                         </div>
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
-                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Clarity</p>
-                            <p className="text-brand-navy font-sans text-sm">{product.diamondClarity}</p>
+                            <p className="text-[10px] uppercase font-bold text-gray-400 mb-1">Clarity & Color</p>
+                            <span className="text-xs font-serif text-brand-navy">{product.diamondClarity} / {product.diamondColor || 'EF'}</span>
                         </div>
                         <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
-                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Carat</p>
-                            <p className="text-brand-navy font-sans text-sm">{product.diamondCarat}</p>
-                        </div>
-                        <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
-                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Weight</p>
+                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Net Wt</p>
                             <p className="text-brand-navy font-sans text-sm">{product.goldWeight}g</p>
+                        </div>
+                        <div className="p-2 bg-white border border-brand-gold/10 rounded-sm text-center">
+                            <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold mb-1">Gross Wt</p>
+                            <p className="text-brand-navy font-sans text-sm">{product.realWeight || product.goldWeight}g</p>
                         </div>
                     </div>
 
@@ -589,20 +591,16 @@ export default function ProductDetailPage() {
                                 <span>{formatPrice(product.pricing?.components?.goldValue || 0)}</span>
                             </div>
                             <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
-                                <span>Diamond Value ({product.diamondCarat}ct)</span>
+                                <span>Diamond ({product.diamondCarat}ct)</span>
                                 <span>{formatPrice(product.pricing?.components?.diamondValue || 0)}</span>
                             </div>
                             <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
                                 <span>Making Charges</span>
                                 <span>{formatPrice(product.pricing?.components?.makingCharges || 0)}</span>
                             </div>
-                            <div className="flex justify-between text-gray-500 text-[11px] uppercase tracking-wider">
+                            <div className="flex justify-between text-brand-navy font-bold text-[12px] uppercase tracking-widest pt-2 border-t border-gray-100/50">
                                 <span>GST (3%)</span>
                                 <span>{formatPrice(product.pricing?.components?.gst || 0)}</span>
-                            </div>
-                            <div className="flex justify-between font-bold text-brand-navy border-t border-gray-100 pt-3 mt-2">
-                                <span className="text-xs uppercase tracking-widest">Total Value</span>
-                                <span className="text-sm">{formatPrice(product.pricing?.finalPrice || 0)}</span>
                             </div>
                             <p className="text-[9px] text-gray-400 mt-2 italic">* Values are subject to market fluctuations.</p>
                         </div>

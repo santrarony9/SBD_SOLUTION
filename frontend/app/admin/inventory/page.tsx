@@ -152,7 +152,32 @@ export default function InventoryDashboard() {
                                         </div>
                                     </td>
                                     <td className="px-6 py-4 text-right font-bold text-brand-navy">
-                                        ₹{formatPrice(((valuation?.breakdown?.find((b: any) => b.sku === product.sku)?.value) || 0))}
+                                        <div className="flex flex-col items-end">
+                                            <span>₹{formatPrice(((valuation?.breakdown?.find((b: any) => b.sku === product.sku)?.value) || 0))}</span>
+                                            <div className="group relative">
+                                                <span className="text-[10px] text-brand-gold font-bold cursor-help border-b border-dotted border-brand-gold">View Breakup</span>
+                                                <div className="absolute right-0 bottom-full mb-2 hidden group-hover:block z-50 bg-white shadow-xl border border-brand-gold/20 rounded-lg p-4 w-56 animate-fade-in text-left">
+                                                    <div className="space-y-2 text-[11px]">
+                                                        <div className="flex justify-between border-b border-gray-100 pb-1 gap-4">
+                                                            <span className="text-gray-500">Gold Value:</span>
+                                                            <span className="font-bold text-brand-navy">₹{Math.round(product.pricing?.components?.goldValue || 0).toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex justify-between border-b border-gray-100 pb-1 gap-4">
+                                                            <span className="text-gray-500">Diamond:</span>
+                                                            <span className="font-bold text-brand-navy">₹{Math.round(product.pricing?.components?.diamondValue || 0).toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex justify-between border-b border-gray-100 pb-1 gap-4">
+                                                            <span className="text-gray-500">Making:</span>
+                                                            <span className="font-bold text-brand-navy">₹{Math.round(product.pricing?.components?.makingCharges || 0).toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="flex justify-between pt-1 text-brand-navy font-bold gap-4">
+                                                            <span>GST (3%):</span>
+                                                            <span>₹{Math.round(product.pricing?.components?.gst || 0).toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4">
                                         <div className="flex justify-center gap-2">
