@@ -242,7 +242,7 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                         ))}
                         {filteredProducts.length === 0 && (
                             <tr>
-                                <td colSpan={5} className="py-12 text-center text-gray-400 font-serif italic">
+                                <td colSpan={8} className="py-12 text-center text-gray-400 font-serif italic">
                                     No products found in inventory.
                                 </td>
                             </tr>

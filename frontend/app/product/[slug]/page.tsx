@@ -16,6 +16,8 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, PiHeart } from 'react-icons/pi';
 import JsonLd from "@/components/JsonLd";
+import RecentlyViewed from "@/components/RecentlyViewed";
+import SimilarPriceRange from "@/components/SimilarPriceRange";
 
 interface Product {
     id: string;
@@ -756,8 +758,14 @@ export default function ProductDetailPage() {
             />
 
             {/* Reviews Section - Kept Separate */}
-            <div className="max-w-7xl mx-auto px-6 mt-24">
+            <div className="max-w-7xl mx-auto px-6 mt-24 pb-16">
                 <ProductReviews productId={product.id} />
+            </div>
+
+            {/* Recommendation Sections */}
+            <div className="bg-white">
+                <SimilarPriceRange currentPrice={product.pricing?.finalPrice || 0} currentProductId={product.id} />
+                <RecentlyViewed />
             </div>
         </div>
     );

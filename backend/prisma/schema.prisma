@@ -335,7 +335,7 @@ model StoreSetting {
 
 model Banner {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
-  imageUrl       String
+  imageUrl       String?
   mobileImageUrl String?
   link           String?
   title          String?

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
-import { PiRocket, PiCheckCircle, PiMagnifyingGlass, PiFunnel, PiCaretLeft, PiCaretRight } from "react-icons/pi";
+import { PiRocket, PiCheckCircle, PiMagnifyingGlass, PiFunnel, PiCaretLeft, PiCaretRight, PiReceipt, PiFilePdf, PiArrowArcLeft } from "react-icons/pi";
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
@@ -240,6 +240,10 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                             <option value="SHIPPED">Shipped</option>
                             <option value="DELIVERED">Delivered</option>
                             <option value="CANCELLED">Cancelled</option>
+                            <option value="RETURN_REQUESTED">Return Requested</option>
+                            <option value="RETURNED">Returned</option>
+                            <option value="EXCHANGE_REQUESTED">Exchange Requested</option>
+                            <option value="EXCHANGED">Exchanged</option>
                         </select>
                     </div>
                 </div>
@@ -373,18 +377,14 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                             className="p-1.5 text-brand-gold hover:bg-brand-gold/10 rounded"
                                             title="Tax Invoice"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                            </svg>
+                                            <PiReceipt className="h-4 w-4" />
                                         </button>
                                         <button
                                             onClick={() => handleDownloadLabel(order.id)}
                                             className="p-1.5 text-brand-navy hover:bg-brand-navy/10 rounded"
                                             title="Shipping Label"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                                            </svg>
+                                            <PiFilePdf className="h-4 w-4" />
                                         </button>
                                         {order.status === 'CANCELLED' && (
                                             <button
@@ -392,9 +392,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                                 className="p-1.5 text-red-600 hover:bg-red-50 rounded"
                                                 title="Download Credit Note"
                                             >
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
-                                                </svg>
+                                                <PiArrowArcLeft className="h-4 w-4" />
                                             </button>
                                         )}
                                         <select
@@ -403,7 +401,7 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                             className="text-[10px] border border-gray-200 rounded p-1 outline-none focus:border-brand-gold"
                                         >
                                             <option value="PENDING">Pending</option>
-                                            <option value="PROCESSED">Processed</option>
+                                            <option value="PROCESSING">Processing</option>
                                             <option value="SHIPPED">Shipped</option>
                                             <option value="DELIVERED">Delivered</option>
                                             <option value="CANCELLED">Cancelled</option>

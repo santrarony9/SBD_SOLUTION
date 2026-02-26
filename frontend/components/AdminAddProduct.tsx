@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { fetchAPI, API_URL } from '@/lib/api';
 import { useToast } from '@/context/ToastContext';
-import { FiDownload } from 'react-icons/fi';
+import { PiDownloadSimple } from 'react-icons/pi';
 
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'; // Removed local definition
 
@@ -457,7 +457,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                     className="absolute bottom-2 right-2 bg-brand-gold text-brand-navy p-2 rounded-lg shadow-lg hover:bg-white hover:scale-110 transition-all z-20"
                                                     title="Download Full Resolution"
                                                 >
-                                                    <FiDownload size={14} />
+                                                    <PiDownloadSimple size={14} />
                                                 </button>
                                             </div>
                                         ) : (
@@ -528,7 +528,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                                             className="absolute bottom-1 right-1 bg-red-500 text-white p-1.5 rounded-md shadow-lg hover:bg-red-600 hover:scale-105 transition-all z-30"
                                                             title="Download Full Resolution"
                                                         >
-                                                            <FiDownload size={12} />
+                                                            <PiDownloadSimple size={12} />
                                                         </button>
                                                     </>
                                                 ) : (

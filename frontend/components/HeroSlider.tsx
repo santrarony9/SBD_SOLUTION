@@ -26,17 +26,11 @@ interface HeroSliderProps {
 export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isMobile, setIsMobile] = useState(false);
-
-    // Fallback if no banners
-    const activeBanners = (banners && Array.isArray(banners) && banners.length > 0) ? banners : [{
-        id: 'default',
-        imageUrl: '/hero-jewellery.png',
-        title: 'Est. 2020',
-        link: '/shop'
-    }];
+    const [mounted, setMounted] = useState(false);
 
     // Screen size detection
     useEffect(() => {
+        setMounted(true);
         const checkMobile = () => {
             setIsMobile(window.innerWidth < 768);
         };
@@ -44,6 +38,35 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    // Filter banners based on device
+    const safeBanners = Array.isArray(banners) ? banners : [];
+    let activeBanners = safeBanners;
+
+    // Only filter after mounting to avoid hydration mismatch
+    if (mounted) {
+        if (isMobile) {
+            // On mobile, show banners that have at least one image (prioritize mobile image, fallback to desktop)
+            activeBanners = safeBanners.filter(b => b.mobileImageUrl || b.imageUrl);
+        } else {
+            // On desktop, only show banners that have a desktop image
+            activeBanners = safeBanners.filter(b => b.imageUrl);
+        }
+    } else {
+        // Default to desktop banners for SSR
+        activeBanners = safeBanners.filter(b => b.imageUrl);
+    }
+
+    // Fallback if no banners match the current device
+    if (activeBanners.length === 0) {
+        activeBanners = [{
+            id: 'default',
+            imageUrl: '/hero-jewellery.png',
+            mobileImageUrl: '/hero-jewellery.png',
+            title: 'Est. 2020',
+            link: '/shop'
+        }];
+    }
 
     // Auto-slide effect
     useEffect(() => {
@@ -56,6 +79,13 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         return () => clearInterval(interval);
     }, [activeBanners.length]);
 
+    // Keep index in bounds if activeBanners length changes
+    useEffect(() => {
+        if (currentIndex >= activeBanners.length) {
+            setCurrentIndex(0);
+        }
+    }, [activeBanners.length, currentIndex]);
+
     const nextSlide = () => {
         setCurrentIndex((prev) => (prev + 1) % activeBanners.length);
     };
@@ -64,7 +94,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         setCurrentIndex((prev) => (prev - 1 + activeBanners.length) % activeBanners.length);
     };
 
-    const currentBanner = activeBanners[currentIndex];
+    const currentBanner = activeBanners[currentIndex] || activeBanners[0];
 
     return (
         <section className="relative h-screen flex items-center justify-center overflow-hidden bg-brand-navy">
@@ -76,7 +106,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                         }`}
                 >
                     <Image
-                        src={(isMobile && banner.mobileImageUrl) ? banner.mobileImageUrl : banner.imageUrl}
+                        src={(isMobile && banner.mobileImageUrl) ? banner.mobileImageUrl : (banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png')}
                         alt={banner.title || "Royal Diamond Collection"}
                         fill
                         priority={index === 0}

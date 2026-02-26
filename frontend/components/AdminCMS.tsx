@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe } from "react-icons/pi";
+import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe, PiDownloadSimple } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
@@ -151,7 +151,7 @@ export default function AdminCMS() {
 
     // --- Banner Actions ---
     const handleAddBanner = async () => {
-        if (!newBanner.imageUrl) return showToast('Image URL is required', 'error');
+        if (!newBanner.imageUrl && !newBanner.mobileImageUrl) return showToast('At least one image (Desktop or Mobile) is required', 'error');
         try {
             if (isEditingBanner && editingBannerId) {
                 await fetchAPI(`/banners/${editingBannerId}`, { method: 'PUT', body: JSON.stringify(newBanner) });
@@ -650,8 +650,9 @@ export default function AdminCMS() {
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
                                                 <img src={newBanner.imageUrl} alt="Desktop Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))} className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform"><PiTrash /></button>
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                                                    <a href={newBanner.imageUrl} download target="_blank" rel="noreferrer" title="Download Desktop Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
+                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
                                                 </div>
                                             </div>
                                         )}
@@ -698,8 +699,9 @@ export default function AdminCMS() {
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
                                                 <img src={newBanner.mobileImageUrl} alt="Mobile Preview" className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, mobileImageUrl: '' }))} className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform"><PiTrash /></button>
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                                                    <a href={newBanner.mobileImageUrl} download target="_blank" rel="noreferrer" title="Download Mobile Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
+                                                    <button onClick={() => setNewBanner(prev => ({ ...prev, mobileImageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
                                                 </div>
                                             </div>
                                         )}
@@ -765,6 +767,30 @@ export default function AdminCMS() {
                                                 <p className="text-gray-400 text-[10px] uppercase tracking-widest">{banner.link || 'No destination link'}</p>
                                             </div>
                                             <div className="flex gap-2">
+                                                {banner.imageUrl && (
+                                                    <a
+                                                        href={banner.imageUrl}
+                                                        download
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
+                                                        title="Download Desktop Banner"
+                                                    >
+                                                        <PiDownloadSimple size={18} />
+                                                    </a>
+                                                )}
+                                                {banner.mobileImageUrl && (
+                                                    <a
+                                                        href={banner.mobileImageUrl}
+                                                        download
+                                                        target="_blank"
+                                                        rel="noreferrer"
+                                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
+                                                        title="Download Mobile Banner"
+                                                    >
+                                                        <PiDownloadSimple size={18} />
+                                                    </a>
+                                                )}
                                                 <button
                                                     onClick={() => handleEditBanner(banner)}
                                                     className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
@@ -1570,64 +1596,62 @@ export default function AdminCMS() {
                                             </div>
 
                                             <div className="space-y-2">
-                                                <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image / Video URL</label>
-                                                <input
-                                                    type="text"
-                                                    value={card.image}
-                                                    onChange={(e) => {
-                                                        const newCards = [...promiseCards];
-                                                        newCards[idx].image = e.target.value;
-                                                        setPromiseCards(newCards);
-                                                    }}
-                                                    className="w-full border-b border-gray-200 py-2 text-[10px] outline-none focus:border-brand-gold bg-transparent transition-colors"
-                                                    placeholder="/path/to/image.png"
-                                                />
-                                                <div className="mt-2 text-center">
+                                                <div className="flex justify-between items-end">
+                                                    <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Image / Video</label>
                                                     <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
                                                         Rec: 800x1200px (Portrait)
                                                     </span>
                                                 </div>
-                                                <label className="mt-2 block w-full border border-dashed border-gray-300 rounded p-2 text-center cursor-pointer hover:border-brand-gold transition-all text-[9px] font-bold text-gray-500 uppercase">
-                                                    <input
-                                                        type="file"
-                                                        accept="image/*,video/*"
-                                                        className="hidden"
-                                                        onChange={(e) => {
-                                                            const file = e.target.files?.[0];
-                                                            if (file) {
-                                                                const formData = new FormData();
-                                                                formData.append('file', file);
-                                                                showToast(`Uploading Card ${idx + 1}...`, 'success');
-                                                                fetchAPI('/media/upload', { method: 'POST', body: formData })
-                                                                    .then(res => {
-                                                                        const newCards = [...promiseCards];
-                                                                        newCards[idx].image = res.url;
-                                                                        setPromiseCards(newCards);
-                                                                        showToast(`Card ${idx + 1} Uploaded`, 'success');
-                                                                    })
-                                                                    .catch(() => showToast('Upload Failed', 'error'));
-                                                            }
-                                                        }}
-                                                    />
-                                                    Quick Upload
-                                                </label>
-                                                {card.image && (
-                                                    <div className="mt-2 aspect-[3/4.5] w-full bg-gray-50 rounded border border-gray-200 overflow-hidden relative group">
+
+                                                {!card.image ? (
+                                                    <label className="relative block w-full h-40 border-2 border-dashed border-gray-300 rounded-lg p-4 text-center cursor-pointer hover:border-brand-gold hover:bg-gray-50 transition-all">
+                                                        <input
+                                                            type="file"
+                                                            accept="image/*,video/*"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer"
+                                                            onChange={(e) => {
+                                                                const file = e.target.files?.[0];
+                                                                if (file) {
+                                                                    const formData = new FormData();
+                                                                    formData.append('file', file);
+                                                                    showToast(`Uploading Card ${idx + 1}...`, 'success');
+                                                                    fetchAPI('/media/upload', { method: 'POST', body: formData })
+                                                                        .then(res => {
+                                                                            const newCards = [...promiseCards];
+                                                                            newCards[idx].image = res.url;
+                                                                            setPromiseCards(newCards);
+                                                                            showToast(`Card ${idx + 1} Uploaded`, 'success');
+                                                                        })
+                                                                        .catch(() => showToast('Upload Failed', 'error'));
+                                                                }
+                                                            }}
+                                                        />
+                                                        <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                            <PiImage className="text-2xl mb-1" />
+                                                            <span className="text-[10px] font-bold uppercase">Click to Upload</span>
+                                                        </div>
+                                                    </label>
+                                                ) : (
+                                                    <div className="relative group w-full h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner bg-gray-50">
                                                         {card.image.match(/\.(mp4|webm)$/i) ? (
                                                             <video src={card.image} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                                                         ) : (
                                                             <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
                                                         )}
-                                                        <button
-                                                            onClick={() => {
-                                                                const newCards = [...promiseCards];
-                                                                newCards[idx].image = '';
-                                                                setPromiseCards(newCards);
-                                                            }}
-                                                            className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                                                        >
-                                                            <PiX size={12} />
-                                                        </button>
+                                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                                                            <a href={card.image} download target="_blank" rel="noreferrer" title="Download Image" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
+                                                            <button
+                                                                title="Remove Image"
+                                                                onClick={() => {
+                                                                    const newCards = [...promiseCards];
+                                                                    newCards[idx].image = '';
+                                                                    setPromiseCards(newCards);
+                                                                }}
+                                                                className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"
+                                                            >
+                                                                <PiTrash />
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                 )}
                                             </div>
