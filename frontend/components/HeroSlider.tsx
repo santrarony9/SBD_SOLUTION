@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
+import { motion } from 'framer-motion';
+import { isFestiveModeActive, FESTIVE_CONFIG } from '@/config/festive-config';
 
 interface Banner {
     id: string;
@@ -105,6 +107,21 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
 
             {/* Static Content Overlay */}
             <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
+                {/* Case: Holi Branding Banner (Phase 4) */}
+                {isFestiveModeActive() && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mb-6 md:mb-8"
+                    >
+                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 text-white shadow-xl shadow-pink-500/20">
+                            <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap">
+                                {FESTIVE_CONFIG.theme.greeting}
+                            </span>
+                        </div>
+                    </motion.div>
+                )}
+
                 {/* Dynamic Kicker from Banner */}
                 <div className="mb-4 md:mb-6 w-full px-4">
                     <h2

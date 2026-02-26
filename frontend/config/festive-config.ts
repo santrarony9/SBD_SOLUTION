@@ -33,7 +33,7 @@ export const FESTIVE_CONFIG = {
     // Advanced Features Toggle
     features: {
         welcomeModal: true,
-        fallingParticles: true,
+        fallingParticles: false,
         siteReskin: true,
         socialProof: true,
         scratchCard: true
