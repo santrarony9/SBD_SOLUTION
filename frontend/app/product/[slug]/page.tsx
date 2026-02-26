@@ -284,7 +284,7 @@ export default function ProductDetailPage() {
     };
 
     return (
-        <div className="bg-brand-cream min-h-screen pb-24 lg:pb-10 pt-20">
+        <div className="bg-brand-cream min-h-screen pb-24 lg:pb-10">
             <JsonLd data={breadcrumbSchema} />
             <JsonLd data={productSchema} />
 
@@ -369,12 +369,12 @@ export default function ProductDetailPage() {
                         </button>
                     </div>
 
-                    {/* Thumbnails - Compact Row */}
-                    <div className="flex gap-3 overflow-x-auto py-3 scrollbar-hide h-20 shrink-0">
+                    {/* Thumbnails - Enhanced Row */}
+                    <div className="flex gap-4 overflow-x-auto py-4 scrollbar-hide h-24 shrink-0 px-1">
                         {product.videoUrl && (
                             <button
                                 onClick={() => setShowVideo(true)}
-                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${showVideo ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
+                                className={`relative flex-shrink-0 w-20 aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 shadow-sm ${showVideo ? 'border-brand-gold scale-105 shadow-brand-gold/20' : 'border-white hover:border-brand-gold/30'}`}
                             >
                                 <div className="absolute inset-0 flex items-center justify-center bg-black/5 z-10">
                                     <div className="w-6 h-6 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-brand-navy shadow-sm">
@@ -395,7 +395,7 @@ export default function ProductDetailPage() {
                                     setShowVideo(false);
                                     setActiveImage(img);
                                 }}
-                                className={`relative flex-shrink-0 w-16 aspect-square rounded-sm overflow-hidden border transition-all duration-300 ${!showVideo && activeImage === img ? 'border-brand-gold ring-1 ring-brand-gold/20' : 'border-transparent hover:border-gray-300'}`}
+                                className={`relative flex-shrink-0 w-20 aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 shadow-sm ${!showVideo && activeImage === img ? 'border-brand-gold scale-105 shadow-brand-gold/20' : 'border-white hover:border-brand-gold/30'}`}
                             >
                                 <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
                             </button>
@@ -403,8 +403,8 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                {/* Right Column: Product Details (Scrollable) */}
-                <div className="flex flex-col h-full py-4 px-6 lg:px-0">
+                {/* Right Column: Product Details */}
+                <div className="flex flex-col py-4 px-6 lg:px-0">
 
                     {/* Header */}
                     <div className="mb-4 border-b border-brand-charcoal/5 pb-4">
@@ -469,8 +469,8 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
-                    {/* Description - Truncated Concept */}
-                    <div className="mb-6 flex-grow">
+                    {/* Description - Conceptual */}
+                    <div className="mb-6">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-brand-navy mb-2 border-l-2 border-brand-gold pl-2">The Story</h3>
                         <p className="text-gray-600 font-light leading-relaxed text-sm selection:bg-brand-gold/20 line-clamp-4 hover:line-clamp-none transition-all cursor-pointer">
                             {product.description}
@@ -607,21 +607,7 @@ export default function ProductDetailPage() {
                     </div>
                 </div>
 
-                {/* Shipping / Returns Footer */}
-                <div className="mt-8 pt-6 border-t border-dashed border-gray-200 grid grid-cols-3 gap-2 text-[10px] text-gray-400 uppercase tracking-widest text-center">
-                    <div className="flex flex-col items-center gap-2">
-                        <span className="text-xl">🚚</span>
-                        <span>Insured Shipping</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                        <span className="text-xl">💎</span>
-                        <span>100% Certified</span>
-                    </div>
-                    <div className="flex flex-col items-center gap-2">
-                        <span className="text-xl">↩️</span>
-                        <span>15 Day Returns</span>
-                    </div>
-                </div>
+
 
                 <TrustBadges />
 

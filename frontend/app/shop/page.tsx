@@ -169,7 +169,7 @@ function ShopContent() {
     }, [products, selectedCategories, selectedMetals, sortBy, searchParams]);
 
     return (
-        <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">
+        <div className="min-h-screen bg-brand-cream/50 pb-20">
 
             {/* Premium Hero Section - Full Width */}
             <div className="relative h-[40vh] min-h-[300px] flex items-center justify-center overflow-hidden mb-16 bg-brand-navy">
@@ -187,7 +187,7 @@ function ShopContent() {
                     <h1 className="text-5xl md:text-6xl font-serif text-white mb-6 leading-tight animate-fade-in-up delay-100">
                         The Collection
                     </h1>
-                    <p className="text-brand-cream/80 font-light text-sm md:text-base tracking-wide leading-relaxed animate-fade-in-up delay-200">
+                    <p className="text-white/70 font-light text-sm md:text-base tracking-wide leading-relaxed animate-fade-in-up delay-200">
                         Curated masterpieces featuring the finest diamonds and precious metals, designed to transcend time.
                     </p>
                 </div>
@@ -434,7 +434,7 @@ import SkeletonLoader, { ProductSkeleton, BannerSkeleton } from '@/components/Sk
 
 function ShopSkeleton() {
     return (
-        <div className="min-h-screen bg-brand-cream/50 pb-20 pt-20">
+        <div className="min-h-screen bg-brand-cream/50 pb-20">
             <div className="relative h-[40vh] min-h-[300px] mb-16 bg-brand-navy overflow-hidden">
                 <BannerSkeleton />
             </div>
