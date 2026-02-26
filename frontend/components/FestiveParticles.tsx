@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FESTIVE_CONFIG, isFestiveModeActive } from '@/config/festive-config';
 
 export default function FestiveParticles() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
+    const [shouldRender, setShouldRender] = useState(true);
+    const [opacity, setOpacity] = useState(0.6);
 
     useEffect(() => {
         if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.fallingParticles) return;
@@ -17,10 +19,19 @@ export default function FestiveParticles() {
 
         let animationFrameId: number;
 
+        // Timer to stop and fade out after 5 seconds
+        const stopTimer = setTimeout(() => {
+            setOpacity(0);
+            // Wait for fade out animation to finish before unmounting
+            setTimeout(() => {
+                setShouldRender(false);
+            }, 2000);
+        }, 5000);
+
         // Configuration for Holi Splashes
         const colors = ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff'];
         const particles: Particle[] = [];
-        const particleCount = 25;
+        const particleCount = 20;
 
         class Particle {
             x: number;
@@ -50,11 +61,7 @@ export default function FestiveParticles() {
                 this.y += this.speedY;
                 this.angle += this.spin;
 
-                // Boundary check
-                if (this.x < -50) this.x = canvas!.width + 50;
-                if (this.x > canvas!.width + 50) this.x = -50;
-                if (this.y < -50) this.y = canvas!.height + 50;
-                if (this.y > canvas!.height + 50) this.y = -50;
+                // Boundary check (no wrapping, let them drift off)
             }
 
             draw() {
@@ -111,18 +118,22 @@ export default function FestiveParticles() {
         window.addEventListener('resize', handleResize);
 
         return () => {
+            clearTimeout(stopTimer);
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', handleResize);
         };
     }, []);
 
-    if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.fallingParticles) return null;
+    if (!isFestiveModeActive() || !FESTIVE_CONFIG.features.fallingParticles || !shouldRender) return null;
 
     return (
         <canvas
             ref={canvasRef}
-            className="fixed inset-0 pointer-events-none z-[45] opacity-60"
-            style={{ mixBlendMode: 'multiply' }}
+            className="fixed inset-0 pointer-events-none z-[45] transition-opacity duration-[2000ms] cubic-bezier(0.4, 0, 0.2, 1)"
+            style={{
+                mixBlendMode: 'multiply',
+                opacity: opacity
+            }}
         />
     );
 }
