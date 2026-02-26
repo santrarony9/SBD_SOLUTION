@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, InternalServerErrorException, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 // import { Role } from '@prisma/client';
 
@@ -11,6 +11,8 @@ import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         private prisma: PrismaService,
         private jwtService: JwtService,
@@ -59,52 +61,49 @@ export class AuthService {
     async register(data: any) {
         const { mobile, otp, name, password, email } = data;
 
+        // OTP Requirement REMOVED for now as per user request
+        /*
         if (!mobile || !otp) {
             throw new UnauthorizedException('Mobile and OTP are required');
         }
+        */
 
         const normalizedEmail = email.toLowerCase();
 
-        // 1. Check for valid OTP on the mobile record
-        const userByMobile = await this.prisma.user.findFirst({ where: { mobile } });
-        if (!userByMobile) {
-            throw new UnauthorizedException('Please request OTP first');
-        }
-
-        if (userByMobile.otp !== otp || !userByMobile.otpExpiry || new Date() > userByMobile.otpExpiry) {
-            throw new UnauthorizedException('Invalid or Expired OTP');
-        }
-
-        // 2. Prevent overwriting existing full accounts
-        if (userByMobile.email && userByMobile.password) {
-            throw new UnauthorizedException('User already registered. Please login.');
-        }
-
-        // 3. Check if email is taken by ANOTHER user (should theoretically not happen if mobile is key, but safety first)
+        // 1. Check for existing user by email FIRST for smoother UX
         const existingEmail = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
-        if (existingEmail && existingEmail.id !== userByMobile.id) {
-            throw new UnauthorizedException('Email already in use');
+
+        if (existingEmail) {
+            // If it's a "STAFF" or "ADMIN" and doesn't have a mobile yet, or just existing
+            throw new UnauthorizedException('Email already in use. Please login or use a different email.');
         }
 
-        // 4. Update the placeholder user to Full User
+        // 2. Check if mobile is used by ANOTHER user
+        if (mobile) {
+            const existingMobile = await this.prisma.user.findFirst({ where: { mobile } });
+            if (existingMobile) {
+                throw new UnauthorizedException('Mobile number already registered. Please login.');
+            }
+        }
+
+        // 3. Create Full User
         const hashedPassword = await bcrypt.hash(password, 10);
-        const updatedUser = await this.prisma.user.update({
-            where: { id: userByMobile.id },
+        const newUser = await this.prisma.user.create({
             data: {
                 name,
                 email: normalizedEmail,
                 password: hashedPassword,
-                otp: null, // Clear OTP after usage
-                otpExpiry: null,
-                role: 'USER' // Ensure role is set
+                mobile: mobile || null,
+                role: 'USER'
             },
         });
 
-        const { password: _, ...result } = updatedUser;
+        const { password: _, ...result } = newUser;
 
-        // Send Welcome Message (AI Powered)
-        if (updatedUser.mobile) {
-            this.whatsappService.sendWelcomeMessage(updatedUser.mobile, updatedUser.name).catch(e => console.error("Welcome Msg Failed", e));
+        // Send Welcome Message (Handled with Fallback)
+        if (newUser.mobile) {
+            this.whatsappService.sendWelcomeMessage(newUser.mobile, newUser.name)
+                .catch(e => this.logger.warn("Welcome Msg Simulation/Failed", e.message));
         }
 
         return result;

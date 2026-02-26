@@ -37,11 +37,21 @@ export class MailService {
         };
 
         try {
+            if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+                console.log('--- EMAIL SIMULATION ---');
+                console.log(`To: ${to}`);
+                console.log(`Subject: ${mailOptions.subject}`);
+                console.log(`Reset URL: ${resetUrl}`);
+                console.log('-------------------------');
+                return;
+            }
             await this.transporter.sendMail(mailOptions);
 
         } catch (error) {
             console.error('Error sending email:', error);
-            throw new Error('Failed to send reset email');
+            // throw new Error('Failed to send reset email'); 
+            // Fallback: log it anyway so dev can continue
+            console.log(`FALLBACK RESET URL for ${to}: ${resetUrl}`);
         }
     }
 

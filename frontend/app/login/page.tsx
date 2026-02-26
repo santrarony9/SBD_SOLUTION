@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAPI, API_URL } from '@/lib/api';
+import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
     const [loginMethod, setLoginMethod] = useState<'password' | 'otp' | 'admin'>('password');
@@ -20,7 +22,18 @@ export default function LoginPage() {
 
     const [error, setError] = useState('');
     const { login } = useAuth();
+    const { showToast } = useToast();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [isLoading, setIsLoading] = useState(false);
+
+    const registered = searchParams.get('registered');
+
+    useEffect(() => {
+        if (registered) {
+            showToast('Registration successful! Please login.', 'success');
+        }
+    }, [registered, showToast]);
 
     const handlePasswordLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -130,6 +143,13 @@ export default function LoginPage() {
                         <p className="text-gray-500 text-sm">Enter your details to access your account</p>
                     </div>
 
+                    {registered && (
+                        <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm flex items-center gap-3">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+                            Account created successfully! Please login with your details.
+                        </div>
+                    )}
+
                     {/* Method Toggle */}
                     <div className="flex border-b border-gray-200">
                         <button
@@ -138,12 +158,15 @@ export default function LoginPage() {
                         >
                             Email & Password
                         </button>
+                        {/* OTP Login hidden for now */}
+                        {/* 
                         <button
                             className={`pb-2 px-4 text-sm font-bold uppercase tracking-wider transition-colors ${loginMethod === 'otp' ? 'text-brand-navy border-b-2 border-brand-navy' : 'text-gray-400 hover:text-brand-navy'}`}
                             onClick={() => setLoginMethod('otp')}
                         >
                             Mobile OTP
                         </button>
+                        */}
                         <button
                             className={`pb-2 px-4 text-sm font-bold uppercase tracking-wider transition-colors ${loginMethod === 'admin' ? 'text-brand-navy border-b-2 border-brand-navy' : 'text-gray-400 hover:text-brand-navy'}`}
                             onClick={() => setLoginMethod('admin')}
