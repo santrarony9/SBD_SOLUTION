@@ -24,16 +24,16 @@ export default function FestiveGlobalDecor() {
     return (
         <div className="fixed inset-0 pointer-events-none z-[1] overflow-hidden">
             {/* Top Left */}
-            <SplashSplat color="#ff0080" className="-top-20 -left-20 w-64 h-64 md:w-96 md:h-96" />
+            <SplashSplat color="var(--brand-gold)" className="-top-20 -left-20 w-64 h-64 md:w-96 md:h-96" />
 
             {/* Bottom Right */}
-            <SplashSplat color="#7ed321" className="-bottom-20 -right-20 w-64 h-64 md:w-96 md:h-96 rotate-180" />
+            <SplashSplat color="var(--festive-accent-1)" className="-bottom-20 -right-20 w-64 h-64 md:w-96 md:h-96 rotate-180" />
 
             {/* Left Middle */}
-            <SplashSplat color="#0099ff" className="top-1/3 -left-32 w-48 h-48 md:w-64 md:h-64 opacity-10" />
+            <SplashSplat color="var(--festive-accent-2)" className="top-1/3 -left-32 w-48 h-48 md:w-64 md:h-64 opacity-10" />
 
             {/* Right Middle */}
-            <SplashSplat color="#ae00ff" className="top-2/3 -right-32 w-48 h-48 md:w-64 md:h-64 opacity-10" />
+            <SplashSplat color="var(--brand-gold)" className="top-2/3 -right-32 w-48 h-48 md:w-64 md:h-64 opacity-10" />
         </div>
     );
 }

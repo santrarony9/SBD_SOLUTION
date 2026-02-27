@@ -32,7 +32,7 @@ export default function AnnouncementBar() {
     const bannerLink = (isFestiveActive) ? "/shop?collection=festive" : setting.link;
 
     const content = (
-        <div className={`py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.25em] relative z-[60] overflow-hidden group transition-all duration-700 ${isFestiveActive ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 text-white' : 'bg-brand-gold text-brand-navy'
+        <div className={`py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.25em] relative z-[60] overflow-hidden group transition-all duration-700 ${isFestiveActive ? 'bg-[var(--brand-navy)] text-[var(--brand-gold)] border-b border-[var(--brand-gold)]/20' : 'bg-brand-gold text-brand-navy'
             }`}>
             {/* Shimmer Effect */}
             <div className="absolute inset-0 animate-shimmer pointer-events-none"></div>

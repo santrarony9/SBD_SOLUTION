@@ -43,8 +43,8 @@ export default function FestiveStartupAnimation() {
                 >
                     {/* Background Ambient Glow */}
                     <div className="absolute inset-0 pointer-events-none">
-                        <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vh] bg-pink-500/20 rounded-full blur-[120px] animate-pulse"></div>
-                        <div className="absolute bottom-1/4 right-1/4 w-[50vw] h-[50vh] bg-yellow-400/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
+                        <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vh] bg-[var(--brand-gold)]/20 rounded-full blur-[120px] animate-pulse"></div>
+                        <div className="absolute bottom-1/4 right-1/4 w-[50vw] h-[50vh] bg-[var(--festive-accent-1)]/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
                     </div>
 
                     <div className="relative z-10 w-full max-w-4xl px-6 text-center">
@@ -86,9 +86,15 @@ export default function FestiveStartupAnimation() {
                             >
                                 <div className="relative inline-block">
                                     <h1 className="text-6xl md:text-9xl font-serif text-white italic tracking-tighter drop-shadow-2xl">
-                                        {festivalType === 'HOLI' ? 'Holi Hai!' : 'Spark Blue Diamond'}
+                                        {festivalType === 'HOLI' ? 'Holi Hai!' :
+                                            festivalType === 'RATH_YATRA' ? 'Jai Jagannath!' :
+                                                festivalType === 'DURGA_PUJA' ? 'Jai Maa Durga!' :
+                                                    festivalType === 'INDEPENDENCE_DAY' ? 'Vande Mataram' :
+                                                        festivalType === 'NEW_YEAR' ? 'Happy 2026' :
+                                                            festivalType === 'VALENTINES' ? 'Celebrate Love' :
+                                                                'Spark Blue Diamond'}
                                     </h1>
-                                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-pink-500 rounded-full blur-xl animate-ping"></div>
+                                    <div className="absolute -top-4 -right-4 w-12 h-12 bg-[var(--brand-gold)] rounded-full blur-xl animate-ping"></div>
                                 </div>
                                 <p className="text-brand-gold font-serif text-xl md:text-3xl tracking-[0.2em] uppercase">
                                     {config.theme.greeting}
@@ -96,7 +102,7 @@ export default function FestiveStartupAnimation() {
 
                                 <button
                                     onClick={handleFinish}
-                                    className="mt-12 px-12 py-4 bg-brand-gold text-brand-navy rounded-full font-black uppercase tracking-[0.4em] text-xs hover:scale-105 active:scale-95 transition-transform"
+                                    className="mt-12 px-12 py-4 bg-[var(--brand-gold)] text-[var(--brand-navy)] rounded-full font-black uppercase tracking-[0.4em] text-xs hover:scale-105 active:scale-95 transition-transform"
                                 >
                                     Experience Magic
                                 </button>

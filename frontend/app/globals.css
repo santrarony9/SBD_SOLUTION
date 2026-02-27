@@ -26,83 +26,74 @@
 /* Festive Re-skinning Support */
 [data-theme='holi'] {
   --brand-navy: #2D0056;
-  /* Deep Festive Purple instead of Navy */
   --brand-gold: #ff0080;
-  /* Vibrant Pink instead of Gold for accents */
   --brand-cream: #FFF5F9;
-  /* Slight pinkish tint for background */
+  --festive-accent-1: #ff0080;
+  --festive-accent-2: #7ed321;
 }
 
 [data-theme='diwali'] {
   --brand-navy: #4A0404;
-  /* Deep Royal Maroon */
   --brand-gold: #FFD700;
-  /* Vibrant Golden */
   --brand-cream: #FFF9F0;
-  /* Warm festive cream */
+  --festive-accent-1: #FFD700;
+  --festive-accent-2: #FF6B00;
 }
 
 [data-theme='rath_yatra'] {
   --brand-navy: #802200;
-  /* Deep Rust/Saffron */
   --brand-gold: #FF6B00;
-  /* Vibrant Saffron */
   --brand-cream: #FFF9F0;
-  /* Warm Saffron Cream */
+  --festive-accent-1: #FF6B00;
+  --festive-accent-2: #D4AF37;
 }
 
 [data-theme='independence_day'] {
   --brand-navy: #000080;
-  /* Ashoke Navy */
   --brand-gold: #FF9933;
-  /* Saffron Accent */
   --brand-cream: #FFFFFF;
-  /* Pure White Base */
+  --festive-accent-1: #FF9933;
+  --festive-accent-2: #128807;
 }
 
 [data-theme='durga_puja'] {
   --brand-navy: #4A0000;
-  /* Royal Red */
   --brand-gold: #D4AF37;
-  /* Antique Gold Metal */
   --brand-cream: #FFFDF5;
-  /* Silk Cream */
+  --festive-accent-1: #D4AF37;
+  --festive-accent-2: #EF4444;
 }
 
 [data-theme='eid'] {
   --brand-navy: #064E3B;
-  /* Islamic Deep Green */
   --brand-gold: #F59E0B;
-  /* Amber Gold */
   --brand-cream: #F0FDF4;
-  /* Very slight minty tint */
+  --festive-accent-1: #F59E0B;
+  --festive-accent-2: #10B981;
 }
 
 [data-theme='christmas'] {
   --brand-navy: #164E63;
-  /* Winter Pine Blue/Green */
   --brand-gold: #EF4444;
-  /* Festive Red */
   --brand-cream: #FFF1F2;
-  /* Festive snow-white/rose tint */
+  --festive-accent-1: #EF4444;
+  --festive-accent-2: #10B981;
 }
 
 [data-theme='new_year'] {
   --brand-navy: #000000;
-  /* Midnight Black */
   --brand-gold: #C6A87C;
-  /* Diamond Gold */
   --brand-cream: #FAFAFA;
-  /* High-end Paper White */
+  --festive-accent-1: #C6A87C;
+  --festive-accent-2: #FFFFFF;
 }
 
 [data-theme='valentines'] {
   --brand-navy: #880E4F;
-  /* Wine Red */
   --brand-gold: #E91E63;
-  /* Rose Pink */
   --brand-cream: #FFF5F7;
-  /* Soft Rose Base */
+  --festive-accent-1: #E91E63;
+  --festive-accent-2: #FF80AB;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -29,8 +29,15 @@ export default function FestiveParticles() {
             }, 2000);
         }, 5000);
 
-        // Configuration for Holi Splashes
-        const colors = ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff'];
+        // Configuration for Particles (Holi Splashes use multi colors, others use theme colors)
+        const isHoli = config?.currentFestival === 'HOLI';
+        const colors = isHoli 
+            ? ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']
+            : [
+                getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),
+                getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim(),
+                getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-2').trim()
+              ].filter(c => c);
         const particles: Particle[] = [];
         const particleCount = 20;
 

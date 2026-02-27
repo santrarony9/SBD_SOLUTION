@@ -5,13 +5,22 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useFestive } from '@/context/FestiveContext';
 
-const splashColors = ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff'];
-
 export default function FestiveSplashTransition() {
     const pathname = usePathname();
     const [isSplashing, setIsSplashing] = useState(false);
     const [lastPathname, setLastPathname] = useState(pathname);
-    const { isFestiveActive } = useFestive();
+    const { config, isFestiveActive } = useFestive();
+
+    // Fallback colors for splash
+    const isHoli = config?.currentFestival === 'HOLI';
+    const splashColors = isHoli
+        ? ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']
+        : [
+            getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),
+            getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim(),
+            getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-2').trim(),
+            getComputedStyle(document.documentElement).getPropertyValue('--brand-navy').trim()
+        ].filter(c => c);
 
     useEffect(() => {
         if (!isFestiveActive) return;

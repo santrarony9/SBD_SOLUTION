@@ -164,7 +164,10 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8 md:mb-10 flex flex-col items-center gap-3"
                     >
-                        <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 text-white shadow-xl shadow-pink-500/20">
+                        <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full text-white shadow-xl ${config?.currentFestival === 'HOLI'
+                                ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 shadow-pink-500/20'
+                                : 'bg-[var(--brand-navy)] border border-[var(--brand-gold)]/30 shadow-[var(--brand-gold)]/10'
+                            }`}>
                             <span className="text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap">
                                 {config?.theme.greeting}
                             </span>

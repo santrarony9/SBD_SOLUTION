@@ -33,11 +33,22 @@ export default function FestiveWelcome() {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        // Fill with "Gulal" texture (pink/purple gradient)
+        // Fill with theme-specific gradient
+        const isHoli = config?.currentFestival === 'HOLI';
+        const brandNavy = getComputedStyle(document.documentElement).getPropertyValue('--brand-navy').trim() || '#1a1a1a';
+        const brandGold = getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim() || '#FFD700';
+        const festiveAccent = getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim() || brandGold;
+
         const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-        gradient.addColorStop(0, '#ff0080');
-        gradient.addColorStop(0.5, '#7e00ff');
-        gradient.addColorStop(1, '#ff0080');
+        if (isHoli) {
+            gradient.addColorStop(0, '#ff0080');
+            gradient.addColorStop(0.5, '#7e00ff');
+            gradient.addColorStop(1, '#ff0080');
+        } else {
+            gradient.addColorStop(0, brandNavy);
+            gradient.addColorStop(0.5, brandGold);
+            gradient.addColorStop(1, festiveAccent);
+        }
 
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -124,9 +135,9 @@ export default function FestiveWelcome() {
                     <PiX className="h-6 w-6" />
                 </button>
 
-                {/* Holi Decor */}
-                <div className="absolute -top-10 -left-10 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
-                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-yellow-400/20 rounded-full blur-3xl animate-pulse delay-700"></div>
+                {/* Theme Ambient Decor */}
+                <div className="absolute -top-10 -left-10 w-40 h-40 bg-[var(--brand-gold)]/20 rounded-full blur-3xl animate-pulse"></div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-[var(--festive-accent-1)]/20 rounded-full blur-3xl animate-pulse delay-700"></div>
 
                 <div className="p-8 md:p-12 text-center relative z-10">
                     <div className="inline-block px-4 py-1.5 bg-brand-gold/10 rounded-full mb-6">
@@ -145,7 +156,7 @@ export default function FestiveWelcome() {
                     <div className="relative mx-auto w-64 h-32 bg-gray-50 rounded-xl mb-8 flex items-center justify-center overflow-hidden border border-dashed border-brand-gold/30">
                         {/* Hidden Content */}
                         <div className={`text-center transition-all duration-700 ${isScratched ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
-                            <span className="text-[10px] text-gray-400 uppercase block mb-1">Your Personal Holi Code</span>
+                            <span className="text-[10px] text-gray-400 uppercase block mb-1">Your Personal {config?.currentFestival.replace('_', ' ')} Code</span>
                             <span className="text-2xl font-mono font-black text-brand-navy tracking-widest uppercase">
                                 {config?.theme.couponCode}
                             </span>
@@ -169,28 +180,27 @@ export default function FestiveWelcome() {
                         <button
                             onClick={closeWelcome}
                             className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-500 ${isScratched
-                                ? 'bg-brand-navy text-white hover:bg-brand-gold hover:shadow-lg'
-                                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                }`}
-                        >
-                            {isScratched ? 'Shop Holi Collection' : 'Scratch Above to Unlock'}
-                        </button>
-                    </div>
+                                >
+                                { isScratched? `Shop ${config?.currentFestival.replace('_', ' ')} Collection` : 'Scratch Above to Unlock'}
+                    </button>
+                </div>
 
-                    <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                        T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
-                    </p>
+                <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                    T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
+                </p>
+            </div>
+        </div>
+
+            {/* Pop confetti when scratched */ }
+    {
+        isScratched && (
+            <div className="fixed inset-0 pointer-events-none z-[120]">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                    <PiConfetti className="w-64 h-64 text-brand-gold opacity-20 animate-ping" />
                 </div>
             </div>
-
-            {/* Pop confetti when scratched */}
-            {isScratched && (
-                <div className="fixed inset-0 pointer-events-none z-[120]">
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                        <PiConfetti className="w-64 h-64 text-brand-gold opacity-20 animate-ping" />
-                    </div>
-                </div>
-            )}
-        </div>
+        )
+    }
+        </div >
     );
 }
