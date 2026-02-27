@@ -5,7 +5,7 @@ import { fetchAPI } from '@/lib/api';
 
 export interface FestiveConfig {
     active: boolean;
-    currentFestival: 'HOLI' | 'DIWALI' | 'EID' | 'CHRISTMAS' | 'NONE';
+    currentFestival: 'HOLI' | 'DIWALI' | 'EID' | 'CHRISTMAS' | 'RATH_YATRA' | 'INDEPENDENCE_DAY' | 'DURGA_PUJA' | 'NEW_YEAR' | 'VALENTINES' | 'NONE';
     startDate: string;
     endDate: string;
     theme: {

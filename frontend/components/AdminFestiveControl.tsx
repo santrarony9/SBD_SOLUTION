@@ -120,9 +120,14 @@ export default function AdminFestiveControl() {
                         >
                             <option value="NONE">None (Normal Mode)</option>
                             <option value="HOLI">Holi Festival</option>
+                            <option value="RATH_YATRA">Rath Yatra</option>
+                            <option value="INDEPENDENCE_DAY">Independence Day (15th Aug)</option>
+                            <option value="DURGA_PUJA">Durga Puja</option>
                             <option value="DIWALI">Diwali Festival</option>
-                            <option value="EID">Eid al-Fitr</option>
                             <option value="CHRISTMAS">Christmas Spirit</option>
+                            <option value="NEW_YEAR">New Year Kickoff</option>
+                            <option value="VALENTINES">Valentine's Day</option>
+                            <option value="EID">Eid al-Fitr</option>
                         </select>
                     </div>
 

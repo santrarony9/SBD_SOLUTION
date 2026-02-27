@@ -42,6 +42,33 @@
   /* Warm festive cream */
 }
 
+[data-theme='rath_yatra'] {
+  --brand-navy: #802200;
+  /* Deep Rust/Saffron */
+  --brand-gold: #FF6B00;
+  /* Vibrant Saffron */
+  --brand-cream: #FFF9F0;
+  /* Warm Saffron Cream */
+}
+
+[data-theme='independence_day'] {
+  --brand-navy: #000080;
+  /* Ashoke Navy */
+  --brand-gold: #FF9933;
+  /* Saffron Accent */
+  --brand-cream: #FFFFFF;
+  /* Pure White Base */
+}
+
+[data-theme='durga_puja'] {
+  --brand-navy: #4A0000;
+  /* Royal Red */
+  --brand-gold: #D4AF37;
+  /* Antique Gold Metal */
+  --brand-cream: #FFFDF5;
+  /* Silk Cream */
+}
+
 [data-theme='eid'] {
   --brand-navy: #064E3B;
   /* Islamic Deep Green */
@@ -58,6 +85,24 @@
   /* Festive Red */
   --brand-cream: #FFF1F2;
   /* Festive snow-white/rose tint */
+}
+
+[data-theme='new_year'] {
+  --brand-navy: #000000;
+  /* Midnight Black */
+  --brand-gold: #C6A87C;
+  /* Diamond Gold */
+  --brand-cream: #FAFAFA;
+  /* High-end Paper White */
+}
+
+[data-theme='valentines'] {
+  --brand-navy: #880E4F;
+  /* Wine Red */
+  --brand-gold: #E91E63;
+  /* Rose Pink */
+  --brand-cream: #FFF5F7;
+  /* Soft Rose Base */
 }
 
 @media (prefers-color-scheme: dark) {
