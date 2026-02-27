@@ -33,6 +33,33 @@
   /* Slight pinkish tint for background */
 }
 
+[data-theme='diwali'] {
+  --brand-navy: #4A0404;
+  /* Deep Royal Maroon */
+  --brand-gold: #FFD700;
+  /* Vibrant Golden */
+  --brand-cream: #FFF9F0;
+  /* Warm festive cream */
+}
+
+[data-theme='eid'] {
+  --brand-navy: #064E3B;
+  /* Islamic Deep Green */
+  --brand-gold: #F59E0B;
+  /* Amber Gold */
+  --brand-cream: #F0FDF4;
+  /* Very slight minty tint */
+}
+
+[data-theme='christmas'] {
+  --brand-navy: #164E63;
+  /* Winter Pine Blue/Green */
+  --brand-gold: #EF4444;
+  /* Festive Red */
+  --brand-cream: #FFF1F2;
+  /* Festive snow-white/rose tint */
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0F172A;

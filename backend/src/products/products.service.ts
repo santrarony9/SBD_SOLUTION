@@ -142,7 +142,16 @@ export class ProductsService {
             this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } })
         ]);
 
-        const makingChargeTiers = (tieredData?.value as unknown as any[]) || [];
+        let makingChargeTiers: any[] = [];
+        if (tieredData?.value) {
+            try {
+                makingChargeTiers = typeof tieredData.value === 'string'
+                    ? JSON.parse(tieredData.value)
+                    : (tieredData.value as unknown as any[]);
+            } catch (e) {
+                console.error("[ProductsService] Error parsing making charge tiers:", e);
+            }
+        }
 
         const goldRateMap = new Map(goldRates.map(r => [r.purity, r.pricePer10g]));
         const diamondRateMap = new Map(diamondRates.map(r => [r.clarity, r.pricePerCarat]));
@@ -194,7 +203,16 @@ export class ProductsService {
         const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
         const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
         const tieredData = await this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } });
-        const makingChargeTiers = (tieredData?.value as unknown as any[]) || [];
+        let makingChargeTiers: any[] = [];
+        if (tieredData?.value) {
+            try {
+                makingChargeTiers = typeof tieredData.value === 'string'
+                    ? JSON.parse(tieredData.value)
+                    : (tieredData.value as unknown as any[]);
+            } catch (e) {
+                console.error("[ProductsService] Error parsing making charge tiers for single product:", e);
+            }
+        }
 
         const result = this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges, makingChargeTiers);
         await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
@@ -261,7 +279,8 @@ export class ProductsService {
                     finalPrice: taxable + gst
                 }
             };
-        } catch (e) {
+        } catch (e: any) {
+            console.error(`[ProductsService] Pricing calculation failed for product ${product?.id || 'unknown'}:`, e.message);
             return { ...product, pricing: null };
         }
     }
