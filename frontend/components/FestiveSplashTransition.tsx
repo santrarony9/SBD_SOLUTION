@@ -13,14 +13,20 @@ export default function FestiveSplashTransition() {
 
     // Fallback colors for splash
     const isHoli = config?.currentFestival === 'HOLI';
-    const splashColors = isHoli
-        ? ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']
-        : [
-            getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),
-            getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim(),
-            getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-2').trim(),
-            getComputedStyle(document.documentElement).getPropertyValue('--brand-navy').trim()
-        ].filter(c => c);
+    const [splashColors, setSplashColors] = useState<string[]>([]);
+
+    useEffect(() => {
+        if (isHoli) {
+            setSplashColors(['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']);
+        } else if (typeof document !== 'undefined') {
+            setSplashColors([
+                getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),
+                getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim(),
+                getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-2').trim(),
+                getComputedStyle(document.documentElement).getPropertyValue('--brand-navy').trim()
+            ].filter(c => c));
+        }
+    }, [isHoli]);
 
     useEffect(() => {
         if (!isFestiveActive) return;
