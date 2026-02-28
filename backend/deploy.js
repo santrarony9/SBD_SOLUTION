@@ -5,6 +5,12 @@ const ssh = new NodeSSH();
 
 async function deploy() {
     try {
+        // 1. Build locally first to save VPS memory
+        console.log('Running local build to prevent VPS memory crash...');
+        const { execSync } = require('child_process');
+        execSync('npm run build', { cwd: __dirname, stdio: 'inherit' });
+        console.log('Local build complete!');
+
         console.log('Connecting to VPS...');
         // Connect to VPS
         await ssh.connect({
@@ -27,15 +33,15 @@ async function deploy() {
         console.log('Preparing remote directory /var/www/sbd_backend...');
         await ssh.execCommand('mkdir -p /var/www/sbd_backend');
 
-        // Filter function for uploading
-        const excludeList = ['node_modules', 'dist', '.git', 'deploy.js', '.env.example'];
+        // Filter function for uploading - Exclude src (TypeScript), include dist (Compiled JavaScript)
+        const excludeList = ['node_modules', '.git', 'deploy.js', '.env.example', 'src'];
         const validate = (localPath) => {
             const p = localPath.replace(/\\/g, '/');
             const shouldExclude = excludeList.some(excluded => p.includes(`/${excluded}`) || p.endsWith(excluded));
             return !shouldExclude;
         };
 
-        console.log('Uploading backend source files... (this may take a minute)');
+        console.log('Uploading backend source files (excluding source, including dist)... (this may take a minute)');
         const localDir = __dirname;
         const remoteDir = '/var/www/sbd_backend';
 
@@ -59,10 +65,6 @@ async function deploy() {
         console.log('Running prisma generate...');
         const prismaRes = await ssh.execCommand(`${initEnv} && npx prisma generate`, { cwd: remoteDir });
         console.log('prisma generate => ', prismaRes.stdout, prismaRes.stderr);
-
-        console.log('Running npm run build...');
-        const buildRes = await ssh.execCommand(`${initEnv} && npm run build`, { cwd: remoteDir });
-        console.log('build => ', buildRes.stdout, buildRes.stderr);
 
         console.log('Ensuring PM2 is installed...');
         await ssh.execCommand(`${initEnv} && npm install -g pm2`);
