@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
+import { safeLocalStorage } from '@/lib/storage';
 
 interface User {
     id: string;
@@ -31,8 +32,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const storedToken = safeLocalStorage.getItem('token');
+        const storedUser = safeLocalStorage.getItem('user');
 
         if (storedToken && storedUser) {
             try {
@@ -40,8 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 setToken(storedToken);
             } catch (error) {
                 console.error('[AuthContext] Failed to parse stored user, clearing corrupt session.', error);
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
+                safeLocalStorage.removeItem('token');
+                safeLocalStorage.removeItem('user');
                 setToken(null);
                 setUser(null);
             }
@@ -51,8 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const login = (newToken: string, newUser: User) => {
         console.log('[AuthContext] login() called with token:', newToken ? 'YES' : 'NO', 'user:', newUser);
-        localStorage.setItem('token', newToken);
-        localStorage.setItem('user', JSON.stringify(newUser));
+        safeLocalStorage.setItem('token', newToken);
+        safeLocalStorage.setItem('user', JSON.stringify(newUser));
         setToken(newToken);
         setUser(newUser);
 
@@ -70,8 +71,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     const logout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        safeLocalStorage.removeItem('token');
+        safeLocalStorage.removeItem('user');
         setToken(null);
         setUser(null);
         router.push('/login');

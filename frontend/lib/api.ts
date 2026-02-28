@@ -1,6 +1,6 @@
-
 const envUrl = process.env.NEXT_PUBLIC_API_URL;
 const isServer = typeof window === 'undefined';
+import { safeLocalStorage } from '@/lib/storage';
 
 // Hardcoded to new VPS to prevent Vercel environment variables from overriding it with the old Render URL
 export const API_URL = 'https://api.sparkbluediamond.com/api';
@@ -42,7 +42,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
             }
 
             // Get token from storage (Client only)
-            const token = !isServer ? localStorage.getItem('token') : null;
+            const token = !isServer ? safeLocalStorage.getItem('token') : null;
 
             const headers: Record<string, string> = {
                 ...((options.headers as Record<string, string>) || {}),
@@ -68,8 +68,8 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
             if (!res.ok) {
                 if (res.status === 401 && typeof window !== 'undefined') {
                     console.error('[API] Unauthorized - Clearing session...');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('user');
+                    safeLocalStorage.removeItem('token');
+                    safeLocalStorage.removeItem('user');
                     window.location.href = '/login?error=session_expired';
                     return;
                 }

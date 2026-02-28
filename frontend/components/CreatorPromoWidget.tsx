@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { PiGift, PiCopy, PiCheckCircle, PiX } from 'react-icons/pi';
 import { fetchAPI } from '@/lib/api';
+import { safeLocalStorage } from '@/lib/storage';
 
 export default function CreatorPromoWidget() {
     const [activePromo, setActivePromo] = useState<any>(null);
@@ -39,7 +40,7 @@ export default function CreatorPromoWidget() {
             }
         };
 
-        const widgetClosed = localStorage.getItem('sbd_creator_widget_closed');
+        const widgetClosed = safeLocalStorage.getItem('sbd_creator_widget_closed');
         if (widgetClosed !== 'true') {
             loadPromos();
         }
@@ -55,7 +56,7 @@ export default function CreatorPromoWidget() {
     const handleClose = () => {
         setIsVisible(false);
         setIsClosed(true);
-        localStorage.setItem('sbd_creator_widget_closed', 'true');
+        safeLocalStorage.setItem('sbd_creator_widget_closed', 'true');
     };
 
     if (!activePromo || !isVisible || isClosed) return null;

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { fetchAPI } from '@/lib/api';
+import { safeSessionStorage } from '@/lib/storage';
 
 export interface FestiveConfig {
     active: boolean;
@@ -62,7 +63,7 @@ export function FestiveProvider({ children }: { children: React.ReactNode }) {
                 const end = new Date(cfg.endDate);
                 const isActive = cfg.active && cfg.currentFestival !== 'NONE' && now >= start && now <= end;
 
-                const hasShown = sessionStorage.getItem('festive_animation_shown');
+                const hasShown = safeSessionStorage.getItem('festive_animation_shown');
                 if (isActive && cfg.features?.startupAnimation && !hasShown) {
                     setShowAnimation(true);
                 }
@@ -90,7 +91,7 @@ export function FestiveProvider({ children }: { children: React.ReactNode }) {
 
     const dismissAnimation = () => {
         setShowAnimation(false);
-        sessionStorage.setItem('festive_animation_shown', 'true');
+        safeSessionStorage.setItem('festive_animation_shown', 'true');
     };
 
     return (

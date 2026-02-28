@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { safeLocalStorage } from '@/lib/storage';
 
 type Currency = 'INR' | 'USD' | 'AED' | 'GBP' | 'EUR';
 
@@ -45,7 +46,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         setIsMounted(true);
-        const storedCurrency = localStorage.getItem('currency') as Currency;
+        const storedCurrency = safeLocalStorage.getItem('currency') as Currency;
         if (storedCurrency && exchangeRates[storedCurrency]) {
             setCurrencyState(storedCurrency);
         }
@@ -53,7 +54,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
     const setCurrency = (newCurrency: Currency) => {
         setCurrencyState(newCurrency);
-        localStorage.setItem('currency', newCurrency);
+        safeLocalStorage.setItem('currency', newCurrency);
     };
 
     const formatPrice = (amount: number) => {

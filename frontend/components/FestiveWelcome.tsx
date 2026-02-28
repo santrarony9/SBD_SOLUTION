@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PiX, PiConfetti } from 'react-icons/pi';
 import { useFestive } from '@/context/FestiveContext';
+import { safeLocalStorage } from '@/lib/storage';
 
 export default function FestiveWelcome() {
     const [isVisible, setIsVisible] = useState(false);
@@ -14,7 +15,7 @@ export default function FestiveWelcome() {
     useEffect(() => {
         setIsMounted(true);
         if (!config) return;
-        const hasSeen = localStorage.getItem(`festive_welcome_${config.currentFestival}`);
+        const hasSeen = safeLocalStorage.getItem(`festive_welcome_${config.currentFestival}`);
         if (!hasSeen && isFestiveActive && config.features.welcomeModal) {
             // Show after 2 seconds for better UX
             const timer = setTimeout(() => {
@@ -119,7 +120,7 @@ export default function FestiveWelcome() {
     const closeWelcome = () => {
         setIsVisible(false);
         document.body.style.overflow = 'auto';
-        localStorage.setItem(`festive_welcome_${config?.currentFestival}`, 'true');
+        safeLocalStorage.setItem(`festive_welcome_${config?.currentFestival}`, 'true');
     };
 
     if (!isMounted || !isVisible) return null;

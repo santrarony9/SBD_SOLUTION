@@ -5,6 +5,7 @@ import { useAuth } from './AuthContext';
 import { fetchAPI } from '@/lib/api';
 import { useToast } from './ToastContext';
 import { useFestive } from './FestiveContext';
+import { safeLocalStorage } from '@/lib/storage';
 
 // Types
 interface CartItem {
@@ -62,7 +63,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             fetchServerCart();
         } else {
             // Load from LocalStorage for Guest
-            const localCart = localStorage.getItem('guest_cart');
+            const localCart = safeLocalStorage.getItem('guest_cart');
             if (localCart) {
                 try {
                     const parsed = JSON.parse(localCart);
@@ -70,7 +71,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     calculateLocalTotal(parsed.items || []);
                 } catch (error) {
                     console.error('[CartContext] Failed to parse guest cart, clearing corrupt data.', error);
-                    localStorage.removeItem('guest_cart');
+                    safeLocalStorage.removeItem('guest_cart');
                     setItems([]);
                     setCartTotal(0);
                 }
@@ -167,7 +168,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     const newItems = [...items, newItem];
                     setItems(newItems);
                     calculateLocalTotal(newItems);
-                    localStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
+                    safeLocalStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
                     openCart();
                     showToast("Added to your guest collection", "success");
                 }
@@ -190,7 +191,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             const newItems = items.filter(i => i.id !== itemId);
             setItems(newItems);
             calculateLocalTotal(newItems);
-            localStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
+            safeLocalStorage.setItem('guest_cart', JSON.stringify({ items: newItems }));
             showToast("Item removed", "info");
         }
     };
@@ -201,7 +202,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             setItems([]);
             setCartTotal(0);
         } else {
-            localStorage.removeItem('guest_cart');
+            safeLocalStorage.removeItem('guest_cart');
             setItems([]);
             setCartTotal(0);
         }
@@ -240,7 +241,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // For MVP, since guest logic is partial, we'll focus on authenticated user first.
             // But let's support local update for now.
             const localCart = JSON.stringify({ items: newItems });
-            localStorage.setItem('guest_cart', localCart);
+            safeLocalStorage.setItem('guest_cart', localCart);
         }
     };
 

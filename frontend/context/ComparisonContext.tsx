@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useToast } from './ToastContext';
+import { safeLocalStorage } from '@/lib/storage';
 
 interface ComparisonContextType {
     comparisonItems: string[];
@@ -19,7 +20,7 @@ export function ComparisonProvider({ children }: { children: React.ReactNode }) 
 
     // Load from local storage
     useEffect(() => {
-        const saved = localStorage.getItem('sbd_comparison');
+        const saved = safeLocalStorage.getItem('sbd_comparison');
         if (saved) {
             try {
                 setComparisonItems(JSON.parse(saved));
@@ -31,7 +32,7 @@ export function ComparisonProvider({ children }: { children: React.ReactNode }) 
 
     // Save to local storage
     useEffect(() => {
-        localStorage.setItem('sbd_comparison', JSON.stringify(comparisonItems));
+        safeLocalStorage.setItem('sbd_comparison', JSON.stringify(comparisonItems));
     }, [comparisonItems]);
 
     const addToComparison = (productId: string) => {
