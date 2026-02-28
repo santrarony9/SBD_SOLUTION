@@ -26,8 +26,11 @@
 /* Festive Re-skinning Support */
 [data-theme='holi'] {
   --brand-navy: #2D0056;
+  /* Deep Festive Purple instead of Navy */
   --brand-gold: #ff0080;
+  /* Vibrant Pink instead of Gold for accents */
   --brand-cream: #FFF5F9;
+  /* Slight pinkish tint for background */
   --festive-accent-1: #ff0080;
   --festive-accent-2: #7ed321;
 }
