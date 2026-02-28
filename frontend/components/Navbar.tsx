@@ -60,7 +60,7 @@ export default function Navbar() {
                     {/* Left: Desktop Links / Mobile Menu Toggle */}
                     <div className="flex items-center justify-start gap-4">
                         {/* Mobile Toggle */}
-                        <div className="flex items-center md:hidden">
+                        <div className="flex items-center lg:hidden">
                             <motion.button
                                 whileTap={{ scale: 0.9 }}
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -71,7 +71,7 @@ export default function Navbar() {
                         </div>
 
                         {/* Desktop Links */}
-                        <div className="hidden md:flex space-x-8 items-center">
+                        <div className="hidden lg:flex space-x-8 items-center">
                             <NavLink href="/" label="Home" textColor={textColor} />
                             <NavLink href="/shop" label="Collections" textColor={textColor} />
                             <NavLink href="/about" label="Heritage" textColor={textColor} />
@@ -97,7 +97,7 @@ export default function Navbar() {
                     {/* Right: Actions */}
                     <div className="flex justify-end items-center gap-3 md:gap-6">
                         {/* Desktop Only Actions */}
-                        <div className={`hidden md:flex items-center gap-3 md:gap-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-4 md:pl-8 transition-colors duration-300`}>
+                        <div className={`hidden lg:flex items-center gap-3 md:gap-5 border-l ${scrolled || !isHome ? 'border-brand-navy/10' : 'border-white/20'} pl-4 md:pl-8 transition-colors duration-300`}>
                             {/* Currency Switcher (Desktop) */}
                             <div className="relative group">
                                 <button className={`flex items-center gap-1 text-[8px] md:text-[10px] uppercase tracking-widest font-black ${textColor} hover:text-brand-gold transition-all`}>
@@ -166,7 +166,7 @@ export default function Navbar() {
                         <div className="flex items-center gap-4">
                             <button
                                 onClick={() => setIsSearchOpen(true)}
-                                className={`md:hidden ${textColor} hover:text-brand-gold transition-colors duration-300`}
+                                className={`lg:hidden ${textColor} hover:text-brand-gold transition-colors duration-300`}
                                 title="Search"
                             >
                                 <PiMagnifyingGlass className="h-5 w-5" />
@@ -196,7 +196,7 @@ export default function Navbar() {
             <MobileSearchOverlay isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />
 
             {/* Mobile Menu Overlay */}
-            <div className={`md:hidden fixed inset-0 bg-brand-navy z-[1001] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className={`lg:hidden fixed inset-0 bg-brand-navy z-[1001] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                 {/* Abstract Background for Menu */}
                 <div className="absolute inset-0 opacity-10 pointer-events-none">
                     <div className="absolute top-0 left-0 w-64 h-64 bg-brand-gold rounded-full blur-[80px] -translate-x-1/2 -translate-y-1/2"></div>
@@ -311,7 +311,7 @@ function MobileNavLink({ href, label, onClick }: { href: string, label: string, 
         <Link
             href={href}
             onClick={onClick}
-            className={`text-3xl font-serif transition-all duration-300 py-2 block ${isActive ? 'text-brand-gold font-bold translate-x-2' : 'text-white'}`}
+            className={`text-3xl font-serif transition-all duration-300 py-2 block ${isActive ? 'text-[var(--festive-accent-1)] font-bold translate-x-2 drop-shadow-md' : 'text-white'}`}
         >
             <motion.div whileTap={{ scale: 0.9 }}>
                 {label}

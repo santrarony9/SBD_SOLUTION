@@ -150,12 +150,12 @@ export default function MotionGallery() {
                                             animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.1 }}
                                         >
-                                            <h3 className={`font-serif text-white mb-2 drop-shadow-md ${isActive ? 'text-2xl md:text-3xl' : 'text-lg opacity-80'}`}>
+                                            <h3 className={`font-serif text-white mb-2 drop-shadow-lg ${isActive ? 'text-2xl md:text-3xl' : 'text-lg opacity-80'}`}>
                                                 {item.title}
                                             </h3>
                                             <div className="flex justify-center items-center gap-2 mb-4">
                                                 <span className="h-[1px] w-8 bg-brand-gold/50"></span>
-                                                <p className="text-brand-gold text-[10px] uppercase tracking-[0.25em] font-bold drop-shadow">
+                                                <p className="text-brand-gold text-[10px] uppercase tracking-[0.25em] font-bold drop-shadow-lg">
                                                     {item.subtitle || 'COLLECTION'}
                                                 </p>
                                                 <span className="h-[1px] w-8 bg-brand-gold/50"></span>
