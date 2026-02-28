@@ -145,7 +145,7 @@ export default function FestiveWelcome() {
                         <span className="text-brand-gold text-[10px] md:text-xs font-bold uppercase tracking-[0.3em]">Special Festive Gift</span>
                     </div>
 
-                    <h2 className="fluid-h2 font-serif text-brand-navy mb-4 leading-tight">
+                    <h2 className={`fluid-h2 font-serif mb-4 leading-tight ${config?.currentFestival === 'HOLI' ? 'text-holi-animated drop-shadow-md' : 'text-brand-navy'}`}>
                         {config?.theme.greeting}
                     </h2>
 

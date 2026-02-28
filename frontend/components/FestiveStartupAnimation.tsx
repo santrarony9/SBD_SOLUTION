@@ -85,7 +85,7 @@ export default function FestiveStartupAnimation() {
                                 className="space-y-8"
                             >
                                 <div className="relative inline-block">
-                                    <h1 className="text-6xl md:text-9xl font-serif text-white italic tracking-tighter drop-shadow-2xl">
+                                    <h1 className={`text-6xl md:text-9xl font-serif italic tracking-tighter drop-shadow-2xl ${festivalType === 'HOLI' ? 'text-holi-animated' : 'text-white'}`}>
                                         {festivalType === 'HOLI' ? 'Holi Hai!' :
                                             festivalType === 'RATH_YATRA' ? 'Jai Jagannath!' :
                                                 festivalType === 'DURGA_PUJA' ? 'Jai Maa Durga!' :
@@ -96,7 +96,7 @@ export default function FestiveStartupAnimation() {
                                     </h1>
                                     <div className="absolute -top-4 -right-4 w-12 h-12 bg-[var(--brand-gold)] rounded-full blur-xl animate-ping"></div>
                                 </div>
-                                <p className="text-brand-gold font-serif text-xl md:text-3xl tracking-[0.2em] uppercase">
+                                <p className={`font-serif text-xl md:text-3xl tracking-[0.2em] uppercase ${festivalType === 'HOLI' ? 'text-holi-animated' : 'text-brand-gold'}`}>
                                     {config.theme.greeting}
                                 </p>
 

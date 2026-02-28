@@ -17,7 +17,7 @@ export default function FestiveSplashTransition() {
 
     useEffect(() => {
         if (isHoli) {
-            setSplashColors(['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']);
+            setSplashColors(['#4A00E0', '#FF007F', '#00D2FF', '#FFD700', '#8E2DE2', '#ff0080']);
         } else if (typeof document !== 'undefined') {
             setSplashColors([
                 getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),

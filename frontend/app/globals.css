@@ -25,16 +25,18 @@
 
 /* Festive Re-skinning Support */
 [data-theme='holi'] {
-  --brand-navy: #7e00ff;
-  /* Neon Purple instead of Dark Purple */
-  --brand-gold: #ff0080;
-  /* Vibrant Pink instead of Gold for accents */
-  --brand-cream: #FFF5F9;
-  /* Slight pinkish tint for background */
-  --festive-accent-1: #fbff00;
-  /* Neon Yellow */
-  --festive-accent-2: #7ed321;
-  /* Lime Green */
+  --brand-navy: #4A00E0;
+  /* Deep Vibrant Purple instead of Dark Purple */
+  --brand-gold: #FF007F;
+  /* Vibrant Pink accent */
+  --brand-cream: #FDF9FF;
+  /* Very light purple/pinkish tint for background */
+  --festive-accent-1: #00D2FF;
+  /* Cyan Blue */
+  --festive-accent-2: #FFD700;
+  /* Golden Yellow */
+  --festive-accent-3: #8E2DE2;
+  /* Deep Magenta Purple */
 }
 
 [data-theme='diwali'] {
@@ -196,6 +198,30 @@ html {
 
 .animate-fade-in-up {
   animation: fadeInUp 0.8s ease-out forwards;
+}
+
+/* Holi Colorful Text Animation */
+@keyframes colorFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.text-holi-animated {
+  background: linear-gradient(270deg, var(--brand-navy), var(--brand-gold), var(--festive-accent-1), var(--festive-accent-2), var(--festive-accent-3), var(--brand-navy));
+  background-size: 400% 400%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: colorFlow 6s ease infinite;
 }
 
 /* Scroll Progress Bar */
