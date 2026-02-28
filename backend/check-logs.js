@@ -17,10 +17,13 @@ async function checkLogs() {
             }
         });
 
-        console.log('Fetching last 100 lines of PM2 logs...');
-        const logRes = await ssh.execCommand('export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && pm2 logs sbd-backend --lines 100 --nostream', { cwd: '/var/www/sbd_backend' });
+        console.log('Fetching PM2 list and Error logs...');
+        const listRes = await ssh.execCommand('export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && pm2 list');
+        console.log("PM2 LIST:\n", listRes.stdout);
 
-        console.log(logRes.stdout);
+        const logRes = await ssh.execCommand('export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \\. "$NVM_DIR/nvm.sh" && pm2 logs sbd-backend --err --lines 200 --nostream', { cwd: '/var/www/sbd_backend' });
+
+        console.log("ERROR LOGS:\n", logRes.stdout);
         if (logRes.stderr) console.error('STDERR:', logRes.stderr);
 
         process.exit(0);
