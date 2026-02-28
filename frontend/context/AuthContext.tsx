@@ -33,9 +33,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
         const storedUser = localStorage.getItem('user');
+
         if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+            try {
+                setUser(JSON.parse(storedUser));
+                setToken(storedToken);
+            } catch (error) {
+                console.error('[AuthContext] Failed to parse stored user, clearing corrupt session.', error);
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                setToken(null);
+                setUser(null);
+            }
         }
         setIsLoading(false);
     }, []);

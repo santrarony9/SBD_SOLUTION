@@ -64,9 +64,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
             // Load from LocalStorage for Guest
             const localCart = localStorage.getItem('guest_cart');
             if (localCart) {
-                const parsed = JSON.parse(localCart);
-                setItems(parsed.items || []);
-                calculateLocalTotal(parsed.items || []);
+                try {
+                    const parsed = JSON.parse(localCart);
+                    setItems(parsed.items || []);
+                    calculateLocalTotal(parsed.items || []);
+                } catch (error) {
+                    console.error('[CartContext] Failed to parse guest cart, clearing corrupt data.', error);
+                    localStorage.removeItem('guest_cart');
+                    setItems([]);
+                    setCartTotal(0);
+                }
             }
         }
     }, [user, token]);

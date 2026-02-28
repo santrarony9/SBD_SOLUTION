@@ -124,6 +124,7 @@ export default function Navbar() {
                                 className={`${textColor} hover:text-brand-gold transition-colors duration-300`}
                                 title="Search"
                             >
+
                                 <PiMagnifyingGlass className="h-5 w-5" />
                             </button>
 
