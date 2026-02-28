@@ -179,28 +179,26 @@ export default function FestiveWelcome() {
                     <div className="flex flex-col gap-4">
                         <button
                             onClick={closeWelcome}
-                            className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-500 ${isScratched
-                                >
-                                { isScratched? `Shop ${config?.currentFestival.replace('_', ' ')} Collection` : 'Scratch Above to Unlock'}
-                    </button>
-                </div>
+                            className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-500 ${isScratched ? 'bg-brand-navy text-white hover:bg-brand-gold hover:text-brand-navy' : 'bg-gray-100 text-gray-400 pointer-events-none'}`}
+                        >
+                            {isScratched ? `Shop ${config?.currentFestival.replace('_', ' ')} Collection` : 'Scratch Above to Unlock'}
+                        </button>
+                    </div>
 
-                <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                    T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
-                </p>
+                    <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
+                        T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
+                    </p>
+                </div>
             </div>
+
+            {/* Pop confetti when scratched */}
+            {isScratched && (
+                <div className="fixed inset-0 pointer-events-none z-[120]">
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                        <PiConfetti className="w-64 h-64 text-brand-gold opacity-20 animate-ping" />
+                    </div>
+                </div>
+            )}
         </div>
-
-            {/* Pop confetti when scratched */ }
-    {
-        isScratched && (
-            <div className="fixed inset-0 pointer-events-none z-[120]">
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                    <PiConfetti className="w-64 h-64 text-brand-gold opacity-20 animate-ping" />
-                </div>
-            </div>
-        )
-    }
-        </div >
     );
 }
