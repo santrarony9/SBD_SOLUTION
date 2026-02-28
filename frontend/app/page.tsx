@@ -12,6 +12,8 @@ import ShopByCategory from '@/components/ShopByCategory';
 import RecentlyViewed from '@/components/RecentlyViewed';
 import SparkbluePromise from '@/components/SparkbluePromise';
 import SmartPlaceholder from '@/components/SmartPlaceholder';
+import CreatorPromoWidget from '@/components/CreatorPromoWidget';
+import InfluencerSpotlight from '@/components/InfluencerSpotlight';
 // Removed motion import to fix Server Component render error
 
 export const dynamic = 'force-dynamic';
@@ -182,6 +184,9 @@ export default async function Home() {
 
   return (
     <div className="bg-brand-cream font-sans overflow-x-hidden">
+
+      {/* 0. Floating Overlay Widgets */}
+      <CreatorPromoWidget />
 
       {/* 1. Hero Section (Slider) */}
       <div className="relative">
@@ -444,6 +449,9 @@ export default async function Home() {
 
       {/* 8. Recently Viewed */}
       <RecentlyViewed />
+
+      {/* 8.2 Influencer Spotlight (Option B) */}
+      <InfluencerSpotlight />
 
       {/* 8.5 Instagram Feed */}
       <InstagramFeed />

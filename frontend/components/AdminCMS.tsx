@@ -7,9 +7,10 @@ import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
+    const [promoCodes, setPromoCodes] = useState<any[]>([]);
     const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
 
     // Headless CMS States
@@ -58,6 +59,7 @@ export default function AdminCMS() {
     const [newTag, setNewTag] = useState({ name: '', slug: '' });
     const [newSocialPost, setNewSocialPost] = useState({ imageUrl: '', caption: '', link: '' });
     const [newGalleryItem, setNewGalleryItem] = useState({ title: '', subtitle: '', imageUrl: '', link: '' });
+    const [newPromoCode, setNewPromoCode] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 10, creatorName: '' });
 
     useEffect(() => {
         loadContent();
@@ -79,16 +81,20 @@ export default function AdminCMS() {
                 fetchAPI('/store/settings/home_royal_standard'),
                 fetchAPI('/store/settings/home_brand_story'),
                 fetchAPI('/store/settings/sparkblue_promise_cards'),
-                fetchAPI('/store/settings/footer_config')
+                fetchAPI('/store/settings/footer_config'),
+                fetchAPI('/promos')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else showToast('Failed to load banners', 'error');
 
             if (offersRes.status === 'fulfilled') setOffers(offersRes.value || []);
             else showToast('Failed to load offers', 'error');
+
+            if (promosRes.status === 'fulfilled') setPromoCodes(promosRes.value || []);
+            else showToast('Failed to load promo codes', 'error');
 
             if (categoriesRes.status === 'fulfilled') setCategories(categoriesRes.value || []);
             else showToast('Failed to load categories', 'error');
@@ -214,6 +220,26 @@ export default function AdminCMS() {
             showToast('Offer Deleted', 'success');
             loadContent();
         } catch (e) { showToast('Failed to delete offer', 'error'); }
+    };
+
+    // --- Promo Code Actions ---
+    const handleAddPromoCode = async () => {
+        if (!newPromoCode.code || !newPromoCode.discountValue) return showToast('Code and Discount Value are required', 'error');
+        try {
+            await fetchAPI('/promos', { method: 'POST', body: JSON.stringify({ ...newPromoCode, discountValue: Number(newPromoCode.discountValue) }) });
+            showToast('Promo Code Created', 'success');
+            setNewPromoCode({ code: '', discountType: 'PERCENTAGE', discountValue: 10, creatorName: '' });
+            loadContent();
+        } catch (e) { showToast('Failed to create promo code - it may already exist', 'error'); }
+    };
+
+    const handleDeletePromoCode = async (id: string) => {
+        if (!confirm('Permanently delete this promo code? This cannot be undone.')) return;
+        try {
+            await fetchAPI(`/promos/${id}`, { method: 'DELETE' });
+            showToast('Promo Code Deleted', 'success');
+            loadContent();
+        } catch (e) { showToast('Failed to delete promo code', 'error'); }
     };
 
     // --- Category Actions ---
@@ -410,6 +436,7 @@ export default function AdminCMS() {
                     <span className="text-[9px] uppercase font-black text-gray-400 tracking-widest">02 Highlights</span>
                 </div>
                 {[
+                    { id: 'promocodes', label: 'Influencer Promos', icon: PiTag },
                     { id: 'offers', label: 'Royal Privileges', icon: PiTag },
                     { id: 'categories', label: 'Product Discovery', icon: PiTag },
                 ].map((item) => (
@@ -488,6 +515,107 @@ export default function AdminCMS() {
                         </h2>
                         {isLoading && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-gold" />}
                     </div>
+
+                    {/* PROMO CODES SECTION */}
+                    {activeSection === 'promocodes' && (
+                        <div className="space-y-10">
+                            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center gap-2">
+                                    <PiPlus className="text-brand-gold" /> Create Influencer Promo Code
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Promo Code (e.g. SONA10)</label>
+                                        <input
+                                            type="text"
+                                            placeholder="Enter Code"
+                                            value={newPromoCode.code}
+                                            onChange={(e) => setNewPromoCode({ ...newPromoCode, code: e.target.value.toUpperCase() })}
+                                            className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent font-black tracking-widest text-brand-navy uppercase"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Discount Type</label>
+                                        <select
+                                            value={newPromoCode.discountType}
+                                            onChange={(e) => setNewPromoCode({ ...newPromoCode, discountType: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                        >
+                                            <option value="PERCENTAGE">Percentage (%)</option>
+                                            <option value="FLAT">Flat Rate (₹)</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Discount Value</label>
+                                        <input
+                                            type="number"
+                                            placeholder={newPromoCode.discountType === 'PERCENTAGE' ? "e.g. 10 for 10%" : "e.g. 500 for ₹500"}
+                                            value={newPromoCode.discountValue}
+                                            onChange={(e) => setNewPromoCode({ ...newPromoCode, discountValue: Number(e.target.value) })}
+                                            className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Influencer Name</label>
+                                        <input
+                                            type="text"
+                                            placeholder="e.g. Shanaya"
+                                            value={newPromoCode.creatorName}
+                                            onChange={(e) => setNewPromoCode({ ...newPromoCode, creatorName: e.target.value })}
+                                            className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddPromoCode}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10 flex items-center gap-2"
+                                    >
+                                        <PiCheck className="text-brand-gold" />
+                                        Create Promo Code
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="overflow-x-auto rounded-2xl border border-gray-100 shadow-sm">
+                                <table className="w-full text-left text-sm border-collapse">
+                                    <thead className="bg-gray-50 text-[10px] uppercase font-black text-gray-500 tracking-widest">
+                                        <tr>
+                                            <th className="px-6 py-4 border-b border-gray-100">Code</th>
+                                            <th className="px-6 py-4 border-b border-gray-100">Influencer</th>
+                                            <th className="px-6 py-4 border-b border-gray-100">Discount</th>
+                                            <th className="px-6 py-4 border-b border-gray-100">Uses</th>
+                                            <th className="px-6 py-4 border-b border-gray-100">Total Sales Generated</th>
+                                            <th className="px-6 py-4 border-b border-gray-100 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="bg-white">
+                                        {promoCodes.map((promo) => (
+                                            <tr key={promo.id} className="hover:bg-gray-50 transition-colors">
+                                                <td className="px-6 py-4 border-b border-gray-50 font-mono font-bold text-brand-navy tracking-widest">{promo.code}</td>
+                                                <td className="px-6 py-4 border-b border-gray-50">{promo.creatorName || <span className="text-gray-400 italic">None</span>}</td>
+                                                <td className="px-6 py-4 border-b border-gray-50">
+                                                    {promo.discountType === 'PERCENTAGE' ? `${promo.discountValue}% OFF` : `₹${formatPrice(promo.discountValue)} OFF`}
+                                                </td>
+                                                <td className="px-6 py-4 border-b border-gray-50 font-mono font-bold">{promo.usageCount}</td>
+                                                <td className="px-6 py-4 border-b border-gray-50 font-mono text-green-600 font-bold">₹{formatPrice(promo.totalSales)}</td>
+                                                <td className="px-6 py-4 border-b border-gray-50 text-right">
+                                                    <button onClick={() => handleDeletePromoCode(promo.id)} className="text-red-400 hover:text-red-600 transition-colors p-2 rounded-full hover:bg-red-50">
+                                                        <PiTrash size={18} />
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {promoCodes.length === 0 && (
+                                            <tr>
+                                                <td colSpan={6} className="px-6 py-12 text-center text-gray-400 italic">No custom promo codes found.</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
 
                     {/* CATEGORIES SECTION */}
                     {activeSection === 'categories' && (
