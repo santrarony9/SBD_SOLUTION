@@ -143,13 +143,14 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
       </head>
       <body
         className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
+        suppressHydrationWarning
       >
         <div className="scroll-progress" />
         <ToastProvider>
