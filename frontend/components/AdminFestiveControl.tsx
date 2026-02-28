@@ -80,6 +80,32 @@ export default function AdminFestiveControl() {
         }
     };
 
+    const handleMasterToggle = async () => {
+        if (!config) return;
+        const newActive = !config.active;
+        const newConfig = { ...config, active: newActive };
+        setConfig(newConfig);
+
+        // Auto-save immediately to provide a true 1-click experience
+        setIsSaving(true);
+        setStatus(null);
+        try {
+            await fetchAPI('/store/settings', {
+                method: 'POST',
+                body: JSON.stringify({
+                    key: 'festive_config',
+                    value: newConfig
+                })
+            });
+            setStatus({ message: `Festive Experience turned ${newActive ? 'ON' : 'OFF'} successfully!`, type: 'success' });
+        } catch (error) {
+            setStatus({ message: 'Failed to toggle festive mode.', type: 'error' });
+            setConfig(config); // revert UI on failure
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
     if (isLoading || !config) return <div className="p-12 text-center text-gray-400">Loading Configuration...</div>;
 
     return (
@@ -91,11 +117,12 @@ export default function AdminFestiveControl() {
                         <PiSparkle className="text-brand-gold" />
                         Master Festive Mode
                     </h3>
-                    <p className="text-gray-400 text-xs">Switch ON to enable all festive thematic features site-wide.</p>
+                    <p className="text-gray-400 text-xs">Switch ON to instantly enable all festive features site-wide (Auto-saves).</p>
                 </div>
                 <button
-                    onClick={() => setConfig({ ...config, active: !config.active })}
-                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none ${config.active ? 'bg-green-500' : 'bg-gray-200'
+                    onClick={handleMasterToggle}
+                    disabled={isSaving}
+                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50 ${config.active ? 'bg-green-500' : 'bg-gray-200'
                         }`}
                 >
                     <span className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${config.active ? 'translate-x-7' : 'translate-x-1'
