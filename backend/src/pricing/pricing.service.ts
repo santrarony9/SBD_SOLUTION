@@ -61,6 +61,8 @@ export class PricingService {
                     if (activeTier) {
                         if (activeTier.type === 'FLAT') {
                             makingCharges = Number(activeTier.amount);
+                        } else if (activeTier.type === 'PER_GRAM') {
+                            makingCharges = Number(activeTier.amount) * weight;
                         } else if (activeTier.type === 'PERCENTAGE') {
                             makingCharges = (goldValue * Number(activeTier.amount)) / 100;
                         }

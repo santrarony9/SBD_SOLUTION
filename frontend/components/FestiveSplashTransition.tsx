@@ -49,7 +49,7 @@ export default function FestiveSplashTransition() {
     return (
         <AnimatePresence mode="wait">
             {isSplashing && (
-                <div className="fixed inset-0 z-[9999] pointer-events-none flex items-center justify-center overflow-hidden">
+                <div className="fixed inset-0 z-40 pointer-events-none flex items-center justify-center overflow-hidden">
                     {/* Multiple "Splashes" expanding from center */}
                     {splashColors.map((color, i) => (
                         <motion.div

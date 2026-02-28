@@ -561,7 +561,12 @@ export default function ProductDetailPage() {
                             </button>
 
                             <button
-                                onClick={() => setShowBreakup(!showBreakup)}
+                                onClick={() => {
+                                    setShowBreakup(true);
+                                    setTimeout(() => {
+                                        document.getElementById('price-breakup-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }, 100);
+                                }}
                                 className={`w-12 h-12 rounded-xl flex flex-col items-center justify-center transition-colors ${showBreakup ? 'bg-brand-gold text-white' : 'bg-gray-50 text-gray-500'}`}
                             >
                                 <span className="text-[8px] font-bold uppercase leading-none mb-0.5">Price</span>
@@ -571,7 +576,7 @@ export default function ProductDetailPage() {
                     </div>
 
                     {/* Price Breakup Panel */}
-                    <div className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
+                    <div id="price-breakup-section" className={`overflow-hidden transition-all duration-500 ease-in-out ${showBreakup ? 'max-h-[600px] opacity-100 mt-4' : 'max-h-0 opacity-0'}`}>
                         <div className="bg-white p-5 rounded-xl border border-gray-100 text-sm space-y-3 shadow-inner bg-gray-50/50 pr-4 relative">
                             <div className="flex justify-between text-gray-400 text-[10px] items-center pb-2 border-b border-gray-100/50 mb-2">
                                 <span className="uppercase tracking-widest font-bold">Calculation Rates</span>

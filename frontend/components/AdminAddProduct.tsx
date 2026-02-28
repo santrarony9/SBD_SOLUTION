@@ -129,8 +129,15 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             let amt = 0;
             if (charge.type === 'PERCENTAGE') {
                 if (charge.applyOn === 'GOLD_VALUE') amt = (goldValue * charge.amount) / 100;
+                else if (charge.applyOn === 'DIAMOND_VALUE') amt = (diamondValue * charge.amount) / 100;
                 else if (charge.applyOn === 'SUBTOTAL') amt = (subTotal * charge.amount) / 100;
-            } else if (charge.type === 'PER_GRAM') amt = charge.amount * weight;
+            } else if (charge.type === 'PER_GRAM' && charge.applyOn === 'GOLD_VALUE') {
+                amt = charge.amount * weight;
+            } else if (charge.type === 'PER_CARAT' && charge.applyOn === 'DIAMOND_VALUE') {
+                amt = charge.amount * (parseFloat(formData.diamondCarat) || 0);
+            } else if (charge.type === 'FLAT') {
+                amt = charge.amount;
+            }
             otherCharges += amt;
         });
 
