@@ -444,7 +444,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                             <div className="col-span-12">
                                 <h3 className="text-[10px] uppercase font-black text-brand-navy tracking-[0.2em] mb-4 border-b pb-2 flex justify-between">
                                     Product Assets
-                                    <span className="text-gray-400 font-bold">Min 3 Images Req.</span>
+                                    <span className="text-gray-400 font-bold uppercase tracking-widest text-[9px]">Primary Main (1) & Secondary Hover (2)</span>
                                 </h3>
                                 <div className="grid grid-cols-6 gap-3">
                                     {[0, 1, 2, 3, 4].map((index) => (
@@ -452,11 +452,14 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                             {tempImages[index] ? (
                                                 <>
                                                     <img src={tempImages[index]} className="w-full h-full object-cover rounded" alt="" />
+                                                    <div className="absolute bottom-1 left-1 bg-brand-navy/80 text-white text-[7px] px-1.5 py-0.5 rounded font-black uppercase tracking-widest">
+                                                        {index === 0 ? 'Main' : index === 1 ? 'Hover Alt' : `Img ${index + 1}`}
+                                                    </div>
                                                     <button type="button" onClick={() => { const n = [...tempImages]; n[index] = ''; setTempImages(n); }} className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                                                 </>
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center border border-dashed border-gray-200 rounded text-gray-300 relative">
-                                                    <span className="text-xs font-bold">{index + 1}</span>
+                                                    <span className="text-[10px] font-black">{index === 0 ? 'MAIN' : index === 1 ? 'HOVER' : index + 1}</span>
                                                     <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleMediaUpload(e.target.files?.[0], `image-${index}`)} />
                                                 </div>
                                             )}
@@ -466,12 +469,15 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         {formData.coverImage ? (
                                             <div className="relative w-full h-full">
                                                 <img src={formData.coverImage} className="w-full h-full object-cover rounded" alt="" />
+                                                <div className="absolute bottom-1 left-1 bg-brand-gold text-brand-navy text-[7px] px-1.5 py-0.5 rounded font-black uppercase tracking-widest">
+                                                    Primary Hover
+                                                </div>
                                                 <button type="button" onClick={() => setFormData({ ...formData, coverImage: '' })} className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full text-[10px] shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">✕</button>
                                             </div>
                                         ) : (
                                             <>
-                                                <span className="text-[8px] uppercase font-bold text-brand-navy">Cover</span>
-                                                <span className="text-[8px] uppercase font-bold text-brand-gold mt-1 underline">Upload</span>
+                                                <span className="text-[8px] uppercase font-black text-brand-navy tracking-tighter leading-tight">Primary<br />Hover</span>
+                                                <span className="text-[7px] uppercase font-bold text-brand-gold mt-1 underline">Upload</span>
                                                 <input type="file" accept="image/*" className="absolute inset-0 opacity-0 cursor-pointer" onChange={(e) => handleMediaUpload(e.target.files?.[0], 'cover')} />
                                             </>
                                         )}
