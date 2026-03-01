@@ -35,7 +35,9 @@ export class OrdersService {
         isB2B?: boolean,
         customerGSTIN?: string,
         businessName?: string,
-        placeOfSupply?: string
+        placeOfSupply?: string,
+        promoCode?: string,
+        discountAmount?: number
     ) {
         // 1. Get Cart
         const cart = await this.cartService.getCart(userId);
@@ -72,6 +74,8 @@ export class OrdersService {
                 customerGSTIN: customerGSTIN || null,
                 businessName: businessName || null,
                 placeOfSupply: placeOfSupply || shippingAddress.state,
+                promoCode: promoCode || null,
+                discountAmount: discountAmount || null,
                 status: 'PENDING',
                 paymentStatus: 'PENDING',
                 items: {

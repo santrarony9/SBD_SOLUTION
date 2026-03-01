@@ -14,6 +14,8 @@ interface Order {
     shiprocketOrderId?: string;
     shipmentId?: string;
     awbCode?: string;
+    promoCode?: string;
+    discountAmount?: number;
     user: {
         name: string;
         email: string;
@@ -335,8 +337,16 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                                         <div className="font-bold text-brand-navy">{order.user?.name || 'Guest'}</div>
                                         <div className="text-xs text-brand-gold">{order.user?.email || '-'}</div>
                                     </td>
-                                    <td className="px-6 py-4 font-serif text-brand-navy">
-                                        ₹{formatPrice(order.totalAmount)}
+                                    <td className="px-6 py-4">
+                                        <div className="font-serif text-brand-navy">₹{formatPrice(order.totalAmount)}</div>
+                                        {order.promoCode && (
+                                            <div className="flex items-center gap-1.5 mt-1">
+                                                <span className="text-[8px] bg-brand-gold/10 text-brand-navy px-1.5 py-0.5 rounded font-bold uppercase tracking-widest border border-brand-gold/20">
+                                                    {order.promoCode}
+                                                </span>
+                                                <span className="text-[9px] text-green-600 font-bold">-₹{formatPrice(order.discountAmount || 0)}</span>
+                                            </div>
+                                        )}
                                     </td>
                                     <td className="px-6 py-4">
                                         <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>

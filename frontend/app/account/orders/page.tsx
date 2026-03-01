@@ -13,7 +13,9 @@ interface Order {
     status: string;
     paymentStatus: string;
     createdAt: string;
-    awbCode?: string; // Added for Shiprocket Tracking
+    awbCode?: string;
+    promoCode?: string;
+    discountAmount?: number;
     items: {
         id: string;
         name: string;
@@ -110,7 +112,17 @@ export default function OrderHistoryPage() {
                             </div>
                             <div className="mt-4 sm:mt-0 flex flex-col items-end">
                                 <p className="text-[9px] text-gray-400 uppercase tracking-widest font-bold mb-1">Total Amount</p>
-                                <p className="text-xl font-sans font-light text-brand-navy">₹{formatPrice(order.totalAmount)}</p>
+                                <div className="flex flex-col items-end">
+                                    <p className="text-xl font-sans font-light text-brand-navy">₹{formatPrice(order.totalAmount)}</p>
+                                    {order.promoCode && (
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <span className="text-[8px] bg-brand-gold/10 text-brand-navy px-1.5 py-0.5 rounded font-bold uppercase tracking-widest border border-brand-gold/20">
+                                                {order.promoCode}
+                                            </span>
+                                            <span className="text-[10px] text-green-600 font-bold">-₹{formatPrice(order.discountAmount || 0)}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 

@@ -16,6 +16,8 @@ export class OrdersController {
         customerGSTIN?: string;
         businessName?: string;
         placeOfSupply?: string;
+        promoCode?: string;
+        discountAmount?: number;
     }) {
         return this.ordersService.createOrder(
             req.user.userId,
@@ -25,7 +27,9 @@ export class OrdersController {
             body.isB2B,
             body.customerGSTIN,
             body.businessName,
-            body.placeOfSupply
+            body.placeOfSupply,
+            body.promoCode,
+            body.discountAmount
         );
     }
 
