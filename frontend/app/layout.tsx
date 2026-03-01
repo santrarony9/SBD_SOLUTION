@@ -9,7 +9,7 @@ import { ToastProvider } from "@/context/ToastContext";
 import { ComparisonProvider } from '@/context/ComparisonContext';
 import { CurrencyProvider } from '@/context/CurrencyContext';
 import { FestiveProvider } from '@/context/FestiveContext';
-import ChatWidget from "@/components/ChatWidget";
+
 
 import JsonLd from "@/components/JsonLd";
 

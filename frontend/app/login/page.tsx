@@ -125,7 +125,7 @@ export default function LoginPage() {
             {/* Left Side - Image (Hidden on Mobile) */}
             <div
                 className="hidden md:block w-1/2 bg-cover bg-center relative"
-                style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=2669&auto=format&fit=crop")' }}
+                style={{ backgroundImage: 'url("/login-bg.jpg")' }}
             >
                 <div className="absolute inset-0 bg-brand-navy/30 mix-blend-multiply"></div>
                 <div className="absolute bottom-10 left-10 text-white p-8">

@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import AnnouncementBar from "@/components/AnnouncementBar";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
 import { motion, AnimatePresence } from 'framer-motion';
-import ChatWidget from "@/components/ChatWidget";
+
 import MobileBottomNav from "@/components/MobileBottomNav";
 import CartDrawer from "@/components/CartDrawer";
 import { useCart } from "@/context/CartContext";
@@ -71,7 +71,7 @@ export default function ClientLayoutWrapper({
                     </motion.main>
                 </AnimatePresence>
             </div>
-            <ChatWidget />
+
             <MobileBottomNav />
             <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
             <Footer config={footerConfig} />
