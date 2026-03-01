@@ -13,6 +13,9 @@ interface Message {
 }
 
 export default function ChatWidget() {
+  // HIDING CHAT BOT FOR NOW
+  return null;
+
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -224,8 +227,6 @@ export default function ChatWidget() {
                     (async () => {
                       try {
                         const history = messages.map(m => ({ role: m.role, content: m.content }));
-                        // Add the new user message to history effectively
-                        history.push({ role: 'user', content: q });
 
                         const response = await fetchAPI('/chat', {
                           method: 'POST',

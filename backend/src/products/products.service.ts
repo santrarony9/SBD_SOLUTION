@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, HttpException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApplyOn } from '@prisma/client';
 // DTOs would normally be defined in a separate file, defining inline for brevity or need to create them.
@@ -15,14 +15,15 @@ export class ProductsService {
         private prisma: PrismaService,
         private redis: RedisService
     ) {
-        if (process.env.GEMINI_API_KEY) {
-            this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+        const productKey = process.env.GEMINI_PRODUCT_API_KEY || process.env.GEMINI_API_KEY;
+        if (productKey) {
+            this.genAI = new GoogleGenerativeAI(productKey);
         }
     }
 
     async generateDescription(promptData: any) {
         if (!this.genAI) {
-            return "AI Description unavailable: Missing GEMINI_API_KEY.";
+            throw new HttpException('AI Description unavailable: Missing GEMINI_API_KEY.', 503);
         }
 
         try {
@@ -33,10 +34,10 @@ export class ProductsService {
             const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
-            Gold: ${promptData.goldPurity}K, ${promptData.goldWeight}g
-            Diamonds: ${promptData.diamondCarat}ct, ${promptData.diamondClarity} clarity
+            Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
+            Diamonds: ${promptData.diamondCarat} ct, ${promptData.diamondClarity} clarity
             Style: Elegant, Premium, Timeless.
-            Keep it under 60 words. Emphasize craftsmanship and eternal value.`;
+            Keep it under 60 words.Emphasize craftsmanship and eternal value.`;
 
             const result = await model.generateContent(prompt);
             const response = await result.response;
@@ -49,20 +50,19 @@ export class ProductsService {
                 const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
                 const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
-                Name: ${promptData.name}
-                Category: ${promptData.category}
-                Gold: ${promptData.goldPurity}K, ${promptData.goldWeight}g
-                Diamonds: ${promptData.diamondCarat}ct, ${promptData.diamondClarity} clarity
-                Style: Elegant, Premium, Timeless.
-                Keep it under 60 words. Emphasize craftsmanship and eternal value.`;
+            Name: ${promptData.name}
+            Category: ${promptData.category}
+            Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
+            Diamonds: ${promptData.diamondCarat} ct, ${promptData.diamondClarity} clarity
+            Style: Elegant, Premium, Timeless.
+                Keep it under 60 words.Emphasize craftsmanship and eternal value.`;
 
                 const result = await fallbackModel.generateContent(prompt);
                 const response = await result.response;
                 return response.text();
             } catch (fallbackError: any) {
                 console.error("AI Generation Failed (Fallback also failed):", fallbackError);
-                // Final STATIC Luxury Fallback
-                return `Exquisite ${promptData.name} crafted with the finest ${promptData.goldPurity}K gold weighing ${promptData.goldWeight}g, featuring brilliant ${promptData.diamondCarat}ct diamonds of ${promptData.diamondClarity} clarity. A masterpiece of timeless elegance and superior craftsmanship from Spark Blue Diamond.`;
+                throw new HttpException('AI Generation Failed: ' + fallbackError.message, 503);
             }
         }
     }
@@ -76,7 +76,7 @@ export class ProductsService {
                 const prefix = data.category ? data.category.substring(0, 3).toUpperCase() : 'GEN';
                 const timestamp = Date.now().toString().substring(6); // shorter timestamp
                 const random = Math.floor(Math.random() * 1000);
-                data.sku = `SBD-${prefix}-${timestamp}-${random}`;
+                data.sku = `SBD - ${prefix} -${timestamp} -${random} `;
             }
 
             const product = await this.prisma.product.create({ data });
@@ -108,7 +108,7 @@ export class ProductsService {
     }
 
     async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number, skip?: number, take?: number }) {
-        const cacheKey = `products:all:${JSON.stringify(filters || {})}`;
+        const cacheKey = `products: all:${JSON.stringify(filters || {})} `;
         const cached = await this.redis.get(cacheKey);
         if (cached) {
             return JSON.parse(cached);
@@ -180,7 +180,7 @@ export class ProductsService {
     }
 
     async findOne(slugOrId: string) {
-        const cacheKey = `products:one:${slugOrId}`;
+        const cacheKey = `products: one:${slugOrId} `;
         const cached = await this.redis.get(cacheKey);
         if (cached) {
             return JSON.parse(cached);
@@ -280,7 +280,7 @@ export class ProductsService {
                 }
             };
         } catch (e: any) {
-            console.error(`[ProductsService] Pricing calculation failed for product ${product?.id || 'unknown'}:`, e.message);
+            console.error(`[ProductsService] Pricing calculation failed for product ${product?.id || 'unknown'}: `, e.message);
             return { ...product, pricing: null };
         }
     }

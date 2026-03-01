@@ -215,8 +215,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 setFormData(prev => ({ ...prev, description: response.description }));
                 showToast('Description generated', 'success');
             }
-        } catch (error) {
-            showToast('Failed to generate description', 'error');
+        } catch (error: any) {
+            showToast(error.message || 'Failed to generate description', 'error');
         } finally {
             setIsGeneratingAI(false);
         }
