@@ -1,3 +1,6 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+import { PricingService } from '../pricing/pricing.service';
 import { PromosService } from '../promos/promos.service';
 
 @Injectable()
