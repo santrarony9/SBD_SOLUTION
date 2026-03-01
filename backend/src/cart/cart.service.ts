@@ -1,10 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { PricingService } from '../pricing/pricing.service';
+import { PromosService } from '../promos/promos.service';
 
 @Injectable()
 export class CartService {
-    constructor(private prisma: PrismaService, private pricingService: PricingService) { }
+    constructor(
+        private prisma: PrismaService,
+        private pricingService: PricingService,
+        private promosService: PromosService
+    ) { }
 
     async getCart(userId: string) {
         let cart = await this.prisma.cart.findUnique({
@@ -55,13 +57,53 @@ export class CartService {
             }
         }
 
+        // Apply Coupon Discount if any
+        let couponDiscount = 0;
+        let coupon = null;
+
+        if (cart.couponCode) {
+            try {
+                coupon = await this.promosService.validate(cart.couponCode);
+                if (coupon.discountType === 'PERCENTAGE') {
+                    couponDiscount = finalTotal * (coupon.discountValue / 100);
+                } else {
+                    couponDiscount = coupon.discountValue;
+                }
+                finalTotal -= couponDiscount;
+            } catch (err) {
+                // If invalid, we could clear it or just ignore? Let's clear it if invalid to be clean.
+                await this.prisma.cart.update({
+                    where: { userId },
+                    data: { couponCode: null }
+                });
+                cart.couponCode = null;
+            }
+        }
+
         return {
             ...cart,
             items: enrichedItems,
             originalTotal: total,
-            cartTotal: finalTotal,
-            appliedRule
+            cartTotal: Math.max(0, finalTotal),
+            appliedRule,
+            coupon,
+            couponDiscount
         };
+    }
+
+    async applyCoupon(userId: string, code: string) {
+        const promo = await this.promosService.validate(code);
+        return this.prisma.cart.update({
+            where: { userId },
+            data: { couponCode: promo.code }
+        });
+    }
+
+    async removeCoupon(userId: string) {
+        return this.prisma.cart.update({
+            where: { userId },
+            data: { couponCode: null }
+        });
     }
 
     async addToCart(userId: string, productId: string, quantity: number) {

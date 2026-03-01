@@ -67,12 +67,12 @@ export default function CategoryCarousel({ category, products }: CategoryCarouse
                     }}
                 >
                     {products.map((product) => (
-                        <div key={product.id} className="min-w-[280px] md:min-w-[320px] snap-start">
+                        <div key={product.id} className="min-w-[240px] md:min-w-[240px] snap-start">
                             <ProductCard product={{ ...product, image: product.imageUrl || product.image || (product.images && product.images[0]) }} />
                         </div>
                     ))}
                     {/* View More Card */}
-                    <div className="min-w-[280px] md:min-w-[320px] snap-start">
+                    <div className="min-w-[240px] md:min-w-[240px] snap-start">
                         <Link
                             href={`/shop?category=${category.slug}`}
                             className="h-full flex flex-col items-center justify-center bg-brand-navy/5 rounded-2xl border border-dashed border-brand-navy/10 group hover:bg-brand-navy/10 transition-all p-12 text-center"

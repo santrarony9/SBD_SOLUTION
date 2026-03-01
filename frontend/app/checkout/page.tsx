@@ -14,7 +14,7 @@ import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
 
 export default function CheckoutPage() {
-    const { items, cartTotal, clearCart, festiveDiscount } = useCart();
+    const { items, cartTotal, clearCart, festiveDiscount, coupon, couponDiscount, applyCoupon, removeCoupon: contextRemoveCoupon } = useCart();
     const { user } = useAuth();
     const { showToast } = useToast();
     const { formatPrice: globalFormatPrice, currency, exchangeRates } = useCurrency();
@@ -37,7 +37,6 @@ export default function CheckoutPage() {
 
     const [paymentMethod, setPaymentMethod] = useState('CCAVENUE');
     const [promoCode, setPromoCode] = useState('');
-    const [appliedPromo, setAppliedPromo] = useState<{ code: string; value: number; type: string } | null>(null);
     const [promoLoading, setPromoLoading] = useState(false);
     const [promoMessage, setPromoMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
     const [showGST, setShowGST] = useState(false);
@@ -84,47 +83,26 @@ export default function CheckoutPage() {
         setPromoLoading(true);
         setPromoMessage(null);
         try {
-            const res = await fetchAPI('/promos/validate', { method: 'POST', body: JSON.stringify({ code: promoCode }) });
-            if (res && res.code) {
-                setAppliedPromo({ code: res.code, value: res.discountValue, type: res.discountType });
-                setPromoMessage({ type: 'success', text: `Coupon '${res.code}' applied!` });
-            } else {
-                setAppliedPromo(null);
-                setPromoMessage({ type: 'error', text: 'Invalid Coupon Code' });
-            }
+            await applyCoupon(promoCode);
+            setPromoMessage({ type: 'success', text: 'Coupon applied successfully!' });
         } catch (err: any) {
-            setAppliedPromo(null);
             setPromoMessage({ type: 'error', text: err.message || 'Failed to apply coupon' });
         } finally {
             setPromoLoading(false);
         }
     };
 
-    const removePromo = () => {
-        setAppliedPromo(null);
-        setPromoCode('');
-        setPromoMessage(null);
-    };
-
-    const calculateDiscount = () => {
-        let totalDiscount = 0;
-
-        // Manual Promo Code
-        if (appliedPromo) {
-            if (appliedPromo.type === 'PERCENTAGE') {
-                totalDiscount += (cartTotal * appliedPromo.value) / 100;
-            } else {
-                totalDiscount += appliedPromo.value;
-            }
+    const handleRemovePromo = async () => {
+        try {
+            await contextRemoveCoupon();
+            setPromoCode('');
+            setPromoMessage(null);
+        } catch (error) {
+            showToast("Failed to remove coupon", "error");
         }
-
-        // Automatic Festive Discount (Dynamic from Context)
-        totalDiscount += festiveDiscount;
-
-        return totalDiscount;
     };
 
-    const discountAmount = calculateDiscount();
+    const discountAmount = festiveDiscount + couponDiscount;
     const finalTotal = Math.max(0, cartTotal - discountAmount);
     const taxAmount = showGST ? finalTotal * 0.03 : 0;
     const grandTotalINR = finalTotal + taxAmount;
@@ -148,7 +126,7 @@ export default function CheckoutPage() {
                 isB2B: showGST,
                 customerGSTIN: showGST ? billingAddress.gstin : undefined,
                 businessName: showGST ? billingAddress.businessName : undefined,
-                promoCode: appliedPromo ? appliedPromo.code : null,
+                promoCode: coupon ? coupon.code : null,
                 discountAmount: convertedDiscount
             };
 
@@ -364,8 +342,8 @@ export default function CheckoutPage() {
                                     <div className="mb-8 p-6 bg-brand-cream/10 border border-brand-gold/10">
                                         <div className="flex justify-between items-center mb-4">
                                             <label className="text-[10px] uppercase font-black tracking-widest text-brand-navy">Have a Boutique Credit Code?</label>
-                                            {appliedPromo && (
-                                                <button onClick={removePromo} className="text-[10px] uppercase font-black tracking-widest text-red-500 hover:text-red-700 underline">Remove</button>
+                                            {coupon && (
+                                                <button onClick={handleRemovePromo} className="text-[10px] uppercase font-black tracking-widest text-red-500 hover:text-red-700 underline">Remove</button>
                                             )}
                                         </div>
                                         <div className="flex gap-2">
@@ -374,12 +352,12 @@ export default function CheckoutPage() {
                                                 placeholder="Enter Code"
                                                 value={promoCode}
                                                 onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
-                                                disabled={!!appliedPromo || promoLoading}
+                                                disabled={!!coupon || promoLoading}
                                                 className="flex-grow p-3 bg-white border border-gray-100 text-sm font-sans focus:border-brand-gold outline-none disabled:bg-gray-50 disabled:text-gray-400 placeholder:text-[10px] placeholder:uppercase placeholder:tracking-widest"
                                             />
                                             <button
                                                 onClick={handleApplyPromo}
-                                                disabled={!!appliedPromo || promoLoading || !promoCode.trim()}
+                                                disabled={!!coupon || promoLoading || !promoCode.trim()}
                                                 className="px-6 bg-brand-navy text-white text-[10px] font-black uppercase tracking-widest hover:bg-brand-gold transition-all disabled:hidden"
                                             >
                                                 {promoLoading ? 'Verifying...' : 'Apply Code'}
@@ -402,10 +380,10 @@ export default function CheckoutPage() {
                                                 <span className="font-sans text-brand-navy">{globalFormatPrice(cartTotal)}</span>
                                             </div>
 
-                                            {appliedPromo && (
+                                            {coupon && (
                                                 <div className="flex justify-between text-[10px] uppercase tracking-widest text-green-600">
-                                                    <span>Boutique Credit ({appliedPromo.code})</span>
-                                                    <span>-{globalFormatPrice(calculateDiscount() - festiveDiscount)}</span>
+                                                    <span>Boutique Credit ({coupon.code})</span>
+                                                    <span>-{globalFormatPrice(couponDiscount)}</span>
                                                 </div>
                                             )}
 

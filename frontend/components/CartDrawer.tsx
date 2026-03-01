@@ -10,7 +10,7 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { useFestive } from '@/context/FestiveContext';
 
 export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-    const { items, removeFromCart, updateQuantity, festiveDiscount } = useCart();
+    const { items, removeFromCart, updateQuantity, festiveDiscount, coupon, couponDiscount, applyCoupon, removeCoupon } = useCart();
     const { formatPrice: globalFormatPrice } = useCurrency();
     const { config, isFestiveActive } = useFestive();
 
@@ -128,10 +128,55 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                         {/* Footer */}
                         {items.length > 0 && (
                             <div className="p-6 border-t border-gray-100 space-y-4 bg-brand-cream/10">
-                                <div className="space-y-2">
+
+                                {/* Coupon Section */}
+                                <div className="space-y-3">
+                                    {!coupon ? (
+                                        <div className="flex gap-2">
+                                            <input
+                                                type="text"
+                                                placeholder="Have a coupon code?"
+                                                className="flex-1 bg-white border border-gray-200 px-3 py-2 text-xs font-sans focus:outline-none focus:border-brand-gold uppercase tracking-widest"
+                                                id="couponInput"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        const input = e.currentTarget;
+                                                        if (input.value) applyCoupon(input.value);
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                onClick={() => {
+                                                    const input = document.getElementById('couponInput') as HTMLInputElement;
+                                                    if (input.value) applyCoupon(input.value);
+                                                }}
+                                                className="bg-brand-navy text-white text-[10px] font-bold uppercase tracking-widest px-4 hover:bg-brand-gold transition-colors"
+                                            >
+                                                Apply
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex justify-between items-center bg-brand-gold/5 border border-brand-gold/20 p-2 rounded-sm">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 bg-brand-gold rounded-full animate-pulse" />
+                                                <span className="text-[10px] font-bold text-brand-navy uppercase tracking-widest">
+                                                    Code: {coupon.code}
+                                                </span>
+                                            </div>
+                                            <button
+                                                onClick={removeCoupon}
+                                                className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase tracking-tighter"
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="space-y-2 pt-2">
                                     <div className="flex justify-between items-center text-gray-400">
                                         <span className="text-[10px] uppercase font-black tracking-[0.3em]">Subtotal</span>
-                                        <span className="text-sm font-sans font-medium line-through decoration-brand-gold/40">
+                                        <span className="text-sm font-sans font-medium">
                                             {globalFormatPrice(subtotal)}
                                         </span>
                                     </div>
@@ -148,10 +193,22 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                         </div>
                                     )}
 
+                                    {couponDiscount > 0 && (
+                                        <div className="flex justify-between items-center text-brand-gold bg-brand-gold/5 p-2 rounded-sm border border-brand-gold/10">
+                                            <div className="flex flex-col">
+                                                <span className="text-[9px] uppercase font-black tracking-widest leading-none mb-1">Coupon Discount</span>
+                                                <span className="text-[8px] text-brand-gold/70 uppercase font-bold tracking-tighter">{coupon?.code} Applied</span>
+                                            </div>
+                                            <span className="text-sm font-sans font-bold">
+                                                -{globalFormatPrice(couponDiscount)}
+                                            </span>
+                                        </div>
+                                    )}
+
                                     <div className="flex justify-between items-center pt-2 border-t border-brand-gold/10">
                                         <span className="text-[10px] uppercase font-black tracking-[0.3em] text-brand-navy">Final Total</span>
                                         <span className="text-2xl font-sans font-light text-brand-gold italic">
-                                            {globalFormatPrice(totalAfterDiscount)}
+                                            {globalFormatPrice(Math.max(0, subtotal - festiveDiscount - couponDiscount))}
                                         </span>
                                     </div>
                                 </div>

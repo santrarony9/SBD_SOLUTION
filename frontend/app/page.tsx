@@ -10,6 +10,7 @@ import CategoryCarousel from '@/components/CategoryCarousel';
 import MotionGallery from '@/components/MotionGallery';
 import ShopByCategory from '@/components/ShopByCategory';
 import RecentlyViewed from '@/components/RecentlyViewed';
+import ShopByPrice from '@/components/ShopByPrice';
 import SparkbluePromise from '@/components/SparkbluePromise';
 import SmartPlaceholder from '@/components/SmartPlaceholder';
 import CreatorPromoWidget from '@/components/CreatorPromoWidget';
@@ -197,12 +198,6 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* 1.5 Shop By Category (Palmanos Style) */}
-      <div
-      >
-        <ShopByCategory categories={categories} />
-      </div>
-
       {/* 2. Flash Sale Component (Dynamic) */}
       <div
       >
@@ -259,6 +254,11 @@ export default async function Home() {
         );
       })}
 
+      {/* 4.5 Shop By Category (Bento Box Style) */}
+      <div className="mb-20">
+        <ShopByCategory categories={categories} />
+      </div>
+
       {/* 5. Shop by Price (New - Premium Redesign) */}
       <section className="py-24 md:py-32 bg-white relative overflow-hidden">
         {/* Background Pattern */}
@@ -272,31 +272,9 @@ export default async function Home() {
             <h2 className="text-3xl md:text-5xl font-serif text-brand-navy mt-4">Shop by Price</h2>
           </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1">
             {Array.isArray(priceRanges) && priceRanges.length > 0 ? (
-              priceRanges.map((range: any, idx: number) => (
-                <div
-                  key={range.id || idx}
-                  className="group h-full"
-                >
-                  <Link href={`/shop?minPrice=${range.minPrice}&maxPrice=${range.maxPrice || ''}`} className="group relative bg-white p-4 md:p-6 rounded-none border border-brand-gold/20 hover:border-brand-gold transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_4px_20px_-5px_rgba(212,175,55,0.2)] overflow-hidden flex flex-col items-center justify-center min-h-[120px] md:min-h-[140px]">
-                    {/* Hover Background */}
-                    <div className="absolute inset-0 bg-brand-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-out-expo z-0"></div>
-
-                    {/* Content */}
-                    <div className="relative z-10 flex flex-col items-center text-center transition-transform duration-500 group-hover:scale-105">
-                      <span className="block text-xl md:text-2xl font-serif text-brand-navy group-hover:text-white transition-colors duration-500 mb-1 leading-tight">
-                        {range.label?.replace(' - ', ' \u2014 ') || 'Browse Range'}
-                      </span>
-                      <span className="text-[9px] uppercase tracking-widest text-brand-gold font-bold opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-500 delay-100">View Collection</span>
-                    </div>
-
-                    {/* Corner Accents */}
-                    <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                    <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-brand-gold opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  </Link>
-                </div>
-              ))
+              <ShopByPrice priceRanges={priceRanges} />
             ) : (
               <div className="col-span-full">
                 <SmartPlaceholder
@@ -347,7 +325,7 @@ export default async function Home() {
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
             {Array.isArray(featuredProducts) && featuredProducts.map((p: any, idx: number) => (
               <div
                 key={p.id || idx}

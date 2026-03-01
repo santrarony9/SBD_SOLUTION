@@ -194,8 +194,8 @@ function ShopContent() {
             </div>
 
             {/* Mobile Category Filter Grid (Visible only on mobile/tablet) */}
-            <div className="md:hidden mb-8 px-4">
-                <div className="flex flex-wrap gap-2 justify-center">
+            <div className="md:hidden mb-6 px-4">
+                <div className="flex flex-wrap gap-2 justify-center max-w-lg mx-auto">
                     {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
                         <button
                             key={cat}

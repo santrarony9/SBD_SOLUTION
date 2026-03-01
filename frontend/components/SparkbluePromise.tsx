@@ -129,28 +129,36 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
                     variants={staggerContainer}
-                    className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 pt-6 md:pt-10"
+                    className="grid grid-cols-4 gap-2 sm:gap-4 md:gap-8 pt-6 md:pt-14"
                 >
                     {displayCards.map((card, idx) => (
-                        <Link href={card.link} key={idx} className="group relative flex flex-col items-center w-full mt-8 md:mt-0">
-                            <motion.div variants={fadeInUp} className="w-full flex flex-col items-center relative">
+                        <Link href={card.link} key={idx} className="group relative w-full aspect-[3/4.5] flex flex-col items-center mt-8 md:mt-0">
+                            <motion.div variants={fadeInUp} className="w-full h-full relative flex justify-center">
 
-                                {/* Gold Wavy Background Shape via SVG Block */}
-                                <div className="absolute bottom-0 w-[102%] h-[20%] md:h-[15%] z-0" style={{ pointerEvents: 'none' }}>
-                                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full">
-                                        <path d="M0,30 Q25,10 50,30 T100,30 L100,100 L0,100 Z" fill="url(#goldGrad)" />
+                                {/* Golden Wavy Background Block */}
+                                <div className="absolute bottom-0 w-full h-[55%] z-0" style={{ pointerEvents: 'none' }}>
+                                    <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full drop-shadow-xl">
+                                        <path d="M0,25 Q25,5 50,25 T100,25 L100,100 L0,100 Z" fill="url(#goldGrad)" />
                                         <defs>
                                             <linearGradient id="goldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                                <stop offset="0%" stopColor="#fcd385" />
-                                                <stop offset="100%" stopColor="#fbbd61" />
+                                                <stop offset="0%" stopColor="#fde09e" />
+                                                <stop offset="30%" stopColor="#fbbd61" />
+                                                <stop offset="100%" stopColor="#d4af37" />
                                             </linearGradient>
                                         </defs>
                                     </svg>
                                 </div>
 
-                                {/* Image Container */}
-                                <div className="relative z-10 w-[90%] md:w-[85%] aspect-[3/4.5] overflow-visible mb-6 flex justify-center items-end">
-                                    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-full h-full relative">
+                                {/* Navy Blue Text Box */}
+                                <div className="absolute bottom-2 left-2 right-2 h-10 sm:h-12 bg-[#1a2238] z-20 flex items-center justify-center">
+                                    <h4 className="text-white text-[9px] sm:text-[11px] md:text-[13px] lg:text-sm font-serif uppercase tracking-[0.1em] font-bold text-center px-1 leading-tight">
+                                        {card.title}
+                                    </h4>
+                                </div>
+
+                                {/* Image Container (Sits on top of Navy Box, pops out of the card) */}
+                                <div className="absolute top-[-15%] w-[95%] left-[2.5%] bottom-[calc(0.5rem_+_40px)] sm:bottom-[calc(0.5rem_+_48px)] z-10 flex justify-center items-end pointer-events-none group-hover:pointer-events-auto">
+                                    <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-full h-full relative origin-bottom">
                                         <Image
                                             src={card.image}
                                             alt={card.title}
@@ -161,10 +169,6 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                     </motion.div>
                                 </div>
 
-                                {/* Title Below Image */}
-                                <h4 className="absolute bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 text-white text-[11px] sm:text-xs md:text-sm lg:text-base font-serif uppercase tracking-[0.1em] z-20 font-bold text-center w-full px-2 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] leading-tight">
-                                    {card.title}
-                                </h4>
                             </motion.div>
                         </Link>
                     ))}

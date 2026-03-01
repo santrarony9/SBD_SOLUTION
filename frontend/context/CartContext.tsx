@@ -40,6 +40,10 @@ interface CartContextType {
     openCart: () => void;
     closeCart: () => void;
     festiveDiscount: number;
+    coupon: any;
+    couponDiscount: number;
+    applyCoupon: (code: string) => Promise<void>;
+    removeCoupon: () => Promise<void>;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -53,6 +57,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const [isCartOpen, setIsCartOpen] = useState(false);
     const { config, isFestiveActive } = useFestive();
     const [festiveDiscount, setFestiveDiscount] = useState(0);
+    const [coupon, setCoupon] = useState<any>(null);
+    const [couponDiscount, setCouponDiscount] = useState(0);
 
     const openCart = () => setIsCartOpen(true);
     const closeCart = () => setIsCartOpen(false);
@@ -111,14 +117,17 @@ export function CartProvider({ children }: { children: ReactNode }) {
             setIsLoading(true);
             const data = await fetchAPI('/cart');
             if (data) {
-                setItems(data.items.map((i: any) => ({
+                const mappedItems = data.items.map((i: any) => ({
                     id: i.id,
                     productId: i.productId,
                     quantity: i.quantity,
-                    product: i.product, // Ensure backend returns enriched product
+                    product: i.product,
                     calculatedPrice: i.calculatedPrice
-                })));
+                }));
+                setItems(mappedItems);
                 setCartTotal(data.cartTotal);
+                setCoupon(data.coupon || null);
+                setCouponDiscount(data.couponDiscount || 0);
             }
         } catch (error) {
             console.error("Failed to fetch cart", error);
@@ -142,7 +151,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 showToast("Failed to add to cart", "error");
             }
         } else {
-            // Guest Logic: Fetch product briefly to store in local cart
             try {
                 const product = await fetchAPI(`/products/${productId}`);
                 if (product) {
@@ -211,13 +219,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const updateQuantity = async (itemId: string, quantity: number) => {
         if (quantity < 1) return;
 
-        // Optimistic UI Update
         const oldItems = [...items];
         const newItems = items.map(item =>
             item.id === itemId ? { ...item, quantity } : item
         );
         setItems(newItems);
-        // Recalculate total locally for responsiveness
         const total = newItems.reduce((sum, item) => {
             const price = item.calculatedPrice || item.product.price || 0;
             return sum + (price * item.quantity);
@@ -230,23 +236,69 @@ export function CartProvider({ children }: { children: ReactNode }) {
                     method: 'PATCH',
                     body: JSON.stringify({ quantity })
                 });
-                await fetchServerCart(); // Resync for accurate pricing/totals
+                await fetchServerCart();
             } catch (error) {
                 console.error("Update failed", error);
-                setItems(oldItems); // Revert on failure
+                setItems(oldItems);
             }
         } else {
-            // Guest Logic
-            // Update local storage...
-            // For MVP, since guest logic is partial, we'll focus on authenticated user first.
-            // But let's support local update for now.
             const localCart = JSON.stringify({ items: newItems });
             safeLocalStorage.setItem('guest_cart', localCart);
         }
     };
 
+    const applyCoupon = async (code: string) => {
+        if (!user) {
+            showToast("Please login to use coupons", "info");
+            return;
+        }
+        try {
+            setIsLoading(true);
+            await fetchAPI('/cart/coupon', {
+                method: 'POST',
+                body: JSON.stringify({ code })
+            });
+            await fetchServerCart();
+            showToast("Coupon applied successfully", "success");
+        } catch (error: any) {
+            showToast(error.message || "Invalid coupon code", "error");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const removeCoupon = async () => {
+        if (!user) return;
+        try {
+            setIsLoading(true);
+            await fetchAPI('/cart/coupon', { method: 'DELETE' });
+            await fetchServerCart();
+            showToast("Coupon removed", "info");
+        } catch (error) {
+            showToast("Failed to remove coupon", "error");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
-        <CartContext.Provider value={{ items, cartTotal, addToCart, removeFromCart, updateQuantity, clearCart, isLoading, isCartOpen, openCart, closeCart, festiveDiscount }}>
+        <CartContext.Provider value={{
+            items,
+            cartTotal,
+            addToCart,
+            removeFromCart,
+            updateQuantity,
+            clearCart,
+            isLoading,
+            isCartOpen,
+            openCart,
+            closeCart,
+            festiveDiscount,
+            coupon,
+            couponDiscount,
+            applyCoupon,
+            removeCoupon
+        }}>
             {children}
         </CartContext.Provider>
     );

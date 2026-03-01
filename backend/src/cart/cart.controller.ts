@@ -37,4 +37,16 @@ export class CartController {
     async clearCart(@Request() req) {
         return this.cartService.clearCart(req.user.userId);
     }
+
+    @UseGuards(JwtAuthGuard)
+    @Post('coupon')
+    async applyCoupon(@Request() req, @Body() body: { code: string }) {
+        return this.cartService.applyCoupon(req.user.userId, body.code);
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Delete('coupon')
+    async removeCoupon(@Request() req) {
+        return this.cartService.removeCoupon(req.user.userId);
+    }
 }
