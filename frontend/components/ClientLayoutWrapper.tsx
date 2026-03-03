@@ -17,7 +17,7 @@ import FestiveGlobalDecor from './FestiveGlobalDecor';
 import FestiveSplashTransition from './FestiveSplashTransition';
 import FestiveStartupAnimation from './FestiveStartupAnimation';
 import { useFestive } from '@/context/FestiveContext';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ClientLayoutWrapper({
     children,
