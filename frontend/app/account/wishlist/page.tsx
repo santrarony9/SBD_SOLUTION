@@ -73,17 +73,17 @@ export default function WishlistPage() {
 
                             <div className="w-1/3 aspect-[4/5] bg-gray-50 overflow-hidden">
                                 <img
-                                    src={item.product.images[0] || 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338'}
-                                    alt={item.product.name}
+                                    src={item.product?.images?.[0] || 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338'}
+                                    alt={item.product?.name || 'Product'}
                                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                                 />
                             </div>
 
                             <div className="w-2/3 p-6 flex flex-col justify-between">
                                 <div>
-                                    <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1">{item.product.category}</p>
-                                    <h3 className="font-serif text-lg text-brand-navy mb-2 line-clamp-1">{item.product.name}</h3>
-                                    <p className="text-xs text-brand-gold font-bold uppercase tracking-widest">₹{formatPrice(item.product.price) || 'P.O.A'}</p>
+                                    <p className="text-[10px] uppercase font-bold tracking-widest text-gray-400 mb-1">{item.product?.category || 'Fine Jewelry'}</p>
+                                    <h3 className="font-serif text-lg text-brand-navy mb-2 line-clamp-1">{item.product?.name || 'Exquisite Piece'}</h3>
+                                    <p className="text-xs text-brand-gold font-bold uppercase tracking-widest">₹{formatPrice(item.product?.price || 0) || 'P.O.A'}</p>
                                 </div>
                                 <div className="space-y-2">
                                     <Link

@@ -327,13 +327,13 @@ export default function CheckoutPage() {
                                                 className="flex gap-4 items-center py-3 border-b border-gray-50 last:border-0"
                                             >
                                                 <div className="relative w-16 h-16 bg-brand-cream/30 rounded-full flex-shrink-0 border border-brand-gold/5 p-1">
-                                                    <Image src={item.product.images[0] || '/placeholder.jpg'} alt={item.product.name} fill className="object-contain p-1" />
+                                                    <Image src={item.product?.images?.[0] || '/placeholder.jpg'} alt={item.product?.name || 'Product Image'} fill className="object-contain p-1" />
                                                 </div>
                                                 <div className="flex-grow">
-                                                    <p className="text-[11px] font-serif italic text-brand-navy line-clamp-1">{item.product.name}</p>
+                                                    <p className="text-[11px] font-serif italic text-brand-navy line-clamp-1">{item.product?.name || 'Exquisite Piece'}</p>
                                                     <p className="text-[9px] text-gray-400 uppercase tracking-widest mt-1">Quantity: {item.quantity}</p>
                                                 </div>
-                                                <p className="text-xs font-sans font-medium text-brand-navy">{globalFormatPrice(item.product.pricing.finalPrice * item.quantity)}</p>
+                                                <p className="text-xs font-sans font-medium text-brand-navy">{globalFormatPrice((item.product?.pricing?.finalPrice || item.product?.price || 0) * item.quantity)}</p>
                                             </motion.div>
                                         ))}
                                     </div>

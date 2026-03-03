@@ -15,40 +15,41 @@ export default function AdminFestiveControl() {
         const loadConfig = async () => {
             try {
                 const data = await fetchAPI('/store/settings/festive_config');
-                if (data?.value) {
-                    setConfig(data.value);
-                } else {
-                    // Default config if none exists
-                    setConfig({
-                        active: false,
-                        currentFestival: 'NONE',
-                        startDate: new Date().toISOString().split('T')[0],
-                        endDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
-                        theme: {
-                            primaryColor: '#ff0080',
-                            secondaryColor: '#7ed321',
-                            accentColor: '#f5a623',
-                            particleType: 'splash',
-                            greeting: 'Happy Holi! Celebrate with Colors & Diamonds.',
-                            couponCode: 'FESTIVE2026',
-                            discountLabel: '₹500 OFF | ₹1000 OFF on ₹10k+',
-                            tieredDiscount: {
-                                flat: 500,
-                                threshold: 10000,
-                                aboveThreshold: 1000
-                            }
+                const rawCfg = data?.value ? (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) : {};
+
+                // Merge with defaults to prevent crashes if certain keys are missing
+                setConfig({
+                    active: false,
+                    currentFestival: 'NONE',
+                    startDate: new Date().toISOString().split('T')[0],
+                    endDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+                    ...rawCfg,
+                    theme: {
+                        primaryColor: '#ff0080',
+                        secondaryColor: '#7ed321',
+                        accentColor: '#f5a623',
+                        particleType: 'splash',
+                        greeting: 'Happy Holi! Celebrate with Colors & Diamonds.',
+                        couponCode: 'FESTIVE2026',
+                        discountLabel: '₹500 OFF | ₹1000 OFF on ₹10k+',
+                        tieredDiscount: {
+                            flat: 500,
+                            threshold: 10000,
+                            aboveThreshold: 1000
                         },
-                        features: {
-                            welcomeModal: true,
-                            fallingParticles: false,
-                            siteReskin: true,
-                            socialProof: true,
-                            scratchCard: true,
-                            startupAnimation: true,
-                            animationUrl: ''
-                        }
-                    });
-                }
+                        ...(rawCfg?.theme || {})
+                    },
+                    features: {
+                        welcomeModal: true,
+                        fallingParticles: false,
+                        siteReskin: true,
+                        socialProof: true,
+                        scratchCard: true,
+                        startupAnimation: true,
+                        animationUrl: '',
+                        ...(rawCfg?.features || {})
+                    }
+                });
             } catch (error) {
                 console.error("Failed to load festive config", error);
             } finally {

@@ -86,7 +86,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }, [user, token]);
 
     const calculateLocalTotal = (currentItems: CartItem[]) => {
-        const total = currentItems.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+        const total = currentItems.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0);
         setCartTotal(total);
     };
 
@@ -94,7 +94,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (isFestiveActive && config) {
             const subtotal = items.reduce((sum, item) => {
-                const price = item.calculatedPrice || item.product.price || 0;
+                const price = item.calculatedPrice || item.product?.price || 0;
                 return sum + (price * item.quantity);
             }, 0);
 
@@ -225,7 +225,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         );
         setItems(newItems);
         const total = newItems.reduce((sum, item) => {
-            const price = item.calculatedPrice || item.product.price || 0;
+            const price = item.calculatedPrice || item.product?.price || 0;
             return sum + (price * item.quantity);
         }, 0);
         setCartTotal(total);

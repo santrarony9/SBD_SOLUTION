@@ -14,7 +14,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
     const { formatPrice: globalFormatPrice } = useCurrency();
     const { config, isFestiveActive } = useFestive();
 
-    const subtotal = items.reduce((acc, item) => acc + (item.product.pricing.finalPrice * item.quantity), 0);
+    const subtotal = items.reduce((acc, item) => acc + ((item.product?.pricing?.finalPrice || item.product?.price || 0) * item.quantity), 0);
     const totalAfterDiscount = Math.max(0, subtotal - festiveDiscount);
 
     return (
@@ -73,8 +73,8 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                     <div key={item.id} className="flex gap-4 group">
                                         <div className="relative w-24 h-24 bg-brand-cream/30 rounded-sm overflow-hidden border border-gray-100 flex-shrink-0">
                                             <Image
-                                                src={item.product.images?.[0] || ''}
-                                                alt={item.product.name}
+                                                src={item.product?.images?.[0] || '/placeholder.jpg'}
+                                                alt={item.product?.name || 'Product Image'}
                                                 fill
                                                 className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
                                             />
@@ -83,7 +83,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                             <div>
                                                 <div className="flex justify-between items-start mb-1">
                                                     <h3 className="text-sm font-serif text-brand-navy italic line-clamp-1">
-                                                        {item.product.name}
+                                                        {item.product?.name || 'Exquisite Piece'}
                                                     </h3>
                                                     <button
                                                         onClick={() => removeFromCart(item.id)}
@@ -93,7 +93,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                                     </button>
                                                 </div>
                                                 <p className="text-[9px] uppercase tracking-widest text-gray-400 font-bold">
-                                                    {item.product.goldPurity}K Gold · {item.product.diamondCarat} CT
+                                                    {item.product?.goldPurity || 18}K Gold · {item.product?.diamondCarat || 0} CT
                                                 </p>
                                             </div>
 
@@ -116,7 +116,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                                     </button>
                                                 </div>
                                                 <p className="text-sm font-sans font-medium text-brand-gold">
-                                                    {globalFormatPrice(item.product.pricing.finalPrice * item.quantity)}
+                                                    {globalFormatPrice((item.product?.pricing?.finalPrice || item.product?.price || 0) * item.quantity)}
                                                 </p>
                                             </div>
                                         </div>
