@@ -35,9 +35,7 @@ async function bootstrap() {
   console.log(`[BOOTSTRAP] Starting Backend v2.3 with Advanced Traffic Coordination...`);
 
   // 1. Security Headers (Restored to stable state)
-  app.use(helmet({
-    contentSecurityPolicy: false, // Disabling to fix client-side exceptions
-  }));
+  app.use(helmet());
 
   // Enable trust proxy for Render/Vercel/Custom VPS
   const adapter = app.getHttpAdapter().getInstance();
@@ -45,15 +43,14 @@ async function bootstrap() {
     adapter.set('trust proxy', true);
   }
 
-  /* Rate Limiting temporarily disabled to fix client-side exceptions
+  // 2. Rate Limiting Protection (Re-enabled for Production)
   app.use(rateLimit({
-    windowMs: 15 * 60 * 1000, 
+    windowMs: 15 * 60 * 1000,
     max: 500,
     message: 'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,
   }));
-  */
 
   app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
   app.setGlobalPrefix('api');
