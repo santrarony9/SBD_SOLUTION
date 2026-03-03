@@ -412,7 +412,6 @@ export default function ProductDetailPage() {
                         <h1 className="text-3xl lg:text-4xl font-serif text-brand-navy mb-2 leading-tight">
                             {product.name}
                         </h1>
-                        <p className="text-[10px] tracking-[0.3em] text-gray-400 uppercase font-medium">SKU: {slug.split('-')[0].toUpperCase()}</p>
                     </div>
 
                     {/* Price Block */}

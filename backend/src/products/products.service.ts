@@ -37,7 +37,7 @@ export class ProductsService {
             Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
             Diamonds: ${promptData.diamondCarat} ct, ${promptData.diamondClarity} clarity
             Style: Elegant, Premium, Timeless.
-            Keep it under 60 words.Emphasize craftsmanship and eternal value.`;
+            Keep it under 60 words. Emphasize craftsmanship and eternal value. DO NOT mention any SKU, Product ID, or codes.`;
 
             const result = await model.generateContent(prompt);
             const response = await result.response;
@@ -55,7 +55,7 @@ export class ProductsService {
             Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
             Diamonds: ${promptData.diamondCarat} ct, ${promptData.diamondClarity} clarity
             Style: Elegant, Premium, Timeless.
-                Keep it under 60 words.Emphasize craftsmanship and eternal value.`;
+                Keep it under 60 words. Emphasize craftsmanship and eternal value. DO NOT mention any SKU, Product ID, or codes.`;
 
                 const result = await fallbackModel.generateContent(prompt);
                 const response = await result.response;
