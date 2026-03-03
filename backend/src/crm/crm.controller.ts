@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Request, Param } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, UseGuards, Request, Param } from '@nestjs/common';
 import { CrmService } from './crm.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { PrismaService } from '../prisma/prisma.service';
@@ -56,6 +56,30 @@ export class CrmController {
         return this.prisma.user.update({
             where: { id: userId },
             data: { crmNotes: body.notes }
+        });
+    }
+
+    // Admin: Edit Customer Profile
+    @Put('customers/:id')
+    async updateCustomer(@Param('id') id: string, @Body() body: any) {
+        return this.prisma.user.update({
+            where: { id },
+            data: {
+                name: body.name,
+                email: body.email,
+                mobile: body.mobile,
+                tier: body.tier,
+            },
+            select: {
+                id: true,
+                name: true,
+                email: true,
+                mobile: true,
+                tier: true,
+                lifetimeSpend: true,
+                loyaltyPoints: true,
+                crmNotes: true
+            }
         });
     }
 

@@ -81,6 +81,12 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                     'Authorization': `Bearer ${token}`
                 }
             });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || 'Failed to generate invoice');
+            }
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -89,8 +95,8 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             document.body.appendChild(a);
             a.click();
             a.remove();
-        } catch (error) {
-            showToast("Error downloading invoice", "error");
+        } catch (error: any) {
+            showToast(error.message || "Error downloading invoice", "error");
         }
     };
 
@@ -133,6 +139,12 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}/label`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                throw new Error(errData.message || 'Failed to fetch label');
+            }
+
             const data = await res.json();
 
             if (data.labelUrl) {
@@ -140,8 +152,8 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             } else {
                 showToast('Label not available yet', 'info');
             }
-        } catch (error) {
-            showToast("Failed to fetch label", "error");
+        } catch (error: any) {
+            showToast(error.message || "Failed to fetch label", "error");
         }
     };
 
@@ -165,6 +177,12 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
                 },
                 body: JSON.stringify({ orderIds: selectedOrders, type })
             });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || 'Failed to bulk print');
+            }
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -173,8 +191,8 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             document.body.appendChild(a);
             a.click();
             a.remove();
-        } catch (error) {
-            console.error("Bulk print failed", error);
+        } catch (error: any) {
+            showToast(error.message || "Bulk print failed", "error");
         }
     };
 
@@ -184,6 +202,12 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/credit-note/${orderId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || 'Failed to generate credit note');
+            }
+
             const blob = await response.blob();
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -192,8 +216,8 @@ export default function AdminOrderList({ refreshTrigger }: { refreshTrigger: num
             document.body.appendChild(a);
             a.click();
             a.remove();
-        } catch (error) {
-            console.error("Credit note download failed", error);
+        } catch (error: any) {
+            showToast(error.message || "Credit note download failed", "error");
         }
     };
 

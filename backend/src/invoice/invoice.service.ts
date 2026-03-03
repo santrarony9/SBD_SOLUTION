@@ -218,8 +218,12 @@ export class InvoiceService {
             // Draw thumbnail if exists
             if (product.images && product.images[0]) {
                 try {
-                    const response = await axios.get(product.images[0], { responseType: 'arraybuffer' });
-                    doc.image(response.data, 50, position, { width: 30 });
+                    // PDFKit ONLY supports JPG and PNG. If Cloudinary returns a webp, this might corrupt the stream.
+                    // A simple check to avoid obvious crashes:
+                    if (!product.images[0].toLowerCase().includes('.webp')) {
+                        const response = await axios.get(product.images[0], { responseType: 'arraybuffer' });
+                        doc.image(response.data, 50, position, { width: 30 });
+                    }
                 } catch (e) { /* skip image if fail */ }
             }
 
@@ -262,8 +266,12 @@ export class InvoiceService {
     }
 
     private generateFooter(doc: PDFKit.PDFDocument, order: any) {
-        // Amount in words logic placeholder
-        const amountWords = "RUPEES " + this.numberToWords(Math.round(order.totalAmount * 1.03)) + " ONLY";
+        let amountWords = "";
+        try {
+            amountWords = "RUPEES " + this.numberToWords(Math.round((order.totalAmount || 0) * 1.03)) + " ONLY";
+        } catch (e) {
+            amountWords = `RUPEES MATH ERROR`;
+        }
 
         doc.fontSize(10).font('Helvetica-Bold').text("Amount in Words:", 50, doc.y + 40);
         doc.fontSize(10).font('Helvetica').text(amountWords, 50, doc.y + 10);

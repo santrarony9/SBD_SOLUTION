@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { fetchAPI } from '@/lib/api';
-import { PiUsers, PiTrophy, PiStar, PiNotebook, PiUserCircle, PiArrowUpRight } from 'react-icons/pi';
+import { PiUsers, PiTrophy, PiStar, PiNotebook, PiUserCircle, PiArrowUpRight, PiPencilSimple, PiX } from 'react-icons/pi';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
@@ -12,6 +12,8 @@ export default function CRMDashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState<any>(null);
     const [noteText, setNoteText] = useState('');
+    const [isEditingUser, setIsEditingUser] = useState(false);
+    const [editForm, setEditForm] = useState({ name: '', email: '', mobile: '', tier: '' });
 
     useEffect(() => {
         loadCustomers();
@@ -38,6 +40,21 @@ export default function CRMDashboard() {
             loadCustomers();
         } catch (err) {
             showToast('Failed to save note', 'error');
+        }
+    };
+
+    const handleSaveUser = async () => {
+        try {
+            await fetchAPI(`/crm/customers/${selectedUser.id}`, {
+                method: 'PUT',
+                body: JSON.stringify(editForm)
+            });
+            showToast('Customer Profile Updated', 'success');
+            setIsEditingUser(false);
+            loadCustomers();
+            setSelectedUser({ ...selectedUser, ...editForm });
+        } catch (err) {
+            showToast('Failed to update customer', 'error');
         }
     };
 
@@ -117,14 +134,26 @@ export default function CRMDashboard() {
                 <div className="space-y-6">
                     {selectedUser ? (
                         <div className="bg-white rounded-xl shadow-lg border border-brand-gold/20 p-6 sticky top-8">
-                            <div className="flex items-center gap-4 mb-6 pb-6 border-b border-gray-100">
-                                <div className="w-16 h-16 rounded-full bg-brand-navy flex items-center justify-center text-xl text-brand-gold font-serif">
-                                    {selectedUser.name.charAt(0)}
+                            <div className="flex items-center justify-between mb-6 pb-6 border-b border-gray-100">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-16 h-16 rounded-full bg-brand-navy flex items-center justify-center text-xl text-brand-gold font-serif">
+                                        {selectedUser.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-serif">{selectedUser.name}</h3>
+                                        <p className="text-xs text-gray-400">Member since {new Date().getFullYear()}</p>
+                                    </div>
                                 </div>
-                                <div>
-                                    <h3 className="text-xl font-serif">{selectedUser.name}</h3>
-                                    <p className="text-xs text-gray-400">Member since {new Date().getFullYear()}</p>
-                                </div>
+                                <button
+                                    onClick={() => {
+                                        setEditForm({ name: selectedUser.name || '', email: selectedUser.email || '', mobile: selectedUser.mobile || '', tier: selectedUser.tier || 'BRONZE' });
+                                        setIsEditingUser(true);
+                                    }}
+                                    className="p-2 text-gray-400 hover:text-brand-gold bg-gray-50 hover:bg-brand-gold/10 rounded-full transition-colors hidden lg:block"
+                                    title="Edit Profile"
+                                >
+                                    <PiPencilSimple size={18} />
+                                </button>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -171,6 +200,47 @@ export default function CRMDashboard() {
                     )}
                 </div>
             </div>
+
+            {/* Edit User Modal */}
+            {isEditingUser && selectedUser && (
+                <div className="fixed inset-0 bg-brand-navy/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fadeIn">
+                        <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                            <h2 className="font-serif text-xl text-brand-navy">Edit Customer Profile</h2>
+                            <button onClick={() => setIsEditingUser(false)} className="text-gray-400 hover:text-red-500">
+                                <PiX size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Full Name</label>
+                                <input type="text" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold focus:outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Email</label>
+                                <input type="email" value={editForm.email} onChange={(e) => setEditForm({ ...editForm, email: e.target.value })} className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold focus:outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Mobile</label>
+                                <input type="text" value={editForm.mobile} onChange={(e) => setEditForm({ ...editForm, mobile: e.target.value })} className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold focus:outline-none" />
+                            </div>
+                            <div>
+                                <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Loyalty Tier</label>
+                                <select value={editForm.tier} onChange={(e) => setEditForm({ ...editForm, tier: e.target.value })} className="w-full border border-gray-200 rounded p-2 text-sm focus:border-brand-gold focus:outline-none">
+                                    <option value="BRONZE">Bronze</option>
+                                    <option value="SILVER">Silver</option>
+                                    <option value="GOLD">Gold</option>
+                                    <option value="PLATINUM">Platinum</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="p-6 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+                            <button onClick={() => setIsEditingUser(false)} className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-gray-500 hover:text-brand-navy">Cancel</button>
+                            <button onClick={handleSaveUser} className="px-6 py-2 bg-brand-navy text-white text-xs font-bold uppercase tracking-widest rounded hover:bg-brand-gold transition-colors shadow-md">Save Changes</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
