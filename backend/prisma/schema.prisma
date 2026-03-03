@@ -39,7 +39,7 @@ model User {
   otpExpiry DateTime?
   name      String
   role      Role      @default(USER)
-  googleId  String?
+  googleId  String?   @unique
   avatar    String?
   resetToken       String?
   resetTokenExpiry DateTime?
