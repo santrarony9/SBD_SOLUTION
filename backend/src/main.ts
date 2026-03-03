@@ -34,18 +34,21 @@ async function bootstrap() {
 
   console.log(`[BOOTSTRAP] Starting Backend v2.3 with Advanced Traffic Coordination...`);
 
-  // 1. Security Headers
+  // 1. Security Headers (Restored to stable state)
   app.use(helmet({
-    contentSecurityPolicy: false, // Disable CSP if frontend/backend are separate or tricky, but keep other protections
+    contentSecurityPolicy: false, // Disabling to fix client-side exceptions
   }));
 
-  // Enable trust proxy for Render/Vercel
-  (app.getHttpAdapter().getInstance() as any).set('trust proxy', true);
+  // Enable trust proxy for Render/Vercel/Custom VPS
+  const adapter = app.getHttpAdapter().getInstance();
+  if (typeof adapter.set === 'function') {
+    adapter.set('trust proxy', true);
+  }
 
-  /* Temporarily disabled to debug production connectivity issues
+  /* Rate Limiting temporarily disabled to fix client-side exceptions
   app.use(rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 1000, // Increased from 100 to 1000 to avoid blocking users
+    windowMs: 15 * 60 * 1000, 
+    max: 500,
     message: 'Too many requests from this IP, please try again after 15 minutes',
     standardHeaders: true,
     legacyHeaders: false,

@@ -212,4 +212,37 @@ export class AuthService {
 
         return { message: 'Password reset successfully' };
     }
+
+    async findOrCreateFromGoogle(profile: any) {
+        const { googleId, email, firstName, lastName, picture } = profile;
+        const name = `${firstName} ${lastName}`.trim();
+
+        // 1. Try finding by googleId
+        let user = await this.prisma.user.findFirst({ where: { googleId } });
+
+        if (user) {
+            return user;
+        }
+
+        // 2. Try finding by email and link
+        user = await this.prisma.user.findUnique({ where: { email } });
+
+        if (user) {
+            return await this.prisma.user.update({
+                where: { id: user.id },
+                data: { googleId, avatar: picture }
+            });
+        }
+
+        // 3. Create new user
+        return await this.prisma.user.create({
+            data: {
+                email,
+                name,
+                googleId,
+                avatar: picture,
+                role: 'USER'
+            }
+        });
+    }
 }

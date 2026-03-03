@@ -1,6 +1,8 @@
-import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request, Delete, Param, Logger } from '@nestjs/common';
+import { Controller, Post, Get, Body, UnauthorizedException, UseGuards, Request, Delete, Param, Logger, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { GoogleAuthGuard } from './google-auth.guard';
+import { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -43,5 +45,30 @@ export class AuthController {
     @Get('ping')
     async ping() {
         return { message: 'pong', version: '2.1' };
+    }
+
+    @Get('google')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuth(@Request() req) {
+        // Guard initiates auth
+    }
+
+    @Get('google/callback')
+    @UseGuards(GoogleAuthGuard)
+    async googleAuthRedirect(@Request() req, @Res() res: Response) {
+        const user = await this.authService.findOrCreateFromGoogle(req.user);
+        const { access_token } = await this.authService.login(user);
+
+        // Redirect to frontend with token and user data
+        const frontendUrl = process.env.FRONTEND_URL || 'https://sparkbluediamond.com';
+        const userData = encodeURIComponent(JSON.stringify({
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role,
+            avatar: (user as any).avatar
+        }));
+
+        return res.redirect(`${frontendUrl}/auth/callback?token=${access_token}&user=${userData}`);
     }
 }
