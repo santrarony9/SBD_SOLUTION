@@ -56,7 +56,6 @@ export default function ClientLayoutWrapper({
                 <>
                     <FestiveStartupAnimation />
                     <FestiveWelcome />
-                    <FestiveParticles />
                     <FestiveSocialProof />
                     <FestiveGlobalDecor />
                     <FestiveSplashTransition />
