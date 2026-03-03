@@ -135,12 +135,12 @@ export default function LoginPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full md:w-1/2 flex items-center justify-center p-8 bg-white">
-                <div className="w-full max-w-md space-y-10">
+            <div className="w-full md:w-1/2 flex items-center justify-center p-6 md:p-8 bg-white overflow-y-auto">
+                <div className="w-full max-w-md space-y-4 md:space-y-6">
                     <div className="text-center md:text-left">
-                        <Link href="/" className="md:hidden font-serif text-2xl tracking-widest text-brand-navy font-bold mb-8 block">SPARK BLUE</Link>
-                        <h2 className="text-3xl font-serif text-brand-navy mb-2">Sign In</h2>
-                        <p className="text-gray-500 text-sm">Enter your details to access your account</p>
+                        <Link href="/" className="md:hidden font-serif text-2xl tracking-widest text-brand-navy font-bold mb-4 block">SPARK BLUE</Link>
+                        <h2 className="text-2xl md:text-3xl font-serif text-brand-navy mb-1">Sign In</h2>
+                        <p className="text-gray-500 text-xs md:text-sm">Enter your details to access your account</p>
                     </div>
 
                     {registered && (
@@ -182,18 +182,18 @@ export default function LoginPage() {
                     )}
 
                     {loginMethod === 'password' || loginMethod === 'admin' ? (
-                        <form onSubmit={handlePasswordLogin} className="space-y-8">
-                            <div className="space-y-6">
+                        <form onSubmit={handlePasswordLogin} className="space-y-4 md:space-y-6">
+                            <div className="space-y-4 md:space-y-5">
                                 {/* Admin Badge */}
                                 {loginMethod === 'admin' && (
                                     <div className="bg-brand-gold/10 text-brand-gold border border-brand-gold p-3 text-center text-xs font-bold uppercase tracking-widest mb-4">
                                         Administrative Access
                                     </div>
                                 )}
-                                <div className="relative z-0 w-full mb-6 group">
+                                <div className="relative z-0 w-full mb-4 md:mb-6 group">
                                     <input
                                         type="email"
-                                        className="block py-2.5 px-0 w-full text-sm text-brand-navy bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer"
+                                        className="block py-2 px-0 w-full text-sm text-brand-navy bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer"
                                         placeholder=" "
                                         required
                                         value={email}
@@ -202,10 +202,10 @@ export default function LoginPage() {
                                     <label className="peer-focus:font-medium absolute text-sm text-gray-500 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-brand-gold peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Email Address</label>
                                 </div>
 
-                                <div className="relative z-0 w-full mb-6 group">
+                                <div className="relative z-0 w-full mb-4 md:mb-6 group">
                                     <input
                                         type={showPassword ? "text" : "password"}
-                                        className="block py-2.5 px-0 w-full text-sm text-brand-navy bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer"
+                                        className="block py-2 px-0 w-full text-sm text-brand-navy bg-transparent border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-brand-gold peer"
                                         placeholder=" "
                                         required
                                         value={password}
@@ -231,17 +231,17 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className={`w-full text-white py-4 rounded-none transition-all duration-300 font-bold uppercase tracking-widest text-sm shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${loginMethod === 'admin' ? 'bg-brand-gold hover:bg-brand-navy' : 'bg-brand-navy hover:bg-gold-gradient hover:text-brand-navy'}`}
+                                className={`w-full text-white py-3.5 rounded-none transition-all duration-300 font-bold uppercase tracking-widest text-sm shadow-md disabled:opacity-70 disabled:cursor-not-allowed ${loginMethod === 'admin' ? 'bg-brand-gold hover:bg-brand-navy' : 'bg-brand-navy hover:bg-gold-gradient hover:text-brand-navy'}`}
                             >
                                 {isLoading ? 'Authenticating...' : (loginMethod === 'admin' ? 'Access Dashboard' : 'Sign In')}
                             </button>
 
                             {/* Google SSO Button */}
                             {loginMethod === 'password' && (
-                                <div className="space-y-4">
+                                <div className="space-y-3">
                                     <div className="relative flex items-center justify-center">
                                         <div className="flex-grow border-t border-gray-200"></div>
-                                        <span className="flex-shrink mx-4 text-gray-400 text-xs uppercase tracking-widest font-medium">Or continue with</span>
+                                        <span className="flex-shrink mx-4 text-gray-400 text-[10px] uppercase tracking-widest font-medium">Or continue with</span>
                                         <div className="flex-grow border-t border-gray-200"></div>
                                     </div>
 
@@ -249,7 +249,7 @@ export default function LoginPage() {
                                         type="button"
                                         disabled={isLoading}
                                         onClick={() => window.location.href = `${API_URL}/auth/google`}
-                                        className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3.5 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                                        className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 py-3 px-4 text-sm font-bold text-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
                                     >
                                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -320,7 +320,7 @@ export default function LoginPage() {
                         </div>
                     )}
 
-                    <div className="text-center text-sm text-gray-500 pb-4">
+                    <div className="text-center text-sm text-gray-500 pb-2">
                         Don't have an account?{' '}
                         <Link href="/register" className="font-bold text-brand-navy hover:text-brand-gold transition-colors">
                             Create Account
@@ -328,10 +328,10 @@ export default function LoginPage() {
                     </div>
 
                     {/* Diagnostics/Emergency Reset */}
-                    <div className="pt-6 border-t border-gray-100 flex justify-center">
+                    <div className="pt-2 border-t border-gray-100 flex justify-center">
                         <button
                             onClick={handleSuperReset}
-                            className="text-[10px] uppercase tracking-widest text-gray-300 hover:text-brand-gold transition-colors"
+                            className="text-[9px] uppercase tracking-widest text-gray-300 hover:text-brand-gold transition-colors"
                         >
                             Emergency Admin Reset
                         </button>
