@@ -28,7 +28,7 @@ export default function AnnouncementBar() {
     if (!isMounted || !setting || !setting.isActive) return null;
 
     // Festive Content
-    const bannerText = (isFestiveActive && config?.theme.greeting) ? config.theme.greeting : setting.text;
+    const bannerText = (isFestiveActive && config?.theme?.greeting) ? config.theme.greeting : setting.text;
     const bannerLink = (isFestiveActive) ? "/shop?collection=festive" : setting.link;
 
     const content = (

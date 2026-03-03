@@ -31,14 +31,19 @@ export default function ClientLayoutWrapper({
     const { config, isFestiveActive } = useFestive();
     const isAdminPath = pathname?.startsWith('/admin');
 
+    const [isMountedState, setIsMountedState] = useState(false);
+    useEffect(() => {
+        setIsMountedState(true);
+    }, []);
+
     // Site-wide Festive Re-skinning
     useEffect(() => {
-        if (isFestiveActive && config?.features.siteReskin) {
+        if (isMountedState && isFestiveActive && config?.features?.siteReskin) {
             document.documentElement.setAttribute('data-theme', config.currentFestival.toLowerCase());
-        } else {
+        } else if (isMountedState) {
             document.documentElement.removeAttribute('data-theme');
         }
-    }, [isFestiveActive, config]);
+    }, [isFestiveActive, config, isMountedState]);
 
     if (isAdminPath) {
         return <main className="min-h-screen">{children}</main>;
@@ -47,12 +52,16 @@ export default function ClientLayoutWrapper({
     return (
         <>
             <ExitIntentPopup />
-            <FestiveStartupAnimation />
-            <FestiveWelcome />
-            <FestiveParticles />
-            <FestiveSocialProof />
-            <FestiveGlobalDecor />
-            <FestiveSplashTransition />
+            {isMountedState && (
+                <>
+                    <FestiveStartupAnimation />
+                    <FestiveWelcome />
+                    <FestiveParticles />
+                    <FestiveSocialProof />
+                    <FestiveGlobalDecor />
+                    <FestiveSplashTransition />
+                </>
+            )}
             <div className="fixed top-0 left-0 w-full z-[1000] flex flex-col">
                 <AnnouncementBar />
                 <Navbar />

@@ -55,12 +55,38 @@ export function FestiveProvider({ children }: { children: React.ReactNode }) {
             const data = await fetchAPI('/store/settings/festive_config');
             if (data?.value) {
                 // Backend store generic settings as JSON values
-                const cfg = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as FestiveConfig;
+                const rawCfg = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
+
+                // Ensure deep defaults to prevent crashes if certain keys are missing
+                const cfg: FestiveConfig = {
+                    ...rawCfg,
+                    theme: {
+                        primaryColor: '#C6A87C',
+                        secondaryColor: '#2D0056',
+                        accentColor: '#FFD700',
+                        particleType: 'none',
+                        greeting: 'Welcome to Spark Blue Diamond',
+                        couponCode: 'WELCOME',
+                        discountLabel: 'Exquisite Collection',
+                        tieredDiscount: { flat: 0, threshold: 0, aboveThreshold: 0 },
+                        ...(rawCfg?.theme || {})
+                    },
+                    features: {
+                        welcomeModal: false,
+                        fallingParticles: false,
+                        siteReskin: false,
+                        socialProof: false,
+                        scratchCard: false,
+                        startupAnimation: false,
+                        ...(rawCfg?.features || {})
+                    }
+                };
+
                 setConfig(cfg);
 
                 const now = new Date();
-                const start = new Date(cfg.startDate);
-                const end = new Date(cfg.endDate);
+                const start = new Date(cfg.startDate || '1970-01-01');
+                const end = new Date(cfg.endDate || '2099-12-31');
                 const isActive = cfg.active && cfg.currentFestival !== 'NONE' && now >= start && now <= end;
 
                 const hasShown = safeSessionStorage.getItem('festive_animation_shown');

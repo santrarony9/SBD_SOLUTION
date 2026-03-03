@@ -9,10 +9,15 @@ export default function FestiveSocialProof() {
     const [orders, setOrders] = useState<any[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isVisible, setIsVisible] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
     const { config, isFestiveActive } = useFestive();
 
     useEffect(() => {
-        if (!isFestiveActive || !config?.features.socialProof) return;
+        setIsMounted(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isMounted || !isFestiveActive || !config?.features?.socialProof) return;
 
         const loadOrders = async () => {
             try {

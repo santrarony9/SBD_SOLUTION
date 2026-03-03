@@ -10,10 +10,15 @@ export default function FestiveSplashTransition() {
     const [isSplashing, setIsSplashing] = useState(false);
     const [lastPathname, setLastPathname] = useState(pathname);
     const { config, isFestiveActive } = useFestive();
+    const [isMounted, setIsMounted] = useState(false);
 
     // Fallback colors for splash
     const isHoli = config?.currentFestival === 'HOLI';
     const [splashColors, setSplashColors] = useState<string[]>([]);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         if (isHoli) {
@@ -29,7 +34,7 @@ export default function FestiveSplashTransition() {
     }, [isHoli]);
 
     useEffect(() => {
-        if (!isFestiveActive) return;
+        if (!isMounted || !isFestiveActive) return;
 
         if (pathname !== lastPathname) {
             setIsSplashing(true);
@@ -42,9 +47,9 @@ export default function FestiveSplashTransition() {
 
             return () => clearTimeout(timer);
         }
-    }, [pathname, lastPathname]);
+    }, [pathname, lastPathname, isMounted, isFestiveActive]);
 
-    if (!isFestiveActive) return null;
+    if (!isMounted || !isFestiveActive) return null;
 
     return (
         <AnimatePresence mode="wait">

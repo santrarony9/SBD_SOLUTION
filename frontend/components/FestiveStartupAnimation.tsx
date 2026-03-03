@@ -7,6 +7,11 @@ import { useFestive } from '@/context/FestiveContext';
 export default function FestiveStartupAnimation() {
     const { config, isFestiveActive, showAnimation, dismissAnimation } = useFestive();
     const [isExiting, setIsExiting] = useState(false);
+    const [isMounted, setIsMounted] = useState(false);
+
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
     useEffect(() => {
         if (showAnimation) {
@@ -26,10 +31,10 @@ export default function FestiveStartupAnimation() {
         }, 8000); // Allow time for exit animation
     };
 
-    if (!showAnimation || !config) return null;
+    if (!isMounted || !showAnimation || !config) return null;
 
-    const festivalType = config.currentFestival;
-    const animationUrl = config.features.animationUrl;
+    const festivalType = config?.currentFestival;
+    const animationUrl = config?.features?.animationUrl;
 
     return (
         <AnimatePresence>
@@ -97,7 +102,7 @@ export default function FestiveStartupAnimation() {
                                     <div className="absolute -top-4 -right-4 w-12 h-12 bg-[var(--brand-gold)] rounded-full blur-xl animate-ping"></div>
                                 </div>
                                 <p className={`font-serif text-xl md:text-3xl tracking-[0.2em] uppercase ${festivalType === 'HOLI' ? 'text-holi-animated' : 'text-brand-gold'}`}>
-                                    {config.theme.greeting}
+                                    {config?.theme?.greeting || 'Welcome to Spark Blue Diamond'}
                                 </p>
 
                                 <button
