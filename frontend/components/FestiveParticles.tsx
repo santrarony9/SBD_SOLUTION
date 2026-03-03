@@ -10,7 +10,7 @@ export default function FestiveParticles() {
     const { config, isFestiveActive } = useFestive();
 
     useEffect(() => {
-        if (!isFestiveActive || !config?.features.fallingParticles) return;
+        if (!isFestiveActive || !config?.features?.fallingParticles) return;
 
         const canvas = canvasRef.current;
         if (!canvas) return;

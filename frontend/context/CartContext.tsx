@@ -98,11 +98,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
                 return sum + (price * item.quantity);
             }, 0);
 
-            const { tieredDiscount } = config.theme;
-            if (subtotal > 0) {
-                const discount = subtotal >= tieredDiscount.threshold
-                    ? tieredDiscount.aboveThreshold
-                    : tieredDiscount.flat;
+            const tieredDiscount = config?.theme?.tieredDiscount;
+            if (subtotal > 0 && tieredDiscount) {
+                const discount = subtotal >= (tieredDiscount.threshold || 0)
+                    ? (tieredDiscount.aboveThreshold || 0)
+                    : (tieredDiscount.flat || 0);
                 setFestiveDiscount(discount);
             } else {
                 setFestiveDiscount(0);

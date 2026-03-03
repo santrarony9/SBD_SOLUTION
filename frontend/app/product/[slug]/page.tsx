@@ -431,7 +431,7 @@ export default function ProductDetailPage() {
                         <div className="flex flex-col gap-3">
                             {isFestiveActive && (
                                 <div className="inline-flex items-center gap-2 text-green-600 bg-green-50 px-3 py-1.5 rounded-sm border border-green-100 animate-pulse">
-                                    <span className="text-[10px] font-black uppercase tracking-widest">{config?.theme.discountLabel}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest">{config?.theme?.discountLabel || 'Exquisite Collection'}</span>
                                     <span className="text-[8px] uppercase tracking-tighter opacity-70">({config?.currentFestival} Special)</span>
                                 </div>
                             )}

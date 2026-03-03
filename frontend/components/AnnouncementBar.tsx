@@ -28,8 +28,8 @@ export default function AnnouncementBar() {
     if (!isMounted || !setting || !setting.isActive) return null;
 
     // Festive Content
-    const bannerText = (isFestiveActive && config?.theme?.greeting) ? config.theme.greeting : setting.text;
-    const bannerLink = (isFestiveActive) ? "/shop?collection=festive" : setting.link;
+    const bannerText = (isFestiveActive && config?.theme?.greeting) ? config.theme.greeting : setting?.text;
+    const bannerLink = (isFestiveActive) ? "/shop?collection=festive" : setting?.link;
 
     const content = (
         <div className={`py-2 px-4 text-center text-[10px] md:text-xs font-black uppercase tracking-[0.25em] relative z-[60] overflow-hidden group transition-all duration-700 ${isFestiveActive ? 'bg-[var(--brand-navy)] text-[var(--brand-gold)] border-b border-[var(--brand-gold)]/20' : 'bg-brand-gold text-brand-navy'

@@ -16,7 +16,7 @@ export default function FestiveWelcome() {
         setIsMounted(true);
         if (!config) return;
         const hasSeen = safeLocalStorage.getItem(`festive_welcome_${config.currentFestival}`);
-        if (!hasSeen && isFestiveActive && config.features.welcomeModal) {
+        if (!hasSeen && isFestiveActive && config?.features?.welcomeModal) {
             // Show after 2 seconds for better UX
             const timer = setTimeout(() => {
                 setIsVisible(true);
