@@ -1,11 +1,16 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, Query, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('products')
 export class ProductsController {
     constructor(private readonly productsService: ProductsService) { }
 
     @Post()
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'PRICE_MANAGER')
     create(@Body() createProductDto: any) {
         return this.productsService.createProduct(createProductDto);
     }
@@ -13,6 +18,8 @@ export class ProductsController {
 
 
     @Post('ai-description')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'PRICE_MANAGER')
     async generateDescription(@Body() body: any) {
         const description = await this.productsService.generateDescription(body);
         return { description };
@@ -39,11 +46,15 @@ export class ProductsController {
     }
 
     @Put(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'PRICE_MANAGER')
     update(@Param('id') id: string, @Body() updateProductDto: any) {
         return this.productsService.updateProduct(id, updateProductDto);
     }
 
     @Delete(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN')
     remove(@Param('id') id: string) {
         return this.productsService.deleteProduct(id);
     }

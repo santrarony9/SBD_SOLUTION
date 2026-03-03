@@ -1,7 +1,8 @@
 import { Controller, Get, Post, Body, UseGuards, Request, Param, Query } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 @Controller('orders')
 export class OrdersController {
     constructor(private readonly ordersService: OrdersService) { }
@@ -39,7 +40,8 @@ export class OrdersController {
         return this.ordersService.getMyOrders(req.user.userId);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'STAFF')
     @Get('all')
     async getAllOrders(
         @Query('status') status?: string,
@@ -47,7 +49,7 @@ export class OrdersController {
         @Query('page') page?: string,
         @Query('limit') limit?: string,
     ) {
-        // In a real app, check for ADMIN role in guard
+        // Enforced ADMIN/STAFF role in guard
         return this.ordersService.getAllOrders(
             status,
             search,
@@ -56,20 +58,23 @@ export class OrdersController {
         );
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'STAFF')
     @Post(':id/status')
     async updateStatus(@Param('id') id: string, @Body() body: { status: string }) {
         return this.ordersService.updateOrderStatus(id, body.status);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'STAFF')
     @Post(':id/shiprocket')
     async pushToShiprocket(@Param('id') id: string) {
         // Logic Updated: This now acts as a "Sync & Ship" trigger
         return this.ordersService.shipOrder(id);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('SUPER_ADMIN', 'ADMIN', 'STAFF')
     @Get(':id/label')
     async getShipmentLabel(@Param('id') id: string) {
         return this.ordersService.generateShipmentLabel(id);
