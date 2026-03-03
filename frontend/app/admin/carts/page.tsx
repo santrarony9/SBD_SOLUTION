@@ -9,7 +9,11 @@ export default function LiveCartsPage() {
     const [carts, setCarts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const { showToast } = useToast();
-    const [lastUpdated, setLastUpdated] = useState(new Date());
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+    useEffect(() => {
+        setLastUpdated(new Date());
+    }, []);
 
     useEffect(() => {
         loadCarts();

@@ -24,6 +24,8 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     // 3. Add stable minute-level cache-busting for GET requests
     // Using '_v' for v1.0.3 to ensure we bypass any stale cache of previous '_cb' or '_t'
     if (!isServer && (!options.method || options.method.toUpperCase() === 'GET')) {
+        // Use a stable minute-level timestamp to avoid hydration mismatches if possible,
+        // though fetchAPI is usually called in useEffect or server components.
         const minuteTimestamp = Math.floor(Date.now() / 60000);
         const separator = fullUrl.includes('?') ? '&' : '?';
         fullUrl = `${fullUrl}${separator}_v=${minuteTimestamp}`;

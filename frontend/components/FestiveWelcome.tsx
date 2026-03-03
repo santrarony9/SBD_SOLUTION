@@ -187,7 +187,7 @@ export default function FestiveWelcome() {
                     </div>
 
                     <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                        T&C Apply • Valid until {config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : ''}
+                        T&C Apply • Valid until {isMounted && config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : '...'}
                     </p>
                 </div>
             </div>

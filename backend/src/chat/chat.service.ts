@@ -174,10 +174,10 @@ export class ChatService {
             const text = await runChat("gemini-2.5-flash");
             return { text };
         } catch (error) {
-            this.logger.warn(`Gemini 2.5 failed, switching to fallback. Error: ${error.message}`);
+            this.logger.warn(`Gemini 2.5 Flash failed, switching to fallback. Error: ${error.message}`);
             try {
-                // Try Fallback Model (Gemini 2.0 Flash Lite)
-                const text = await runChat("gemini-2.0-flash-lite");
+                // Try Fallback Model (Gemini 2.0 Flash)
+                const text = await runChat("gemini-2.0-flash");
                 return { text };
             } catch (fallbackError) {
                 this.logger.error('Gemini Chat Error (Primary & Fallback)', fallbackError);

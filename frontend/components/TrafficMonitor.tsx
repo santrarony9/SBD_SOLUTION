@@ -16,7 +16,11 @@ interface TrafficMetrics {
 export default function TrafficMonitor() {
     const { user } = useAuth();
     const [metrics, setMetrics] = useState<TrafficMetrics | null>(null);
-    const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+    const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+    useEffect(() => {
+        setLastUpdated(new Date());
+    }, []);
 
     // Only render if user email is admin@sparkblue.com
     if (user?.email !== 'admin@sparkblue.com') {
@@ -78,7 +82,7 @@ export default function TrafficMonitor() {
                             <span className={`text-xs font-bold uppercase tracking-widest ${colors.text}`}>{metrics.status}</span>
                         </div>
                     </div>
-                    <span className="text-[9px] font-mono text-gray-400">Updated: {lastUpdated.toLocaleTimeString()}</span>
+                    <span className="text-[9px] font-mono text-gray-400">Updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : '--:--:--'}</span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">

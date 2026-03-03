@@ -13,7 +13,11 @@ import { useCurrency } from '@/context/CurrencyContext';
 import { PiArrowsLeftRight, PiGlobe } from 'react-icons/pi';
 
 export default function Navbar() {
+    const [isMounted, setIsMounted] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const pathname = usePathname();

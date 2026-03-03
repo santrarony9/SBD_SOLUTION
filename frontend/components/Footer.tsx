@@ -1,8 +1,13 @@
 import Link from 'next/link';
 import { PiInstagramLogo, PiFacebookLogo, PiWhatsappLogo, PiEnvelopeSimple, PiMapPin, PiGlobe, PiYoutubeLogo, PiPinterestLogo, PiEnvelope } from 'react-icons/pi';
+import { useState, useEffect } from 'react';
 import { useCurrency } from '@/context/CurrencyContext';
 
 export default function Footer({ config }: { config?: any }) {
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
     const { currency, setCurrency } = useCurrency();
     const description = config?.description || "Crafting timeless elegance since 2020. IGI certified excellence in every piece.";
     const social = config?.social || { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" };
@@ -88,7 +93,7 @@ export default function Footer({ config }: { config?: any }) {
 
                 {/* Bottom Bar */}
                 <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-[9px] tracking-widest uppercase opacity-30 font-bold">
-                    <p>&copy; {new Date().getFullYear()} Spark Blue Diamond. Handcrafted Brilliance.</p>
+                    <p>&copy; {isMounted ? new Date().getFullYear() : '2025'} Spark Blue Diamond. Handcrafted Brilliance.</p>
 
                     {/* Footer Currency Switcher */}
                     <div className="flex gap-4 items-center">

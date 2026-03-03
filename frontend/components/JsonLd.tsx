@@ -1,4 +1,4 @@
-'use client';
+// Server Component for injecting structured data (Schema.org) into the page.
 
 /**
  * JsonLd component for injecting structured data (Schema.org) into the page.

@@ -13,8 +13,7 @@ interface Message {
 }
 
 export default function ChatWidget() {
-  // HIDING CHAT BOT FOR NOW
-  return null;
+  // Chatbot is now enabled with a fresh API key.
 
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
