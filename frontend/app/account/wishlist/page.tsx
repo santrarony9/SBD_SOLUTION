@@ -16,9 +16,10 @@ export default function WishlistPage() {
     const loadWishlist = async () => {
         try {
             const data = await fetchAPI('/wishlist');
-            setWishlist(data);
+            setWishlist(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Failed to load wishlist');
+            setWishlist([]);
         } finally {
             setLoading(false);
         }
