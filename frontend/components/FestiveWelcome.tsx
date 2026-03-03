@@ -104,14 +104,21 @@ export default function FestiveWelcome() {
             }
         };
 
-        canvas.addEventListener('mousedown', () => painting = true);
-        canvas.addEventListener('touchstart', () => painting = true);
-        window.addEventListener('mouseup', () => painting = false);
-        window.addEventListener('touchend', () => painting = false);
+        const startPaint = () => painting = true;
+        const stopPaint = () => painting = false;
+
+        canvas.addEventListener('mousedown', startPaint);
+        canvas.addEventListener('touchstart', startPaint);
+        window.addEventListener('mouseup', stopPaint);
+        window.addEventListener('touchend', stopPaint);
         canvas.addEventListener('mousemove', scratch);
         canvas.addEventListener('touchmove', scratch);
 
         return () => {
+            canvas.removeEventListener('mousedown', startPaint);
+            canvas.removeEventListener('touchstart', startPaint);
+            window.removeEventListener('mouseup', stopPaint);
+            window.removeEventListener('touchend', stopPaint);
             canvas.removeEventListener('mousemove', scratch);
             canvas.removeEventListener('touchmove', scratch);
         };
@@ -119,7 +126,9 @@ export default function FestiveWelcome() {
 
     const closeWelcome = () => {
         setIsVisible(false);
-        document.body.style.overflow = 'auto';
+        if (typeof document !== 'undefined') {
+            document.body.style.overflow = 'auto';
+        }
         safeLocalStorage.setItem(`festive_welcome_${config?.currentFestival}`, 'true');
     };
 
@@ -146,7 +155,7 @@ export default function FestiveWelcome() {
                     </div>
 
                     <h2 className={`fluid-h2 font-serif mb-4 leading-tight ${config?.currentFestival === 'HOLI' ? 'text-holi-animated drop-shadow-md' : 'text-brand-navy'}`}>
-                        {config?.theme.greeting}
+                        {config?.theme?.greeting || 'Happy Festive Season'}
                     </h2>
 
                     <p className="text-gray-500 font-light text-sm md:text-base mb-10 text-balance">
@@ -157,12 +166,12 @@ export default function FestiveWelcome() {
                     <div className="relative mx-auto w-64 h-32 bg-gray-50 rounded-xl mb-8 flex items-center justify-center overflow-hidden border border-dashed border-brand-gold/30">
                         {/* Hidden Content */}
                         <div className={`text-center transition-all duration-700 ${isScratched ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}>
-                            <span className="text-[10px] text-gray-400 uppercase block mb-1">Your Personal {config?.currentFestival.replace('_', ' ')} Code</span>
+                            <span className="text-[10px] text-gray-400 uppercase block mb-1">Your Personal {config?.currentFestival?.replace('_', ' ') || ''} Code</span>
                             <span className="text-2xl font-mono font-black text-brand-navy tracking-widest uppercase">
-                                {config?.theme.couponCode}
+                                {config?.theme?.couponCode || 'FESTIVE10'}
                             </span>
                             <div className="mt-2 text-brand-gold font-bold text-sm tracking-widest">
-                                {config?.theme.discountLabel}
+                                {config?.theme?.discountLabel || '₹500 OFF'}
                             </div>
                         </div>
 
@@ -182,12 +191,12 @@ export default function FestiveWelcome() {
                             onClick={closeWelcome}
                             className={`w-full py-4 rounded-xl font-bold uppercase tracking-widest text-xs transition-all duration-500 ${isScratched ? 'bg-brand-navy text-white hover:bg-brand-gold hover:text-brand-navy' : 'bg-gray-100 text-gray-400 pointer-events-none'}`}
                         >
-                            {isScratched ? `Shop ${config?.currentFestival.replace('_', ' ')} Collection` : 'Scratch Above to Unlock'}
+                            {isScratched ? `Shop ${config?.currentFestival?.replace('_', ' ') || 'Special'} Collection` : 'Scratch Above to Unlock'}
                         </button>
                     </div>
 
                     <p className="mt-6 text-[10px] text-gray-400 uppercase tracking-widest leading-relaxed">
-                        T&C Apply • Valid until {isMounted && config ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : '...'}
+                        T&C Apply • Valid until {isMounted && config?.endDate ? new Date(config.endDate).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' }) : '...'}
                     </p>
                 </div>
             </div>

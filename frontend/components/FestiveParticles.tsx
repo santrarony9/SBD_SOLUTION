@@ -31,13 +31,13 @@ export default function FestiveParticles() {
 
         // Configuration for Particles (Holi Splashes use multi colors, others use theme colors)
         const isHoli = config?.currentFestival === 'HOLI';
-        const colors = isHoli 
+        const colors = isHoli
             ? ['#ff0080', '#fbff00', '#00ff40', '#0099ff', '#ff5a00', '#ae00ff']
             : [
                 getComputedStyle(document.documentElement).getPropertyValue('--brand-gold').trim(),
                 getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-1').trim(),
                 getComputedStyle(document.documentElement).getPropertyValue('--festive-accent-2').trim()
-              ].filter(c => c);
+            ].filter(c => c);
         const particles: Particle[] = [];
         const particleCount = 20;
 
@@ -53,10 +53,10 @@ export default function FestiveParticles() {
             spin: number;
 
             constructor() {
-                this.x = Math.random() * canvas!.width;
-                this.y = Math.random() * canvas!.height;
+                this.x = Math.random() * (canvas?.width || 1000);
+                this.y = Math.random() * (canvas?.height || 1000);
                 this.size = Math.random() * 40 + 20;
-                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.color = colors[Math.floor(Math.random() * colors.length)] || '#C6A87C';
                 this.speedX = (Math.random() - 0.5) * 1.5;
                 this.speedY = (Math.random() - 0.5) * 1.5;
                 this.opacity = Math.random() * 0.4 + 0.1;
@@ -68,37 +68,35 @@ export default function FestiveParticles() {
                 this.x += this.speedX;
                 this.y += this.speedY;
                 this.angle += this.spin;
-
-                // Boundary check (no wrapping, let them drift off)
             }
 
             draw() {
-                ctx!.save();
-                ctx!.translate(this.x, this.y);
-                ctx!.rotate((this.angle * Math.PI) / 180);
-                ctx!.globalAlpha = this.opacity;
-                ctx!.fillStyle = this.color;
+                if (!ctx) return;
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate((this.angle * Math.PI) / 180);
+                ctx.globalAlpha = this.opacity;
+                ctx.fillStyle = this.color;
 
-                // Create a "splash" shape (irregular circle)
-                ctx!.beginPath();
+                ctx.beginPath();
                 for (let i = 0; i < 8; i++) {
                     const radius = (i % 2 === 0 ? this.size : this.size * 0.8) * Math.random() * 0.5 + this.size * 0.5;
                     const angle = (i / 8) * Math.PI * 2;
                     const x = Math.cos(angle) * radius;
                     const y = Math.sin(angle) * radius;
-                    if (i === 0) ctx!.moveTo(x, y);
-                    else ctx!.lineTo(x, y);
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
                 }
-                ctx!.closePath();
-                ctx!.fill();
+                ctx.closePath();
+                ctx.fill();
 
-                // Add soft blur look
-                ctx!.filter = 'blur(4px)';
-                ctx!.restore();
+                ctx.filter = 'blur(4px)';
+                ctx.restore();
             }
         }
 
         const init = () => {
+            if (!canvas) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             for (let i = 0; i < particleCount; i++) {
@@ -107,6 +105,7 @@ export default function FestiveParticles() {
         };
 
         const animate = () => {
+            if (!ctx || !canvas) return;
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach((p) => {
                 p.update();
@@ -119,6 +118,7 @@ export default function FestiveParticles() {
         animate();
 
         const handleResize = () => {
+            if (!canvas) return;
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         };
@@ -130,9 +130,9 @@ export default function FestiveParticles() {
             cancelAnimationFrame(animationFrameId);
             window.removeEventListener('resize', handleResize);
         };
-    }, []);
+    }, [isFestiveActive, config]);
 
-    if (!isFestiveActive || !config?.features.fallingParticles || !shouldRender) return null;
+    if (!isFestiveActive || !config?.features?.fallingParticles || !shouldRender) return null;
 
     return (
         <canvas

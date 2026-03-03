@@ -63,11 +63,12 @@ export async function generateMetadata(): Promise<Metadata> {
   try {
     const data = await fetchAPI('/store/settings/seo');
     if (data && data.value) {
+      const seo = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
       return {
         ...defaultMeta,
-        title: data.value.title || defaultMeta.title,
-        description: data.value.description || defaultMeta.description,
-        keywords: data.value.keywords || defaultMeta.keywords,
+        title: seo?.title || defaultMeta.title,
+        description: seo?.description || defaultMeta.description,
+        keywords: seo?.keywords || defaultMeta.keywords,
       };
     }
   } catch (e) {

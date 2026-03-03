@@ -46,11 +46,15 @@ export default function CreatorPromoWidget() {
         }
     }, []);
 
-    const handleCopy = () => {
-        if (!activePromo) return;
-        navigator.clipboard.writeText(activePromo.code);
-        setIsCopied(true);
-        setTimeout(() => setIsCopied(false), 3000);
+    const handleCopy = async () => {
+        if (!activePromo?.code) return;
+        try {
+            await navigator.clipboard.writeText(activePromo.code);
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 3000);
+        } catch (err) {
+            console.error('Failed to copy promo code:', err);
+        }
     };
 
     const handleClose = () => {
@@ -85,7 +89,7 @@ export default function CreatorPromoWidget() {
                 {/* Content */}
                 <div className="py-2">
                     <p className="text-[10px] font-black uppercase tracking-widest text-brand-gold mb-0.5">
-                        {activePromo.creatorName ? `${activePromo.creatorName}'s Gift` : 'Special Promo'}
+                        {activePromo?.creatorName ? `${activePromo.creatorName}'s Gift` : 'Special Promo'}
                     </p>
                     <p className="text-sm font-serif text-brand-navy leading-tight pr-6">
                         Unlock <b>{discountText}</b> your entire order.
@@ -103,7 +107,7 @@ export default function CreatorPromoWidget() {
                         ) : (
                             <>
                                 <span className="bg-gray-100 px-2 py-0.5 rounded font-mono group-hover/btn:bg-brand-gold/10 transition-colors uppercase">
-                                    {activePromo.code}
+                                    {activePromo?.code}
                                 </span>
                                 <PiCopy size={14} />
                                 COPY CODE

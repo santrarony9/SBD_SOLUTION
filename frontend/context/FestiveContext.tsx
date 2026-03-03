@@ -55,7 +55,7 @@ export function FestiveProvider({ children }: { children: React.ReactNode }) {
             const data = await fetchAPI('/store/settings/festive_config');
             if (data?.value) {
                 // Backend store generic settings as JSON values
-                const cfg = data.value as FestiveConfig;
+                const cfg = (typeof data.value === 'string' ? JSON.parse(data.value) : data.value) as FestiveConfig;
                 setConfig(cfg);
 
                 const now = new Date();

@@ -169,7 +169,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             : 'bg-[var(--brand-navy)] border border-[var(--brand-gold)]/30 shadow-[var(--brand-gold)]/10'
                             }`}>
                             <span className={`text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap ${config?.currentFestival === 'HOLI' ? 'text-holi-animated' : ''}`}>
-                                {config?.theme.greeting}
+                                {config?.theme?.greeting || 'Welcome to Spark Blue Diamond'}
                             </span>
                         </div>
                         <motion.div
@@ -179,7 +179,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-sm shadow-sm"
                         >
                             <span className="text-white text-[9px] md:text-xs font-black uppercase tracking-[0.2em]">
-                                Offer: {config?.theme.discountLabel}
+                                Offer: {config?.theme?.discountLabel || 'Exquisite Collection'}
                             </span>
                         </motion.div>
                     </motion.div>
