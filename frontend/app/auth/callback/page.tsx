@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, Suspense } from 'react';
+import { useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/context/ToastContext';
@@ -11,11 +11,16 @@ function CallbackHandler() {
     const { login } = useAuth();
     const { showToast } = useToast();
 
+    const hasAttemptedRef = useRef(false);
+
     useEffect(() => {
+        if (hasAttemptedRef.current) return;
+
         const token = searchParams.get('token');
         const userDataStr = searchParams.get('user');
 
         if (token && userDataStr) {
+            hasAttemptedRef.current = true;
             try {
                 const userData = JSON.parse(decodeURIComponent(userDataStr));
                 login(token, userData);

@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { safeLocalStorage } from '@/lib/storage';
 
@@ -50,7 +50,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setIsLoading(false);
     }, []);
 
-    const login = (newToken: string, newUser: User) => {
+    const login = useCallback((newToken: string, newUser: User) => {
         console.log('[AuthContext] login() called with token:', newToken ? 'YES' : 'NO', 'user:', newUser);
         safeLocalStorage.setItem('token', newToken);
         safeLocalStorage.setItem('user', JSON.stringify(newUser));
@@ -68,15 +68,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             console.log('[AuthContext] Role is regular user. Redirecting to /account...');
             router.push('/account');
         }
-    };
+    }, [router]);
 
-    const logout = () => {
+    const logout = useCallback(() => {
         safeLocalStorage.removeItem('token');
         safeLocalStorage.removeItem('user');
         setToken(null);
         setUser(null);
         router.push('/login');
-    };
+    }, [router]);
 
     return (
         <AuthContext.Provider value={{ user, token, login, logout, isAuthenticated: !!user, isLoading }}>
