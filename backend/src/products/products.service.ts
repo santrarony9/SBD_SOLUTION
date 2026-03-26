@@ -9,29 +9,35 @@ import { RedisService } from '../redis/redis.service';
 
 @Injectable()
 export class ProductsService {
-    private genAI: GoogleGenerativeAI;
+  private genAI: GoogleGenerativeAI;
 
-    constructor(
-        private prisma: PrismaService,
-        private redis: RedisService
-    ) {
-        const productKey = process.env.GEMINI_PRODUCT_API_KEY || process.env.GEMINI_API_KEY;
-        if (productKey) {
-            this.genAI = new GoogleGenerativeAI(productKey);
-        }
+  constructor(
+    private prisma: PrismaService,
+    private redis: RedisService,
+  ) {
+    const productKey =
+      process.env.GEMINI_PRODUCT_API_KEY || process.env.GEMINI_API_KEY;
+    if (productKey) {
+      this.genAI = new GoogleGenerativeAI(productKey);
+    }
+  }
+
+  async generateDescription(promptData: any) {
+    if (!this.genAI) {
+      throw new HttpException(
+        'AI Description unavailable: Missing GEMINI_API_KEY.',
+        503,
+      );
     }
 
-    async generateDescription(promptData: any) {
-        if (!this.genAI) {
-            throw new HttpException('AI Description unavailable: Missing GEMINI_API_KEY.', 503);
-        }
+    try {
+      // Primary Model: Gemini 2.5 Flash (General Availability)
+      console.log('Attempting AI Generation with: gemini-2.5-flash');
+      const model = this.genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+      });
 
-        try {
-            // Primary Model: Gemini 2.5 Flash (General Availability)
-            console.log("Attempting AI Generation with: gemini-2.5-flash");
-            const model = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-            const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
+      const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
             Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
@@ -39,17 +45,22 @@ export class ProductsService {
             Style: Elegant, Premium, Timeless.
             Keep it under 60 words. Emphasize craftsmanship and eternal value. DO NOT mention any SKU, Product ID, or codes.`;
 
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            return response.text();
-        } catch (error: any) {
-            console.error("Gemini 2.5 Flash failed, attempting fallback to 2.0 Flash Lite. Error:", error.message);
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      return response.text();
+    } catch (error: any) {
+      console.error(
+        'Gemini 2.5 Flash failed, attempting fallback to 2.0 Flash Lite. Error:',
+        error.message,
+      );
 
-            try {
-                // Fallback Model: Gemini 2.0 Flash Lite (Cost effective, fast)
-                const fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+      try {
+        // Fallback Model: Gemini 2.0 Flash Lite (Cost effective, fast)
+        const fallbackModel = this.genAI.getGenerativeModel({
+          model: 'gemini-2.0-flash-lite',
+        });
 
-                const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
+        const prompt = `Write a luxurious, captivating product description for a piece of jewelry with these details:
             Name: ${promptData.name}
             Category: ${promptData.category}
             Gold: ${promptData.goldPurity} K, ${promptData.goldWeight} g
@@ -57,231 +68,318 @@ export class ProductsService {
             Style: Elegant, Premium, Timeless.
                 Keep it under 60 words. Emphasize craftsmanship and eternal value. DO NOT mention any SKU, Product ID, or codes.`;
 
-                const result = await fallbackModel.generateContent(prompt);
-                const response = await result.response;
-                return response.text();
-            } catch (fallbackError: any) {
-                console.error("AI Generation Failed (Fallback also failed):", fallbackError);
-                throw new HttpException('AI Generation Failed: ' + fallbackError.message, 503);
-            }
-        }
+        const result = await fallbackModel.generateContent(prompt);
+        const response = await result.response;
+        return response.text();
+      } catch (fallbackError: any) {
+        console.error(
+          'AI Generation Failed (Fallback also failed):',
+          fallbackError,
+        );
+        throw new HttpException(
+          'AI Generation Failed: ' + fallbackError.message,
+          503,
+        );
+      }
+    }
+  }
+
+  async createProduct(data: any) {
+    try {
+      // Auto-generate SKU if not provided to avoid Unique Constraint errors
+      if (!data.sku) {
+        const prefix = data.category
+          ? data.category.substring(0, 3).toUpperCase()
+          : 'GEN';
+        const timestamp = Date.now().toString().substring(6); // shorter timestamp
+        const random = Math.floor(Math.random() * 1000);
+        data.sku = `SBD - ${prefix} -${timestamp} -${random} `;
+      }
+
+      const product = await this.prisma.product.create({ data });
+      await this.redis.delByPattern('products:*');
+      return product;
+    } catch (error) {
+      console.error('Failed to create product:', error);
+      throw error; // Re-throw to let global filter handle it, but log first
+    }
+  }
+
+  async updateProduct(id: string, data: any) {
+    // Ensure product exists
+    await this.findOne(id);
+    const updated = await this.prisma.product.update({
+      where: { id },
+      data,
+    });
+    await this.redis.delByPattern('products:*');
+    return updated;
+  }
+
+  async deleteProduct(id: string) {
+    await this.findOne(id); // Ensure existence
+    // Soft delete could be better, but hard delete for now as per mvp
+    const deleted = await this.prisma.product.delete({ where: { id } });
+    await this.redis.delByPattern('products:*');
+    return deleted;
+  }
+
+  async findAll(filters?: {
+    category?: string;
+    tag?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    skip?: number;
+    take?: number;
+  }) {
+    const cacheKey = `products: all:${JSON.stringify(filters || {})} `;
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
     }
 
+    const where: any = { isActive: true };
 
-
-    async createProduct(data: any) {
-        try {
-            // Auto-generate SKU if not provided to avoid Unique Constraint errors
-            if (!data.sku) {
-                const prefix = data.category ? data.category.substring(0, 3).toUpperCase() : 'GEN';
-                const timestamp = Date.now().toString().substring(6); // shorter timestamp
-                const random = Math.floor(Math.random() * 1000);
-                data.sku = `SBD - ${prefix} -${timestamp} -${random} `;
-            }
-
-            const product = await this.prisma.product.create({ data });
-            await this.redis.delByPattern('products:*');
-            return product;
-        } catch (error) {
-            console.error('Failed to create product:', error);
-            throw error; // Re-throw to let global filter handle it, but log first
-        }
+    if (filters?.category) {
+      where.category = filters.category;
     }
 
-    async updateProduct(id: string, data: any) {
-        // Ensure product exists
-        await this.findOne(id);
-        const updated = await this.prisma.product.update({
-            where: { id },
-            data,
-        });
-        await this.redis.delByPattern('products:*');
-        return updated;
+    if (filters?.tag) {
+      where.tags = { has: filters.tag };
     }
 
-    async deleteProduct(id: string) {
-        await this.findOne(id); // Ensure existence
-        // Soft delete could be better, but hard delete for now as per mvp
-        const deleted = await this.prisma.product.delete({ where: { id } });
-        await this.redis.delByPattern('products:*');
-        return deleted;
+    // 1. Batch fetch products with pagination (at DB level)
+    const products = await this.prisma.product.findMany({
+      where,
+      skip: filters?.skip || 0,
+      take: filters?.take || 100, // Default limit for safety
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (products.length === 0) return [];
+
+    // 2. Batch fetch global rates to solve N+1 Problem
+    const [goldRates, diamondRates, charges, tieredData] = await Promise.all([
+      this.prisma.goldPrice.findMany(),
+      this.prisma.diamondPrice.findMany(),
+      this.prisma.charge.findMany({ where: { isActive: true } }),
+      this.prisma.storeSetting.findUnique({
+        where: { key: 'making_charge_tiers' },
+      }),
+    ]);
+
+    let makingChargeTiers: any[] = [];
+    if (tieredData?.value) {
+      try {
+        makingChargeTiers =
+          typeof tieredData.value === 'string'
+            ? JSON.parse(tieredData.value)
+            : (tieredData.value as unknown as any[]);
+      } catch (e) {
+        console.error(
+          '[ProductsService] Error parsing making charge tiers:',
+          e,
+        );
+      }
     }
 
-    async findAll(filters?: { category?: string, tag?: string, minPrice?: number, maxPrice?: number, skip?: number, take?: number }) {
-        const cacheKey = `products: all:${JSON.stringify(filters || {})} `;
-        const cached = await this.redis.get(cacheKey);
-        if (cached) {
-            return JSON.parse(cached);
-        }
+    const goldRateMap = new Map(
+      goldRates.map((r) => [r.purity, r.pricePer10g]),
+    );
+    const diamondRateMap = new Map(
+      diamondRates.map((r) => [r.clarity, r.pricePerCarat]),
+    );
 
-        const where: any = { isActive: true };
+    // 3. Enrich products using cached rates
+    const enriched = products.map((product) => {
+      const goldPricePer10g = goldRateMap.get(product.goldPurity) || 0;
+      const diamondPricePerCarat =
+        diamondRateMap.get(product.diamondClarity) || 0;
 
-        if (filters?.category) {
-            where.category = filters.category;
-        }
+      return this.calculatePricing(
+        product,
+        goldPricePer10g,
+        diamondPricePerCarat,
+        charges,
+        makingChargeTiers,
+      );
+    });
 
-        if (filters?.tag) {
-            where.tags = { has: filters.tag };
-        }
-
-        // 1. Batch fetch products with pagination (at DB level)
-        const products = await this.prisma.product.findMany({
-            where,
-            skip: filters?.skip || 0,
-            take: filters?.take || 100, // Default limit for safety
-            orderBy: { createdAt: 'desc' }
-        });
-
-        if (products.length === 0) return [];
-
-        // 2. Batch fetch global rates to solve N+1 Problem
-        const [goldRates, diamondRates, charges, tieredData] = await Promise.all([
-            this.prisma.goldPrice.findMany(),
-            this.prisma.diamondPrice.findMany(),
-            this.prisma.charge.findMany({ where: { isActive: true } }),
-            this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } })
-        ]);
-
-        let makingChargeTiers: any[] = [];
-        if (tieredData?.value) {
-            try {
-                makingChargeTiers = typeof tieredData.value === 'string'
-                    ? JSON.parse(tieredData.value)
-                    : (tieredData.value as unknown as any[]);
-            } catch (e) {
-                console.error("[ProductsService] Error parsing making charge tiers:", e);
-            }
-        }
-
-        const goldRateMap = new Map(goldRates.map(r => [r.purity, r.pricePer10g]));
-        const diamondRateMap = new Map(diamondRates.map(r => [r.clarity, r.pricePerCarat]));
-
-        // 3. Enrich products using cached rates
-        const enriched = products.map(product => {
-            const goldPricePer10g = goldRateMap.get(product.goldPurity) || 0;
-            const diamondPricePerCarat = diamondRateMap.get(product.diamondClarity) || 0;
-
-            return this.calculatePricing(product, goldPricePer10g, diamondPricePerCarat, charges, makingChargeTiers);
-        });
-
-        // 4. Client-side price filtering (since pricing is dynamic)
-        let result = enriched;
-        if (filters?.minPrice || filters?.maxPrice) {
-            result = enriched.filter(p => {
-                const price = p.pricing?.finalPrice || 0;
-                if (filters.minPrice && price < filters.minPrice) return false;
-                if (filters.maxPrice && price > filters.maxPrice) return false;
-                return true;
-            });
-        }
-
-        await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
-        return result;
+    // 4. Client-side price filtering (since pricing is dynamic)
+    let result = enriched;
+    if (filters?.minPrice || filters?.maxPrice) {
+      result = enriched.filter((p) => {
+        const price = p.pricing?.finalPrice || 0;
+        if (filters.minPrice && price < filters.minPrice) return false;
+        if (filters.maxPrice && price > filters.maxPrice) return false;
+        return true;
+      });
     }
 
-    async findOne(slugOrId: string) {
-        const cacheKey = `products: one:${slugOrId} `;
-        const cached = await this.redis.get(cacheKey);
-        if (cached) {
-            return JSON.parse(cached);
-        }
+    await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
+    return result;
+  }
 
-        let product;
-
-        if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
-            product = await this.prisma.product.findUnique({ where: { id: slugOrId } });
-        }
-
-        if (!product) {
-            product = await this.prisma.product.findFirst({ where: { slug: slugOrId } });
-        }
-
-        if (!product) throw new NotFoundException('Product not found');
-
-        // Fetch rates for single enrichment
-        const goldRate = await this.prisma.goldPrice.findUnique({ where: { purity: product.goldPurity } });
-        const diamondRate = await this.prisma.diamondPrice.findUnique({ where: { clarity: product.diamondClarity } });
-        const charges = await this.prisma.charge.findMany({ where: { isActive: true } });
-        const tieredData = await this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } });
-        let makingChargeTiers: any[] = [];
-        if (tieredData?.value) {
-            try {
-                makingChargeTiers = typeof tieredData.value === 'string'
-                    ? JSON.parse(tieredData.value)
-                    : (tieredData.value as unknown as any[]);
-            } catch (e) {
-                console.error("[ProductsService] Error parsing making charge tiers for single product:", e);
-            }
-        }
-
-        const result = this.calculatePricing(product, goldRate?.pricePer10g || 0, diamondRate?.pricePerCarat || 0, charges, makingChargeTiers);
-        await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
-        return result;
+  async findOne(slugOrId: string) {
+    const cacheKey = `products: one:${slugOrId} `;
+    const cached = await this.redis.get(cacheKey);
+    if (cached) {
+      return JSON.parse(cached);
     }
 
-    // ------------------------------------------
-    // OPTIMIZED PRICING LOGIC (Pure Function style)
-    // ------------------------------------------
-    private calculatePricing(product: any, goldRate: number, diamondRate: number, charges: any[], makingChargeTiers: any[] = []) {
-        try {
-            const goldValue = (goldRate / 10) * product.goldWeight;
-            const diamondValue = diamondRate * product.diamondCarat;
-            const subTotal = goldValue + diamondValue;
+    let product;
 
-            let makingCharges = 0;
-            let otherCharges = 0;
-
-            // 1. Apply Tiered Making Charges first if tiers exist
-            const weight = product.goldWeight || 0;
-            let activeTier = makingChargeTiers.find((t: any) => t.id === '3g_plus');
-            if (weight >= 0 && weight < 1) activeTier = makingChargeTiers.find((t: any) => t.id === '0_1g');
-            else if (weight >= 1 && weight < 2) activeTier = makingChargeTiers.find((t: any) => t.id === '1_2g');
-            else if (weight >= 2 && weight < 3) activeTier = makingChargeTiers.find((t: any) => t.id === '2_3g');
-
-            if (activeTier) {
-                if (activeTier.type === 'FLAT') makingCharges = Number(activeTier.amount);
-                else if (activeTier.type === 'PER_GRAM') makingCharges = Number(activeTier.amount) * weight;
-                else if (activeTier.type === 'PERCENTAGE') makingCharges = (goldValue * Number(activeTier.amount)) / 100;
-            }
-
-            // 2. Apply other charges (legacy making charges are skipped if tiers handled them)
-            for (const charge of charges) {
-                if (charge.name.toUpperCase().includes('GST')) continue;
-
-                // If tiered making is active, skip legacy making charges to avoid double charging
-                if (activeTier && charge.name.toLowerCase().includes('making')) continue;
-
-                let amt = 0;
-                if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE) amt = charge.amount * product.goldWeight;
-                else if (charge.type === 'PER_CARAT' && charge.applyOn === ApplyOn.DIAMOND_VALUE) amt = charge.amount * product.diamondCarat;
-                else if (charge.type === 'FLAT') amt = charge.amount;
-                else if (charge.type === 'PERCENTAGE') {
-                    if (charge.applyOn === ApplyOn.GOLD_VALUE) amt = (goldValue * charge.amount) / 100;
-                    else if (charge.applyOn === ApplyOn.DIAMOND_VALUE) amt = (diamondValue * charge.amount) / 100;
-                    else if (charge.applyOn === ApplyOn.SUBTOTAL) amt = (subTotal * charge.amount) / 100;
-                }
-
-                if (charge.name.toLowerCase().includes('making')) makingCharges += amt;
-                else otherCharges += amt;
-            }
-
-            const taxable = subTotal + makingCharges + otherCharges;
-            const gstCharge = charges.find(c => c.name.toUpperCase().includes('GST'));
-            const gst = (gstCharge && gstCharge.type === 'PERCENTAGE') ? (taxable * gstCharge.amount) / 100 : (taxable * 3) / 100;
-
-            return {
-                ...product,
-                pricing: {
-                    validAsOf: new Date(),
-                    goldRate,
-                    diamondRate,
-                    components: { goldValue, diamondValue, makingCharges, otherCharges, gst },
-                    finalPrice: taxable + gst
-                }
-            };
-        } catch (e: any) {
-            console.error(`[ProductsService] Pricing calculation failed for product ${product?.id || 'unknown'}: `, e.message);
-            return { ...product, pricing: null };
-        }
+    if (/^[0-9a-fA-F]{24}$/.test(slugOrId)) {
+      product = await this.prisma.product.findUnique({
+        where: { id: slugOrId },
+      });
     }
+
+    if (!product) {
+      product = await this.prisma.product.findFirst({
+        where: { slug: slugOrId },
+      });
+    }
+
+    if (!product) throw new NotFoundException('Product not found');
+
+    // Fetch rates for single enrichment
+    const goldRate = await this.prisma.goldPrice.findUnique({
+      where: { purity: product.goldPurity },
+    });
+    const diamondRate = await this.prisma.diamondPrice.findUnique({
+      where: { clarity: product.diamondClarity },
+    });
+    const charges = await this.prisma.charge.findMany({
+      where: { isActive: true },
+    });
+    const tieredData = await this.prisma.storeSetting.findUnique({
+      where: { key: 'making_charge_tiers' },
+    });
+    let makingChargeTiers: any[] = [];
+    if (tieredData?.value) {
+      try {
+        makingChargeTiers =
+          typeof tieredData.value === 'string'
+            ? JSON.parse(tieredData.value)
+            : (tieredData.value as unknown as any[]);
+      } catch (e) {
+        console.error(
+          '[ProductsService] Error parsing making charge tiers for single product:',
+          e,
+        );
+      }
+    }
+
+    const result = this.calculatePricing(
+      product,
+      goldRate?.pricePer10g || 0,
+      diamondRate?.pricePerCarat || 0,
+      charges,
+      makingChargeTiers,
+    );
+    await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
+    return result;
+  }
+
+  // ------------------------------------------
+  // OPTIMIZED PRICING LOGIC (Pure Function style)
+  // ------------------------------------------
+  private calculatePricing(
+    product: any,
+    goldRate: number,
+    diamondRate: number,
+    charges: any[],
+    makingChargeTiers: any[] = [],
+  ) {
+    try {
+      const goldValue = (goldRate / 10) * product.goldWeight;
+      const diamondValue = diamondRate * product.diamondCarat;
+      const subTotal = goldValue + diamondValue;
+
+      let makingCharges = 0;
+      let otherCharges = 0;
+
+      // 1. Apply Tiered Making Charges first if tiers exist
+      const weight = product.goldWeight || 0;
+      let activeTier = makingChargeTiers.find((t: any) => t.id === '3g_plus');
+      if (weight >= 0 && weight < 1)
+        activeTier = makingChargeTiers.find((t: any) => t.id === '0_1g');
+      else if (weight >= 1 && weight < 2)
+        activeTier = makingChargeTiers.find((t: any) => t.id === '1_2g');
+      else if (weight >= 2 && weight < 3)
+        activeTier = makingChargeTiers.find((t: any) => t.id === '2_3g');
+
+      if (activeTier) {
+        if (activeTier.type === 'FLAT')
+          makingCharges = Number(activeTier.amount);
+        else if (activeTier.type === 'PER_GRAM')
+          makingCharges = Number(activeTier.amount) * weight;
+        else if (activeTier.type === 'PERCENTAGE')
+          makingCharges = (goldValue * Number(activeTier.amount)) / 100;
+      }
+
+      // 2. Apply other charges (legacy making charges are skipped if tiers handled them)
+      for (const charge of charges) {
+        if (charge.name.toUpperCase().includes('GST')) continue;
+
+        // If tiered making is active, skip legacy making charges to avoid double charging
+        if (activeTier && charge.name.toLowerCase().includes('making'))
+          continue;
+
+        let amt = 0;
+        if (charge.type === 'PER_GRAM' && charge.applyOn === ApplyOn.GOLD_VALUE)
+          amt = charge.amount * product.goldWeight;
+        else if (
+          charge.type === 'PER_CARAT' &&
+          charge.applyOn === ApplyOn.DIAMOND_VALUE
+        )
+          amt = charge.amount * product.diamondCarat;
+        else if (charge.type === 'FLAT') amt = charge.amount;
+        else if (charge.type === 'PERCENTAGE') {
+          if (charge.applyOn === ApplyOn.GOLD_VALUE)
+            amt = (goldValue * charge.amount) / 100;
+          else if (charge.applyOn === ApplyOn.DIAMOND_VALUE)
+            amt = (diamondValue * charge.amount) / 100;
+          else if (charge.applyOn === ApplyOn.SUBTOTAL)
+            amt = (subTotal * charge.amount) / 100;
+        }
+
+        if (charge.name.toLowerCase().includes('making')) makingCharges += amt;
+        else otherCharges += amt;
+      }
+
+      const taxable = subTotal + makingCharges + otherCharges;
+      const gstCharge = charges.find((c) =>
+        c.name.toUpperCase().includes('GST'),
+      );
+      const gst =
+        gstCharge && gstCharge.type === 'PERCENTAGE'
+          ? (taxable * gstCharge.amount) / 100
+          : (taxable * 3) / 100;
+
+      return {
+        ...product,
+        pricing: {
+          validAsOf: new Date(),
+          goldRate,
+          diamondRate,
+          components: {
+            goldValue,
+            diamondValue,
+            makingCharges,
+            otherCharges,
+            gst,
+          },
+          finalPrice: taxable + gst,
+        },
+      };
+    } catch (e: any) {
+      console.error(
+        `[ProductsService] Pricing calculation failed for product ${product?.id || 'unknown'}: `,
+        e.message,
+      );
+      return { ...product, pricing: null };
+    }
+  }
 }

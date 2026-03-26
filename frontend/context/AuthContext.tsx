@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = useCallback((newToken: string, newUser: User) => {
-        console.log('[AuthContext] login() called with token:', newToken ? 'YES' : 'NO', 'user:', newUser);
+
         safeLocalStorage.setItem('token', newToken);
         safeLocalStorage.setItem('user', JSON.stringify(newUser));
         setToken(newToken);
@@ -59,13 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Check for any admin-level role
         const adminRoles = ['ADMIN', 'SUPER_ADMIN', 'STAFF', 'PRICE_MANAGER'];
-        console.log('[AuthContext] Checking if user role is admin:', newUser.role);
+
 
         if (adminRoles.includes(newUser.role)) {
-            console.log('[AuthContext] Role is admin. Redirecting to /admin...');
+
             router.push('/admin');
         } else {
-            console.log('[AuthContext] Role is regular user. Redirecting to /account...');
+
             router.push('/account');
         }
     }, [router]);

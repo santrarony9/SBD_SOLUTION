@@ -4,7 +4,7 @@ import { GalleryController } from './gallery.controller';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
-    controllers: [GalleryController],
-    providers: [GalleryService, PrismaService],
+  controllers: [GalleryController],
+  providers: [GalleryService, PrismaService],
 })
-export class GalleryModule { }
+export class GalleryModule {}

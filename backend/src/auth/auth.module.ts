@@ -15,15 +15,15 @@ import { GoogleStrategy } from './google.strategy';
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'SUPER_SECRET_KEY_123',
+      secret: process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET is not defined in environment variables'); })(),
       signOptions: { expiresIn: '15d' },
     }),
     SmsModule,
     MailModule,
-    WhatsappModule
+    WhatsappModule,
   ],
   providers: [AuthService, JwtStrategy, GoogleStrategy],
   controllers: [AuthController],
-  exports: [AuthService, JwtStrategy, PassportModule]
+  exports: [AuthService, JwtStrategy, PassportModule],
 })
-export class AuthModule { }
+export class AuthModule {}

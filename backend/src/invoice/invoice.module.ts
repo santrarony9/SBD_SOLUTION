@@ -8,6 +8,6 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
 @Module({
   imports: [PrismaModule, MediaModule, WhatsappModule],
   providers: [InvoiceService],
-  controllers: [InvoiceController]
+  controllers: [InvoiceController],
 })
-export class InvoiceModule { }
+export class InvoiceModule {}

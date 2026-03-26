@@ -32,7 +32,9 @@ async function bootstrap() {
   const logBufferService = app.get(LogBufferService);
   const httpAdapterHost = app.get(HttpAdapterHost);
 
-  console.log(`[BOOTSTRAP] Starting Backend v2.3 with Advanced Traffic Coordination...`);
+  console.log(
+    `[BOOTSTRAP] Starting Backend v2.3 with Advanced Traffic Coordination...`,
+  );
 
   // 1. Security Headers (Restored to stable state)
   app.use(helmet());
@@ -44,22 +46,32 @@ async function bootstrap() {
   }
 
   // 2. Rate Limiting Protection (Re-enabled for Production)
-  app.use(rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 500,
-    message: 'Too many requests from this IP, please try again after 15 minutes',
-    standardHeaders: true,
-    legacyHeaders: false,
-  }));
+  app.use(
+    rateLimit({
+      windowMs: 15 * 60 * 1000,
+      max: 500,
+      message:
+        'Too many requests from this IP, please try again after 15 minutes',
+      standardHeaders: true,
+      legacyHeaders: false,
+    }),
+  );
 
-  app.useGlobalFilters(new AllExceptionsFilter(httpAdapterHost, logBufferService));
+  app.useGlobalFilters(
+    new AllExceptionsFilter(httpAdapterHost, logBufferService),
+  );
+  
+  // Enable global validation with whitelist to strip injected properties
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  
   app.setGlobalPrefix('api');
 
-  // 3. Restricted CORS
+  // 3. Strict CORS configuration
   app.enableCors({
-    origin: FRONTEND_URL === '*' ? true : FRONTEND_URL.split(','),
+    origin: FRONTEND_URL === '*' ? false : FRONTEND_URL.split(','), // Prevents '*' from allowing all origins in production
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    allowedHeaders: 'Content-Type, Accept, Authorization, X-Requested-With, X-Client-Version, Cache-Control, Pragma',
+    allowedHeaders:
+      'Content-Type, Accept, Authorization, X-Requested-With, X-Client-Version, Cache-Control, Pragma',
     credentials: true,
   });
   return app;

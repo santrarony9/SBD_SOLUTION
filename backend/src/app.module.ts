@@ -77,15 +77,13 @@ import { RedisModule } from './redis/redis.module';
     MediaModule,
     ShiprocketModule,
     RazorpayModule,
-    CcavenueModule
+    CcavenueModule,
   ],
   controllers: [AppController],
   providers: [AppService, CartCleanupService, CartRecoveryService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(LoggingMiddleware, TrafficMiddleware)
-      .forRoutes('*');
+    consumer.apply(LoggingMiddleware, TrafficMiddleware).forRoutes('*');
   }
 }

@@ -11,4 +11,4 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
   providers: [InventoryService],
   exports: [InventoryService],
 })
-export class InventoryModule { }
+export class InventoryModule {}

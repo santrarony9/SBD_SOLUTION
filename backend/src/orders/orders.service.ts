@@ -1,4 +1,10 @@
-import { Injectable, BadRequestException, Inject, forwardRef, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  Inject,
+  forwardRef,
+  Logger,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CartService } from '../cart/cart.service';
 import { RazorpayService } from '../razorpay/razorpay.service';
@@ -10,468 +16,548 @@ import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class OrdersService {
-    private readonly logger = new Logger(OrdersService.name);
+  private readonly logger = new Logger(OrdersService.name);
 
-    constructor(
-        private prisma: PrismaService,
-        private cartService: CartService,
-        private crmService: CrmService,
-        private inventoryService: InventoryService,
-        private shiprocketService: ShiprocketService,
-        private whatsappService: WhatsappService,
-        @Inject(forwardRef(() => RazorpayService))
-        private razorpayService: RazorpayService,
-    ) { }
+  constructor(
+    private prisma: PrismaService,
+    private cartService: CartService,
+    private crmService: CrmService,
+    private inventoryService: InventoryService,
+    private shiprocketService: ShiprocketService,
+    private whatsappService: WhatsappService,
+    @Inject(forwardRef(() => RazorpayService))
+    private razorpayService: RazorpayService,
+  ) {}
 
-    async testShiprocketAuth() {
-        return this.shiprocketService.testAuth();
+  async testShiprocketAuth() {
+    return this.shiprocketService.testAuth();
+  }
+
+  async createOrder(
+    userId: string,
+    shippingAddress: any,
+    paymentMethod: string,
+    billingAddress?: any,
+    isB2B?: boolean,
+    customerGSTIN?: string,
+    businessName?: string,
+    placeOfSupply?: string,
+    promoCode?: string,
+    discountAmount?: number,
+  ) {
+    // 1. Get Cart
+    const cart = await this.cartService.getCart(userId);
+    if (!cart || cart.items.length === 0) {
+      throw new BadRequestException('Cart is empty');
     }
 
-    async createOrder(
-        userId: string,
-        shippingAddress: any,
-        paymentMethod: string,
-        billingAddress?: any,
-        isB2B?: boolean,
-        customerGSTIN?: string,
-        businessName?: string,
-        placeOfSupply?: string,
-        promoCode?: string,
-        discountAmount?: number
-    ) {
-        // 1. Get Cart
-        const cart = await this.cartService.getCart(userId);
-        if (!cart || cart.items.length === 0) {
-            throw new BadRequestException('Cart is empty');
-        }
+    // 1.1 Check Stock Availability
+    for (const item of cart.items) {
+      // Re-fetch product to get latest stock
+      const product = await (this.prisma as any).product.findUnique({
+        where: { id: item.productId },
+      });
+      if (!product)
+        throw new BadRequestException(`Product ${item.product.name} not found`);
 
-        // 1.1 Check Stock Availability
-        for (const item of cart.items) {
-            // Re-fetch product to get latest stock
-            const product = await (this.prisma as any).product.findUnique({ where: { id: item.productId } });
-            if (!product) throw new BadRequestException(`Product ${item.product.name} not found`);
+      if (product.stockCount < item.quantity) {
+        throw new BadRequestException(
+          `Insufficient stock for ${product.name}. Available: ${product.stockCount}`,
+        );
+      }
+    }
 
-            if (product.stockCount < item.quantity) {
-                throw new BadRequestException(`Insufficient stock for ${product.name}. Available: ${product.stockCount}`);
-            }
-        }
+    // 2. Calculate Totals (Re-verify)
+    const totalAmount = cart.cartTotal;
+    const taxRate = 0.03;
+    const taxAmount = totalAmount * taxRate;
 
-        // 2. Calculate Totals (Re-verify)
-        const totalAmount = cart.cartTotal;
-        const taxRate = 0.03;
-        const taxAmount = totalAmount * taxRate;
+    // 3. Create Order
+    const order = await this.prisma.order.create({
+      data: {
+        userId,
+        totalAmount,
+        taxAmount,
+        currency: 'INR',
+        shippingAddress,
+        billingAddress: billingAddress || shippingAddress,
+        isB2B: isB2B || false,
+        customerGSTIN: customerGSTIN || null,
+        businessName: businessName || null,
+        placeOfSupply: placeOfSupply || shippingAddress.state,
+        promoCode: promoCode || null,
+        discountAmount: discountAmount || null,
+        status: 'PENDING',
+        paymentStatus: 'PENDING',
+        items: {
+          create: cart.items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.calculatedPrice || 0,
+            name: item.product.name,
+          })),
+        },
+      } as any,
+    });
 
-        // 3. Create Order
-        const order = await this.prisma.order.create({
-            data: {
-                userId,
-                totalAmount,
-                taxAmount,
-                currency: 'INR',
-                shippingAddress,
-                billingAddress: billingAddress || shippingAddress,
-                isB2B: isB2B || false,
-                customerGSTIN: customerGSTIN || null,
-                businessName: businessName || null,
-                placeOfSupply: placeOfSupply || shippingAddress.state,
-                promoCode: promoCode || null,
-                discountAmount: discountAmount || null,
-                status: 'PENDING',
-                paymentStatus: 'PENDING',
-                items: {
-                    create: cart.items.map((item) => ({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        price: item.calculatedPrice || 0,
-                        name: item.product.name,
-                    })),
-                },
-            } as any,
+    // 4. Razorpay Logic
+    let razorpayOrderId = null;
+    if (paymentMethod === 'RAZORPAY') {
+      try {
+        const razorpayOrder = await this.razorpayService.createOrder(
+          totalAmount,
+          'INR',
+          order.id,
+        );
+        razorpayOrderId = razorpayOrder.id;
+
+        await this.prisma.order.update({
+          where: { id: order.id },
+          data: { razorpayOrderId },
         });
-
-        // 4. Razorpay Logic
-        let razorpayOrderId = null;
-        if (paymentMethod === 'RAZORPAY') {
-            try {
-                const razorpayOrder = await this.razorpayService.createOrder(
-                    totalAmount,
-                    'INR',
-                    order.id
-                );
-                razorpayOrderId = razorpayOrder.id;
-
-                await this.prisma.order.update({
-                    where: { id: order.id },
-                    data: { razorpayOrderId },
-                });
-            } catch (error) {
-                console.error("Razorpay Creation Failed", error);
-                // Optionally cancel the created order or throw
-            }
-        }
-
-        // 5. Shiprocket Integration
-        // Non-blocking call
-        this.pushToShiprocket(order.id).catch(e => console.error("Shiprocket Auto-Push Failed:", e.message));
-
-        // 6. Clear Cart
-        await this.cartService.clearCart(userId);
-
-        // 7. Deduct Stock
-        for (const item of cart.items) {
-            await this.inventoryService.adjustStock(
-                item.productId,
-                -item.quantity,
-                'SALE',
-                `Order Created: ${order.id}`,
-                userId
-            );
-        }
-
-        // 8. WhatsApp Alerts (New Order - PENDING payment but created)
-        // Usually wait for payment confirmation, but admins might want to know about attempted orders too
-        try {
-            const userPhone = shippingAddress.phone;
-            if (userPhone && order.id) {
-                // Customer Alert (Optional at this stage, maybe better after payment)
-                // this.whatsappService.sendOrderConfirmation(userPhone, order.id, totalAmount);
-            }
-            // Admin Alert
-            await this.whatsappService.sendAdminNewOrderAlert(order.id, totalAmount);
-        } catch (e) {
-            console.error("WhatsApp Alert Failed", e);
-        }
-
-        return { ...order, razorpayOrderId };
+      } catch (error) {
+        console.error('Razorpay Creation Failed', error);
+        // Optionally cancel the created order or throw
+      }
     }
 
-    async pushToShiprocket(orderId: string) {
-        const order = await (this.prisma as any).order.findUnique({
-            where: { id: orderId },
-            include: { items: { include: { product: true } }, user: true }
-        });
+    // 5. Shiprocket Integration
+    // Non-blocking call
+    this.pushToShiprocket(order.id).catch((e) =>
+      console.error('Shiprocket Auto-Push Failed:', e.message),
+    );
 
-        if (!order) throw new Error("Order not found");
+    // 6. Clear Cart
+    await this.cartService.clearCart(userId);
 
-        try {
-            // Check if already pushed
-            if (order.shiprocketOrderId) {
-                // If pushed but no AWB, try to generate AWB (Auto-Ship Flow)
-                if (!order.awbCode) {
-                    return this.shipOrder(orderId);
-                }
-                return { success: true, message: "Order already pushed", shiprocketOrderId: order.shiprocketOrderId };
-            }
-
-            const shiprocketOrder = await this.shiprocketService.createOrder({
-                ...order,
-                items: order.items.map((item) => ({
-                    ...item,
-                    product: item.product
-                }))
-            });
-
-            if (shiprocketOrder) {
-                await (this.prisma as any).order.update({
-                    where: { id: order.id },
-                    data: {
-                        shiprocketOrderId: String(shiprocketOrder.order_id),
-                        shipmentId: String(shiprocketOrder.shipment_id),
-                        awbCode: shiprocketOrder.awb_code || null
-                    }
-                });
-
-                // Auto-trigger AWB generation if configured (Optional, usually manual step for admin)
-                // await this.shipOrder(order.id); 
-
-                return { success: true, shiprocketOrder };
-            }
-            return { success: false, message: "Shiprocket returned no data" };
-        } catch (e) {
-            console.error("Shiprocket Service Error:", e.message);
-            throw new BadRequestException("Failed to push to Shiprocket: " + e.message);
-        }
+    // 7. Deduct Stock
+    for (const item of cart.items) {
+      await this.inventoryService.adjustStock(
+        item.productId,
+        -item.quantity,
+        'SALE',
+        `Order Created: ${order.id}`,
+        userId,
+      );
     }
 
-    // New Method: Assign Courier & Generate AWB
-    async shipOrder(orderId: string) {
-        const order = await (this.prisma as any).order.findUnique({ where: { id: orderId } });
-        if (!order || !order.shipmentId) {
-            // Ensure pushed first
-            if (order && !order.shiprocketOrderId) {
-                await this.pushToShiprocket(orderId);
-                // Re-fetch
-                return this.shipOrder(orderId);
-            }
-            throw new BadRequestException("Order not ready for shipping (No Shipment ID).");
-        }
-
-        try {
-            // 1. Generate AWB (Assign Courier)
-            const awbData = await this.shiprocketService.generateAWB(order.shipmentId);
-
-            // 2. Update Order
-            const updatedOrder = await (this.prisma as any).order.update({
-                where: { id: orderId },
-                data: {
-                    awbCode: awbData.awb_code,
-                    status: 'SHIPPED', // Move to SHIPPED
-                    updatedAt: new Date()
-                }
-            });
-
-            // 3. Notify CRM / Email (Future)
-
-            // 4. WhatsApp Dispatch Alert
-            if (order.shippingAddress?.phone) {
-                this.whatsappService.sendDispatchAlert(
-                    order.shippingAddress.phone,
-                    this.shiprocketService.getTrackingUrl(awbData.awb_code)
-                );
-            }
-
-            return { success: true, awb: awbData.awb_code, trackingUrl: this.shiprocketService.getTrackingUrl(awbData.awb_code) };
-
-        } catch (e) {
-            console.error("Shipping Failed:", e.message);
-            throw new BadRequestException("Failed to ship order: " + e.message);
-        }
+    // 8. WhatsApp Alerts (New Order - PENDING payment but created)
+    // Usually wait for payment confirmation, but admins might want to know about attempted orders too
+    try {
+      const userPhone = shippingAddress.phone;
+      if (userPhone && order.id) {
+        // Customer Alert (Optional at this stage, maybe better after payment)
+        // this.whatsappService.sendOrderConfirmation(userPhone, order.id, totalAmount);
+      }
+      // Admin Alert
+      await this.whatsappService.sendAdminNewOrderAlert(order.id, totalAmount);
+    } catch (e) {
+      console.error('WhatsApp Alert Failed', e);
     }
 
-    async generateShipmentLabel(orderId: string) {
-        const order = await (this.prisma as any).order.findUnique({ where: { id: orderId } });
-        if (!order || !order.shipmentId) {
-            throw new BadRequestException("Order not found or not pushed to Shiprocket yet.");
+    return { ...order, razorpayOrderId };
+  }
+
+  async pushToShiprocket(orderId: string) {
+    const order = await (this.prisma as any).order.findUnique({
+      where: { id: orderId },
+      include: { items: { include: { product: true } }, user: true },
+    });
+
+    if (!order) throw new Error('Order not found');
+
+    try {
+      // Check if already pushed
+      if (order.shiprocketOrderId) {
+        // If pushed but no AWB, try to generate AWB (Auto-Ship Flow)
+        if (!order.awbCode) {
+          return this.shipOrder(orderId);
         }
-
-        const labelData = await this.shiprocketService.generateLabel(order.shipmentId);
-        if (!labelData || !labelData.label_url) {
-            throw new BadRequestException("Failed to generate label from Shiprocket.");
-        }
-
-        return { labelUrl: labelData.label_url };
-    }
-
-
-    async getMyOrders(userId: string) {
-        return this.prisma.order.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-            include: { items: true },
-        });
-    }
-
-    // Admin: Get all orders
-    async getAllOrders(status?: string, search?: string, page: number = 1, limit: number = 20) {
-        const skip = (page - 1) * limit;
-        const where: any = {};
-
-        if (status && status !== 'ALL') {
-            where.status = status;
-        }
-
-        if (search) {
-            where.OR = [
-                { id: { contains: search, mode: 'insensitive' } },
-                { user: { name: { contains: search, mode: 'insensitive' } } },
-                { user: { email: { contains: search, mode: 'insensitive' } } },
-                { user: { phone: { contains: search, mode: 'insensitive' } } },
-            ];
-        }
-
-        const [orders, total] = await Promise.all([
-            this.prisma.order.findMany({
-                where,
-                include: {
-                    user: {
-                        select: { name: true, email: true },
-                    },
-                    items: true,
-                },
-                orderBy: { createdAt: 'desc' },
-                take: limit,
-                skip: skip,
-            }),
-            this.prisma.order.count({ where }),
-        ]);
-
         return {
-            data: orders,
-            meta: {
-                total,
-                page,
-                last_page: Math.ceil(total / limit),
-            },
+          success: true,
+          message: 'Order already pushed',
+          shiprocketOrderId: order.shiprocketOrderId,
         };
-    }
+      }
 
-    async updatePhonePeDetails(orderId: string, merchantTransactionId: string) {
-        return (this.prisma as any).order.update({
-            where: { id: orderId },
-            data: { phonepeMerchantTransactionId: merchantTransactionId }
-        });
-    }
+      const shiprocketOrder = await this.shiprocketService.createOrder({
+        ...order,
+        items: order.items.map((item) => ({
+          ...item,
+          product: item.product,
+        })),
+      });
 
-    async findByPhonePeTransactionId(merchantTransactionId: string) {
-        return (this.prisma as any).order.findFirst({
-            where: { phonepeMerchantTransactionId: merchantTransactionId }
-        });
-    }
-
-    // Admin: Update Status
-    async updateOrderStatus(id: string, status: string) {
-        let updateData: any = { status: status as any };
-
-        // 1. Handle Cancellation
-        if (status === 'CANCELLED') {
-            updateData.cancelledAt = new Date();
-            updateData.creditNoteNumber = `SBD/CN/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
-
-            // Sync with Shiprocket
-            const order = await (this.prisma as any).order.findUnique({ where: { id } });
-            if (order && order.shiprocketOrderId) {
-                try {
-                    await this.shiprocketService.cancelOrder(order.shiprocketOrderId);
-                    console.log(`Shiprocket Order ${order.shiprocketOrderId} cancelled successfully.`);
-                } catch (e) {
-                    console.error("Failed to sync cancellation with Shiprocket:", e.message);
-                    // We log but don't block the local cancellation to ensure data consistency
-                }
-            }
-        }
-
-        // 2. Handle Return Initiation
-        if (status === 'RETURN_INITIATED') {
-            // For MVP: We just mark it locally. 
-            // Future: Call Shiprocket Return API here.
-        }
-
-        if (status === 'SHIPPED') {
-            updateData.updatedAt = new Date(); // Update timestamp
-        }
-
-        const updatedOrder = await (this.prisma as any).order.update({
-            where: { id },
-            data: updateData,
-            include: { shippingAddress: true, user: true }
+      if (shiprocketOrder) {
+        await (this.prisma as any).order.update({
+          where: { id: order.id },
+          data: {
+            shiprocketOrderId: String(shiprocketOrder.order_id),
+            shipmentId: String(shiprocketOrder.shipment_id),
+            awbCode: shiprocketOrder.awb_code || null,
+          },
         });
 
-        // WhatsApp Alerts for Status Changes
+        // Auto-trigger AWB generation if configured (Optional, usually manual step for admin)
+        // await this.shipOrder(order.id);
+
+        return { success: true, shiprocketOrder };
+      }
+      return { success: false, message: 'Shiprocket returned no data' };
+    } catch (e) {
+      console.error('Shiprocket Service Error:', e.message);
+      throw new BadRequestException(
+        'Failed to push to Shiprocket: ' + e.message,
+      );
+    }
+  }
+
+  // New Method: Assign Courier & Generate AWB
+  async shipOrder(orderId: string) {
+    const order = await (this.prisma as any).order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order || !order.shipmentId) {
+      // Ensure pushed first
+      if (order && !order.shiprocketOrderId) {
+        await this.pushToShiprocket(orderId);
+        // Re-fetch
+        return this.shipOrder(orderId);
+      }
+      throw new BadRequestException(
+        'Order not ready for shipping (No Shipment ID).',
+      );
+    }
+
+    try {
+      // 1. Generate AWB (Assign Courier)
+      const awbData = await this.shiprocketService.generateAWB(
+        order.shipmentId,
+      );
+
+      // 2. Update Order
+      const updatedOrder = await (this.prisma as any).order.update({
+        where: { id: orderId },
+        data: {
+          awbCode: awbData.awb_code,
+          status: 'SHIPPED', // Move to SHIPPED
+          updatedAt: new Date(),
+        },
+      });
+
+      // 3. Notify CRM / Email (Future)
+
+      // 4. WhatsApp Dispatch Alert
+      if (order.shippingAddress?.phone) {
+        this.whatsappService.sendDispatchAlert(
+          order.shippingAddress.phone,
+          this.shiprocketService.getTrackingUrl(awbData.awb_code),
+        );
+      }
+
+      return {
+        success: true,
+        awb: awbData.awb_code,
+        trackingUrl: this.shiprocketService.getTrackingUrl(awbData.awb_code),
+      };
+    } catch (e) {
+      console.error('Shipping Failed:', e.message);
+      throw new BadRequestException('Failed to ship order: ' + e.message);
+    }
+  }
+
+  async generateShipmentLabel(orderId: string) {
+    const order = await (this.prisma as any).order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order || !order.shipmentId) {
+      throw new BadRequestException(
+        'Order not found or not pushed to Shiprocket yet.',
+      );
+    }
+
+    const labelData = await this.shiprocketService.generateLabel(
+      order.shipmentId,
+    );
+    if (!labelData || !labelData.label_url) {
+      throw new BadRequestException(
+        'Failed to generate label from Shiprocket.',
+      );
+    }
+
+    return { labelUrl: labelData.label_url };
+  }
+
+  async getMyOrders(userId: string) {
+    return this.prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      include: { items: true },
+    });
+  }
+
+  // Admin: Get all orders
+  async getAllOrders(
+    status?: string,
+    search?: string,
+    page: number = 1,
+    limit: number = 20,
+  ) {
+    const skip = (page - 1) * limit;
+    const where: any = {};
+
+    if (status && status !== 'ALL') {
+      where.status = status;
+    }
+
+    if (search) {
+      where.OR = [
+        { id: { contains: search, mode: 'insensitive' } },
+        { user: { name: { contains: search, mode: 'insensitive' } } },
+        { user: { email: { contains: search, mode: 'insensitive' } } },
+        { user: { phone: { contains: search, mode: 'insensitive' } } },
+      ];
+    }
+
+    const [orders, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: {
+          user: {
+            select: { name: true, email: true },
+          },
+          items: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: skip,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return {
+      data: orders,
+      meta: {
+        total,
+        page,
+        last_page: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async updatePhonePeDetails(orderId: string, merchantTransactionId: string) {
+    return (this.prisma as any).order.update({
+      where: { id: orderId },
+      data: { phonepeMerchantTransactionId: merchantTransactionId },
+    });
+  }
+
+  async findByPhonePeTransactionId(merchantTransactionId: string) {
+    return (this.prisma as any).order.findFirst({
+      where: { phonepeMerchantTransactionId: merchantTransactionId },
+    });
+  }
+
+  // Admin: Update Status
+  async updateOrderStatus(id: string, status: string) {
+    const updateData: any = { status: status as any };
+
+    // 1. Handle Cancellation
+    if (status === 'CANCELLED') {
+      updateData.cancelledAt = new Date();
+      updateData.creditNoteNumber = `SBD/CN/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
+
+      // Sync with Shiprocket
+      const order = await (this.prisma as any).order.findUnique({
+        where: { id },
+      });
+      if (order && order.shiprocketOrderId) {
         try {
-            if (status === 'RETURN_REQUESTED') {
-                this.whatsappService.sendAdminReturnAlert(id, "Customer requested return via Support/App").catch(e => console.error(e));
-            } else if (status === 'EXCHANGE_REQUESTED') {
-                this.whatsappService.sendAdminExchangeAlert(id, "Customer requested exchange via Support/App").catch(e => console.error(e));
-            }
+          await this.shiprocketService.cancelOrder(order.shiprocketOrderId);
+          console.log(
+            `Shiprocket Order ${order.shiprocketOrderId} cancelled successfully.`,
+          );
         } catch (e) {
-            console.error("Status Change Alert Failed", e);
+          console.error(
+            'Failed to sync cancellation with Shiprocket:',
+            e.message,
+          );
+          // We log but don't block the local cancellation to ensure data consistency
         }
-
-        // Trigger CRM Logic if order is CONFIRMED (Treating it as successful payment for now)
-        if (status === 'CONFIRMED' && updatedOrder.userId) {
-            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
-        }
-
-        // Trigger Reversal Logic if order is CANCELLED
-        if (status === 'CANCELLED') {
-            // 1. Restock Inventory
-            await this.inventoryService.onOrderCancel(updatedOrder.id);
-
-            // 2. Reverse CRM Points
-            if (updatedOrder.userId) {
-                await this.crmService.onOrderCancel(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
-            }
-        }
-
-        return updatedOrder;
-    }
-    async markAsPaid(orderId: string, paymentId: string) {
-        return this.prisma.order.update({
-            where: { id: orderId },
-            data: {
-                status: 'CONFIRMED',
-                paymentStatus: 'PAID',
-                razorpayPaymentId: paymentId
-            }
-        });
+      }
     }
 
-    async confirmPhonePePayment(orderId: string, merchantTransactionId: string, phonepeTransactionId?: string) {
-        // Find order first to ensure it exists
-        const order = await this.prisma.order.findUnique({ where: { id: orderId } });
-        if (!order) return null;
-
-        const updatedOrder = await (this.prisma as any).order.update({
-            where: { id: orderId },
-            data: {
-                status: 'CONFIRMED',
-                paymentStatus: 'PAID',
-                phonepeMerchantTransactionId: merchantTransactionId,
-                phonepeTransactionId: phonepeTransactionId
-            }
-        });
-
-        // Trigger CRM
-        if (updatedOrder.userId) {
-            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
-        }
-
-        // Push to Shiprocket (if not already)
-        this.pushToShiprocket(updatedOrder.id).catch(e => console.error("Shiprocket Push Retry:", e.message));
-
-        return updatedOrder;
-    }
-    async confirmCcavenuePayment(orderId: string, trackingId: string, bankRefNo?: string) {
-        const order = await this.prisma.order.findUnique({ where: { id: orderId } });
-        if (!order) return null;
-
-        const updatedOrder = await (this.prisma as any).order.update({
-            where: { id: orderId },
-            data: {
-                status: 'CONFIRMED',
-                paymentStatus: 'PAID',
-                ccavenueTrackingId: trackingId,
-                ccavenueBankRefNo: bankRefNo
-            }
-        });
-
-        // Trigger CRM
-        if (updatedOrder.userId) {
-            await this.crmService.onOrderComplete(updatedOrder.userId, updatedOrder.id, updatedOrder.totalAmount);
-        }
-
-        // Push to Shiprocket
-        this.pushToShiprocket(updatedOrder.id).catch(e => console.error("Shiprocket Push Retry:", e.message));
-
-        return updatedOrder;
+    // 2. Handle Return Initiation
+    if (status === 'RETURN_INITIATED') {
+      // For MVP: We just mark it locally.
+      // Future: Call Shiprocket Return API here.
     }
 
-    /**
-     * Public endpoint to fetch anonymized recent orders for social proof.
-     */
-    async getPublicRecentOrders() {
-        const orders = await this.prisma.order.findMany({
-            where: {
-                paymentStatus: 'PAID',
-                status: { notIn: ['CANCELLED', 'RETURNED'] }
-            } as any,
-            orderBy: { createdAt: 'desc' },
-            take: 15,
-            include: {
-                items: {
-                    take: 1, // Only need the first item for the notification
-                    select: { name: true }
-                }
-            }
-        });
-
-        return orders.map(order => ({
-            id: order.id,
-            // Anonymize name: "Rony" -> "Rony S." OR just "Rony" if only one name
-            name: order.shippingAddress?.['firstName'] || 'Valued Customer',
-            city: order.shippingAddress?.['city'] || 'India',
-            product: order.items[0]?.name || 'Signature Piece',
-            createdAt: order.createdAt
-        }));
+    if (status === 'SHIPPED') {
+      updateData.updatedAt = new Date(); // Update timestamp
     }
+
+    const updatedOrder = await (this.prisma as any).order.update({
+      where: { id },
+      data: updateData,
+      include: { shippingAddress: true, user: true },
+    });
+
+    // WhatsApp Alerts for Status Changes
+    try {
+      if (status === 'RETURN_REQUESTED') {
+        this.whatsappService
+          .sendAdminReturnAlert(id, 'Customer requested return via Support/App')
+          .catch((e) => console.error(e));
+      } else if (status === 'EXCHANGE_REQUESTED') {
+        this.whatsappService
+          .sendAdminExchangeAlert(
+            id,
+            'Customer requested exchange via Support/App',
+          )
+          .catch((e) => console.error(e));
+      }
+    } catch (e) {
+      console.error('Status Change Alert Failed', e);
+    }
+
+    // Trigger CRM Logic if order is CONFIRMED (Treating it as successful payment for now)
+    if (status === 'CONFIRMED' && updatedOrder.userId) {
+      await this.crmService.onOrderComplete(
+        updatedOrder.userId,
+        updatedOrder.id,
+        updatedOrder.totalAmount,
+      );
+    }
+
+    // Trigger Reversal Logic if order is CANCELLED
+    if (status === 'CANCELLED') {
+      // 1. Restock Inventory
+      await this.inventoryService.onOrderCancel(updatedOrder.id);
+
+      // 2. Reverse CRM Points
+      if (updatedOrder.userId) {
+        await this.crmService.onOrderCancel(
+          updatedOrder.userId,
+          updatedOrder.id,
+          updatedOrder.totalAmount,
+        );
+      }
+    }
+
+    return updatedOrder;
+  }
+  async markAsPaid(orderId: string, paymentId: string) {
+    return this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: 'CONFIRMED',
+        paymentStatus: 'PAID',
+        razorpayPaymentId: paymentId,
+      },
+    });
+  }
+
+  async confirmPhonePePayment(
+    orderId: string,
+    merchantTransactionId: string,
+    phonepeTransactionId?: string,
+  ) {
+    // Find order first to ensure it exists
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) return null;
+
+    const updatedOrder = await (this.prisma as any).order.update({
+      where: { id: orderId },
+      data: {
+        status: 'CONFIRMED',
+        paymentStatus: 'PAID',
+        phonepeMerchantTransactionId: merchantTransactionId,
+        phonepeTransactionId: phonepeTransactionId,
+      },
+    });
+
+    // Trigger CRM
+    if (updatedOrder.userId) {
+      await this.crmService.onOrderComplete(
+        updatedOrder.userId,
+        updatedOrder.id,
+        updatedOrder.totalAmount,
+      );
+    }
+
+    // Push to Shiprocket (if not already)
+    this.pushToShiprocket(updatedOrder.id).catch((e) =>
+      console.error('Shiprocket Push Retry:', e.message),
+    );
+
+    return updatedOrder;
+  }
+  async confirmCcavenuePayment(
+    orderId: string,
+    trackingId: string,
+    bankRefNo?: string,
+  ) {
+    const order = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    });
+    if (!order) return null;
+
+    const updatedOrder = await (this.prisma as any).order.update({
+      where: { id: orderId },
+      data: {
+        status: 'CONFIRMED',
+        paymentStatus: 'PAID',
+        ccavenueTrackingId: trackingId,
+        ccavenueBankRefNo: bankRefNo,
+      },
+    });
+
+    // Trigger CRM
+    if (updatedOrder.userId) {
+      await this.crmService.onOrderComplete(
+        updatedOrder.userId,
+        updatedOrder.id,
+        updatedOrder.totalAmount,
+      );
+    }
+
+    // Push to Shiprocket
+    this.pushToShiprocket(updatedOrder.id).catch((e) =>
+      console.error('Shiprocket Push Retry:', e.message),
+    );
+
+    return updatedOrder;
+  }
+
+  /**
+   * Public endpoint to fetch anonymized recent orders for social proof.
+   */
+  async getPublicRecentOrders() {
+    const orders = await this.prisma.order.findMany({
+      where: {
+        paymentStatus: 'PAID',
+        status: { notIn: ['CANCELLED', 'RETURNED'] },
+      } as any,
+      orderBy: { createdAt: 'desc' },
+      take: 15,
+      include: {
+        items: {
+          take: 1, // Only need the first item for the notification
+          select: { name: true },
+        },
+      },
+    });
+
+    return orders.map((order) => ({
+      id: order.id,
+      // Anonymize name: "Rony" -> "Rony S." OR just "Rony" if only one name
+      name: order.shippingAddress?.['firstName'] || 'Valued Customer',
+      city: order.shippingAddress?.['city'] || 'India',
+      product: order.items[0]?.name || 'Signature Piece',
+      createdAt: order.createdAt,
+    }));
+  }
 }

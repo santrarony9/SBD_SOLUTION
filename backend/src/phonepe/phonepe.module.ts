@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { PhonePeService } from './phonepe.service';
 import { PhonePeController } from './phonepe.controller';
@@ -7,9 +6,9 @@ import { PrismaModule } from '../prisma/prisma.module';
 import { HttpModule } from '@nestjs/axios';
 
 @Module({
-    imports: [OrdersModule, PrismaModule, HttpModule],
-    controllers: [PhonePeController],
-    providers: [PhonePeService],
-    exports: [PhonePeService],
+  imports: [OrdersModule, PrismaModule, HttpModule],
+  controllers: [PhonePeController],
+  providers: [PhonePeService],
+  exports: [PhonePeService],
 })
-export class PhonePeModule { }
+export class PhonePeModule {}

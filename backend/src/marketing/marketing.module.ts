@@ -6,8 +6,8 @@ import { WhatsappModule } from '../whatsapp/whatsapp.module';
 import { ProductsModule } from '../products/products.module';
 
 @Module({
-    imports: [PrismaModule, WhatsappModule, ProductsModule],
-    controllers: [MarketingController],
-    providers: [MarketingService],
+  imports: [PrismaModule, WhatsappModule, ProductsModule],
+  controllers: [MarketingController],
+  providers: [MarketingService],
 })
-export class MarketingModule { }
+export class MarketingModule {}

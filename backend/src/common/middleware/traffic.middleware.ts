@@ -4,11 +4,11 @@ import { TrafficService } from '../../diagnostics/traffic.service';
 
 @Injectable()
 export class TrafficMiddleware implements NestMiddleware {
-    constructor(private readonly traffic: TrafficService) { }
+  constructor(private readonly traffic: TrafficService) {}
 
-    use(req: Request, res: Response, next: NextFunction) {
-        // Record the request timestamp
-        this.traffic.recordRequest();
-        next();
-    }
+  use(req: Request, res: Response, next: NextFunction) {
+    // Record the request timestamp
+    this.traffic.recordRequest();
+    next();
+  }
 }

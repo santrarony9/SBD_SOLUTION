@@ -3,8 +3,8 @@ import { BannerController } from './banner.controller';
 import { BannerService } from './banner.service';
 
 @Module({
-    controllers: [BannerController],
-    providers: [BannerService],
-    exports: [BannerService]
+  controllers: [BannerController],
+  providers: [BannerService],
+  exports: [BannerService],
 })
-export class BannerModule { }
+export class BannerModule {}

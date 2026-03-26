@@ -3,8 +3,8 @@ import { ShiprocketService } from './shiprocket.service';
 import { ShiprocketController } from './shiprocket.controller';
 
 @Module({
-    controllers: [ShiprocketController],
-    providers: [ShiprocketService],
-    exports: [ShiprocketService],
+  controllers: [ShiprocketController],
+  providers: [ShiprocketService],
+  exports: [ShiprocketService],
 })
-export class ShiprocketModule { }
+export class ShiprocketModule {}

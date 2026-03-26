@@ -11,17 +11,17 @@ import { RazorpayModule } from '../razorpay/razorpay.module';
 import { WhatsappModule } from '../whatsapp/whatsapp.module';
 
 @Module({
-    imports: [
-        PrismaModule,
-        CartModule,
-        CrmModule,
-        InventoryModule,
-        ShiprocketModule,
-        forwardRef(() => RazorpayModule),
-        WhatsappModule
-    ],
-    providers: [OrdersService],
-    controllers: [OrdersController],
-    exports: [OrdersService]
+  imports: [
+    PrismaModule,
+    CartModule,
+    CrmModule,
+    InventoryModule,
+    ShiprocketModule,
+    forwardRef(() => RazorpayModule),
+    WhatsappModule,
+  ],
+  providers: [OrdersService],
+  controllers: [OrdersController],
+  exports: [OrdersService],
 })
-export class OrdersModule { }
+export class OrdersModule {}

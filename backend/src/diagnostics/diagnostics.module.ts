@@ -6,9 +6,9 @@ import { TrafficService } from './traffic.service';
 
 @Global()
 @Module({
-    imports: [PrismaModule],
-    controllers: [DiagnosticsController],
-    providers: [LogBufferService, TrafficService],
-    exports: [LogBufferService, TrafficService],
+  imports: [PrismaModule],
+  controllers: [DiagnosticsController],
+  providers: [LogBufferService, TrafficService],
+  exports: [LogBufferService, TrafficService],
 })
-export class DiagnosticsModule { }
+export class DiagnosticsModule {}

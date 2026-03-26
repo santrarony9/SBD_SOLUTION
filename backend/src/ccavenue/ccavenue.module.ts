@@ -4,9 +4,9 @@ import { CcavenueService } from './ccavenue.service';
 import { OrdersModule } from '../orders/orders.module';
 
 @Module({
-    imports: [OrdersModule],
-    controllers: [CcavenueController],
-    providers: [CcavenueService],
-    exports: [CcavenueService]
+  imports: [OrdersModule],
+  controllers: [CcavenueController],
+  providers: [CcavenueService],
+  exports: [CcavenueService],
 })
-export class CcavenueModule { }
+export class CcavenueModule {}

@@ -4,39 +4,47 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ChatService {
-    private readonly logger = new Logger(ChatService.name);
-    private genAI: GoogleGenerativeAI;
+  private readonly logger = new Logger(ChatService.name);
+  private genAI: GoogleGenerativeAI;
 
-    constructor(private prisma: PrismaService) {
-        const apiKey = process.env.GEMINI_API_KEY;
-        if (!apiKey) {
-            this.logger.error('GEMINI_API_KEY is not set');
-        } else {
-            this.genAI = new GoogleGenerativeAI(apiKey);
-        }
+  constructor(private prisma: PrismaService) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      this.logger.error('GEMINI_API_KEY is not set');
+    } else {
+      this.genAI = new GoogleGenerativeAI(apiKey);
+    }
+  }
+
+  async generateResponse(
+    message: string,
+    userId?: string,
+    history: any[] = [],
+    ipAddress?: string,
+  ) {
+    if (!this.genAI) {
+      return {
+        text: 'System Error: GEMINI_API_KEY is missing in backend environment variables.',
+      };
     }
 
-    async generateResponse(message: string, userId?: string, history: any[] = [], ipAddress?: string) {
-        if (!this.genAI) {
-            return { text: "System Error: GEMINI_API_KEY is missing in backend environment variables." };
-        }
+    const runChat = async (modelName: string) => {
+      const model = this.genAI.getGenerativeModel({ model: modelName });
 
-        const runChat = async (modelName: string) => {
-            const model = this.genAI.getGenerativeModel({ model: modelName });
+      // 1. Gather Context
+      const [userContext, productContext, orderContext, marketingContext] =
+        await Promise.all([
+          this.getUserContext(userId),
+          this.getProductContext(message),
+          this.getOrderContext(userId),
+          this.getMarketingContext(ipAddress, userId),
+        ]);
 
-            // 1. Gather Context
-            const [userContext, productContext, orderContext, marketingContext] = await Promise.all([
-                this.getUserContext(userId),
-                this.getProductContext(message),
-                this.getOrderContext(userId),
-                this.getMarketingContext(ipAddress, userId)
-            ]);
+      // 1b. Log Activity for Marketing Memory
+      this.logActivity(message, ipAddress, userId, productContext);
 
-            // 1b. Log Activity for Marketing Memory
-            this.logActivity(message, ipAddress, userId, productContext);
-
-            // 2. System Prompt
-            const systemInstruction = `
+      // 2. System Prompt
+      const systemInstruction = `
             You are the "Spark Blue Diamond Concierge", a luxury jewelry assistant.
             Your tone is: Soft-spoken, Gentle, Elegant, Professional, and Extremely Polite.
             
@@ -142,168 +150,198 @@ export class ChatService {
             - Default Email: support@sparkbluediamond.com.
             `;
 
-            // 3. Chat Session
-            // Gemini requires history to start with 'user'. 
-            // We filter out any initial 'model' messages (like the welcome greeting).
-            let cleanHistory = history.map(h => ({
-                role: h.role === 'user' ? 'user' : 'model',
-                parts: [{ text: h.content }],
-            }));
+      // 3. Chat Session
+      // Gemini requires history to start with 'user'.
+      // We filter out any initial 'model' messages (like the welcome greeting).
+      let cleanHistory = history.map((h) => ({
+        role: h.role === 'user' ? 'user' : 'model',
+        parts: [{ text: h.content }],
+      }));
 
-            if (cleanHistory.length > 0 && cleanHistory[0].role === 'model') {
-                cleanHistory = cleanHistory.slice(1);
-            }
+      if (cleanHistory.length > 0 && cleanHistory[0].role === 'model') {
+        cleanHistory = cleanHistory.slice(1);
+      }
 
-            const chat = model.startChat({
-                history: cleanHistory,
-                generationConfig: {
-                    maxOutputTokens: 500,
-                },
-            });
+      const chat = model.startChat({
+        history: cleanHistory,
+        generationConfig: {
+          maxOutputTokens: 500,
+        },
+      });
 
-            // 4. Send Message
-            const fullPrompt = `${systemInstruction}\n\nUser Query: ${message}`;
+      // 4. Send Message
+      const fullPrompt = `${systemInstruction}\n\nUser Query: ${message}`;
 
-            const result = await chat.sendMessage(fullPrompt);
-            const response = await result.response;
-            return response.text();
+      const result = await chat.sendMessage(fullPrompt);
+      const response = await result.response;
+      return response.text();
+    };
+
+    try {
+      // Try Primary Model (Gemini 2.5 Flash)
+      const text = await runChat('gemini-2.5-flash');
+      return { text };
+    } catch (error) {
+      this.logger.warn(
+        `Gemini 2.5 Flash failed, switching to fallback. Error: ${error.message}`,
+      );
+      try {
+        // Try Fallback Model (Gemini 2.0 Flash)
+        const text = await runChat('gemini-2.0-flash');
+        return { text };
+      } catch (fallbackError) {
+        this.logger.error(
+          'Gemini Chat Error (Primary & Fallback)',
+          fallbackError,
+        );
+        return {
+          text: `System Error: ${fallbackError.message || fallbackError}`,
         };
-
-        try {
-            // Try Primary Model (Gemini 2.5 Flash)
-            const text = await runChat("gemini-2.5-flash");
-            return { text };
-        } catch (error) {
-            this.logger.warn(`Gemini 2.5 Flash failed, switching to fallback. Error: ${error.message}`);
-            try {
-                // Try Fallback Model (Gemini 2.0 Flash)
-                const text = await runChat("gemini-2.0-flash");
-                return { text };
-            } catch (fallbackError) {
-                this.logger.error('Gemini Chat Error (Primary & Fallback)', fallbackError);
-                return { text: `System Error: ${fallbackError.message || fallbackError}` };
-            }
-        }
+      }
     }
+  }
 
-    private async getUserContext(userId?: string): Promise<string> {
-        if (!userId) return "User is a Guest.";
-        const user = await this.prisma.user.findUnique({ where: { id: userId } });
-        return user ? `User Name: ${user.name}` : "User is a Guest.";
+  private async getUserContext(userId?: string): Promise<string> {
+    if (!userId) return 'User is a Guest.';
+    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    return user ? `User Name: ${user.name}` : 'User is a Guest.';
+  }
+
+  private async getProductContext(query: string): Promise<string> {
+    const keywords = query.split(' ').filter((w) => w.length > 3);
+    if (keywords.length === 0) return 'No specific products found.';
+
+    const products = await this.prisma.product.findMany({
+      where: {
+        OR: [
+          { name: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } },
+          { category: { contains: query, mode: 'insensitive' } },
+        ],
+        isActive: true,
+      },
+      take: 3,
+      select: {
+        name: true,
+        category: true,
+        slug: true,
+        goldPurity: true,
+        goldWeight: true,
+        diamondCarat: true,
+        diamondClarity: true,
+        diamondColor: true,
+        diamondCut: true,
+      },
+    });
+
+    if (products.length === 0) return 'No specific products found.';
+
+    // lightweight price calculation
+    try {
+      // Fetch live rates - ideally cached or batched, but okay for low volume chat
+      // We fetch the first matching rate for simplicity in this context
+      const [goldRates, diamondRates] = await Promise.all([
+        this.prisma.goldPrice.findMany(),
+        this.prisma.diamondPrice.findMany(),
+      ]);
+
+      const enriched = products.map((p) => {
+        const gRate =
+          goldRates.find((r) => r.purity === p.goldPurity)?.pricePer10g || 0;
+        const dRate =
+          diamondRates.find((r) => r.clarity === p.diamondClarity)
+            ?.pricePerCarat || 0;
+
+        const goldVal = (gRate / 10) * p.goldWeight;
+        const diamondVal = dRate * p.diamondCarat;
+
+        // Approximate charges (Making + GST) ~ 20% overhead for estimation
+        const estimatedPrice = (goldVal + diamondVal) * 1.25;
+        const formattedPrice =
+          Math.round(estimatedPrice).toLocaleString('en-IN');
+
+        return `- ${p.name} (~₹${formattedPrice}) | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}, ${p.diamondColor || 'N/A'}, ${p.diamondCut || 'N/A'}) | [Link: /product/${p.slug}]`;
+      });
+
+      return enriched.join('\n');
+    } catch (e) {
+      // Fallback if price calc fails
+      return products
+        .map(
+          (p) =>
+            `- ${p.name} | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}) | [Link: /product/${p.slug}]`,
+        )
+        .join('\n');
     }
+  }
 
-    private async getProductContext(query: string): Promise<string> {
-        const keywords = query.split(' ').filter(w => w.length > 3);
-        if (keywords.length === 0) return "No specific products found.";
+  private async getOrderContext(userId?: string): Promise<string> {
+    if (!userId) return 'No order history available.';
 
-        const products = await this.prisma.product.findMany({
-            where: {
-                OR: [
-                    { name: { contains: query, mode: 'insensitive' } },
-                    { description: { contains: query, mode: 'insensitive' } },
-                    { category: { contains: query, mode: 'insensitive' } }
-                ],
-                isActive: true
-            },
-            take: 3,
-            select: {
-                name: true,
-                category: true,
-                slug: true,
-                goldPurity: true,
-                goldWeight: true,
-                diamondCarat: true,
-                diamondClarity: true,
-                diamondColor: true,
-                diamondCut: true
-            }
-        });
+    const orders = await this.prisma.order.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      select: { id: true, status: true, totalAmount: true, createdAt: true },
+    });
 
-        if (products.length === 0) return "No specific products found.";
+    if (orders.length === 0) return 'User has no recent orders.';
 
-        // lightweight price calculation
-        try {
-            // Fetch live rates - ideally cached or batched, but okay for low volume chat
-            // We fetch the first matching rate for simplicity in this context
-            const [goldRates, diamondRates] = await Promise.all([
-                this.prisma.goldPrice.findMany(),
-                this.prisma.diamondPrice.findMany()
-            ]);
+    return orders
+      .map(
+        (o) =>
+          `Order #${o.id.slice(-6)}: ${o.status} (placed on ${o.createdAt.toDateString()})`,
+      )
+      .join('\n');
+  }
 
-            const enriched = products.map(p => {
-                const gRate = goldRates.find(r => r.purity === p.goldPurity)?.pricePer10g || 0;
-                const dRate = diamondRates.find(r => r.clarity === p.diamondClarity)?.pricePerCarat || 0;
-
-                const goldVal = (gRate / 10) * p.goldWeight;
-                const diamondVal = dRate * p.diamondCarat;
-
-                // Approximate charges (Making + GST) ~ 20% overhead for estimation
-                const estimatedPrice = (goldVal + diamondVal) * 1.25;
-                const formattedPrice = Math.round(estimatedPrice).toLocaleString('en-IN');
-
-                return `- ${p.name} (~₹${formattedPrice}) | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}, ${p.diamondColor || 'N/A'}, ${p.diamondCut || 'N/A'}) | [Link: /product/${p.slug}]`;
-            });
-
-            return enriched.join('\n');
-        } catch (e) {
-            // Fallback if price calc fails
-            return products.map(p => `- ${p.name} | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}) | [Link: /product/${p.slug}]`).join('\n');
-        }
+  private async logActivity(
+    message: string,
+    ipAddress?: string,
+    userId?: string,
+    productContext?: string,
+  ) {
+    if (!ipAddress) return;
+    try {
+      await this.prisma.userActivity.create({
+        data: {
+          ipAddress,
+          userId,
+          activity: 'CHAT_QUERY',
+          metadata: {
+            query: message,
+            foundProducts: productContext !== 'No specific products found.',
+          },
+        },
+      });
+    } catch (e) {
+      this.logger.error('Failed to log activity', e);
     }
+  }
 
-    private async getOrderContext(userId?: string): Promise<string> {
-        if (!userId) return "No order history available.";
+  private async getMarketingContext(
+    ipAddress?: string,
+    userId?: string,
+  ): Promise<string> {
+    if (!ipAddress && !userId) return 'No marketing history.';
 
-        const orders = await this.prisma.order.findMany({
-            where: { userId },
-            orderBy: { createdAt: 'desc' },
-            take: 3,
-            select: { id: true, status: true, totalAmount: true, createdAt: true }
-        });
+    const activities = await this.prisma.userActivity.findMany({
+      where: {
+        OR: [userId ? { userId } : { ipAddress }],
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 5,
+      select: { metadata: true, createdAt: true },
+    });
 
-        if (orders.length === 0) return "User has no recent orders.";
+    if (activities.length === 0)
+      return 'New customer (no previous interaction history).';
 
-        return orders.map(o => `Order #${o.id.slice(-6)}: ${o.status} (placed on ${o.createdAt.toDateString()})`).join('\n');
-    }
-
-    private async logActivity(message: string, ipAddress?: string, userId?: string, productContext?: string) {
-        if (!ipAddress) return;
-        try {
-            await this.prisma.userActivity.create({
-                data: {
-                    ipAddress,
-                    userId,
-                    activity: 'CHAT_QUERY',
-                    metadata: {
-                        query: message,
-                        foundProducts: productContext !== "No specific products found."
-                    }
-                }
-            });
-        } catch (e) {
-            this.logger.error('Failed to log activity', e);
-        }
-    }
-
-    private async getMarketingContext(ipAddress?: string, userId?: string): Promise<string> {
-        if (!ipAddress && !userId) return "No marketing history.";
-
-        const activities = await this.prisma.userActivity.findMany({
-            where: {
-                OR: [
-                    userId ? { userId } : { ipAddress }
-                ]
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 5,
-            select: { metadata: true, createdAt: true }
-        });
-
-        if (activities.length === 0) return "New customer (no previous interaction history).";
-
-        return activities.map(a => {
-            const meta = a.metadata as any;
-            return `- [${a.createdAt.toDateString()}] Searched for: "${meta?.query}"`;
-        }).join('\n');
-    }
+    return activities
+      .map((a) => {
+        const meta = a.metadata as any;
+        return `- [${a.createdAt.toDateString()}] Searched for: "${meta?.query}"`;
+      })
+      .join('\n');
+  }
 }

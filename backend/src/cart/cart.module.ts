@@ -8,9 +8,9 @@ import { ProductsModule } from '../products/products.module'; // To check produc
 import { PromosModule } from '../promos/promos.module';
 
 @Module({
-    imports: [PrismaModule, ProductsModule, PricingModule, PromosModule],
-    controllers: [CartController],
-    providers: [CartService],
-    exports: [CartService],
+  imports: [PrismaModule, ProductsModule, PricingModule, PromosModule],
+  controllers: [CartController],
+  providers: [CartService],
+  exports: [CartService],
 })
-export class CartModule { }
+export class CartModule {}
