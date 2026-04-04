@@ -278,15 +278,17 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
             )}
 
             {/* Scroll Indicator */}
-            <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-slow opacity-80 z-20 flex justify-center items-center">
-                <button 
-                    onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-                    className="text-white/60 text-[10px] tracking-[0.4em] uppercase hover:text-brand-gold transition-colors py-2 px-4 shadow-sm"
-                    style={{ marginLeft: '0.4em' }} // Visually offsets the trailing tracking space
-                    aria-label="Scroll down to explore"
-                >
-                    Explore
-                </button>
+            <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none">
+                <div className="animate-bounce-slow opacity-80 pointer-events-auto flex justify-center items-center">
+                    <button 
+                        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
+                        className="text-white/60 text-[10px] tracking-[0.4em] uppercase hover:text-brand-gold transition-colors py-2 px-4 shadow-sm"
+                        style={{ textIndent: '0.4em' }} // Push text right to compensate for trailing tracking space
+                        aria-label="Scroll down to explore"
+                    >
+                        Explore
+                    </button>
+                </div>
             </div>
         </section>
     );
