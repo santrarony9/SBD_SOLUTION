@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import Link from 'next/link';
+import { API_URL } from '@/lib/api';
 
 interface VideoReel {
     id: string;
@@ -106,6 +107,9 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {videos.map((video, index) => {
+                        const host = API_URL.replace('/api', '');
+                        const fullVideoUrl = video.videoUrl.startsWith('http') ? video.videoUrl : `${host}${video.videoUrl}`;
+
                         const CardContent = (
                             <motion.div
                                 initial={{ opacity: 0, scale: 0.95 }}
@@ -115,7 +119,7 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                                 className="relative w-[85vw] md:w-[350px] aspect-[9/16] flex-shrink-0 snap-center rounded-[2rem] overflow-hidden group shadow-xl"
                             >
                                 <video
-                                    src={video.videoUrl}
+                                    src={fullVideoUrl}
                                     className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     autoPlay
                                     muted
