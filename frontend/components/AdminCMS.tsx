@@ -61,6 +61,7 @@ export default function AdminCMS() {
     const [newSocialPost, setNewSocialPost] = useState({ imageUrl: '', caption: '', link: '' });
     const [newGalleryItem, setNewGalleryItem] = useState({ title: '', subtitle: '', imageUrl: '', link: '' });
     const [newVideoReel, setNewVideoReel] = useState({ title: '', tagline: '', videoUrl: '', link: '' });
+    const [isSavingVideo, setIsSavingVideo] = useState(false);
     const [newPromoCode, setNewPromoCode] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 10, creatorName: '' });
 
     useEffect(() => {
@@ -351,12 +352,26 @@ export default function AdminCMS() {
     // --- Video Reel Actions ---
     const handleAddVideoReel = async () => {
         if (!newVideoReel.videoUrl) return showToast('Video URL is required', 'error');
+        setIsSavingVideo(true);
         try {
-            await fetchAPI('/video-showcase', { method: 'POST', body: JSON.stringify(newVideoReel) });
-            showToast('Video Added', 'success');
+            // Convert empty strings to undefined so Prisma handles them as optional/null
+            const cleanData = {
+                videoUrl: newVideoReel.videoUrl,
+                title: newVideoReel.title || undefined,
+                tagline: newVideoReel.tagline || undefined,
+                link: newVideoReel.link || undefined
+            };
+
+            await fetchAPI('/video-showcase', { method: 'POST', body: JSON.stringify(cleanData) });
+            showToast('Video Added Successfully', 'success');
             setNewVideoReel({ title: '', tagline: '', videoUrl: '', link: '' });
-            loadContent();
-        } catch (e) { showToast('Failed to add video', 'error'); }
+            await loadContent(); // Force refresh the list
+        } catch (e) { 
+            console.error(e);
+            showToast('Failed to add video. Please check your connection.', 'error'); 
+        } finally {
+            setIsSavingVideo(false);
+        }
     };
 
     const handleDeleteVideoReel = async (id: string) => {
@@ -637,10 +652,15 @@ export default function AdminCMS() {
                                 <div className="mt-6 flex justify-end">
                                     <button
                                         onClick={handleAddVideoReel}
-                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10 flex items-center gap-2"
+                                        disabled={isSavingVideo || !newVideoReel.videoUrl}
+                                        className={`bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all shadow-lg shadow-brand-navy/10 flex items-center gap-2 ${isSavingVideo ? 'opacity-50 cursor-not-allowed' : 'hover:bg-brand-gold hover:text-brand-navy'}`}
                                     >
-                                        <PiCheck className="text-brand-gold" />
-                                        Save Video Reel
+                                        {isSavingVideo ? (
+                                            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-white" />
+                                        ) : (
+                                            <PiCheck className="text-brand-gold" />
+                                        )}
+                                        {isSavingVideo ? 'Saving Video...' : 'Save Video Reel'}
                                     </button>
                                 </div>
                             </div>
