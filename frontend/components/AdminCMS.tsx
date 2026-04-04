@@ -578,7 +578,7 @@ export default function AdminCMS() {
                                             <label className={`relative block w-full h-40 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-200 hover:border-brand-navy hover:bg-white'}`}>
                                                 <input
                                                     type="file"
-                                                    accept="video/*"
+                                                    accept="video/mp4,video/webm,video/quicktime"
                                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                                     onChange={(e) => {
                                                         const file = e.target.files?.[0];
@@ -590,16 +590,16 @@ export default function AdminCMS() {
                                                             setIsUploading(true);
                                                             const formData = new FormData();
                                                             formData.append('file', file);
-                                                            showToast('Uploading Video...', 'success');
-                                                            fetchAPI('/media/upload-local', { method: 'POST', body: formData })
+                                                            showToast('Uploading Video to Cloud... This may take a minute.', 'success');
+                                                            fetchAPI('/media/upload-video', { method: 'POST', body: formData })
                                                                 .then(res => {
-                                                                    // Prefix the local path with the backend host
-                                                                    const host = API_URL.replace('/api', '');
-                                                                    setNewVideoReel(prev => ({ ...prev, videoUrl: `${host}${res.url}` }));
+                                                                    // Cloudinary returns a full absolute URL (https://res.cloudinary.com/...)
+                                                                    showToast('Video uploaded successfully!', 'success');
+                                                                    setNewVideoReel(prev => ({ ...prev, videoUrl: res.url }));
                                                                 })
                                                                 .catch(err => {
-                                                                    console.error(err);
-                                                                    showToast('Failed to upload video', 'error');
+                                                                    console.error('Video upload error:', err);
+                                                                    showToast('Failed to upload video. Check file size or try again.', 'error');
                                                                 })
                                                                 .finally(() => setIsUploading(false));
                                                         }
@@ -611,10 +611,11 @@ export default function AdminCMS() {
                                                     ) : (
                                                         <PiVideoCamera className="text-3xl mb-2 text-brand-gold" />
                                                     )}
-                                                    <span className="text-[10px] font-bold">{isUploading ? 'UPLOADING...' : 'CLICK TO UPLOAD .MP4/.WEBM'}</span>
-                                                    <span className="text-[8px] mt-1 text-gray-400">Streamed from local server</span>
+                                                    <span className="text-[10px] font-bold">{isUploading ? 'UPLOADING TO CLOUD...' : 'CLICK TO UPLOAD .MP4/.WEBM'}</span>
+                                                    <span className="text-[8px] mt-1 text-gray-400">Stored on Cloudinary CDN (Max 50MB)</span>
                                                 </div>
                                             </label>
+
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 bg-black">
                                                 <video src={newVideoReel.videoUrl} className="w-full h-full object-cover opacity-70" autoPlay loop muted playsInline />
