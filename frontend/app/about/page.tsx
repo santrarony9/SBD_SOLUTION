@@ -132,7 +132,7 @@ export default function AboutPage() {
                                 <div className="w-10 h-10 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold italic font-serif">T</div>
                                 <div>
                                     <p className="text-[10px] uppercase tracking-widest text-gray-500 mb-1">Concierge Line</p>
-                                    <p className="text-sm">+91 98765 43210</p>
+                                    <p className="text-sm">+91 79986 11572</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-4">

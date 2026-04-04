@@ -111,7 +111,7 @@ export default async function RootLayout({
     },
     "contactPoint": {
       "@type": "ContactPoint",
-      "telephone": "+91-XXXXXXXXXX",
+      "telephone": "+91-7998611572",
       "contactType": "customer service"
     },
     "priceRange": "$$$"

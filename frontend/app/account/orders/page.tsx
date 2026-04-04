@@ -57,7 +57,7 @@ export default function OrderHistoryPage() {
             // However, since we don't have a user-facing 'cancel' endpoint yet, we'll direct them to support 
             // OR if we want to be proactive, we'd add 'POST /orders/:id/cancel' in backend.
             // For now, let's use the support alert as a safe fallback to prevent unauthorized status changes if endpoints aren't secured for user status updates.
-            showToast('Please contact our Concierge at +91 99999 99999 to cancel your order.', 'info');
+            showToast('Please contact our Concierge at +91 79986 11572 to cancel your order.', 'info');
         } catch (error) {
             console.error("Cancellation failed", error);
         }
@@ -179,7 +179,7 @@ export default function OrderHistoryPage() {
                                     )}
                                     {order.status === 'DELIVERED' && (
                                         <button
-                                            onClick={() => showToast('Please contact support at +91 99999 99999 to initiate a return.', 'info')}
+                                            onClick={() => showToast('Please contact support at +91 79986 11572 to initiate a return.', 'info')}
                                             className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-navy hover:text-brand-gold hover:underline transition-all"
                                         >
                                             Return / Exchange

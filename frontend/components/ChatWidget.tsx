@@ -92,7 +92,7 @@ export default function ChatWidget() {
       }
       if (part.startsWith('whatsapp:')) {
         const message = encodeURIComponent(part.split('whatsapp:')[1] || "Hello, I need assistance with Spark Blue Diamond.");
-        const whatsappUrl = `https://wa.me/919876543210?text=${message}`; // Using Samarjeet's number as base
+        const whatsappUrl = `https://wa.me/917998611572?text=${message}`; // Using Samarjeet's number as base
         return (
           <a
             key={i}
