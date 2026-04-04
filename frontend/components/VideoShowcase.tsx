@@ -99,11 +99,11 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                 </div>
             </div>
 
-            <div className="relative pl-6 lg:pl-12 max-w-[1400px] mx-auto pb-12">
+            <div className="relative max-w-[1400px] mx-auto pb-12 px-6 lg:px-12">
                 <div
                     ref={scrollContainerRef}
                     onScroll={checkScroll}
-                    className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar pr-6 lg:pr-12"
+                    className="flex gap-6 overflow-x-auto snap-x snap-mandatory hide-scrollbar justify-start md:justify-center"
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {videos.map((video, index) => {

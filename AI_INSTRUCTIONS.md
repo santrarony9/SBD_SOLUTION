@@ -28,6 +28,9 @@ This file acts as a persistent memory for Antigravity AI or any AI assistant wor
    - Deployed manually using the custom deploy script that packages, uploads via SSH, installs dependencies, and restarts the PM2 process.
    - Example to deploy Backend: `cd backend && node deploy.js`
    - *Note:* This script uses `node-ssh` and requires SSH password authentication.
+   - **CRITICAL: The `.env` file is deployed TO the VPS.** The local `backend/.env` MUST contain `JWT_SECRET` and `FRONTEND_URL` or the backend will crash on startup. Always verify these exist before deploying.
+   - **CRITICAL: After every deploy, verify `class-validator` and `class-transformer` are installed on the VPS.** If missing, PM2 will crash-loop. Run `npm install class-validator class-transformer --legacy-peer-deps` on the VPS if needed.
+   - **VPS Hosting:** HostGraber (my.hostgraber.com), IP: `160.187.68.243`, password in deploy.js.
 
 ## 3. General Rules & Known Quirks
 - **Price Formatting:** Always use the `formatPrice` function from the `CurrencyContext` on the frontend for rendering currency. Do not manually append symbols.

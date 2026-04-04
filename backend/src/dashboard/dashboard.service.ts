@@ -77,7 +77,7 @@ export class DashboardService {
         items: { include: { product: true } },
       },
       orderBy: { updatedAt: 'desc' },
-      take: 50,
+      take: 200,
     });
   }
 

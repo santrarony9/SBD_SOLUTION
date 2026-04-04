@@ -110,6 +110,19 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
 
     const currentBanner = activeBanners[currentIndex] || activeBanners[0];
 
+    // Helper to detect if a text is empty or a technical CMS placeholder slug
+    const isPlaceholder = (text?: string) => {
+        if (!text) return true;
+        const cleaned = text.trim();
+        if (cleaned === '') return true;
+        if (cleaned.includes('_')) return true; // e.g. OFFER_BANNER1
+        if (cleaned === 'welcomeoffer') return true;
+        if (/^banner/i.test(cleaned)) return true;
+        return false;
+    };
+
+    const hasAnyContent = !isPlaceholder(currentBanner?.title) || !isPlaceholder(heroText?.title) || !isPlaceholder(heroText?.subtitle);
+
     if (!mounted || activeBanners.length === 0) {
         return <section className="relative h-[100dvh] bg-brand-navy" />;
     }
@@ -186,46 +199,54 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                 )}
 
                 {/* Dynamic Kicker from Banner */}
-                <div className="mb-4 md:mb-6 w-full px-4">
-                    <h2
-                        key={currentIndex} // Re-animate on change
-                        className="text-brand-gold/90 font-serif italic text-sm md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-medium animate-fade-in-up text-balance"
-                    >
-                        {currentBanner.title}
-                    </h2>
-                </div>
+                {!isPlaceholder(currentBanner.title) && (
+                    <div className="mb-4 md:mb-6 w-full px-4">
+                        <h2
+                            key={currentIndex} // Re-animate on change
+                            className="text-brand-gold/90 font-serif italic text-sm md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-medium animate-fade-in-up text-balance"
+                        >
+                            {currentBanner.title}
+                        </h2>
+                    </div>
+                )}
 
                 {/* Main Hero Text (Static Global Setting) */}
-                <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
-                    {heroText?.title?.includes('Eternal') ? (
-                        <>
-                            {heroText.title.split('Eternal')[0]}
-                            <span className="text-brand-gold italic pr-2">Eternal</span>
-                            {heroText.title.split('Eternal')[1]}
-                        </>
-                    ) : (
-                        heroText?.title || "Royal Diamond Collection"
-                    )}
-                </h1>
+                {!isPlaceholder(heroText?.title) && (
+                    <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
+                        {heroText?.title?.includes('Eternal') ? (
+                            <>
+                                {heroText.title.split('Eternal')[0]}
+                                <span className="text-brand-gold italic pr-2">Eternal</span>
+                                {heroText.title.split('Eternal')[1]}
+                            </>
+                        ) : (
+                            heroText?.title
+                        )}
+                    </h1>
+                )}
 
-                <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
-                    {heroText?.subtitle || "Exquisite craftsmanship since 2020"}
-                </p>
+                {!isPlaceholder(heroText?.subtitle) && (
+                    <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
+                        {heroText?.subtitle}
+                    </p>
+                )}
 
-                <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">
-                    <Link
-                        href={currentBanner.link || "/shop"}
-                        className="bg-white text-brand-navy px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full sm:w-auto"
-                    >
-                        Shop Collection
-                    </Link>
-                    <Link
-                        href="/about"
-                        className="bg-transparent text-white px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full sm:w-auto"
-                    >
-                        Our Heritage
-                    </Link>
-                </div>
+                {hasAnyContent && (
+                    <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">
+                        <Link
+                            href={currentBanner.link || "/shop"}
+                            className="bg-white text-brand-navy px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full sm:w-auto"
+                        >
+                            Shop Collection
+                        </Link>
+                        <Link
+                            href="/about"
+                            className="bg-transparent text-white px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full sm:w-auto"
+                        >
+                            Our Heritage
+                        </Link>
+                    </div>
+                )}
             </div>
 
             {/* Navigation Controls */}
