@@ -142,8 +142,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}
-                            className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
-                                }`}
+                            className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
                             quality={90}
                         />
@@ -156,8 +155,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}
-                            className={`object-cover transition-transform duration-[10s] ease-linear ${index === currentIndex ? 'scale-110' : 'scale-100'
-                                }`}
+                            className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
                             quality={80}
                         />
