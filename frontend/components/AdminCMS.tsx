@@ -1,13 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe, PiDownloadSimple } from "react-icons/pi";
+import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe, PiDownloadSimple, PiVideoCamera } from "react-icons/pi";
 import { fetchAPI } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes' | 'video-reels'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -46,6 +46,7 @@ export default function AdminCMS() {
     const [tags, setTags] = useState<any[]>([]);
     const [socialPosts, setSocialPosts] = useState<any[]>([]);
     const [galleryItems, setGalleryItems] = useState<any[]>([]);
+    const [videoReels, setVideoReels] = useState<any[]>([]);
 
     // Form States
     const [newBanner, setNewBanner] = useState({ imageUrl: '', mobileImageUrl: '', title: '', link: '' });
@@ -59,6 +60,7 @@ export default function AdminCMS() {
     const [newTag, setNewTag] = useState({ name: '', slug: '' });
     const [newSocialPost, setNewSocialPost] = useState({ imageUrl: '', caption: '', link: '' });
     const [newGalleryItem, setNewGalleryItem] = useState({ title: '', subtitle: '', imageUrl: '', link: '' });
+    const [newVideoReel, setNewVideoReel] = useState({ title: '', tagline: '', videoUrl: '', link: '' });
     const [newPromoCode, setNewPromoCode] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 10, creatorName: '' });
 
     useEffect(() => {
@@ -82,10 +84,11 @@ export default function AdminCMS() {
                 fetchAPI('/store/settings/home_brand_story'),
                 fetchAPI('/store/settings/sparkblue_promise_cards'),
                 fetchAPI('/store/settings/footer_config'),
-                fetchAPI('/promos')
+                fetchAPI('/promos'),
+                fetchAPI('/video-showcase')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes, videoReelsRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else showToast('Failed to load banners', 'error');
@@ -110,6 +113,9 @@ export default function AdminCMS() {
 
             if (galleryRes.status === 'fulfilled') setGalleryItems(galleryRes.value || []);
             else showToast('Failed to load gallery items', 'error');
+
+            if (videoReelsRes.status === 'fulfilled') setVideoReels(videoReelsRes.value || []);
+            else showToast('Failed to load video reels', 'error');
 
             if (heroTextRes.status === 'fulfilled') {
                 const fetchedHeroText = heroTextRes.value;
@@ -342,6 +348,26 @@ export default function AdminCMS() {
         } catch (e) { showToast('Failed to delete item', 'error'); }
     };
 
+    // --- Video Reel Actions ---
+    const handleAddVideoReel = async () => {
+        if (!newVideoReel.videoUrl) return showToast('Video URL is required', 'error');
+        try {
+            await fetchAPI('/video-showcase', { method: 'POST', body: JSON.stringify(newVideoReel) });
+            showToast('Video Added', 'success');
+            setNewVideoReel({ title: '', tagline: '', videoUrl: '', link: '' });
+            loadContent();
+        } catch (e) { showToast('Failed to add video', 'error'); }
+    };
+
+    const handleDeleteVideoReel = async (id: string) => {
+        if (!confirm('Delete this video?')) return;
+        try {
+            await fetchAPI(`/video-showcase/${id}`, { method: 'DELETE' });
+            showToast('Video Deleted', 'success');
+            loadContent();
+        } catch (e) { showToast('Failed to delete video', 'error'); }
+    };
+
     // --- Text Actions ---
     const handleUpdateText = async () => {
         try {
@@ -386,6 +412,10 @@ export default function AdminCMS() {
 
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start animate-fade-in min-h-[600px]">
+            {/* SYNC VERIFICATION BANNER */}
+            <div className="fixed top-0 left-0 w-full bg-brand-gold text-brand-navy p-2 z-[9999] text-center text-[10px] uppercase font-black tracking-widest shadow-xl">
+                SYNC STATUS: ACTIVE (v3 - {new Date().toLocaleTimeString()})
+            </div>
 
             {/* Mobile Sidebar Toggle */}
             <button
@@ -412,6 +442,7 @@ export default function AdminCMS() {
                 {[
                     { id: 'banners', label: 'Slider Banners', icon: PiImage },
                     { id: 'gallery', label: 'Motion Gallery', icon: PiImage },
+                    { id: 'video-reels', label: 'Video Showcase [NEW]', icon: PiVideoCamera },
                     { id: 'text', label: 'Brand Narratives', icon: PiTextT },
                     { id: 'spotlight', label: 'Master Spotlight', icon: PiSparkle },
                 ].map((item) => (
@@ -515,6 +546,128 @@ export default function AdminCMS() {
                         </h2>
                         {isLoading && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-brand-gold" />}
                     </div>
+
+                    {/* VIDEO REELS SECTION */}
+                    {activeSection === 'video-reels' && (
+                        <div className="space-y-10">
+                            <div className="bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6 flex items-center gap-2">
+                                    <PiPlus className="text-brand-gold" /> Add New Video Reel
+                                </h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                    <div className="space-y-2">
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Video File</label>
+                                            <span className="text-[9px] text-gray-400 font-bold bg-gray-100 px-2 py-0.5 rounded">
+                                                Local Upload (Max 50MB)
+                                            </span>
+                                        </div>
+
+                                        {!newVideoReel.videoUrl ? (
+                                            <label className={`relative block w-full h-40 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-all ${isUploading ? 'border-brand-gold bg-brand-gold/5 animate-pulse' : 'border-gray-200 hover:border-brand-navy hover:bg-white'}`}>
+                                                <input
+                                                    type="file"
+                                                    accept="video/*"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    onChange={(e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            if (file.size > 50 * 1024 * 1024) {
+                                                                showToast('File is too large! Max 50MB allowed.', 'error');
+                                                                return;
+                                                            }
+                                                            setIsUploading(true);
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showToast('Uploading Video...', 'success');
+                                                            fetchAPI('/media/upload-local', { method: 'POST', body: formData })
+                                                                .then(res => setNewVideoReel(prev => ({ ...prev, videoUrl: res.url })))
+                                                                .catch(err => {
+                                                                    console.error(err);
+                                                                    showToast('Failed to upload video', 'error');
+                                                                })
+                                                                .finally(() => setIsUploading(false));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                                                    <PiVideoCamera className="text-3xl mb-2 text-brand-gold" />
+                                                    <span className="text-[10px] font-bold">CLICK TO UPLOAD .MP4/.WEBM</span>
+                                                    <span className="text-[8px] mt-1 text-gray-400">Streamed from local server</span>
+                                                </div>
+                                            </label>
+                                        ) : (
+                                            <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 bg-black">
+                                                <video src={newVideoReel.videoUrl} className="w-full h-full object-cover opacity-70" autoPlay loop muted playsInline />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                    <button onClick={() => setNewVideoReel(prev => ({ ...prev, videoUrl: '' }))} title="Remove Video" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Title (Optional)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. Wedding Edit"
+                                                value={newVideoReel.title}
+                                                onChange={(e) => setNewVideoReel({ ...newVideoReel, title: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Tagline (Optional)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. For Her"
+                                                value={newVideoReel.tagline}
+                                                onChange={(e) => setNewVideoReel({ ...newVideoReel, tagline: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-600 tracking-wider">Link/URL (Optional)</label>
+                                            <input
+                                                type="text"
+                                                placeholder="e.g. /shop?tag=wedding"
+                                                value={newVideoReel.link}
+                                                onChange={(e) => setNewVideoReel({ ...newVideoReel, link: e.target.value })}
+                                                className="w-full border-b border-gray-200 py-2 text-sm outline-none focus:border-brand-gold bg-transparent"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-6 flex justify-end">
+                                    <button
+                                        onClick={handleAddVideoReel}
+                                        className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10 flex items-center gap-2"
+                                    >
+                                        <PiCheck className="text-brand-gold" />
+                                        Save Video Reel
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                {videoReels.map((reel) => (
+                                    <div key={reel.id} className="group relative aspect-[9/16] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-black">
+                                        <video src={reel.videoUrl} className="w-full h-full object-cover transition-transform duration-700" loop muted playsInline onMouseOver={(e) => e.currentTarget.play()} onMouseOut={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }} />
+                                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent p-4 flex flex-col justify-end">
+                                            <span className="text-brand-gold text-[10px] font-bold uppercase tracking-widest">{reel.tagline || 'REEL'}</span>
+                                            <h4 className="text-white font-serif">{reel.title || 'Untitled'}</h4>
+                                        </div>
+                                        <div className="absolute top-2 right-2">
+                                            <button onClick={() => handleDeleteVideoReel(reel.id)} className="bg-white/10 backdrop-blur-md text-white p-2 rounded-full hover:bg-red-500 transition-colors border border-white/20">
+                                                <PiTrash size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {videoReels.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No video reels added yet. Upload local MP4s above.</div>}
+                            </div>
+                        </div>
+                    )}
 
                     {/* PROMO CODES SECTION */}
                     {activeSection === 'promocodes' && (

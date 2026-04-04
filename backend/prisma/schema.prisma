@@ -548,3 +548,15 @@ model GalleryItem {
   updatedAt DateTime @updatedAt
 }
 
+model VideoShowcase {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String?
+  tagline   String?
+  videoUrl  String
+  thumbnail String?
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

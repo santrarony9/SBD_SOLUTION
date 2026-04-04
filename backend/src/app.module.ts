@@ -39,14 +39,22 @@ import { PhonePeModule } from './phonepe/phonepe.module';
 import { GalleryModule } from './gallery/gallery.module';
 import { CcavenueModule } from './ccavenue/ccavenue.module';
 import { ConfigModule } from '@nestjs/config'; // Added ConfigModule import
+import { VideoShowcaseModule } from './video-showcase/video-showcase.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }), // Added ConfigModule
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
     ScheduleModule.forRoot(),
     RedisModule,
+    VideoShowcaseModule,
     GalleryModule,
     ChatModule,
     WhatsappModule,

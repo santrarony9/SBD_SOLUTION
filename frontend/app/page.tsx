@@ -15,6 +15,7 @@ import SparkbluePromise from '@/components/SparkbluePromise';
 import SmartPlaceholder from '@/components/SmartPlaceholder';
 import CreatorPromoWidget from '@/components/CreatorPromoWidget';
 import InfluencerSpotlight from '@/components/InfluencerSpotlight';
+import VideoShowcase from '@/components/VideoShowcase';
 // Removed motion import to fix Server Component render error
 
 export const dynamic = 'force-dynamic';
@@ -42,6 +43,14 @@ async function getOffers() {
 async function getBanners() {
   try {
     return await fetchAPI('/banners');
+  } catch (e) {
+    return [];
+  }
+}
+
+async function getVideoReels() {
+  try {
+    return await fetchAPI('/video-showcase');
   } catch (e) {
     return [];
   }
@@ -134,6 +143,7 @@ async function getBrandStory() {
 }
 
 export default async function Home() {
+  // Concurrent Data Fetching for Performance
   const [
     allProducts,
     offers,
@@ -146,7 +156,8 @@ export default async function Home() {
     tags,
     promiseCards,
     royalStandardData,
-    brandStoryData
+    brandStoryData,
+    videoReels
   ] = await Promise.all([
     getFeaturedProducts(),
     getOffers(),
@@ -159,7 +170,8 @@ export default async function Home() {
     getTags(),
     getPromiseCards(),
     getRoyalStandard(),
-    getBrandStory()
+    getBrandStory(),
+    getVideoReels()
   ]);
 
   // Defensive Guards
@@ -289,7 +301,10 @@ export default async function Home() {
         </div>
       </section>
 
-      {/* 5. Trending Tags */}
+      {/* 5.5. Video Showcase Carousel */}
+      <VideoShowcase videos={videoReels || []} />
+
+      {/* 6. Trending Tags */}
       <section
         className="py-12 bg-white"
       >

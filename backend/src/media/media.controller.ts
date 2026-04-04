@@ -9,6 +9,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 
 @Controller('media')
 export class MediaController {
@@ -40,6 +42,51 @@ export class MediaController {
       const message =
         error instanceof Error ? error.message : JSON.stringify(error); // Capture Cloudinary object errors
       throw new Error(`Upload Failed: ${message}`);
+    }
+  }
+
+  @Post('upload-local')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './uploads/videos',
+        filename: (req, file, callback) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
+  async uploadLocalFile(
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB max cap for local video uploads
+        ],
+      }),
+    )
+    file: Express.Multer.File,
+  ) {
+    try {
+      if (!file) {
+        throw new Error('No file uploaded');
+      }
+      
+      // Return the URL that will be accessible via the ServeStatic module config
+      const fileUrl = `/uploads/videos/${file.filename}`;
+      
+      return {
+        url: fileUrl,
+        public_id: file.filename,
+        resource_type: 'video', // Assume video primarily for this endpoint
+      };
+    } catch (error) {
+      console.error('Local Upload Controller Error:', error);
+      const message =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      throw new Error(`Local Upload Failed: ${message}`);
     }
   }
 }

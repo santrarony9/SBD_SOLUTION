@@ -39,6 +39,7 @@ export default function LoginPage() {
         e.preventDefault();
         setError('');
         setIsLoading(true);
+        try {
             const data = await fetchAPI('/auth/login', {
                 method: 'POST',
                 body: JSON.stringify({ email, password }),
