@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe, PiDownloadSimple, PiVideoCamera } from "react-icons/pi";
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
@@ -592,7 +592,11 @@ export default function AdminCMS() {
                                                             formData.append('file', file);
                                                             showToast('Uploading Video...', 'success');
                                                             fetchAPI('/media/upload-local', { method: 'POST', body: formData })
-                                                                .then(res => setNewVideoReel(prev => ({ ...prev, videoUrl: res.url })))
+                                                                .then(res => {
+                                                                    // Prefix the local path with the backend host
+                                                                    const host = API_URL.replace('/api', '');
+                                                                    setNewVideoReel(prev => ({ ...prev, videoUrl: `${host}${res.url}` }));
+                                                                })
                                                                 .catch(err => {
                                                                     console.error(err);
                                                                     showToast('Failed to upload video', 'error');
@@ -602,8 +606,12 @@ export default function AdminCMS() {
                                                     }}
                                                 />
                                                 <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                                                    <PiVideoCamera className="text-3xl mb-2 text-brand-gold" />
-                                                    <span className="text-[10px] font-bold">CLICK TO UPLOAD .MP4/.WEBM</span>
+                                                    {isUploading ? (
+                                                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-gold mb-2" />
+                                                    ) : (
+                                                        <PiVideoCamera className="text-3xl mb-2 text-brand-gold" />
+                                                    )}
+                                                    <span className="text-[10px] font-bold">{isUploading ? 'UPLOADING...' : 'CLICK TO UPLOAD .MP4/.WEBM'}</span>
                                                     <span className="text-[8px] mt-1 text-gray-400">Streamed from local server</span>
                                                 </div>
                                             </label>
