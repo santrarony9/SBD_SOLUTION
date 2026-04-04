@@ -412,10 +412,6 @@ export default function AdminCMS() {
 
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start animate-fade-in min-h-[600px]">
-            {/* SYNC VERIFICATION BANNER */}
-            <div className="fixed top-0 left-0 w-full bg-brand-gold text-brand-navy p-2 z-[9999] text-center text-[10px] uppercase font-black tracking-widest shadow-xl">
-                SYNC STATUS: ACTIVE (v3 - {new Date().toLocaleTimeString()})
-            </div>
 
             {/* Mobile Sidebar Toggle */}
             <button

@@ -140,7 +140,6 @@ export default function AdminDashboard() {
                     <div className="mb-12">
                         <h2 className="text-2xl font-bold font-serif tracking-widest text-white">SPARK BLUE</h2>
                         <span className="text-[0.6rem] uppercase tracking-[0.4em] text-brand-gold ml-1">Administration</span>
-                        <div className="hidden">FORCE_REBUILD_{new Date().getTime()}</div>
                     </div>
 
                     <nav className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
