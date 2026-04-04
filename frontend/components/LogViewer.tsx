@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PiCopy, PiArrowsClockwise, PiX, PiTerminalWindow } from 'react-icons/pi';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
 
 export default function LogViewer({ onClose }: { onClose: () => void }) {
     const [logs, setLogs] = useState<string[]>([]);
@@ -16,7 +16,8 @@ export default function LogViewer({ onClose }: { onClose: () => void }) {
             console.error("Failed to fetch logs", error);
             setLogs([
                 `Error loading logs: ${error instanceof Error ? error.message : String(error)}`,
-                `Attempted URL: ${process.env.NEXT_PUBLIC_API_URL || '/api'}/diagnostics/logs`,
+                `Attempted URL: ${API_URL}/diagnostics/logs`,
+                "Reason: Backend might be offline or syncing. Check VPS status.",
                 "Check console for details."
             ]);
         } finally {

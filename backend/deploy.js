@@ -8,15 +8,16 @@ async function deploy() {
         // 1. Build locally first to save VPS memory
         console.log('Running local build to prevent VPS memory crash...');
         const { execSync } = require('child_process');
-        execSync('npm run build', { cwd: __dirname, stdio: 'inherit' });
+        execSync('npm.cmd run build', { cwd: __dirname, stdio: 'inherit' });
         console.log('Local build complete!');
 
         console.log('Connecting to VPS...');
-        // Connect to VPS
+        // Connect to VPS with increased timeout for slow handshakes
         await ssh.connect({
             host: '160.187.68.243',
             username: 'root',
             password: 'Bm0y431YQKrf6iI',
+            readyTimeout: 60000,
             debug: (msg) => console.log('DEBUG:', msg),
             tryKeyboard: true,
             onKeyboardInteractive: (name, instructions, instructionsLang, prompts, finish) => {
