@@ -210,7 +210,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             {heroText?.title?.includes('Eternal') ? (
                                 <>
                                     {heroText.title.split('Eternal')[0]}
-                                    <span className="text-brand-gold italic pr-2">Eternal</span>
+                                    <span className="text-[#fbbd61] italic pr-2">Eternal</span>
                                     {heroText.title.split('Eternal')[1]}
                                 </>
                             ) : (

@@ -85,13 +85,13 @@ export default function Navbar() {
                     {/* Center: Logo */}
                     <div className={`flex flex-col items-center justify-center transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
                         <Link href="/" className={`font-serif text-xl md:text-3xl tracking-[0.2em] md:tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em] whitespace-nowrap flex items-center`}>
-                            SPARK <span className="text-brand-gold ml-2">BLUE</span>
+                            SPARK <span className="text-[#fbbd61] ml-2">BLUE</span>
                         </Link>
                         {!scrolled && (
                             <motion.span
                                 initial={{ opacity: 0, y: -5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-[0.4rem] md:text-[0.6rem] uppercase tracking-[0.4em] md:tracking-[0.6em] text-brand-gold font-black mt-0.5"
+                                className="text-[0.4rem] md:text-[0.6rem] uppercase tracking-[0.4em] md:tracking-[0.6em] text-[#fbbd61] font-black mt-0.5"
                             >
                                 Diamond
                             </motion.span>

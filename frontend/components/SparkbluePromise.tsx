@@ -68,11 +68,11 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
 
                     {/* Left: Brand Promise */}
                     <motion.div variants={fadeInUp} className="flex flex-col max-w-lg">
-                        <h2 className="text-3xl md:text-4xl font-serif tracking-[0.2em] text-brand-gold mb-2 uppercase flex flex-wrap gap-2 md:gap-4">
-                            <span className="text-brand-gold/80 whitespace-nowrap">S P A R K B L U E</span>
-                            <span className="text-brand-navy whitespace-nowrap">P R O M I S E</span>
+                        <h2 className="text-3xl md:text-4xl font-serif tracking-[0.2em] text-[#d4af37] mb-2 uppercase flex flex-wrap gap-2 md:gap-4">
+                            <span className="text-[#fbbd61] whitespace-nowrap">S P A R K B L U E</span>
+                            <span className="text-[#1a2238] whitespace-nowrap">P R O M I S E</span>
                         </h2>
-                        <p className="text-brand-navy font-medium tracking-wide">
+                        <p className="text-[#1a2238] font-medium tracking-wide">
                             Crafted with precision. Delivered with trust.
                         </p>
                     </motion.div>
@@ -80,26 +80,26 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     {/* Right: Icons */}
                     <motion.div variants={fadeInUp} className="flex gap-8 md:gap-16">
                         <div className="flex flex-col items-center">
-                            <div className="w-12 h-12 mb-3 text-brand-gold flex items-center justify-center">
+                            <div className="w-12 h-12 mb-3 text-[#fbbd61] flex items-center justify-center">
                                 <PiHammer className="w-10 h-10" />
                             </div>
-                            <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase text-center w-20 leading-tight">
+                            <p className="text-[#fbbd61] text-[10px] font-bold tracking-widest uppercase text-center w-20 leading-tight">
                                 PRECISION<br />CRAFT
                             </p>
                         </div>
                         <div className="flex flex-col items-center">
-                            <div className="w-12 h-12 mb-3 text-brand-gold flex items-center justify-center">
+                            <div className="w-12 h-12 mb-3 text-[#fbbd61] flex items-center justify-center">
                                 <PiDiamond className="w-10 h-10" />
                             </div>
-                            <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase text-center w-20 leading-tight">
+                            <p className="text-[#fbbd61] text-[10px] font-bold tracking-widest uppercase text-center w-20 leading-tight">
                                 ETHICAL<br />DIAMONDS
                             </p>
                         </div>
                         <div className="flex flex-col items-center">
-                            <div className="w-12 h-12 mb-3 text-brand-gold flex items-center justify-center">
+                            <div className="w-12 h-12 mb-3 text-[#fbbd61] flex items-center justify-center">
                                 <PiCurrencyInr className="w-10 h-10" />
                             </div>
-                            <p className="text-brand-gold text-[10px] font-bold tracking-widest uppercase text-center w-24 leading-tight">
+                            <p className="text-[#fbbd61] text-[10px] font-bold tracking-widest uppercase text-center w-24 leading-tight">
                                 TRANSPARENT<br />VALUE
                             </p>
                         </div>
@@ -115,10 +115,10 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                     className="text-center mb-12 md:mb-16"
                 >
                     <h3 className="text-3xl md:text-5xl font-serif mb-4 flex justify-center gap-3 uppercase items-baseline flex-wrap">
-                        <span className="text-brand-navy">FIND YOUR</span>
-                        <span className="text-brand-gold">PERFECT SPARK</span>
+                        <span className="text-[#1a2238]">FIND YOUR</span>
+                        <span className="text-[#fbbd61]">PERFECT SPARK</span>
                     </h3>
-                    <p className="text-brand-navy uppercase tracking-[0.1em] text-sm md:text-base font-light max-w-2xl mx-auto">
+                    <p className="text-[#1a2238] uppercase tracking-[0.1em] text-sm md:text-base font-light max-w-2xl mx-auto">
                         BECAUSE EVERY RELATIONSHIP DESERVES A <br className="hidden md:block" /> BRILLIANCE OF ITS OWN.
                     </p>
                 </motion.div>

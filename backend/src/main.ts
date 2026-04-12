@@ -9,18 +9,9 @@ import * as path from 'path';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 
-// Manual .env loading since @nestjs/config is missing
-const envPath = path.resolve(__dirname, '../../.env');
-if (fs.existsSync(envPath)) {
-  const envConfig = fs.readFileSync(envPath).toString();
-  envConfig.split('\n').forEach((line) => {
-    const [key, value] = line.split('=');
-    if (key && value && !process.env[key.trim()]) {
-      process.env[key.trim()] = value.trim().replace(/^["']|["']$/g, '');
-    }
-  });
-  console.log('[BOOTSTRAP] Loaded .env manually');
-}
+// Load environment variables immediately before any modules evaluate
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || '*';
