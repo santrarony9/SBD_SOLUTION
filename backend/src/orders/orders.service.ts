@@ -124,7 +124,7 @@ export class OrdersService {
     // 5. Shiprocket Integration
     // Non-blocking call
     this.pushToShiprocket(order.id).catch((e) =>
-      console.error('Shiprocket Auto-Push Failed:', e.message),
+      console.error('Shiprocket Auto-Push Failed:', (e as any).message),
     );
 
     // 6. Clear Cart
@@ -205,9 +205,9 @@ export class OrdersService {
       }
       return { success: false, message: 'Shiprocket returned no data' };
     } catch (e) {
-      console.error('Shiprocket Service Error:', e.message);
+      console.error('Shiprocket Service Error:', (e as any).message);
       throw new BadRequestException(
-        'Failed to push to Shiprocket: ' + e.message,
+        'Failed to push to Shiprocket: ' + (e as any).message,
       );
     }
   }
@@ -261,8 +261,8 @@ export class OrdersService {
         trackingUrl: this.shiprocketService.getTrackingUrl(awbData.awb_code),
       };
     } catch (e) {
-      console.error('Shipping Failed:', e.message);
-      throw new BadRequestException('Failed to ship order: ' + e.message);
+      console.error('Shipping Failed:', (e as any).message);
+      throw new BadRequestException('Failed to ship order: ' + (e as any).message);
     }
   }
 
@@ -380,7 +380,7 @@ export class OrdersService {
         } catch (e) {
           console.error(
             'Failed to sync cancellation with Shiprocket:',
-            e.message,
+            (e as any).message,
           );
           // We log but don't block the local cancellation to ensure data consistency
         }
@@ -490,7 +490,7 @@ export class OrdersService {
 
     // Push to Shiprocket (if not already)
     this.pushToShiprocket(updatedOrder.id).catch((e) =>
-      console.error('Shiprocket Push Retry:', e.message),
+      console.error('Shiprocket Push Retry:', (e as any).message),
     );
 
     return updatedOrder;
@@ -526,7 +526,7 @@ export class OrdersService {
 
     // Push to Shiprocket
     this.pushToShiprocket(updatedOrder.id).catch((e) =>
-      console.error('Shiprocket Push Retry:', e.message),
+      console.error('Shiprocket Push Retry:', (e as any).message),
     );
 
     return updatedOrder;

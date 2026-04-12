@@ -2,22 +2,27 @@
 This file acts as a persistent memory for Antigravity AI or any AI assistant working on the SBD project. Read these instructions before making structural changes or deployments.
 
 ## 1. Project Architecture & Stack
-### Frontend
-- **Framework:** Next.js (App Router, React 18+).
-- **Styling:** Tailwind CSS. Do NOT use standard CSS unless creating specific custom animations (like Holi).
-- **PWA:** Uses `@ducanh2912/next-pwa`. **Crucial**: Service workers are intentionally disabled in development mode to prevent caching loops. To test PWA features locally, you must run `npm run build && npm run start`.
-- **State/Context:** Relies heavily on React Context (`CartContext`, `CurrencyContext`, `FestiveContext`, `ToastContext`).
-- **Design System:** 
-  - **Colors:** `brand-navy` (#0A1128), `brand-gold` (#D4AF37), `brand-cream` (#FDFBF7), `brand-charcoal` (#2C303A).
-  - **Fonts:** Playfair Display (Serif/Headings) and Inter (Sans-serif/Body text). Always aim for a minimalist, premium luxury aesthetic.
+### Frontend (Elite 2026 Standard)
+- **Framework:** Next.js 16.2.3+ (App Router, React 19.2.5+).
+- **Styling:** Tailwind CSS 4.2.2+. Uses `@theme` directive in `globals.css` for design tokens.
+  - **Luxury Tokens:** `brand-navy` (#0F172A), `brand-gold` (#C6A87C), `brand-gold-light` (#F0E6D2), `brand-cream` (#FAFAF9).
+  - **Utilities:** `.glass` (Standard), `.glass-dark` (Obsidian), `.text-gold-gradient`.
+- **PWA:** Uses `@ducanh2912/next-pwa`. **Crucial**: Service workers are intentionally disabled in development mode.
+- **State/Context:** Relies on React Context (`CartContext`, `CurrencyContext`, `FestiveContext`, `ToastContext`).
+- **Typography:** Playfair Display (Serif/Headings) and Inter (Sans-serif/Body text). Always aim for a minimalist, premium luxury aesthetic.
+- **Smooth Scroll:** Lenis Smooth Scroll is integrated into the root layout for cinematic engagement.
 
-### Backend
-- **Framework:** NestJS.
-- **Database:** MongoDB (using Prisma ORM). Run `npx prisma generate` when the schema changes. 
+### Backend (Elite 2026 Standard)
+- **Framework:** NestJS 11+.
+- **Language:** TypeScript 6.0.2+ (Strict `unknown` error handling in catch blocks is mandatory).
+- **ORM:** Prisma 7.7.0+. 
+  - **Prisma 7 Configuration:** Connection strings are managed via `prisma.config.ts` using `defineConfig`. The `url` property is REMOVED from `schema.prisma`. 
+  - **Workflow:** Run `npx prisma generate` after schema changes.
 - **Integrations:**
-  - **Payment Gateway:** CCAvenue. Do NOT alter the hashing or encryption logic without explicit permission.
+  - **Payment Gateway:** PhonePe and CCAvenue. Do NOT alter the hashing or encryption logic without explicit permission.
   - **Shipping:** Shiprocket API.
-  - **AI Features:** Google Gemini (`@google/generative-ai`) is used in the admin panel to auto-generate luxury product descriptions based on jewelry parameters.
+  - **AI Features:** Google Gemini (`@google/generative-ai`) is used for generating luxury product descriptions.
+- **Node Engine:** Effectively forced to 24.x/22.x for modern environment compatibility.
 
 ## 2. Deployment Protocol
 1. **Frontend (Vercel):** 

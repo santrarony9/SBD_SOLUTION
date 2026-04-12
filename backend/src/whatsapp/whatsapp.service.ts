@@ -54,8 +54,8 @@ export class WhatsappService {
         return { success: false, response: response.data };
       }
     } catch (error) {
-      this.logger.error(`WhatsApp API Error: ${error.message}`);
-      return { success: false, error: error.message };
+      this.logger.error(`WhatsApp API Error: ${(error as any).message}`);
+      return { success: false, error: (error as any).message };
     }
   }
 

@@ -37,7 +37,7 @@ export class ShiprocketService {
     } catch (error) {
       this.logger.error(
         'Shiprocket Login Failed',
-        error.response?.data || error.message,
+        (error as any).response?.data || (error as any).message,
       );
       throw new Error('Shiprocket Authentication Failed');
     }
@@ -99,7 +99,7 @@ export class ShiprocketService {
     } catch (error) {
       this.logger.error(
         'Shiprocket Create Order Failed',
-        error.response?.data || error.message,
+        (error as any).response?.data || (error as any).message,
       );
       // Don't throw, just return null so we don't break the main order flow
       return null;
@@ -120,7 +120,7 @@ export class ShiprocketService {
       );
       return true;
     } catch (error) {
-      this.logger.error('Shiprocket Cancel Failed', error.message);
+      this.logger.error('Shiprocket Cancel Failed', (error as any).message);
       return false;
     }
   }
@@ -146,7 +146,7 @@ export class ShiprocketService {
     } catch (error) {
       this.logger.error(
         'Shiprocket AWB Generation Failed',
-        error.response?.data || error.message,
+        (error as any).response?.data || (error as any).message,
       );
       throw new Error('Failed to generate AWB');
     }
@@ -170,7 +170,7 @@ export class ShiprocketService {
     } catch (error) {
       this.logger.error(
         'Shiprocket Label Generation Failed',
-        error.response?.data || error.message,
+        (error as any).response?.data || (error as any).message,
       );
       return null;
     }
@@ -185,7 +185,7 @@ export class ShiprocketService {
       const token = await this.login();
       return { success: true, token: !!token };
     } catch (e) {
-      return { success: false, error: e.message };
+      return { success: false, error: (e as any).message };
     }
   }
 }

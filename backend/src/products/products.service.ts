@@ -183,10 +183,10 @@ export class ProductsService {
       }
     }
 
-    const goldRateMap = new Map(
+    const goldRateMap = new Map<number, number>(
       goldRates.map((r) => [r.purity, r.pricePer10g]),
     );
-    const diamondRateMap = new Map(
+    const diamondRateMap = new Map<string, number>(
       diamondRates.map((r) => [r.clarity, r.pricePerCarat]),
     );
 

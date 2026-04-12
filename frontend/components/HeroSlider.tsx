@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
 import { useFestive } from '@/context/FestiveContext';
 
 interface Banner {
@@ -30,6 +30,12 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     const { config, isFestiveActive } = useFestive();
     const [isMobile, setIsMobile] = useState(false);
     const [mounted, setMounted] = useState(false);
+
+    // Parallax logic
+    const { scrollY } = useScroll();
+    const y1 = useTransform(scrollY, [0, 500], [0, 200]);
+    const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+    const scale = useTransform(scrollY, [0, 500], [1, 1.1]);
 
     // Screen size detection
     useEffect(() => {
@@ -129,45 +135,52 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     return (
         <section className="relative h-[100dvh] flex items-center justify-center overflow-hidden bg-brand-navy">
             {/* Background Images Layer */}
-            {activeBanners.map((banner, index) => (
-                <div
-                    key={banner.id}
-                    className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentIndex ? 'opacity-100 z-0' : 'opacity-0 -z-10'
-                        }`}
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={currentBanner?.id || currentIndex}
+                    initial={{ opacity: 0, scale: 1.1 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+                    className="absolute inset-0"
+                    style={{ y: y1, scale }}
                 >
                     {/* Desktop Image */}
                     <div className="hidden md:block absolute inset-0">
                         <Image
-                            src={banner.imageUrl || '/hero-jewellery.png'}
-                            alt={banner.title || "Royal Diamond Collection"}
+                            src={currentBanner?.imageUrl || '/hero-jewellery.png'}
+                            alt={currentBanner?.title || "Royal Diamond Collection"}
                             fill
-                            priority={index === 0}
+                            priority
                             className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
-                            quality={90}
+                            quality={100}
                         />
                     </div>
 
                     {/* Mobile Image */}
                     <div className="block md:hidden absolute inset-0">
                         <Image
-                            src={banner.mobileImageUrl || banner.imageUrl || '/hero-jewellery.png'}
-                            alt={banner.title || "Royal Diamond Collection"}
+                            src={currentBanner?.mobileImageUrl || currentBanner?.imageUrl || '/hero-jewellery.png'}
+                            alt={currentBanner?.title || "Royal Diamond Collection"}
                             fill
-                            priority={index === 0}
+                            priority
                             className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
-                            quality={80}
+                            quality={90}
                         />
                     </div>
 
                     {/* Sophisticated Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/20 to-brand-navy/90 mix-blend-multiply z-0" />
-                </div>
-            ))}
+                    <div className="absolute inset-0 bg-gradient-to-b from-brand-navy/60 via-brand-navy/10 to-brand-navy/95 mix-blend-multiply z-0" />
+                </motion.div>
+            </AnimatePresence>
 
             {/* Static Content Overlay */}
-            <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto">
+            <motion.div 
+                style={{ opacity }}
+                className="relative z-10 flex flex-col items-center justify-center text-center px-4 pt-20 pb-12 w-full max-w-6xl mx-auto"
+            >
                 {/* Case: Festive Branding Banner */}
                 {isFestiveActive && (
                     <motion.div
@@ -175,77 +188,61 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                         animate={{ opacity: 1, y: 0 }}
                         className="mb-8 md:mb-10 flex flex-col items-center gap-3"
                     >
-                        <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full text-white shadow-xl ${config?.currentFestival === 'HOLI'
-                            ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-green-500 shadow-pink-500/20'
-                            : 'bg-[var(--brand-navy)] border border-[var(--brand-gold)]/30 shadow-[var(--brand-gold)]/10'
+                        <div className={`inline-flex items-center gap-2 px-6 py-2 rounded-full text-white shadow-2xl glass ${config?.currentFestival === 'HOLI'
+                            ? 'bg-gradient-to-r from-pink-500 via-purple-500 to-green-500'
+                            : 'border border-brand-gold/30 shadow-brand-gold/10'
                             }`}>
                             <span className={`text-[10px] md:text-sm font-black uppercase tracking-[0.3em] whitespace-nowrap ${config?.currentFestival === 'HOLI' ? 'text-holi-animated' : ''}`}>
                                 {config?.theme?.greeting || 'Welcome to Spark Blue Diamond'}
                             </span>
                         </div>
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.2 }}
-                            className="bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-sm shadow-sm"
-                        >
-                            <span className="text-white text-[9px] md:text-xs font-black uppercase tracking-[0.2em]">
-                                Offer: {config?.theme?.discountLabel || 'Exquisite Collection'}
-                            </span>
-                        </motion.div>
                     </motion.div>
                 )}
 
-                {/* Dynamic Kicker from Banner */}
-                {!isPlaceholder(currentBanner.title) && (
-                    <div className="mb-4 md:mb-6 w-full px-4">
-                        <h2
-                            key={currentIndex} // Re-animate on change
-                            className="text-brand-gold/90 font-serif italic text-sm md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-medium animate-fade-in-up text-balance"
-                        >
-                            {currentBanner.title}
-                        </h2>
-                    </div>
-                )}
-
                 {/* Main Hero Text (Static Global Setting) */}
-                {!isPlaceholder(heroText?.title) && (
-                    <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
-                        {heroText?.title?.includes('Eternal') ? (
-                            <>
-                                {heroText.title.split('Eternal')[0]}
-                                <span className="text-brand-gold italic pr-2">Eternal</span>
-                                {heroText.title.split('Eternal')[1]}
-                            </>
-                        ) : (
-                            heroText?.title
-                        )}
-                    </h1>
-                )}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, delay: 0.2 }}
+                >
+                    {!isPlaceholder(heroText?.title) && (
+                        <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-2xl max-w-5xl text-balance">
+                            {heroText?.title?.includes('Eternal') ? (
+                                <>
+                                    {heroText.title.split('Eternal')[0]}
+                                    <span className="text-brand-gold italic pr-2">Eternal</span>
+                                    {heroText.title.split('Eternal')[1]}
+                                </>
+                            ) : (
+                                heroText?.title
+                            )}
+                        </h1>
+                    )}
 
-                {!isPlaceholder(heroText?.subtitle) && (
-                    <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
-                        {heroText?.subtitle}
-                    </p>
-                )}
+                    {!isPlaceholder(heroText?.subtitle) && (
+                        <p className="text-gray-100 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-widest leading-relaxed drop-shadow-md px-4">
+                            {heroText?.subtitle}
+                        </p>
+                    )}
 
-                {hasAnyContent && (
-                    <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">
-                        <Link
-                            href={currentBanner.link || "/shop"}
-                            className="bg-white text-brand-navy px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-500 ease-out shadow-lg hover:shadow-brand-gold/20 w-full sm:w-auto"
-                        >
-                            Shop Collection
-                        </Link>
-                        <Link
-                            href="/about"
-                            className="bg-transparent text-white px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-colors duration-500 border border-white/30 hover:border-white w-full sm:w-auto"
-                        >
-                            Our Heritage
-                        </Link>
-                    </div>
-                )}
-            </div>
+                    {hasAnyContent && (
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-8 w-full sm:w-auto px-4 md:px-0">
+                            <Link
+                                href={currentBanner.link || "/shop"}
+                                className="bg-white text-brand-navy px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-brand-gold hover:text-white transition-all duration-700 ease-out shadow-2xl hover:shadow-brand-gold/40 w-full sm:w-auto btn-gold-glow"
+                            >
+                                Shop Collection
+                            </Link>
+                            <Link
+                                href="/about"
+                                className="bg-transparent text-white px-6 py-3 md:px-12 md:py-4 uppercase tracking-[0.2em] font-bold text-[10px] md:text-xs hover:bg-white/10 transition-all duration-500 border border-white/30 hover:border-white w-full sm:w-auto backdrop-blur-sm"
+                            >
+                                Our Heritage
+                            </Link>
+                        </div>
+                    )}
+                </motion.div>
+            </motion.div>
 
             {/* Navigation Controls */}
             {activeBanners.length > 1 && (

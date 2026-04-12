@@ -45,12 +45,12 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = isMobileMenuOpen
-        ? 'bg-brand-navy text-white pb-safe border-b border-brand-gold/10' // Solid background, no blur, to prevent CSS containing block
+        ? 'bg-brand-navy text-white pb-safe border-b border-brand-gold/15'
         : scrolled
-            ? 'bg-white/95 backdrop-blur-3xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
+            ? 'glass-dark py-2 md:py-3'
             : isHome
-                ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
-                : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
+                ? 'bg-gradient-to-b from-black/40 to-transparent py-4 md:py-6'
+                : 'bg-brand-navy py-3 md:py-4 shadow-2xl shadow-brand-navy/20';
 
     const textColor = scrolled && !isMobileMenuOpen ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
     const accentColor = 'text-brand-gold';
@@ -315,7 +315,7 @@ function MobileNavLink({ href, label, onClick }: { href: string, label: string, 
         <Link
             href={href}
             onClick={onClick}
-            className={`text-3xl font-serif transition-all duration-300 py-2 block ${isActive ? 'text-[var(--festive-accent-1)] font-bold translate-x-2 drop-shadow-md' : 'text-white'}`}
+            className={`text-3xl font-serif transition-colors duration-500 py-3 block ${isActive ? 'text-brand-gold font-bold translate-x-3 drop-shadow-xl' : 'text-white/90 hover:text-brand-gold'}`}
         >
             <motion.div whileTap={{ scale: 0.9 }}>
                 {label}

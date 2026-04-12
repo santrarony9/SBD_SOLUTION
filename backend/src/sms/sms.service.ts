@@ -37,7 +37,7 @@ export class SmsService {
       this.logger.log(`SMS Sent: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error) {
-      this.logger.error(`Failed to send SMS: ${error.message}`);
+      this.logger.error(`Failed to send SMS: ${(error as any).message}`);
       throw error;
     }
   }

@@ -97,7 +97,7 @@ export class PhonePeService {
         );
       }
     } catch (error) {
-      this.logger.error(`PhonePe Init Error: ${error.message}`, error.stack);
+      this.logger.error(`PhonePe Init Error: ${(error as any).message}`, (error as any).stack);
       throw new BadRequestException('Payment initiation failed');
     }
   }
@@ -134,7 +134,7 @@ export class PhonePeService {
         return { success: false, status: data.code };
       }
     } catch (error) {
-      this.logger.error(`Verification Failed: ${error.message}`);
+      this.logger.error(`Verification Failed: ${(error as any).message}`);
       return { success: false };
     }
   }

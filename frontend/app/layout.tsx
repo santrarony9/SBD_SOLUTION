@@ -12,6 +12,7 @@ import { FestiveProvider } from '@/context/FestiveContext';
 
 
 import JsonLd from "@/components/JsonLd";
+import LenisProvider from "@/components/LenisProvider";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair-display",
@@ -160,9 +161,11 @@ export default async function RootLayout({
               <CartProvider>
                 <ComparisonProvider>
                   <CurrencyProvider>
-                    <ClientLayoutWrapper footerConfig={footerConfig}>
-                      {children}
-                    </ClientLayoutWrapper>
+                    <LenisProvider>
+                      <ClientLayoutWrapper footerConfig={footerConfig}>
+                        {children}
+                      </ClientLayoutWrapper>
+                    </LenisProvider>
                   </CurrencyProvider>
                 </ComparisonProvider>
               </CartProvider>

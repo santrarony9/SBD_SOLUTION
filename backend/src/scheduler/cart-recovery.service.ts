@@ -63,7 +63,7 @@ export class CartRecoveryService {
       } catch (error) {
         this.logger.error(
           `Failed to send recovery nudge for Cart ${cart.id}:`,
-          error.message,
+          (error as any).message,
         );
       }
     }

@@ -183,7 +183,7 @@ export class ChatService {
       return { text };
     } catch (error) {
       this.logger.warn(
-        `Gemini 2.5 Flash failed, switching to fallback. Error: ${error.message}`,
+        `Gemini 2.5 Flash failed, switching to fallback. Error: ${(error as any).message}`,
       );
       try {
         // Try Fallback Model (Gemini 2.0 Flash)
@@ -195,7 +195,7 @@ export class ChatService {
           fallbackError,
         );
         return {
-          text: `System Error: ${fallbackError.message || fallbackError}`,
+          text: `System Error: ${(fallbackError as any).message || fallbackError}`,
         };
       }
     }

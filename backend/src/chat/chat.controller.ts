@@ -37,7 +37,7 @@ export class ChatController {
       return response;
     } catch (error) {
       this.logger.error('ChatController Error', error);
-      return { text: `Controller Error: ${error.message}` };
+      return { text: `Controller Error: ${(error as any).message}` };
     }
   }
 }
