@@ -52,8 +52,8 @@ export default function Navbar() {
                 ? 'bg-gradient-to-b from-black/40 to-transparent py-4 md:py-6'
                 : 'bg-brand-navy py-3 md:py-4 shadow-2xl shadow-brand-navy/20';
 
-    const textColor = scrolled && !isMobileMenuOpen ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
-    const accentColor = 'text-brand-gold';
+    const textColor = 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
+    const accentColor = 'text-[#fbbd61]';
 
     return (
         <nav className={`w-full transition-all duration-500 ease-in-out ${navClasses}`}>
