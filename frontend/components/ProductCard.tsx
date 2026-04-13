@@ -43,12 +43,12 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            whileHover={{ y: -8 }}
-            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative flex flex-col h-full bg-white transition-all duration-700 hover:shadow-[0_40px_80px_-15px_rgba(198,168,124,0.25)] rounded-none border border-transparent hover:border-brand-gold/20"
+            initial={{ opacity: 0, scale: 0.98 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            whileHover={{ y: -5 }}
+            transition={{ duration: 0.5 }}
+            className="group relative flex flex-col h-full bg-white transition-all duration-500 hover:shadow-2xl hover:shadow-brand-gold/15 rounded-none border border-transparent hover:border-brand-gold/10"
         >
             {/* Image & Action Container */}
             <Link href={`/product/${product.slug}`} className="block relative flex flex-col overflow-hidden bg-[#FDFDFD] p-1">
@@ -81,13 +81,13 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                 {/* Quick Action Overlay (Absolute on Desktop, Static on Mobile) */}
                 <div className="absolute inset-0 bg-transparent group-hover:bg-brand-navy/[0.01] transition-all duration-300 pointer-events-none" />
 
-                <div className="md:absolute static bottom-0 left-0 right-0 md:opacity-0 group-hover:opacity-100 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] z-20 mt-1 md:mt-0">
+                <div className="md:absolute static bottom-0 left-0 right-0 md:opacity-0 group-hover:opacity-100 transition-all duration-500 ease-out z-20 mt-1 md:mt-0">
                     <motion.button
-                        whileTap={{ scale: 0.98 }}
+                        whileTap={{ scale: 0.95 }}
                         onClick={handleAddToCart}
-                        className="w-full min-h-[40px] md:min-h-[52px] bg-brand-navy text-white py-2 md:py-3.5 text-[9px] md:text-[10px] uppercase font-black tracking-[0.3em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-2xl glass-dark haptic-touch"
+                        className="w-full min-h-[40px] md:min-h-[48px] bg-brand-navy text-white py-2 md:py-3.5 text-[9px] md:text-[10px] uppercase font-black tracking-[0.25em] hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center justify-center gap-2 shadow-[0_-4px_20px_rgba(0,0,0,0.15)]"
                     >
-                        <PiBasket className="w-4.5 h-4.5" />
+                        <PiBasket className="w-4 h-4" />
                         Quick Add
                     </motion.button>
                 </div>

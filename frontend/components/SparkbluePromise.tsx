@@ -51,7 +51,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
     };
 
     return (
-        <section className="relative w-full bg-brand-navy overflow-hidden">
+        <section className="relative w-full bg-[#1a2238] overflow-hidden">
             {/* Top half white background */}
             <div className="absolute top-0 w-full h-[65%] bg-white z-0" />
 
@@ -149,8 +149,8 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                     </svg>
                                 </div>
 
-                                {/* Navy Blue Text Box (Obsidian Glassmorphism) */}
-                                <div className="absolute bottom-2 left-2 right-2 h-10 sm:h-12 bg-brand-navy z-20 flex items-center justify-center glass-dark">
+                                {/* Navy Blue Text Box */}
+                                <div className="absolute bottom-2 left-2 right-2 h-10 sm:h-12 bg-[#1a2238] z-20 flex items-center justify-center">
                                     <h4 className="text-white text-[9px] sm:text-[11px] md:text-[13px] lg:text-sm font-serif uppercase tracking-[0.1em] font-bold text-center px-1 leading-tight">
                                         {card.title}
                                     </h4>

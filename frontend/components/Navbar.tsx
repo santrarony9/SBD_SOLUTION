@@ -45,15 +45,15 @@ export default function Navbar() {
 
     // Dynamic styles based on scroll & page
     const navClasses = isMobileMenuOpen
-        ? 'bg-brand-navy text-white pb-safe border-b border-brand-gold/15'
+        ? 'bg-brand-navy text-white pb-safe border-b border-brand-gold/10' // Solid background, no blur, to prevent CSS containing block
         : scrolled
-            ? 'glass-dark py-2 md:py-3'
+            ? 'bg-white/95 backdrop-blur-3xl shadow-[0_2px_40px_-15px_rgba(0,0,0,0.1)] py-2 md:py-3 border-b border-brand-gold/10'
             : isHome
-                ? 'bg-gradient-to-b from-black/40 to-transparent py-4 md:py-6'
-                : 'bg-brand-navy py-3 md:py-4 shadow-2xl shadow-brand-navy/20';
+                ? 'bg-gradient-to-b from-black/20 to-transparent py-4 md:py-6'
+                : 'bg-brand-navy py-3 md:py-4 shadow-xl shadow-brand-navy/10';
 
-    const textColor = 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
-    const accentColor = 'text-[#fbbd61]';
+    const textColor = scrolled && !isMobileMenuOpen ? 'text-brand-navy' : 'text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]';
+    const accentColor = 'text-brand-gold';
 
     return (
         <nav className={`w-full transition-all duration-500 ease-in-out ${navClasses}`}>
@@ -85,13 +85,13 @@ export default function Navbar() {
                     {/* Center: Logo */}
                     <div className={`flex flex-col items-center justify-center transition-all duration-700 ${scrolled ? 'scale-90' : 'scale-100'}`}>
                         <Link href="/" className={`font-serif text-xl md:text-3xl tracking-[0.2em] md:tracking-[0.3em] ${textColor} font-bold transition-all duration-500 hover:tracking-[0.4em] whitespace-nowrap flex items-center`}>
-                            SPARK <span className="text-[#fbbd61] ml-2">BLUE</span>
+                            SPARK <span className="text-brand-gold ml-2">BLUE</span>
                         </Link>
                         {!scrolled && (
                             <motion.span
                                 initial={{ opacity: 0, y: -5 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="text-[0.4rem] md:text-[0.6rem] uppercase tracking-[0.4em] md:tracking-[0.6em] text-[#fbbd61] font-black mt-0.5"
+                                className="text-[0.4rem] md:text-[0.6rem] uppercase tracking-[0.4em] md:tracking-[0.6em] text-brand-gold font-black mt-0.5"
                             >
                                 Diamond
                             </motion.span>
@@ -315,7 +315,7 @@ function MobileNavLink({ href, label, onClick }: { href: string, label: string, 
         <Link
             href={href}
             onClick={onClick}
-            className={`text-3xl font-serif transition-colors duration-500 py-3 block ${isActive ? 'text-brand-gold font-bold translate-x-3 drop-shadow-xl' : 'text-white/90 hover:text-brand-gold'}`}
+            className={`text-3xl font-serif transition-all duration-300 py-2 block ${isActive ? 'text-[var(--festive-accent-1)] font-bold translate-x-2 drop-shadow-md' : 'text-white'}`}
         >
             <motion.div whileTap={{ scale: 0.9 }}>
                 {label}
