@@ -142,6 +142,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}
+                            sizes="100vw"
                             className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
                             quality={90}
@@ -155,6 +156,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}
+                            sizes="100vw"
                             className="object-cover w-full h-full"
                             style={{ objectPosition: 'center center' }}
                             quality={80}

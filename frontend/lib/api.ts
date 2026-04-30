@@ -21,11 +21,11 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
         ? endpoint
         : `${API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
 
-    // 3. Add stable minute-level cache-busting for GET requests
-    // Using '_v' for v1.0.3 to ensure we bypass any stale cache of previous '_cb' or '_t'
-    if (!isServer && (!options.method || options.method.toUpperCase() === 'GET')) {
-        // Use a stable minute-level timestamp to avoid hydration mismatches if possible,
-        // though fetchAPI is usually called in useEffect or server components.
+    // 3. Optional cache-busting (only if specifically requested or for Client GETs without revalidate)
+    const isGet = !options.method || options.method.toUpperCase() === 'GET';
+    const hasRevalidate = (options as any)?.next?.revalidate !== undefined;
+
+    if (!isServer && isGet && !hasRevalidate) {
         const minuteTimestamp = Math.floor(Date.now() / 60000);
         const separator = fullUrl.includes('?') ? '&' : '?';
         fullUrl = `${fullUrl}${separator}_v=${minuteTimestamp}`;
@@ -40,7 +40,7 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
     const requestPromise = (async () => {
         try {
             if (!isServer) {
-                console.log(`[SBD-API] Requesting (v1.0.3): ${fullUrl}`);
+                console.log(`[SBD-API] Requesting: ${fullUrl}`);
             }
 
             // Get token from storage (Client only)
@@ -48,10 +48,14 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
             const headers: Record<string, string> = {
                 ...((options.headers as Record<string, string>) || {}),
-                'X-Client-Version': '1.0.2',
-                'Cache-Control': 'no-cache', // Signal to proxies not to cache
-                'Pragma': 'no-cache'
+                'X-Client-Version': '1.0.3',
             };
+
+            // Only add no-cache headers if it's not a server-side cached request
+            if (!isServer || !hasRevalidate) {
+                headers['Cache-Control'] = 'no-cache';
+                headers['Pragma'] = 'no-cache';
+            }
 
             if (!(options.body instanceof FormData)) {
                 headers['Content-Type'] = 'application/json';
@@ -61,11 +65,18 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
 
-            const res = await fetch(fullUrl, {
+            // Use the provided options, but ensure 'no-store' isn't forced if we want revalidation
+            const fetchOptions: RequestInit = {
                 ...options,
-                cache: 'no-store',
                 headers,
-            });
+            };
+
+            // If we have revalidate, we shouldn't force 'no-store'
+            if (!hasRevalidate && isServer) {
+                fetchOptions.cache = 'no-store';
+            }
+
+            const res = await fetch(fullUrl, fetchOptions);
 
             if (!res.ok) {
                 if (res.status === 401 && typeof window !== 'undefined') {

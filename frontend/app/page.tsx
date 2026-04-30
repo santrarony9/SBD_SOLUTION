@@ -18,12 +18,13 @@ import InfluencerSpotlight from '@/components/InfluencerSpotlight';
 import VideoShowcase from '@/components/VideoShowcase';
 // Removed motion import to fix Server Component render error
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60; // Revalidate every minute
+
 
 // Fetch Featured Products
 async function getFeaturedProducts() {
   try {
-    return await fetchAPI('/products');
+    return await fetchAPI('/products', { next: { revalidate: 300 } });
   } catch (error) {
     console.error("Failed to fetch products", error);
     return [];
@@ -33,7 +34,7 @@ async function getFeaturedProducts() {
 // Fetch Offers
 async function getOffers() {
   try {
-    return await fetchAPI('/offers');
+    return await fetchAPI('/offers', { next: { revalidate: 300 } });
   } catch (error) {
     console.error("Failed to fetch offers", error);
     return [];
@@ -42,7 +43,7 @@ async function getOffers() {
 
 async function getBanners() {
   try {
-    return await fetchAPI('/banners');
+    return await fetchAPI('/banners', { next: { revalidate: 300 } });
   } catch (e) {
     return [];
   }
@@ -50,7 +51,7 @@ async function getBanners() {
 
 async function getVideoReels() {
   try {
-    return await fetchAPI('/video-showcase');
+    return await fetchAPI('/video-showcase', { next: { revalidate: 300 } });
   } catch (e) {
     return [];
   }
@@ -58,7 +59,7 @@ async function getVideoReels() {
 
 async function getHeroText() {
   try {
-    const setting = await fetchAPI('/store/settings/homepage_hero_text');
+    const setting = await fetchAPI('/store/settings/homepage_hero_text', { next: { revalidate: 300 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -74,7 +75,7 @@ async function getHeroText() {
 
 async function getFeaturedReviews() {
   try {
-    return await fetchAPI('/reviews/featured');
+    return await fetchAPI('/reviews/featured', { next: { revalidate: 300 } });
   } catch (e) {
     return [];
   }
@@ -82,7 +83,8 @@ async function getFeaturedReviews() {
 
 async function getSpotlight() {
   try {
-    return await fetchAPI('/store/settings/spotlight');
+    const res = await fetchAPI('/store/settings/spotlight', { next: { revalidate: 300 } });
+    return res;
   } catch (e) {
     return null;
   }
@@ -90,25 +92,25 @@ async function getSpotlight() {
 
 async function getCategories() {
   try {
-    return await fetchAPI('/categories');
+    return await fetchAPI('/categories', { next: { revalidate: 300 } });
   } catch (e) { return []; }
 }
 
 async function getPriceRanges() {
   try {
-    return await fetchAPI('/marketing/price-ranges');
+    return await fetchAPI('/marketing/price-ranges', { next: { revalidate: 300 } });
   } catch (e) { return []; }
 }
 
 async function getTags() {
   try {
-    return await fetchAPI('/marketing/tags');
+    return await fetchAPI('/marketing/tags', { next: { revalidate: 300 } });
   } catch (e) { return []; }
 }
 
 async function getPromiseCards() {
   try {
-    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards');
+    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards', { next: { revalidate: 300 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -124,7 +126,7 @@ async function getPromiseCards() {
 
 async function getRoyalStandard() {
   try {
-    const setting = await fetchAPI('/store/settings/home_royal_standard');
+    const setting = await fetchAPI('/store/settings/home_royal_standard', { next: { revalidate: 300 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -134,7 +136,7 @@ async function getRoyalStandard() {
 
 async function getBrandStory() {
   try {
-    const setting = await fetchAPI('/store/settings/home_brand_story');
+    const setting = await fetchAPI('/store/settings/home_brand_story', { next: { revalidate: 300 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;

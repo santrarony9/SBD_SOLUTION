@@ -4,19 +4,28 @@ This file acts as a persistent memory for Antigravity AI or any AI assistant wor
 ## 1. Project Architecture & Stack
 ### Frontend (Elite 2026 Standard)
 - **Framework:** Next.js 16.2.3+ (App Router, React 19.2.5+).
-- **Styling:** Tailwind CSS 4.2.2+. Uses `@theme` directive in `globals.css` for design tokens.
+- **Styling:** Tailwind CSS 3.4.1. Configuration is in `tailwind.config.ts`. Avoid upgrading to v4 without a comprehensive design audit.
   - **Luxury Tokens:** `brand-navy` (#0F172A), `brand-gold` (#C6A87C), `brand-gold-light` (#F0E6D2), `brand-cream` (#FAFAF9).
   - **Utilities:** `.glass` (Standard), `.glass-dark` (Obsidian), `.text-gold-gradient`.
 - **PWA:** Uses `@ducanh2912/next-pwa`. **Crucial**: Service workers are intentionally disabled in development mode.
+- **Icons & Favicon:** Uses a high-resolution `favicon.png` in `/public`. The `generateMetadata` in `layout.tsx` is the source of truth for all icon types (shortcut, apple-touch, maskable).
 - **State/Context:** Relies on React Context (`CartContext`, `CurrencyContext`, `FestiveContext`, `ToastContext`).
 - **Typography:** Playfair Display (Serif/Headings) and Inter (Sans-serif/Body text). Always aim for a minimalist, premium luxury aesthetic.
-- **Smooth Scroll:** Lenis Smooth Scroll is integrated into the root layout for cinematic engagement.
+
+### SEO & Performance (Elite 2026 Standard)
+- **ISR (Incremental Static Regeneration):** The home page is configured with `export const revalidate = 60`. Changes to banners or products via the admin panel will reflect within 60 seconds without a rebuild.
+- **API Caching:** The `fetchAPI` wrapper in `lib/api.ts` supports Next.js `revalidate` options. It is configured to cache repetitive GET requests (e.g., categories, banners) for 300 seconds (5 mins) to optimize LCP and reduce server load.
+- **Sitemap & Robots:**
+  - `frontend/app/sitemap.ts`: Generates a dynamic sitemap for categories and products.
+  - `frontend/public/robots.txt`: Explicitly manages crawler access (Disallows `/admin`, `/checkout`, `/api`).
+- **Image Optimization:** Always use `priority` and `sizes="100vw"` (or appropriate width) for LCP images like the Hero Slider to ensure fast rendering on mobile/tablet.
+- **Metadata:** Comprehensive OpenGraph and Twitter card metadata are managed in `layout.tsx`. Always include `alt` text for OG images.
 
 ### Backend (Elite 2026 Standard)
 - **Framework:** NestJS 11+.
 - **Language:** TypeScript 6.0.2+ (Strict `unknown` error handling in catch blocks is mandatory).
-- **ORM:** Prisma 7.7.0+. 
-  - **Prisma 7 Configuration:** Connection strings are managed via `prisma.config.ts` using `defineConfig`. The `url` property is REMOVED from `schema.prisma`. 
+- **ORM:** Prisma 5.22.0.
+  - **Configuration:** Standard `schema.prisma` with `url = env("DATABASE_URL")`.
   - **Workflow:** Run `npx prisma generate` after schema changes.
 - **Integrations:**
   - **Payment Gateway:** PhonePe and CCAvenue. Do NOT alter the hashing or encryption logic without explicit permission.

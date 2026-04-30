@@ -36,27 +36,47 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: '/',
     },
     openGraph: {
-      title: 'Spark Blue Diamond',
-      description: 'Premium Certified Diamonds & Gold Jewellery',
-      url: '/',
+      title: 'Spark Blue Diamond | Premium Certified Diamonds & Gold Jewellery',
+      description: 'Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold.',
+      url: 'https://sparkbluediamond.com',
       siteName: 'Spark Blue Diamond',
       images: [
         {
           url: '/og-image.jpg',
           width: 1200,
           height: 630,
+          alt: 'Spark Blue Diamond Luxury Jewellery',
         },
       ],
       locale: 'en_IN',
       type: 'website',
     },
-    appleWebApp: {
-      capable: true,
-      statusBarStyle: 'black-translucent' as const,
-      title: 'Spark Blue Diamond',
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Spark Blue Diamond | Premium Jewellery',
+      description: 'IGI certified diamonds and BIS hallmarked gold since 2020.',
+      images: ['/og-image.jpg'],
     },
     icons: {
-      apple: '/favicon.png',
+      icon: [
+        { url: '/favicon.png' },
+        { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
+      ],
+      shortcut: '/favicon.png',
+      apple: [
+        { url: '/favicon.png', sizes: '180x180', type: 'image/png' },
+      ],
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large' as const,
+        'max-snippet': -1,
+      },
     },
   };
 
