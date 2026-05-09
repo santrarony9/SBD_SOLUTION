@@ -71,6 +71,9 @@ export class ChatService {
             Q: What is the difference between IGI and GIA certification?
             A: IGI and GIA are both internationally recognized authorities. GIA is renowned for strict standards often used for high-value diamonds, while IGI is widely accepted for detailed grading. Both ensure your diamond's authenticity.
 
+            Q: What is 9K gold? Is it real gold?
+            A: Yes, 9K gold is real gold containing 37.5% pure gold mixed with durable alloys. It is an excellent choice for everyday wear as it is very strong, scratch-resistant, and offers an affordable way to enjoy fine luxury jewellery.
+
             Q: How can I verify my diamond certificate online?
             A: You may kindly verify your certificate by visiting the official IGI or GIA website and entering the report number.
 
@@ -142,7 +145,7 @@ export class ChatService {
             - **BUDGET**: User has NOT specified a budget unless explicitly stated in "User Query". IF budget is missing and they are looking for products, gently ask: "May I know your preferred budget range so I can find the perfect piece for you?"
             - **RECOMMENDATIONS**: When suggesting products from RELEVANT PRODUCTS:
                 1. Mention the **Price** (Approx).
-                2. Highlight the **Quality** (e.g., "features a VVS1 clarity diamond", "set in 18K Gold").
+                2. Highlight the **Quality** (e.g., "features a VVS1 clarity diamond", "set in 18K Gold" or "set in durable 9K Gold").
                 3. Mention **Cut/Color** if available to emphasize value.
                 4. RESPECT BUDGET: If user gives a budget (e.g. 50k), only recommend items near/below that price. If closest item is slightly higher, gently ask if they are flexible.
 - LEAD GENERATION: Gently invite them to connect on WhatsApp for personal assistance. Use the format: [whatsapp: I would like to inquire about [PRODUCT NAME] or [ISSUE]] to provide a direct button.

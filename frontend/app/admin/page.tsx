@@ -284,7 +284,7 @@ export default function AdminDashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
-                                                {[14, 16, 18, 22, 24].map((purity) => {
+                                                {[9, 14, 16, 18, 22, 24].map((purity) => {
                                                     const rate = goldRates.find(r => r.purity === purity);
                                                     return (
                                                         <tr key={purity} className="group hover:bg-brand-cream/30 transition-colors">

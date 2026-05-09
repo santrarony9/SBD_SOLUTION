@@ -205,6 +205,9 @@ model Product {
   orderItems  OrderItem[]
   wishlistedBy Wishlist[]
   reviews      Review[]
+
+  @@index([category, isActive])
+  @@index([goldPurity])
 }
 
 model Offer {
@@ -429,6 +432,8 @@ model Order {
   @@index([razorpayOrderId])
   @@index([phonepeMerchantTransactionId])
   @@index([shiprocketOrderId])
+  @@index([status])
+  @@index([createdAt])
 }
 
 model OrderItem {

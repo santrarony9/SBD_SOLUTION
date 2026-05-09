@@ -112,6 +112,8 @@ function ShopContent() {
         if (selectedMetals.length > 0) {
             result = result.filter(p => {
                 return selectedMetals.some(metal => {
+                    if (metal === '9K Gold') return p.goldPurity === 9;
+                    if (metal === '14K Gold') return p.goldPurity === 14;
                     if (metal === '16K Gold') return p.goldPurity === 16;
                     if (metal === '18K Gold') return p.goldPurity === 18;
                     if (metal === '22K Gold') return p.goldPurity === 22;
@@ -250,7 +252,7 @@ function ShopContent() {
                                 Metal
                             </h3>
                             <ul className="space-y-4">
-                                {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                {['9K Gold', '14K Gold', '16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
                                     <li key={metal}>
                                         <label className="group flex items-center cursor-pointer" onClick={() => toggleMetal(metal)}>
                                             <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedMetals.includes(metal) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
@@ -389,7 +391,7 @@ function ShopContent() {
                                 <div>
                                     <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold mb-6 border-b border-brand-gold/10 pb-2">Metal</h4>
                                     <div className="grid grid-cols-2 gap-3">
-                                        {['16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
+                                        {['9K Gold', '14K Gold', '16K Gold', '18K Gold', '22K Gold', 'Platinum'].map(metal => (
                                             <button
                                                 key={metal}
                                                 onClick={() => toggleMetal(metal)}

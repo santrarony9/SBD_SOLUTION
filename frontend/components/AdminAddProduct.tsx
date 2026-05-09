@@ -373,7 +373,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                             value={formData.goldPurity}
                                             onChange={e => setFormData({ ...formData, goldPurity: e.target.value })}
                                         >
-                                            {[14, 16, 18, 22, 24].map(p => <option key={p} value={p}>{p}K Gold</option>)}
+                                            {[9, 14, 16, 18, 22, 24].map(p => <option key={p} value={p}>{p}K Gold</option>)}
                                         </select>
                                     </div>
                                     <div>

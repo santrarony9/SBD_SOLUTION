@@ -34,7 +34,7 @@ async function main() {
     }
 
     // 2. Ensure Gold Rate (Base)
-    const goldPurities = [18, 22, 24];
+    const goldPurities = [9, 14, 16, 18, 22, 24];
     for (const purity of goldPurities) {
         const exists = await prisma.goldPrice.findUnique({ where: { purity } });
         if (!exists) {

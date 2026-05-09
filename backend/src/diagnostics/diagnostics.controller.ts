@@ -54,8 +54,17 @@ export class DiagnosticsController {
       const dbUrl = process.env.DATABASE_URL || 'NOT_SET';
       const maskedDbUrl = dbUrl.replace(/:[^:]*@/, ':****@');
 
+      const memoryUsage = process.memoryUsage();
+      
       return {
         status: 'OK',
+        system: {
+          uptime: process.uptime(),
+          memory: {
+            heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024) + 'MB',
+            rss: Math.round(memoryUsage.rss / 1024 / 1024) + 'MB',
+          }
+        },
         database: {
           connected: true,
           userCount,

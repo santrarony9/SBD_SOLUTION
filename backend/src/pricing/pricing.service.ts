@@ -1,26 +1,49 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ApplyOn } from '@prisma/client';
 
 @Injectable()
 export class PricingService {
+  private readonly logger = new Logger(PricingService.name);
+  
+  // Simple in-memory cache to prevent N+1 DB calls
+  private cachedRates: any = null;
+  private lastFetch: number = 0;
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   constructor(private prisma: PrismaService) {}
+
+  private async getLatestRates() {
+    const now = Date.now();
+    if (this.cachedRates && (now - this.lastFetch < this.CACHE_TTL)) {
+      return this.cachedRates;
+    }
+
+    try {
+      const [goldRates, diamondRates, charges, makingTiers] = await Promise.all([
+        this.prisma.goldPrice.findMany({ where: { isActive: true } }),
+        this.prisma.diamondPrice.findMany({ where: { isActive: true } }),
+        this.prisma.charge.findMany({ where: { isActive: true } }),
+        this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } }),
+      ]);
+
+      this.cachedRates = { goldRates, diamondRates, charges, makingTiers };
+      this.lastFetch = now;
+      this.logger.log('Refreshed Gold/Diamond rates and charges cache');
+      return this.cachedRates;
+    } catch (error) {
+      this.logger.error('Failed to fetch rates for cache', error);
+      return this.cachedRates || { goldRates: [], diamondRates: [], charges: [], makingTiers: null };
+    }
+  }
 
   async calculateProductPrice(product: any) {
     try {
-      // 1. Fetch Rates & Tiered Settings
-      const goldRate = await this.prisma.goldPrice.findUnique({
-        where: { purity: product.goldPurity },
-      });
-      const diamondRate = await this.prisma.diamondPrice.findUnique({
-        where: { clarity: product.diamondClarity },
-      });
-      const charges =
-        (await this.prisma.charge.findMany({ where: { isActive: true } })) ||
-        [];
-      const makingChargeTierSetting = await this.prisma.storeSetting.findUnique(
-        { where: { key: 'making_charge_tiers' } },
-      );
+      // 1. Get rates from cache (Prevents 4 DB calls per item)
+      const { goldRates, diamondRates, charges, makingTiers } = await this.getLatestRates();
+
+      const goldRate = goldRates.find((p) => p.purity === product.goldPurity);
+      const diamondRate = diamondRates.find((p) => p.clarity === product.diamondClarity);
 
       // Defaults if rates missing
       const goldPricePer10g = goldRate?.pricePer10g || 0;
@@ -30,7 +53,7 @@ export class PricingService {
       const goldValue = (goldPricePer10g / 10) * product.goldWeight;
       const diamondValue = diamondPricePerCarat * product.diamondCarat;
 
-      // 3. Calculate Other Charges first (Excluding standard making charge)
+      // 3. Calculate Other Charges
       const subTotal = goldValue + diamondValue;
       let otherCharges = 0;
 
@@ -39,7 +62,7 @@ export class PricingService {
           charge.name.toUpperCase().includes('GST') ||
           charge.name.toLowerCase().includes('making')
         )
-          continue; // Skip GST AND legacy making charge
+          continue;
 
         let chargeAmount = 0;
 
@@ -69,10 +92,10 @@ export class PricingService {
 
       // 4. Calculate Tiered Making Charges
       let makingCharges = 0;
-      if (makingChargeTierSetting) {
+      if (makingTiers) {
         try {
-          const tiers = JSON.parse(makingChargeTierSetting.value);
-          let activeTier = tiers.find((t) => t.id === '3g_plus'); // Default to highest tier
+          const tiers = JSON.parse(makingTiers.value);
+          let activeTier = tiers.find((t) => t.id === '3g_plus');
 
           const weight = product.goldWeight || 0;
           if (weight >= 0 && weight < 1)
@@ -92,10 +115,9 @@ export class PricingService {
             }
           }
         } catch (e) {
-          console.error('Error parsing making charge tiers', e);
+          this.logger.error('Error parsing making charge tiers', e);
         }
       } else {
-        // Fallback to legacy Making Charge if tiers aren't configured yet
         const legacyMakingCharge = charges.find((c) =>
           c.name.toLowerCase().includes('making'),
         );
@@ -112,7 +134,6 @@ export class PricingService {
       let gst = 0;
       const taxableAmount = subTotal + makingCharges + otherCharges;
 
-      // GST
       const gstCharge = charges.find((c) =>
         c.name.toUpperCase().includes('GST'),
       );
@@ -123,7 +144,7 @@ export class PricingService {
       const finalPrice = taxableAmount + gst;
 
       return {
-        validAsOf: new Date(),
+        validAsOf: new Date(this.lastFetch),
         goldRate: goldPricePer10g,
         diamondRate: diamondPricePerCarat,
         components: {
@@ -136,8 +157,9 @@ export class PricingService {
         finalPrice,
       };
     } catch (error) {
-      console.error('Error calculating price:', error);
+      this.logger.error('Error calculating price:', error);
       return null;
     }
   }
 }
+

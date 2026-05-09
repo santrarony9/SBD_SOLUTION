@@ -36,15 +36,16 @@ async function bootstrap() {
     adapter.set('trust proxy', true);
   }
 
-  // 2. Rate Limiting Protection (Re-enabled for Production)
+  // 2. Rate Limiting Protection (Increased for Production Dashboards)
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 500,
+      max: 2000, // Increased from 500 to 2000
       message:
         'Too many requests from this IP, please try again after 15 minutes',
       standardHeaders: true,
       legacyHeaders: false,
+      // Use trust proxy to correctly identify client IPs behind Nginx/Cloudflare
     }),
   );
 
@@ -65,6 +66,7 @@ async function bootstrap() {
       'Content-Type, Accept, Authorization, X-Requested-With, X-Client-Version, Cache-Control, Pragma',
     credentials: true,
   });
+  app.enableShutdownHooks();
   return app;
 }
 
