@@ -2,8 +2,8 @@ const envUrl = process.env.NEXT_PUBLIC_API_URL;
 const isServer = typeof window === 'undefined';
 import { safeLocalStorage } from '@/lib/storage';
 
-// Hardcoded to new VPS to prevent Vercel environment variables from overriding it with the old Render URL
-export const API_URL = 'https://api.sparkbluediamond.com/api';
+// Prioritize local environment variable if available, fallback to production VPS URL
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://api.sparkbluediamond.com/api';
 
 // In-memory request deduplication to prevent 429 bursts
 const pendingRequests = new Map<string, Promise<any>>();

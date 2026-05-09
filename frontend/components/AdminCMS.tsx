@@ -7,7 +7,7 @@ import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes' | 'video-reels'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes' | 'video-reels' | 'aura-collection'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -35,6 +35,13 @@ export default function AdminCMS() {
     const [footerConfig, setFooterConfig] = useState({
         description: "Crafting timeless elegance since 2020. IGI certified excellence in every piece.",
         social: { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" }
+    });
+    const [auraConfig, setAuraConfig] = useState({
+        title: "SBD AURA: The Everyday Luxury",
+        subtitle: "Discover delicate 9K gold masterpieces designed for the modern era.",
+        bannerUrl: "",
+        mobileBannerUrl: "",
+        isActive: true
     });
 
     const [isLoading, setIsLoading] = useState(true);
@@ -86,10 +93,11 @@ export default function AdminCMS() {
                 fetchAPI('/store/settings/sparkblue_promise_cards'),
                 fetchAPI('/store/settings/footer_config'),
                 fetchAPI('/promos'),
-                fetchAPI('/video-showcase')
+                fetchAPI('/video-showcase'),
+                fetchAPI('/store/settings/aura_collection_config')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes, videoReelsRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes, videoReelsRes, auraRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else showToast('Failed to load banners', 'error');
@@ -138,6 +146,7 @@ export default function AdminCMS() {
             parseSetting(brandStoryRes, setBrandStory, brandStory);
             parseSetting(promiseCardsRes, setPromiseCards, promiseCards);
             parseSetting(footerConfigRes, setFooterConfig, footerConfig);
+            parseSetting(auraRes, setAuraConfig, auraConfig);
 
             // Fetch Spotlight separately (fail silently if missing)
             try {
@@ -480,6 +489,7 @@ export default function AdminCMS() {
                 {[
                     { id: 'promocodes', label: 'Influencer Promos', icon: PiTag },
                     { id: 'offers', label: 'Royal Privileges', icon: PiTag },
+                    { id: 'aura-collection', label: 'SBD Aura (Youth) [NEW]', icon: PiSparkle },
                     { id: 'categories', label: 'Product Discovery', icon: PiTag },
                 ].map((item) => (
                     <button
@@ -690,6 +700,136 @@ export default function AdminCMS() {
                                     </div>
                                 ))}
                                 {videoReels.length === 0 && <div className="col-span-full py-20 text-center border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 text-sm italic">No video reels added yet. Upload local MP4s above.</div>}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* AURA COLLECTION (YOUTH) SECTION */}
+                    {activeSection === 'aura-collection' && (
+                        <div className="space-y-10 animate-fade-in">
+                            <div className="bg-brand-gold/5 p-8 rounded-3xl border border-brand-gold/20 shadow-sm">
+                                <div className="flex justify-between items-start mb-8">
+                                    <div>
+                                        <h3 className="text-xl font-serif text-brand-navy mb-1">SBD Aura: Youth Collection</h3>
+                                        <p className="text-[10px] text-gray-500 uppercase font-black tracking-widest">Global Configuration & Branding</p>
+                                    </div>
+                                    <div className="flex items-center gap-3 bg-white p-2 px-4 rounded-full border border-gray-100 shadow-sm">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Status:</span>
+                                        <button 
+                                            onClick={() => setAuraConfig({ ...auraConfig, isActive: !auraConfig.isActive })}
+                                            className={`px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${auraConfig.isActive ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-500'}`}
+                                        >
+                                            {auraConfig.isActive ? 'Live' : 'Hidden'}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                    {/* Text Config */}
+                                    <div className="space-y-6">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Collection Title</label>
+                                            <input 
+                                                type="text"
+                                                value={auraConfig.title}
+                                                onChange={(e) => setAuraConfig({ ...auraConfig, title: e.target.value })}
+                                                className="w-full bg-white border border-gray-100 p-4 rounded-xl text-brand-navy font-serif text-lg outline-none focus:border-brand-gold transition-all shadow-sm"
+                                                placeholder="e.g. SBD AURA: The New Era"
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Tagline / Subtitle</label>
+                                            <textarea 
+                                                value={auraConfig.subtitle}
+                                                onChange={(e) => setAuraConfig({ ...auraConfig, subtitle: e.target.value })}
+                                                className="w-full bg-white border border-gray-100 p-4 rounded-xl text-sm text-gray-500 outline-none focus:border-brand-gold transition-all shadow-sm min-h-[100px] resize-none"
+                                                placeholder="Enter a compelling story for the youth audience..."
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Banner Config */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Desktop Banner</label>
+                                            {!auraConfig.bannerUrl ? (
+                                                <label className="relative block aspect-square border-2 border-dashed border-gray-200 rounded-2xl hover:border-brand-gold hover:bg-brand-gold/5 cursor-pointer transition-all flex flex-col items-center justify-center gap-2">
+                                                    <PiImage className="text-2xl text-gray-300" />
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase">Upload</span>
+                                                    <input type="file" className="hidden" onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showToast('Uploading Desktop Banner...', 'success');
+                                                            const res = await fetchAPI('/media/upload', { method: 'POST', body: formData });
+                                                            setAuraConfig({ ...auraConfig, bannerUrl: res.url });
+                                                        }
+                                                    }} />
+                                                </label>
+                                            ) : (
+                                                <div className="relative aspect-square rounded-2xl overflow-hidden group">
+                                                    <img src={auraConfig.bannerUrl} className="w-full h-full object-cover" alt="" />
+                                                    <button onClick={() => setAuraConfig({ ...auraConfig, bannerUrl: '' })} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"><PiTrash size={24} /></button>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] uppercase font-black text-gray-400 tracking-widest">Mobile Banner</label>
+                                            {!auraConfig.mobileBannerUrl ? (
+                                                <label className="relative block aspect-square border-2 border-dashed border-gray-200 rounded-2xl hover:border-brand-gold hover:bg-brand-gold/5 cursor-pointer transition-all flex flex-col items-center justify-center gap-2">
+                                                    <PiImage className="text-2xl text-gray-300" />
+                                                    <span className="text-[9px] font-black text-gray-400 uppercase">Upload</span>
+                                                    <input type="file" className="hidden" onChange={async (e) => {
+                                                        const file = e.target.files?.[0];
+                                                        if (file) {
+                                                            const formData = new FormData();
+                                                            formData.append('file', file);
+                                                            showToast('Uploading Mobile Banner...', 'success');
+                                                            const res = await fetchAPI('/media/upload', { method: 'POST', body: formData });
+                                                            setAuraConfig({ ...auraConfig, mobileBannerUrl: res.url });
+                                                        }
+                                                    }} />
+                                                </label>
+                                            ) : (
+                                                <div className="relative aspect-square rounded-2xl overflow-hidden group">
+                                                    <img src={auraConfig.mobileBannerUrl} className="w-full h-full object-cover" alt="" />
+                                                    <button onClick={() => setAuraConfig({ ...auraConfig, mobileBannerUrl: '' })} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"><PiTrash size={24} /></button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="mt-10 flex justify-end">
+                                    <button 
+                                        onClick={() => handleUpdateCMS('aura_collection_config', auraConfig, 'Aura Collection Settings Updated!')}
+                                        className="bg-brand-navy text-white px-12 py-4 rounded-2xl font-black uppercase tracking-[0.2em] text-[10px] shadow-xl shadow-brand-navy/20 hover:bg-brand-gold hover:text-brand-navy transition-all flex items-center gap-3"
+                                    >
+                                        <PiCheck className="text-brand-gold text-lg" /> Save Aura Configuration
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                                <h3 className="text-sm font-bold text-brand-navy uppercase tracking-widest mb-6">Aura Collection Inventory Tips</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <PiSparkle className="text-brand-gold text-2xl mb-2" />
+                                        <h4 className="text-[10px] font-black uppercase text-brand-navy mb-1">Select 9K Gold</h4>
+                                        <p className="text-[10px] text-gray-500 leading-relaxed font-bold">Ensure products are marked as 9K for the most affordable entry points.</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <PiTag className="text-brand-gold text-2xl mb-2" />
+                                        <h4 className="text-[10px] font-black uppercase text-brand-navy mb-1">Use 'Aura' Flag</h4>
+                                        <p className="text-[10px] text-gray-500 leading-relaxed font-bold">In the 'Add Product' form, check the "Youth Target" box to sync here.</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-2xl border border-gray-100">
+                                        <PiVideoCamera className="text-brand-gold text-2xl mb-2" />
+                                        <h4 className="text-[10px] font-black uppercase text-brand-navy mb-1">Add Reels</h4>
+                                        <p className="text-[10px] text-gray-500 leading-relaxed font-bold">The youth shop heavily via video. Upload MP4s to the Motion Gallery section.</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}

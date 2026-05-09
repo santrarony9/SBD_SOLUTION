@@ -32,7 +32,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
         certificatePdf: '',
 
         coverImage: '',
-        stockCount: '' // Added for Inventory Management
+        stockCount: '', // Added for Inventory Management
+        isYouthTarget: false // Added for Aura Collection
     });
     const [tempImages, setTempImages] = useState<string[]>([]);
     const { showToast } = useToast();
@@ -61,7 +62,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 certificatePdf: initialData.certificatePdf || '',
 
                 coverImage: initialData.coverImage || '',
-                stockCount: initialData.stockCount?.toString() || '' // Hydrate Stock
+                stockCount: initialData.stockCount?.toString() || '', // Hydrate Stock
+                isYouthTarget: initialData.isYouthTarget || false
             });
             setTempImages(initialData.images || []);
         } else {
@@ -75,7 +77,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 certificatePdf: '',
 
                 coverImage: '',
-                stockCount: '' // Reset Stock
+                stockCount: '', // Reset Stock
+                isYouthTarget: false
             });
             setTempImages([]);
         }
@@ -266,7 +269,8 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                 certificatePdf: formData.certificatePdf,
 
                 coverImage: formData.coverImage,
-                stockCount: parseInt(formData.stockCount) || 0 // Include stock count in payload
+                stockCount: parseInt(formData.stockCount) || 0, // Include stock count in payload
+                isYouthTarget: formData.isYouthTarget
             };
 
             const url = initialData
@@ -436,6 +440,20 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         >
                                             {['EF', 'FG', 'GH', 'HI', 'IJ'].map(c => <option key={c} value={c}>{c}</option>)}
                                         </select>
+                                    </div>
+                                </div>
+
+                                <div className="mt-6 bg-brand-gold/5 p-4 rounded-xl border border-brand-gold/20 flex items-center gap-4">
+                                    <input
+                                        type="checkbox"
+                                        id="isYouthTarget"
+                                        className="w-5 h-5 accent-brand-gold cursor-pointer"
+                                        checked={formData.isYouthTarget}
+                                        onChange={e => setFormData({ ...formData, isYouthTarget: e.target.checked })}
+                                    />
+                                    <div>
+                                        <label htmlFor="isYouthTarget" className="block text-[10px] uppercase tracking-widest text-brand-navy font-black cursor-pointer">Youth Target (Aura Collection)</label>
+                                        <p className="text-[8px] text-gray-500 uppercase font-bold tracking-tighter">Flag this product to appear in the youth-centric 9K Aura section.</p>
                                     </div>
                                 </div>
                             </div>

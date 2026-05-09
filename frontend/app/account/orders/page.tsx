@@ -63,6 +63,33 @@ export default function OrderHistoryPage() {
         }
     };
 
+    const handleDownloadInvoice = async (orderId: string) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/invoice/${orderId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.message || 'Failed to generate invoice');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `SBD-Invoice-${orderId.slice(-8).toUpperCase()}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (error: any) {
+            showToast(error.message || "Error downloading invoice", "error");
+        }
+    };
+
     if (isLoading) return (
         <div className="flex flex-col items-center justify-center min-h-[400px] space-y-4">
             <div className="w-12 h-12 border-4 border-brand-gold/20 border-t-brand-gold rounded-full animate-spin"></div>
@@ -185,7 +212,10 @@ export default function OrderHistoryPage() {
                                             Return / Exchange
                                         </button>
                                     )}
-                                    <button className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all">
+                                    <button 
+                                        onClick={() => handleDownloadInvoice(order.id)}
+                                        className="text-[10px] uppercase font-bold tracking-[0.2em] text-brand-gold hover:text-brand-navy hover:underline transition-all"
+                                    >
                                         Download Invoice
                                     </button>
                                     {order.awbCode && (

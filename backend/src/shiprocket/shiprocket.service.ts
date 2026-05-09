@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import axios from 'axios';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class ShiprocketService {
@@ -10,7 +11,7 @@ export class ShiprocketService {
   private readonly email = process.env.SHIPROCKET_EMAIL;
   private readonly password = process.env.SHIPROCKET_PASSWORD;
 
-  constructor() {}
+  constructor(private prisma: PrismaService) {}
 
   private async login() {
     if (this.token && this.tokenExpiry && new Date() < this.tokenExpiry) {
@@ -46,6 +47,17 @@ export class ShiprocketService {
   async createOrder(orderData: any) {
     const token = await this.login();
 
+    // Calculate total weight (gold weight + standard 300g packaging)
+    let totalWeightKg = 0.3; // Default 300g for the box
+    if (orderData.items && orderData.items.length > 0) {
+      const totalProductWeightGrams = orderData.items.reduce((sum: number, item: any) => {
+        const goldW = item.product?.goldWeight || 0;
+        const diamondW = (item.product?.diamondCarat || 0) * 0.2; // 1 carat = 0.2g
+        return sum + ((goldW + diamondW) * item.quantity);
+      }, 0);
+      totalWeightKg += (totalProductWeightGrams / 1000);
+    }
+
     // Map our Order to Shiprocket Order Schema
     const payload = {
       order_id: orderData.id,
@@ -77,10 +89,10 @@ export class ShiprocketService {
       })),
       payment_method: 'Prepaid',
       sub_total: orderData.totalAmount, // Assuming total includes tax for now
-      length: 10,
-      breadth: 10,
+      length: 15,
+      breadth: 15,
       height: 10,
-      weight: 0.5, // Default weight 500g, should come from product in future
+      weight: parseFloat(totalWeightKg.toFixed(3)),
     };
 
     try {
@@ -187,5 +199,31 @@ export class ShiprocketService {
     } catch (e) {
       return { success: false, error: (e as any).message };
     }
+  }
+
+  async handleWebhook(payload: any) {
+    this.logger.log(`Shiprocket Webhook Received for AWB: ${payload.awb}, Status: ${payload.current_status}`);
+    
+    const statusMap: { [key: string]: string } = {
+      'DELIVERED': 'DELIVERED',
+      'RTO DELIVERED': 'RETURNED',
+      'RETURNED': 'RETURNED',
+      'CANCELED': 'CANCELLED'
+    };
+
+    const ourStatus = statusMap[payload.current_status?.toUpperCase()];
+    
+    if (ourStatus) {
+      try {
+        await (this.prisma as any).order.updateMany({
+          where: { awbCode: payload.awb },
+          data: { status: ourStatus }
+        });
+        this.logger.log(`Order status updated to ${ourStatus} via webhook.`);
+      } catch(e: any) {
+        this.logger.error('Failed to update order status via webhook', e.message);
+      }
+    }
+    return { success: true };
   }
 }

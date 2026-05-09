@@ -66,6 +66,7 @@ export class ChatService {
             - Returns: Free returns within 48 hours if tags are intact, box is unbroken, and no used marks. After 48 hours, a 20% restocking fee applies (80% refund).
             - Customization: We offer bespoke design services.
             - Exchange: 100% value adjusted on gold. Only making charges and auxiliary fees (not visible in frontend) are deducted for the exchange.
+            - SBD Aura Collection: Our exclusive youth-targeted segment featuring durable 9K gold masterpieces. It is perfect for everyday luxury and modern aesthetics.
 
             KNOWLEDGE BASE (Use these answers for specific questions - but soften the tone):
             Q: What is the difference between IGI and GIA certification?
@@ -149,6 +150,7 @@ export class ChatService {
                 3. Mention **Cut/Color** if available to emphasize value.
                 4. RESPECT BUDGET: If user gives a budget (e.g. 50k), only recommend items near/below that price. If closest item is slightly higher, gently ask if they are flexible.
 - LEAD GENERATION: Gently invite them to connect on WhatsApp for personal assistance. Use the format: [whatsapp: I would like to inquire about [PRODUCT NAME] or [ISSUE]] to provide a direct button.
+            - SBD AURA TARGETING: If the user mentions "youth", "9K", "everyday wear", "affordable", or "modern", prioritize SBD Aura products and mention the collection specifically.
             - LENGTH: Keep responses concise (2-3 sentences max) but prioritize politeness over extreme brevity.
             - Default Email: support@sparkbluediamond.com.
             `;
@@ -220,6 +222,7 @@ export class ChatService {
           { name: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
           { category: { contains: query, mode: 'insensitive' } },
+          { isYouthTarget: query.toLowerCase().includes('aura') || query.toLowerCase().includes('youth') || query.toLowerCase().includes('9k') }
         ],
         isActive: true,
       },
@@ -234,6 +237,7 @@ export class ChatService {
         diamondClarity: true,
         diamondColor: true,
         diamondCut: true,
+        isYouthTarget: true,
       },
     });
 
@@ -263,7 +267,9 @@ export class ChatService {
         const formattedPrice =
           Math.round(estimatedPrice).toLocaleString('en-IN');
 
-        return `- ${p.name} (~₹${formattedPrice}) | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}, ${p.diamondColor || 'N/A'}, ${p.diamondCut || 'N/A'}) | [Link: /product/${p.slug}]`;
+        const auraTag = p.isYouthTarget ? '[SBD AURA EXCLUSIVE] ' : '';
+
+        return `- ${auraTag}${p.name} (~₹${formattedPrice}) | ${p.goldPurity}K Gold, ${p.diamondCarat}ct Diamond (${p.diamondClarity}, ${p.diamondColor || 'N/A'}, ${p.diamondCut || 'N/A'}) | [Link: /product/${p.slug}]`;
       });
 
       return enriched.join('\n');

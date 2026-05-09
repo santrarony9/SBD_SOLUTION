@@ -144,6 +144,16 @@ async function getBrandStory() {
   } catch (e) { return null; }
 }
 
+async function getAuraConfig() {
+  try {
+    const setting = await fetchAPI('/store/settings/aura_collection_config', { next: { revalidate: 300 } });
+    if (!setting?.value) return null;
+    try {
+      return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
+    } catch (e) { return null; }
+  } catch (e) { return null; }
+}
+
 export default async function Home() {
   // Concurrent Data Fetching for Performance
   const [
@@ -159,7 +169,8 @@ export default async function Home() {
     promiseCards,
     royalStandardData,
     brandStoryData,
-    videoReels
+    videoReels,
+    auraConfigData
   ] = await Promise.all([
     getFeaturedProducts(),
     getOffers(),
@@ -173,7 +184,8 @@ export default async function Home() {
     getPromiseCards(),
     getRoyalStandard(),
     getBrandStory(),
-    getVideoReels()
+    getVideoReels(),
+    getAuraConfig()
   ]);
 
   // Defensive Guards
@@ -181,6 +193,13 @@ export default async function Home() {
   const spotlight = spotlightSetting?.value?.isActive ? spotlightSetting.value : null;
   const heroTitle = heroText?.title ?? "Elegance is Eternal";
   const heroSubtitle = heroText?.subtitle ?? "Discover jewellery that transcends time. Certified purity, bespoke craftsmanship, and a legacy of trust since 2020.";
+  
+  const auraConfig = auraConfigData || {
+    title: "SBD AURA: The Everyday Luxury",
+    subtitle: "Discover delicate 9K gold masterpieces designed for the modern era.",
+    isActive: true
+  };
+  const auraProducts = Array.isArray(allProducts) ? allProducts.filter((p: any) => p.isYouthTarget).slice(0, 4) : [];
 
   // Default CMS values
   const royalStandard = royalStandardData || {
@@ -354,6 +373,35 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* 5.2 SBD AURA COLLECTION (YOUTH) SECTION */}
+      {auraConfig.isActive && auraProducts.length > 0 && (
+        <section className="py-24 bg-brand-gold/5 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+              <div className="max-w-xl">
+                <span className="text-brand-gold text-xs font-black uppercase tracking-[0.5em] mb-4 inline-block">Youth Series</span>
+                <h2 className="text-4xl font-serif text-brand-navy mt-4">{auraConfig.title}</h2>
+                <p className="text-gray-500 mt-4 leading-relaxed">{auraConfig.subtitle}</p>
+              </div>
+              <Link href="/aura" className="px-10 py-4 bg-brand-navy text-white text-[10px] font-black uppercase tracking-[0.2em] hover:bg-brand-gold hover:text-brand-navy transition-all duration-500 shadow-xl shadow-brand-navy/10">
+                Explore The New Era
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8">
+              {auraProducts.map((p: any) => (
+                <div key={p.id} className="group h-full bg-white p-2 rounded-2xl shadow-sm hover:shadow-2xl transition-all duration-700">
+                  <ProductCard product={{ ...p, slug: p.slug || p.id, image: p.images?.[0] || '/placeholder.jpg' }} />
+                  <div className="mt-4 px-2 pb-2">
+                    <span className="text-[8px] font-black uppercase tracking-widest text-brand-gold">Aura Series</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* 6. Royal Privileges (Dynamic Offers) */}
       <section className="py-20 bg-brand-navy relative overflow-hidden">

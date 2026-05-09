@@ -78,6 +78,7 @@ export default function Navbar() {
                         <div className="hidden lg:flex space-x-8 items-center">
                             <NavLink href="/" label="Home" textColor={textColor} />
                             <NavLink href="/shop" label="Collections" textColor={textColor} />
+                            <NavLink href="/aura" label="Aura" textColor={textColor} tag="NEW" />
                             <NavLink href="/about" label="Heritage" textColor={textColor} />
                         </div>
                     </div>
@@ -296,11 +297,16 @@ export default function Navbar() {
     );
 }
 
-function NavLink({ href, label, textColor }: { href: string, label: string, textColor: string }) {
+function NavLink({ href, label, textColor, tag }: { href: string, label: string, textColor: string, tag?: string }) {
     return (
         <Link href={href} className={`${textColor} group relative text-[11px] tracking-[0.2em] uppercase font-bold hover:text-brand-gold transition-colors duration-300`}>
             <motion.span whileTap={{ scale: 0.95 }} className="block">
                 {label}
+                {tag && (
+                    <span className="absolute -top-3 -right-4 bg-brand-gold text-brand-navy text-[7px] px-1.5 py-0.5 rounded-full font-black animate-bounce">
+                        {tag}
+                    </span>
+                )}
             </motion.span>
             <span className="absolute -bottom-2 left-1/2 w-0 h-[1px] bg-brand-gold transition-all duration-300 group-hover:w-full group-hover:left-0"></span>
         </Link>

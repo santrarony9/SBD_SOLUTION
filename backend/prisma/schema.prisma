@@ -192,6 +192,8 @@ model Product {
   updatedAt   DateTime @updatedAt
   
   isActive    Boolean  @default(true)
+  isYouthTarget Boolean @default(false)
+
 
   // Inventory & Logistics
   sku         String?  @unique

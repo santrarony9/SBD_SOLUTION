@@ -39,12 +39,14 @@ export class ProductsController {
     @Query('tag') tag?: string,
     @Query('minPrice') minPrice?: string,
     @Query('maxPrice') maxPrice?: string,
+    @Query('isYouthTarget') isYouthTarget?: string,
   ) {
     return this.productsService.findAll({
       category,
       tag,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
+      isYouthTarget: isYouthTarget === 'true',
     });
   }
 

@@ -129,6 +129,7 @@ export class ProductsService {
     tag?: string;
     minPrice?: number;
     maxPrice?: number;
+    isYouthTarget?: boolean;
     skip?: number;
     take?: number;
   }) {
@@ -146,6 +147,13 @@ export class ProductsService {
 
     if (filters?.tag) {
       where.tags = { has: filters.tag };
+    }
+
+    if (filters?.isYouthTarget !== undefined) {
+      where.isYouthTarget =
+        typeof filters.isYouthTarget === 'string'
+          ? filters.isYouthTarget === 'true'
+          : filters.isYouthTarget;
     }
 
     // 1. Batch fetch products with pagination (at DB level)
