@@ -383,7 +383,7 @@ export class OrdersService {
     }
 
     // 2. Handle Return Initiation
-    if (status === 'RETURN_INITIATED') {
+    if (status === 'RETURN_REQUESTED') {
       // For MVP: We just mark it locally.
       // Future: Call Shiprocket Return API here.
     }
@@ -395,7 +395,7 @@ export class OrdersService {
     const updatedOrder = await (this.prisma as any).order.update({
       where: { id },
       data: updateData,
-      include: { shippingAddress: true, user: true },
+      include: { user: true },
     });
 
     // WhatsApp Alerts for Status Changes

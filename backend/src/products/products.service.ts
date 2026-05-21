@@ -93,7 +93,7 @@ export class ProductsService {
           : 'GEN';
         const timestamp = Date.now().toString().substring(6); // shorter timestamp
         const random = Math.floor(Math.random() * 1000);
-        data.sku = `SBD - ${prefix} -${timestamp} -${random} `;
+        data.sku = `SBD-${prefix}-${timestamp}-${random}`;
       }
 
       const product = await this.prisma.product.create({ data });

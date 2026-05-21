@@ -40,11 +40,8 @@ export class VideoShowcaseService {
     if (item.videoUrl && item.videoUrl.startsWith('/uploads')) {
       item.videoUrl = `${cleanBaseUrl}${item.videoUrl}`;
     }
-    if (item.posterUrl && item.posterUrl.startsWith('/uploads')) {
-      item.posterUrl = `${cleanBaseUrl}${item.posterUrl}`;
-    }
-    if (item.thumbnailUrl && item.thumbnailUrl.startsWith('/uploads')) {
-      item.thumbnailUrl = `${cleanBaseUrl}${item.thumbnailUrl}`;
+    if (item.thumbnail && item.thumbnail.startsWith('/uploads')) {
+      item.thumbnail = `${cleanBaseUrl}${item.thumbnail}`;
     }
     return item;
   }
