@@ -8,6 +8,8 @@ import { formatPrice } from '@/lib/utils';
 import { useComparison } from '@/context/ComparisonContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { PiCheckBold, PiHeart } from 'react-icons/pi';
+import { API_URL } from '@/lib/api';
+
 
 interface ProductProps {
     id: string;
@@ -33,8 +35,23 @@ export default function ProductCard({ product }: { product: ProductProps }) {
 
     const isCompared = isInComparison(product.id);
 
-    // Normalize image source
-    const displayImage = product.image || (product.images && product.images[0]) || '/placeholder.jpg';
+    // Normalize image sources
+    let displayImage = product.image || (product.images && product.images[0]) || '/placeholder.jpg';
+    let hoverImage = product.coverImage || (product.images && product.images[1]) || null;
+    
+    // Prefix relative paths with the API URL (stripping /api if necessary)
+    const mediaBaseUrl = API_URL.replace('/api', '');
+    
+    // Helper: prefix only relative /uploads paths (skip already-absolute URLs)
+    const normalizeUrl = (url: string | null) => {
+        if (!url) return url;
+        if (url.startsWith('http://') || url.startsWith('https://')) return url;
+        if (url.startsWith('/uploads')) return `${mediaBaseUrl}${url}`;
+        return url;
+    };
+    
+    displayImage = normalizeUrl(displayImage) || '/placeholder.jpg';
+    hoverImage = normalizeUrl(hoverImage);
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -67,9 +84,9 @@ export default function ProductCard({ product }: { product: ProductProps }) {
                     />
 
                     {/* Cover Image (Reveals on Hover) */}
-                    {(product.coverImage || (product.images && product.images[1])) && (
+                    {hoverImage && (
                         <Image
-                            src={product.coverImage || product.images![1]}
+                            src={hoverImage}
                             alt={product.name + " cover"}
                             fill
                             className="object-contain absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 ease-in-out"

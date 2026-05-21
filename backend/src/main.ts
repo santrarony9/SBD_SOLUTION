@@ -30,22 +30,22 @@ async function bootstrap() {
   // 1. Security Headers (Restored to stable state)
   app.use(helmet());
 
-  // Enable trust proxy for Render/Vercel/Custom VPS
+  // Enable trust proxy for Nginx/Cloudflare to correctly identify client IPs
   const adapter = app.getHttpAdapter().getInstance();
   if (typeof adapter.set === 'function') {
-    adapter.set('trust proxy', true);
+    adapter.set('trust proxy', 1); // Trust first proxy (Nginx)
   }
 
   // 2. Rate Limiting Protection (Increased for Production Dashboards)
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 2000, // Increased from 500 to 2000
-      message:
-        'Too many requests from this IP, please try again after 15 minutes',
+      max: 2000, 
+      message: 'Too many requests from this IP, please try again after 15 minutes',
       standardHeaders: true,
       legacyHeaders: false,
-      // Use trust proxy to correctly identify client IPs behind Nginx/Cloudflare
+      // The validator is strict about trust proxy, but we need it for correct IP detection
+      validate: { trustProxy: false }, 
     }),
   );
 
@@ -60,7 +60,13 @@ async function bootstrap() {
 
   // 3. Strict CORS configuration
   app.enableCors({
-    origin: FRONTEND_URL === '*' ? false : FRONTEND_URL.split(','), // Prevents '*' from allowing all origins in production
+    origin: (origin, callback) => {
+      if (!origin || FRONTEND_URL === '*' || FRONTEND_URL.split(',').includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders:
       'Content-Type, Accept, Authorization, X-Requested-With, X-Client-Version, Cache-Control, Pragma',
@@ -73,7 +79,7 @@ async function bootstrap() {
 // If running directly (e.g. "npm run start")
 if (require.main === module) {
   bootstrap().then(async (app) => {
-    await app.listen(PORT);
+    await app.listen(PORT, '0.0.0.0');
     console.log(`Application is running on: ${await app.getUrl()}`);
   });
 }

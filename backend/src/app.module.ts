@@ -22,6 +22,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
 import { CartCleanupService } from './scheduler/cart-cleanup.service';
 import { CartRecoveryService } from './scheduler/cart-recovery.service';
+import { OrderCleanupService } from './scheduler/order-cleanup.service';
 import { PromosModule } from './promos/promos.module';
 import { StoreModule } from './store/store.module';
 import { BannerModule } from './banner/banner.module';
@@ -88,7 +89,7 @@ import { RedisModule } from './redis/redis.module';
     CcavenueModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CartCleanupService, CartRecoveryService],
+  providers: [AppService, CartCleanupService, CartRecoveryService, OrderCleanupService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

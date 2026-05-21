@@ -7,7 +7,7 @@ import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
 export default function AdminCMS() {
-    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes' | 'video-reels' | 'aura-collection'>('banners');
+    const [activeSection, setActiveSection] = useState<'banners' | 'offers' | 'text' | 'spotlight' | 'categories' | 'price' | 'tags' | 'social' | 'gallery' | 'royal-standard' | 'brand-story' | 'promise-cards' | 'footer-config' | 'promocodes' | 'video-reels' | 'aura-collection' | 'system-health'>('banners');
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
@@ -70,6 +70,10 @@ export default function AdminCMS() {
     const [newVideoReel, setNewVideoReel] = useState({ title: '', tagline: '', videoUrl: '', link: '' });
     const [isSavingVideo, setIsSavingVideo] = useState(false);
     const [newPromoCode, setNewPromoCode] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 10, creatorName: '' });
+    
+    // System Health State
+    const [healthData, setHealthData] = useState<any>(null);
+    const [isRefreshingHealth, setIsRefreshingHealth] = useState(false);
 
     useEffect(() => {
         loadContent();
@@ -85,7 +89,6 @@ export default function AdminCMS() {
                 fetchAPI('/categories'),
                 fetchAPI('/marketing/price-ranges'),
                 fetchAPI('/marketing/tags'),
-                fetchAPI('/marketing/tags'), // Duplicate? Removing one of these isn't crucial right now but noting it.
                 fetchAPI('/marketing/social-posts'),
                 fetchAPI('/gallery'),
                 fetchAPI('/store/settings/home_royal_standard'),
@@ -97,7 +100,7 @@ export default function AdminCMS() {
                 fetchAPI('/store/settings/aura_collection_config')
             ]);
 
-            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, _dupTagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes, videoReelsRes, auraRes] = results;
+            const [bannersRes, offersRes, heroTextRes, categoriesRes, priceRangesRes, tagsRes, socialPostsRes, galleryRes, royalStdRes, brandStoryRes, promiseCardsRes, footerConfigRes, promosRes, videoReelsRes, auraRes] = results;
 
             if (bannersRes.status === 'fulfilled') setBanners(bannersRes.value || []);
             else showToast('Failed to load banners', 'error');
@@ -426,13 +429,35 @@ export default function AdminCMS() {
         try {
             await fetchAPI('/store/settings', {
                 method: 'POST',
-                body: JSON.stringify({ key, value: JSON.stringify(value) })
+                body: JSON.stringify({ key, value: value }) // Pass value directly, backend handles stringification
             });
             showToast(successMsg, 'success');
         } catch (e) {
             showToast('Failed to update settings', 'error');
         }
     };
+
+    const fetchHealthData = async () => {
+        setIsRefreshingHealth(true);
+        try {
+            const data = await fetchAPI('/diagnostics');
+            setHealthData(data);
+        } catch (err) {
+            console.error('Failed to fetch health data', err);
+            showToast('Backend Connection Failed', 'error');
+            setHealthData({ status: 'OFFLINE', timestamp: new Date().toISOString() });
+        } finally {
+            setIsRefreshingHealth(false);
+        }
+    };
+
+    useEffect(() => {
+        if (activeSection === 'system-health') {
+            fetchHealthData();
+            const interval = setInterval(fetchHealthData, 30000); // Auto refresh every 30s
+            return () => clearInterval(interval);
+        }
+    }, [activeSection]);
 
     return (
         <div className="flex flex-col md:flex-row gap-8 items-start animate-fade-in min-h-[600px]">
@@ -555,6 +580,20 @@ export default function AdminCMS() {
                         {item.label}
                     </button>
                 ))}
+                {/* Section Group: System */}
+                <div className="pt-4 border-t border-brand-gold/10">
+                    <p className="text-[8px] font-black text-brand-gold uppercase tracking-[0.3em] mb-4 pl-4">System</p>
+                    <div className="space-y-1">
+                        <button
+                            onClick={() => { setActiveSection('system-health'); setIsMobileNavOpen(false); }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 ${activeSection === 'system-health' ? 'bg-brand-gold text-brand-navy shadow-lg shadow-brand-gold/20 font-bold' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}
+                        >
+                            <PiLayout className={activeSection === 'system-health' ? 'text-brand-navy' : 'text-gray-500'} />
+                            <span className="text-[10px] uppercase tracking-widest">System Health</span>
+                            <div className={`ml-auto w-1.5 h-1.5 rounded-full ${healthData?.status === 'OK' ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                        </button>
+                    </div>
+                </div>
             </aside>
 
             {/* Main Content Area */}
@@ -769,7 +808,10 @@ export default function AdminCMS() {
                                                 </label>
                                             ) : (
                                                 <div className="relative aspect-square rounded-2xl overflow-hidden group">
-                                                    <img src={auraConfig.bannerUrl} className="w-full h-full object-cover" alt="" />
+                                                     <img 
+                                                         src={auraConfig.bannerUrl?.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${auraConfig.bannerUrl}` : auraConfig.bannerUrl} 
+                                                         className="w-full h-full object-cover" alt="" 
+                                                     />
                                                     <button onClick={() => setAuraConfig({ ...auraConfig, bannerUrl: '' })} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"><PiTrash size={24} /></button>
                                                 </div>
                                             )}
@@ -793,7 +835,10 @@ export default function AdminCMS() {
                                                 </label>
                                             ) : (
                                                 <div className="relative aspect-square rounded-2xl overflow-hidden group">
-                                                    <img src={auraConfig.mobileBannerUrl} className="w-full h-full object-cover" alt="" />
+                                                     <img 
+                                                         src={auraConfig.mobileBannerUrl?.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${auraConfig.mobileBannerUrl}` : auraConfig.mobileBannerUrl} 
+                                                         className="w-full h-full object-cover" alt="" 
+                                                     />
                                                     <button onClick={() => setAuraConfig({ ...auraConfig, mobileBannerUrl: '' })} className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"><PiTrash size={24} /></button>
                                                 </div>
                                             )}
@@ -1103,7 +1148,11 @@ export default function AdminCMS() {
                                             </label>
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
-                                                <img src={newBanner.imageUrl} alt="Desktop Preview" className="w-full h-full object-cover" />
+                                                <img 
+                                                     src={newBanner.imageUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${newBanner.imageUrl}` : newBanner.imageUrl} 
+                                                     alt="Desktop Preview" 
+                                                     className="w-full h-full object-cover" 
+                                                 />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                                     <a href={newBanner.imageUrl} download target="_blank" rel="noreferrer" title="Download Desktop Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
                                                     <button onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
@@ -1152,7 +1201,11 @@ export default function AdminCMS() {
                                             </label>
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner">
-                                                <img src={newBanner.mobileImageUrl} alt="Mobile Preview" className="w-full h-full object-cover" />
+                                                <img 
+                                                     src={newBanner.mobileImageUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${newBanner.mobileImageUrl}` : newBanner.mobileImageUrl} 
+                                                     alt="Mobile Preview" 
+                                                     className="w-full h-full object-cover" 
+                                                 />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                                     <a href={newBanner.mobileImageUrl} download target="_blank" rel="noreferrer" title="Download Mobile Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
                                                     <button onClick={() => setNewBanner(prev => ({ ...prev, mobileImageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
@@ -2191,6 +2244,121 @@ export default function AdminCMS() {
                                         className="bg-brand-navy text-white px-8 py-2.5 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:bg-brand-gold hover:text-brand-navy transition-all shadow-lg shadow-brand-navy/10"
                                     >
                                         Save Changes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {/* SYSTEM HEALTH SECTION */}
+                    {activeSection === 'system-health' && (
+                        <div className="space-y-8">
+                            <div className="flex justify-between items-center bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+                                <div>
+                                    <h2 className="text-2xl font-serif text-brand-navy">System Diagnostics</h2>
+                                    <p className="text-xs text-gray-500 mt-1">Real-time backend performance and connectivity monitoring.</p>
+                                </div>
+                                <button 
+                                    onClick={fetchHealthData}
+                                    disabled={isRefreshingHealth}
+                                    className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${isRefreshingHealth ? 'bg-gray-100 text-gray-400 animate-pulse' : 'bg-brand-navy text-white hover:bg-brand-gold hover:text-brand-navy'}`}
+                                >
+                                    {isRefreshingHealth ? 'Refreshing...' : 'Refresh Status'}
+                                </button>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Connectivity Card */}
+                                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${healthData?.status === 'OK' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                                        <PiGlobe size={24} className={healthData?.status === 'OK' ? 'animate-spin-slow' : ''} />
+                                    </div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Connection Status</h3>
+                                    <p className={`text-xl font-bold mt-2 ${healthData?.status === 'OK' ? 'text-green-600' : 'text-red-600'}`}>
+                                        {healthData?.status || 'UNKNOWN'}
+                                    </p>
+                                    <p className="text-[9px] text-gray-400 mt-2">Latency: {healthData?.system?.uptime ? '< 50ms' : 'N/A'}</p>
+                                </div>
+
+                                {/* Memory Card */}
+                                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                    <div className="w-12 h-12 rounded-full bg-brand-gold/10 text-brand-gold flex items-center justify-center mb-4">
+                                        <PiCards size={24} />
+                                    </div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Memory Usage (Heap)</h3>
+                                    <p className="text-xl font-bold text-brand-navy mt-2">{healthData?.system?.memory?.heapUsed || 'N/A'}</p>
+                                    <p className="text-[9px] text-gray-400 mt-2">RSS: {healthData?.system?.memory?.rss || 'N/A'}</p>
+                                </div>
+
+                                {/* Uptime Card */}
+                                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center text-center">
+                                    <div className="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-4">
+                                        <PiLayout size={24} />
+                                    </div>
+                                    <h3 className="text-[10px] font-black uppercase tracking-widest text-gray-400">Backend Uptime</h3>
+                                    <p className="text-xl font-bold text-brand-navy mt-2">
+                                        {healthData?.system?.uptime ? `${Math.floor(healthData.system.uptime / 3600)}h ${Math.floor((healthData.system.uptime % 3600) / 60)}m` : 'N/A'}
+                                    </p>
+                                    <p className="text-[9px] text-gray-400 mt-2">Last Sync: {new Date(healthData?.timestamp).toLocaleTimeString()}</p>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Database & Infrastructure */}
+                                <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+                                    <h3 className="text-xs font-black uppercase tracking-[0.2em] text-brand-navy border-b border-gray-50 pb-4">Infrastructure Details</h3>
+                                    <div className="space-y-4">
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-500">Database Connection</span>
+                                            <span className={`font-bold ${healthData?.database?.connected ? 'text-green-600' : 'text-red-600'}`}>
+                                                {healthData?.database?.connected ? 'CONNECTED' : 'DISCONNECTED'}
+                                            </span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-500">Total Registered Users</span>
+                                            <span className="font-bold text-brand-navy">{healthData?.database?.userCount || 0}</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-sm">
+                                            <span className="text-gray-500">Admin Account Status</span>
+                                            <span className={`font-bold ${healthData?.admin_check?.exists ? 'text-green-600' : 'text-red-600'}`}>
+                                                {healthData?.admin_check?.exists ? 'VERIFIED' : 'NOT FOUND'}
+                                            </span>
+                                        </div>
+                                        <div className="pt-4 mt-4 border-t border-gray-50">
+                                            <p className="text-[9px] uppercase font-bold text-gray-400 mb-2">DB URL (Masked)</p>
+                                            <code className="block p-3 bg-gray-50 rounded-xl text-[10px] text-gray-500 break-all">
+                                                {healthData?.database?.url_config || 'N/A'}
+                                            </code>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Recent Activity Logs */}
+                                <div className="bg-brand-navy p-8 rounded-3xl shadow-xl space-y-6 overflow-hidden">
+                                    <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                                        <h3 className="text-xs font-black uppercase tracking-[0.2em] text-white">Security & App Logs</h3>
+                                        <span className="text-[9px] font-bold text-brand-gold bg-brand-gold/10 px-2 py-1 rounded">LIVE TRAFFIC</span>
+                                    </div>
+                                    <div className="h-[300px] overflow-y-auto font-mono text-[10px] space-y-2 custom-scrollbar pr-2">
+                                        {healthData?.logs?.length > 0 ? (
+                                            healthData.logs.map((log: any, idx: number) => (
+                                                <div key={idx} className={`p-2 rounded border-l-2 ${log.type === 'error' ? 'bg-red-500/10 border-red-500 text-red-200' : 'bg-white/5 border-brand-gold text-gray-300'}`}>
+                                                    <span className="text-[8px] opacity-50 block mb-1">{new Date(log.timestamp).toLocaleTimeString()}</span>
+                                                    {log.message}
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500 italic py-10 text-center">No recent activity logs available.</p>
+                                        )}
+                                    </div>
+                                    <button 
+                                        onClick={async () => {
+                                            const res = await fetchAPI('/diagnostics/logs');
+                                            setHealthData((prev: any) => ({ ...prev, logs: res.logs }));
+                                            showToast('Logs Updated', 'success');
+                                        }}
+                                        className="w-full py-3 border border-white/20 rounded-xl text-[9px] font-black uppercase text-white hover:bg-white hover:text-brand-navy transition-all"
+                                    >
+                                        Force Refresh Logs
                                     </button>
                                 </div>
                             </div>

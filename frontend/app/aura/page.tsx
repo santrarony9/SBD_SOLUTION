@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
+
 import { PiSparkle, PiVideoCamera, PiArrowRight } from "react-icons/pi";
 import Link from 'next/link';
 
@@ -63,13 +64,26 @@ export default function AuraCollectionPage() {
         <div className="bg-white min-h-screen font-sans text-brand-navy selection:bg-brand-gold selection:text-brand-navy">
             {/* Hero Section */}
             <section className="relative h-[80vh] md:h-[90vh] flex items-center justify-center overflow-hidden">
-                {config?.bannerUrl ? (
+                {/* Desktop Banner */}
+                {config?.bannerUrl && (
                     <img 
-                        src={config.bannerUrl} 
-                        className="absolute inset-0 w-full h-full object-cover" 
-                        alt="Aura Collection" 
+                        src={config.bannerUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${config.bannerUrl}` : config.bannerUrl} 
+                        className={`${config.mobileBannerUrl ? 'hidden md:block' : 'block'} absolute inset-0 w-full h-full object-cover`} 
+                        alt="Aura Collection Desktop" 
                     />
-                ) : (
+                )}
+                
+                {/* Mobile Banner */}
+                {config?.mobileBannerUrl && (
+                    <img 
+                        src={config.mobileBannerUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${config.mobileBannerUrl}` : config.mobileBannerUrl} 
+                        className="md:hidden absolute inset-0 w-full h-full object-cover" 
+                        alt="Aura Collection Mobile" 
+                    />
+                )}
+
+                {/* Fallback if no banners */}
+                {!config?.bannerUrl && !config?.mobileBannerUrl && (
                     <div className="absolute inset-0 bg-brand-navy">
                         <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]"></div>
                     </div>

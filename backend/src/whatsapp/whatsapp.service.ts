@@ -166,9 +166,21 @@ export class WhatsappService {
   // Added Methods for Backward Compilation Compatibility
   // ------------------------------------------
 
-  async sendAbandonedCartReminder(phone: string, customerName?: string, ...args: any[]) {
-    this.logger.log(`[Stub] Sending abandoned cart reminder to ${phone}`);
-    return { success: true, message: 'Stub method executed' };
+  async sendAbandonedCartReminder(
+    phone: string,
+    customerName: string,
+    imageUrl: string,
+    productNames: string,
+    discountCode: string,
+  ) {
+    const text = `ABANDONED_CART_TEMPLATE`;
+    const params = `${customerName},${productNames},${discountCode}`;
+
+    return this.sendBhashSms(phone, text, {
+      Params: params,
+      htype: 'image',
+      url: imageUrl,
+    });
   }
 
   async sendTemplateMessage(phone: string, templateId: string, parameters?: any[]) {

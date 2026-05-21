@@ -24,6 +24,11 @@ export class InventoryController {
     return this.inventory.getVaults();
   }
 
+  @Get('materials')
+  getMaterials() {
+    return this.inventory.getMaterialStock();
+  }
+
   @Post('adjust')
   adjustStock(
     @Body()

@@ -21,6 +21,7 @@ interface Product {
     };
     category?: string;
     tags?: string[];
+    isYouthTarget?: boolean;
     createdAt?: string;
 }
 
@@ -36,6 +37,7 @@ function ShopContent() {
     const [sortBy, setSortBy] = useState('newest'); // Default to Newest
     const [selectedCategories, setSelectedCategories] = useState<string[]>(initialCategory ? [initialCategory.toLowerCase()] : []);
     const [selectedMetals, setSelectedMetals] = useState<string[]>([]);
+    const [selectedCollections, setSelectedCollections] = useState<string[]>([]);
     const [isFilterOpen, setIsFilterOpen] = useState(false); // Mobile Filter State
 
     const loadProducts = async () => {
@@ -96,6 +98,14 @@ function ShopContent() {
         );
     };
 
+    const toggleCollection = (collection: string) => {
+        setSelectedCollections(prev =>
+            prev.includes(collection)
+                ? prev.filter(c => c !== collection)
+                : [...prev, collection]
+        );
+    };
+
     // Filter and Sort Logic combined
     const filteredAndSortedProducts = useMemo(() => {
         let result = [...products];
@@ -118,6 +128,16 @@ function ShopContent() {
                     if (metal === '18K Gold') return p.goldPurity === 18;
                     if (metal === '22K Gold') return p.goldPurity === 22;
                     if (metal === 'Platinum') return p.tags?.some(t => t.toLowerCase().includes('platinum')) || p.name.toLowerCase().includes('platinum');
+                    return false;
+                });
+            });
+        }
+
+        // Filter by Collection (Aura/Youth)
+        if (selectedCollections.length > 0) {
+            result = result.filter(p => {
+                return selectedCollections.some(col => {
+                    if (col === 'Aura Series') return p.isYouthTarget;
                     return false;
                 });
             });
@@ -270,6 +290,31 @@ function ShopContent() {
                                 ))}
                             </ul>
                         </div>
+
+                        <div className="animate-fade-in delay-500">
+                            <h3 className="font-serif text-lg text-brand-navy mb-6 flex items-center gap-3">
+                                <span className="w-8 h-[1px] bg-brand-gold"></span>
+                                Collection
+                            </h3>
+                            <ul className="space-y-4">
+                                {['Aura Series'].map(col => (
+                                    <li key={col}>
+                                        <label className="group flex items-center cursor-pointer" onClick={() => toggleCollection(col)}>
+                                            <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedCollections.includes(col) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
+                                                {selectedCollections.includes(col) && (
+                                                    <svg className="w-2.5 h-2.5 text-brand-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                )}
+                                            </div>
+                                            <span className={`text-xs uppercase tracking-widest transition-colors duration-300 ${selectedCollections.includes(col) ? 'text-brand-navy font-bold' : 'text-gray-500 group-hover:text-brand-navy'}`}>
+                                                {col}
+                                            </span>
+                                        </label>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
@@ -403,11 +448,28 @@ function ShopContent() {
                                     </div>
                                 </div>
 
-                                {(selectedCategories.length > 0 || selectedMetals.length > 0) && (
+                                {/* Collection Filter */}
+                                <div>
+                                    <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold mb-6 border-b border-brand-gold/10 pb-2">Collection</h4>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        {['Aura Series'].map(col => (
+                                            <button
+                                                key={col}
+                                                onClick={() => toggleCollection(col)}
+                                                className={`px-4 py-3 text-[10px] uppercase tracking-widest font-bold border rounded-sm transition-all ${selectedCollections.includes(col) ? 'bg-brand-navy border-brand-navy text-white shadow-lg' : 'bg-white border-gray-100 text-gray-500'}`}
+                                            >
+                                                {col}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {(selectedCategories.length > 0 || selectedMetals.length > 0 || selectedCollections.length > 0) && (
                                     <button
                                         onClick={() => {
                                             setSelectedCategories([]);
                                             setSelectedMetals([]);
+                                            setSelectedCollections([]);
                                         }}
                                         className="w-full py-4 text-[10px] uppercase tracking-[0.2em] font-black text-red-500 bg-red-50 border border-red-100"
                                     >

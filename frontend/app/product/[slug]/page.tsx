@@ -19,6 +19,8 @@ import JsonLd from "@/components/JsonLd";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import SimilarPriceRange from "@/components/SimilarPriceRange";
 import { useFestive } from '@/context/FestiveContext';
+import { API_URL } from '@/lib/api';
+
 
 interface Product {
     id: string;
@@ -321,7 +323,7 @@ export default function ProductDetailPage() {
                                         muted
                                         loop
                                         playsInline
-                                        poster={product.images?.[0] || ''}
+                                        poster={product.images?.[0] && product.images[0].startsWith('/uploads') ? `${API_URL.replace('/api', '')}${product.images[0]}` : (product.images?.[0] || '')}
                                     />
                                     <div className="absolute top-4 left-4 bg-white/90 backdrop-blur text-brand-navy text-[9px] font-bold uppercase px-2 py-1 tracking-[0.2em] shadow-sm">
                                         360° View
@@ -337,7 +339,7 @@ export default function ProductDetailPage() {
                                     className="relative w-full h-full cursor-zoom-in zoom-image-container zoom-hover"
                                 >
                                     <Image
-                                        src={activeImage}
+                                        src={activeImage.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${activeImage}` : activeImage}
                                         alt={product.name}
                                         fill
                                         className="object-contain transition-all duration-700 ease-out"
@@ -384,9 +386,11 @@ export default function ProductDetailPage() {
                                         </svg>
                                     </div>
                                 </div>
-                                {product.images?.[0] && (
-                                    <img src={product.images[0]} alt="Video" className="w-full h-full object-cover opacity-80" />
-                                )}
+                                <img 
+                                    src={product.images?.[0] && product.images[0].startsWith('/uploads') ? `${API_URL.replace('/api', '')}${product.images[0]}` : (product.images?.[0] || '')} 
+                                    alt="Video" 
+                                    className="w-full h-full object-cover opacity-80" 
+                                />
                             </button>
                         )}
                         {product.images?.map((img, i) => (
@@ -398,7 +402,11 @@ export default function ProductDetailPage() {
                                 }}
                                 className={`relative flex-shrink-0 w-20 aspect-square rounded-lg overflow-hidden border-2 transition-all duration-300 shadow-sm ${!showVideo && activeImage === img ? 'border-brand-gold scale-105 shadow-brand-gold/20' : 'border-white hover:border-brand-gold/30'}`}
                             >
-                                <img src={img} alt={`View ${i + 1}`} className="w-full h-full object-cover" />
+                                <img 
+                                    src={img.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${img}` : img} 
+                                    alt={`View ${i + 1}`} 
+                                    className="w-full h-full object-cover" 
+                                />
                             </button>
                         ))}
                     </div>

@@ -205,10 +205,16 @@ export class ShiprocketService {
     this.logger.log(`Shiprocket Webhook Received for AWB: ${payload.awb}, Status: ${payload.current_status}`);
     
     const statusMap: { [key: string]: string } = {
+      'PICKED UP': 'SHIPPED',
+      'IN TRANSIT': 'SHIPPED',
+      'OUT FOR DELIVERY': 'SHIPPED',
+      'SHIPPED': 'SHIPPED',
       'DELIVERED': 'DELIVERED',
+      'RTO IN TRANSIT': 'RETURNED',
       'RTO DELIVERED': 'RETURNED',
       'RETURNED': 'RETURNED',
-      'CANCELED': 'CANCELLED'
+      'CANCELED': 'CANCELLED',
+      'CANCELLED': 'CANCELLED'
     };
 
     const ourStatus = statusMap[payload.current_status?.toUpperCase()];

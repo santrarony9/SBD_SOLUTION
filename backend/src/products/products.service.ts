@@ -98,7 +98,7 @@ export class ProductsService {
 
       const product = await this.prisma.product.create({ data });
       await this.redis.delByPattern('products:*');
-      return product;
+      return this.normalizeImageUrls(product);
     } catch (error) {
       console.error('Failed to create product:', error);
       throw error; // Re-throw to let global filter handle it, but log first
@@ -113,7 +113,7 @@ export class ProductsService {
       data,
     });
     await this.redis.delByPattern('products:*');
-    return updated;
+    return this.normalizeImageUrls(updated);
   }
 
   async deleteProduct(id: string) {
@@ -133,7 +133,7 @@ export class ProductsService {
     skip?: number;
     take?: number;
   }) {
-    const cacheKey = `products: all:${JSON.stringify(filters || {})} `;
+    const cacheKey = `products:all:${JSON.stringify(filters || {})}`;
     const cached = await this.redis.get(cacheKey);
     if (cached) {
       return JSON.parse(cached);
@@ -150,10 +150,20 @@ export class ProductsService {
     }
 
     if (filters?.isYouthTarget !== undefined) {
-      where.isYouthTarget =
-        typeof filters.isYouthTarget === 'string'
-          ? filters.isYouthTarget === 'true'
-          : filters.isYouthTarget;
+      const isTarget = typeof filters.isYouthTarget === 'string'
+        ? filters.isYouthTarget === 'true'
+        : filters.isYouthTarget;
+      
+      if (isTarget) {
+        // For Aura collection, show explicitly flagged items OR any 9K items
+        where.OR = [
+          { isYouthTarget: true },
+          { goldPurity: 9 }
+        ];
+      } else {
+        // For main collection, exclude explicitly flagged items
+        where.isYouthTarget = false;
+      }
     }
 
     // 1. Batch fetch products with pagination (at DB level)
@@ -163,6 +173,8 @@ export class ProductsService {
       take: filters?.take || 500, // Default limit for safety (expanded to 500)
       orderBy: { createdAt: 'desc' },
     });
+
+    console.log(`[ProductsService] Found ${products.length} products with filters:`, where);
 
     if (products.length === 0) return [];
 
@@ -204,13 +216,13 @@ export class ProductsService {
       const diamondPricePerCarat =
         diamondRateMap.get(product.diamondClarity) || 0;
 
-      return this.calculatePricing(
+      return this.normalizeImageUrls(this.calculatePricing(
         product,
         goldPricePer10g,
         diamondPricePerCarat,
         charges,
         makingChargeTiers,
-      );
+      ));
     });
 
     // 4. Client-side price filtering (since pricing is dynamic)
@@ -229,7 +241,7 @@ export class ProductsService {
   }
 
   async findOne(slugOrId: string) {
-    const cacheKey = `products: one:${slugOrId} `;
+    const cacheKey = `products:one:${slugOrId}`;
     const cached = await this.redis.get(cacheKey);
     if (cached) {
       return JSON.parse(cached);
@@ -279,13 +291,13 @@ export class ProductsService {
       }
     }
 
-    const result = this.calculatePricing(
+    const result = this.normalizeImageUrls(this.calculatePricing(
       product,
       goldRate?.pricePer10g || 0,
       diamondRate?.pricePerCarat || 0,
       charges,
       makingChargeTiers,
-    );
+    ));
     await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
     return result;
   }
@@ -389,5 +401,26 @@ export class ProductsService {
       );
       return { ...product, pricing: null };
     }
+  }
+  
+  private normalizeImageUrls(product: any) {
+    const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
+    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+
+    if (product.coverImage && product.coverImage.startsWith('/uploads')) {
+      product.coverImage = `${cleanBaseUrl}${product.coverImage}`;
+    }
+
+    if (product.images && Array.isArray(product.images)) {
+      product.images = product.images.map(img => 
+        img && img.startsWith('/uploads') ? `${cleanBaseUrl}${img}` : img
+      );
+    }
+    
+    if (product.videoUrl && product.videoUrl.startsWith('/uploads')) {
+      product.videoUrl = `${cleanBaseUrl}${product.videoUrl}`;
+    }
+
+    return product;
   }
 }

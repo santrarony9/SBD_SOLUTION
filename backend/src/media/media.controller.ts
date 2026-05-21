@@ -6,6 +6,7 @@ import {
   ParseFilePipe,
   MaxFileSizeValidator,
   FileTypeValidator,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { MediaService } from './media.service';
@@ -17,12 +18,14 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FileInterceptor('file', {
+    limits: { fileSize: 20 * 1024 * 1024 } // 20MB limit for Multer parsing
+  }))
   async uploadFile(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 7 * 1024 * 1024 }), // 7MB max cap
+          new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // Increased to 20MB for high-res banners
         ],
       }),
     )
@@ -39,7 +42,7 @@ export class MediaController {
       console.error('Upload Controller Error:', error);
       const message =
         error instanceof Error ? error.message : JSON.stringify(error);
-      throw new Error(`Upload Failed: ${message}`);
+      throw new InternalServerErrorException(`Upload Failed: ${message}`);
     }
   }
 

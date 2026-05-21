@@ -121,12 +121,7 @@ export class OrdersService {
       }
     }
 
-    // 5. Shiprocket Integration
-    // Non-blocking call
-    this.pushToShiprocket(order.id).catch((e) =>
-      console.error('Shiprocket Auto-Push Failed:', (e as any).message),
-    );
-
+    // 5. Shiprocket Integration (Deferred until payment)
     // 6. Clear Cart
     await this.cartService.clearCart(userId);
 
@@ -428,6 +423,11 @@ export class OrdersService {
         updatedOrder.id,
         updatedOrder.totalAmount,
       );
+      
+      // Auto-Push to Shiprocket on Confirmation
+      this.pushToShiprocket(updatedOrder.id).catch((e) =>
+        console.error('Shiprocket Auto-Push Failed on Confirmation:', (e as any).message),
+      );
     }
 
     // Trigger Reversal Logic if order is CANCELLED
@@ -448,7 +448,7 @@ export class OrdersService {
     return updatedOrder;
   }
   async markAsPaid(orderId: string, paymentId: string) {
-    return this.prisma.order.update({
+    const updatedOrder = await this.prisma.order.update({
       where: { id: orderId },
       data: {
         status: 'CONFIRMED',
@@ -456,6 +456,20 @@ export class OrdersService {
         razorpayPaymentId: paymentId,
       },
     });
+
+    // Trigger Success Hooks
+    if (updatedOrder.userId) {
+      await this.crmService.onOrderComplete(
+        updatedOrder.userId,
+        updatedOrder.id,
+        updatedOrder.totalAmount,
+      );
+    }
+    this.pushToShiprocket(updatedOrder.id).catch((e) =>
+      console.error('Shiprocket Push Failed (Razorpay):', (e as any).message),
+    );
+
+    return updatedOrder;
   }
 
   async confirmPhonePePayment(

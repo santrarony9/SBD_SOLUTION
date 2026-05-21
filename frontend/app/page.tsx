@@ -377,8 +377,28 @@ export default async function Home() {
       {/* 5.2 SBD AURA COLLECTION (YOUTH) SECTION */}
       {auraConfig.isActive && auraProducts.length > 0 && (
         <section className="py-24 bg-brand-gold/5 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
-          <div className="max-w-7xl mx-auto px-6">
+          {/* Background Banners */}
+          <div className="absolute inset-0 z-0">
+            {auraConfig.bannerUrl && (
+              <img 
+                src={auraConfig.bannerUrl} 
+                alt="Aura Desktop Banner" 
+                className="hidden md:block w-full h-full object-cover opacity-20"
+              />
+            )}
+            {auraConfig.mobileBannerUrl && (
+              <img 
+                src={auraConfig.mobileBannerUrl} 
+                alt="Aura Mobile Banner" 
+                className="md:hidden w-full h-full object-cover opacity-30"
+              />
+            )}
+            {!auraConfig.bannerUrl && !auraConfig.mobileBannerUrl && (
+              <div className="absolute top-0 right-0 w-96 h-96 bg-brand-gold/10 blur-[120px] rounded-full -translate-y-1/2 translate-x-1/2"></div>
+            )}
+          </div>
+
+          <div className="max-w-7xl mx-auto px-6 relative z-10">
             <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
               <div className="max-w-xl">
                 <span className="text-brand-gold text-xs font-black uppercase tracking-[0.5em] mb-4 inline-block">Youth Series</span>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
+
 import { formatPrice } from '@/lib/utils';
 import { useCurrency } from '@/context/CurrencyContext';
 import { motion } from 'framer-motion';
@@ -88,7 +89,7 @@ export default function RecentlyViewed() {
                                 <div className="relative aspect-square mb-4 bg-brand-cream/20 overflow-hidden rounded-sm border border-brand-charcoal/5">
                                     {product.images?.[0] ? (
                                         <Image
-                                            src={product.images[0]}
+                                            src={product.images[0].startsWith('/uploads') ? `${API_URL.replace('/api', '')}${product.images[0]}` : product.images[0]}
                                             alt={product.name}
                                             fill
                                             className="object-cover transition-transform duration-700 group-hover:scale-110"

@@ -160,4 +160,10 @@ export class InventoryService {
       });
     }
   }
+
+  async getMaterialStock() {
+    return this.prisma.materialStock.findMany({
+      orderBy: { type: 'asc' },
+    });
+  }
 }

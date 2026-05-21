@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL } from '@/lib/api';
+
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
 import { PiLink, PiCopy } from "react-icons/pi";
@@ -184,10 +185,21 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
                                 <td className="px-6 py-4">
                                     <div className="flex items-center space-x-4">
                                         <div className="relative w-12 h-12 rounded bg-gray-100 overflow-hidden flex-shrink-0 border border-gray-200 group-hover:border-brand-gold/50 transition-colors">
-                                            {product.images[0] ? (
-                                                <Image src={product.images[0]} alt={product.name} fill className="object-cover" />
+                                            {product.images?.[0] ? (
+                                                <img 
+                                                    src={product.images[0].startsWith('/uploads') 
+                                                        ? `${API_URL.replace('/api', '')}${product.images[0]}` 
+                                                        : product.images[0]
+                                                    } 
+                                                    alt={product.name} 
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.src = 'https://placehold.co/100x100/1a2238/fbbd61?text=No+Img';
+                                                    }}
+                                                />
                                             ) : (
-                                                <div className="flex items-center justify-center w-full h-full text-[8px] uppercase text-gray-300 font-bold">No IMG</div>
+                                                <div className="flex items-center justify-center w-full h-full text-[8px] uppercase text-gray-300 font-bold bg-gray-50">No IMG</div>
                                             )}
                                         </div>
                                         <span className="font-medium text-brand-navy line-clamp-2 max-w-[200px]">{product.name}</span>

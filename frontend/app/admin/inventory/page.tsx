@@ -28,14 +28,16 @@ export default function InventoryDashboard() {
     const loadData = async () => {
         setIsLoading(true);
         try {
-            const [prodData, valData, vaultData] = await Promise.all([
+            const [prodData, valData, vaultData, matData] = await Promise.all([
                 fetchAPI('/products'),
                 fetchAPI('/inventory/valuation'),
-                fetchAPI('/inventory/vaults')
+                fetchAPI('/inventory/vaults'),
+                fetchAPI('/inventory/materials')
             ]);
             setProducts(prodData);
             setValuation(valData);
             setVaults(vaultData);
+            setMaterials(matData);
         } catch (err) {
         } finally {
             setIsLoading(false);
@@ -126,7 +128,7 @@ export default function InventoryDashboard() {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded bg-gray-100 overflow-hidden relative border border-gray-200">
-                                                <img src={product.imageUrl} className="object-cover w-full h-full" alt="" />
+                                                <img src={product.images?.[0] || product.coverImage || '/placeholder.png'} className="object-cover w-full h-full" alt="" />
                                             </div>
                                             <div>
                                                 <div className="font-bold text-brand-navy">{product.name}</div>
@@ -210,15 +212,29 @@ export default function InventoryDashboard() {
             )}
 
             {activeTab === 'materials' && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Placeholder for Raw Material Cards */}
-                    <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm flex flex-col items-center justify-center min-h-[200px] text-center opacity-50">
-                        <PiGraph className="text-4xl text-gray-300 mb-4" />
-                        <h3 className="font-bold text-gray-400 text-sm italic uppercase tracking-widest">Connect Raw Stock</h3>
-                        <p className="text-xs text-gray-400 px-8">Track your Mother Stock of Gold and Diamonds here.</p>
-                    </div>
-                    <button className="border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-all text-xs font-bold uppercase tracking-widest gap-2">
-                        <PiPlus /> Add New Material
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    {materials.map((mat) => (
+                        <div key={mat.id} className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                            <div className="flex justify-between items-start mb-4">
+                                <div className="w-10 h-10 rounded-full bg-brand-gold/10 flex items-center justify-center text-brand-gold">
+                                    <PiGraph />
+                                </div>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Raw Stock</span>
+                            </div>
+                            <h3 className="font-bold text-brand-navy mb-1">{mat.type}</h3>
+                            <div className="flex items-end gap-2">
+                                <span className="text-3xl font-serif text-brand-navy">{mat.quantity}</span>
+                                <span className="text-sm font-bold text-gray-400 mb-1 uppercase tracking-widest">{mat.unit}</span>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-gray-50 flex justify-between items-center">
+                                <span className="text-[8px] text-gray-400 uppercase tracking-widest">Last Restock: {new Date(mat.updatedAt).toLocaleDateString()}</span>
+                                <button className="text-brand-gold text-[10px] font-bold uppercase tracking-widest hover:underline">Adjust</button>
+                            </div>
+                        </div>
+                    ))}
+                    <button className="border-2 border-dashed border-gray-200 rounded-xl p-6 flex flex-col items-center justify-center text-gray-400 hover:border-brand-gold hover:text-brand-gold transition-all">
+                        <PiPlus className="text-2xl mb-2" />
+                        <span className="text-[10px] font-bold uppercase tracking-widest">New Material</span>
                     </button>
                 </div>
             )}

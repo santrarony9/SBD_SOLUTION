@@ -18,6 +18,7 @@ import FestiveSplashTransition from './FestiveSplashTransition';
 import FestiveStartupAnimation from './FestiveStartupAnimation';
 import { useFestive } from '@/context/FestiveContext';
 import { useState, useEffect } from 'react';
+import ChatWidget from './ChatWidget';
 
 export default function ClientLayoutWrapper({
     children,
@@ -81,6 +82,7 @@ export default function ClientLayoutWrapper({
             </div>
 
             <MobileBottomNav />
+            <ChatWidget />
             <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
             <Footer config={footerConfig} />
         </>

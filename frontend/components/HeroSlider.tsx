@@ -6,6 +6,16 @@ import Link from 'next/link';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import { motion } from 'framer-motion';
 import { useFestive } from '@/context/FestiveContext';
+import { API_URL } from '@/lib/api';
+
+// Helper: normalize image URLs (handles both relative /uploads paths and already-absolute URLs)
+const normalizeImageUrl = (url: string | undefined, fallback: string): string => {
+    if (!url) return fallback;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads')) return `${API_URL.replace('/api', '')}${url}`;
+    return url;
+};
+
 
 interface Banner {
     id: string;
@@ -42,12 +52,14 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Optimized banners based on device
-    const [activeBanners, setActiveBanners] = useState<Banner[]>([]);
+    // Optimized banners based on device - Initialized with props for SSR/LCP
+    const [activeBanners, setActiveBanners] = useState<Banner[]>(banners && banners.length > 0 ? banners : []);
 
     useEffect(() => {
         if (!mounted) return;
 
+        // Simplified filtering: Show all active banners. 
+        // We only filter if a banner is explicitly marked as inactive (handled by backend usually).
         let filtered = banners && Array.isArray(banners) && banners.length > 0 ? banners : [{
             id: 'default',
             imageUrl: '/hero-jewellery.png',
@@ -56,29 +68,8 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
             link: '/shop'
         }];
 
-        // If on mobile, prioritize mobile banners if they exist
-        if (isMobile) {
-            const hasMobileSpecific = filtered.some(b => b.mobileImageUrl);
-            if (hasMobileSpecific) {
-                // If the user has uploaded specific mobile banners, let's show them.
-                // We show banners that have either a mobile image OR ONLY a desktop image (fallback)
-                // BUT we exclude banners that are clearly "Desktop-only" if there are mobile counterparts?
-                // Actually, let's just show banners that have a mobileImageUrl OR (has ONLY imageUrl but no other version)
-                // Simplest: only hide mobile-only banners on desktop, and desktop-only on mobile if mobile versions exist.
-                filtered = filtered.filter(b => b.mobileImageUrl || b.imageUrl);
-
-                // If there are specific mobile banners (M), the user likely wants to hide the desktop-only ones.
-                const mobileOnlyCount = filtered.filter(b => b.mobileImageUrl && !b.imageUrl).length;
-                if (mobileOnlyCount > 0) {
-                    // Hide banners that have NO mobileImageUrl but DO have an imageUrl
-                    filtered = filtered.filter(b => b.mobileImageUrl || !b.imageUrl);
-                }
-            }
-        } else {
-            // On Desktop, hide banners that are clearly "Mobile-only" (no imageUrl but has mobileImageUrl)
-            filtered = filtered.filter(b => b.imageUrl || !b.mobileImageUrl);
-        }
-
+        // Optional: If you wanted to ONLY show mobile-specific on mobile, you'd do it here.
+        // But for SBD, it's better to show the desktop one than nothing.
         setActiveBanners(filtered);
     }, [banners, isMobile, mounted]);
 
@@ -123,7 +114,9 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
 
     const hasAnyContent = !isPlaceholder(currentBanner?.title) || !isPlaceholder(heroText?.title) || !isPlaceholder(heroText?.subtitle);
 
-    if (!mounted || activeBanners.length === 0) {
+    // Removed the !mounted guard that was blocking SSR LCP
+    if (activeBanners.length === 0 && !mounted) {
+        // Fallback for truly empty state
         return <section className="relative h-[100dvh] bg-brand-navy" />;
     }
     return (
@@ -138,7 +131,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     {/* Desktop Image */}
                     <div className="hidden md:block absolute inset-0">
                         <Image
-                            src={banner.imageUrl || '/hero-jewellery.png'}
+                            src={normalizeImageUrl(banner.imageUrl, '/hero-jewellery.png')}
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}
@@ -152,7 +145,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     {/* Mobile Image */}
                     <div className="block md:hidden absolute inset-0">
                         <Image
-                            src={banner.mobileImageUrl || banner.imageUrl || '/hero-jewellery.png'}
+                            src={normalizeImageUrl(banner.mobileImageUrl || banner.imageUrl, '/hero-jewellery.png')}
                             alt={banner.title || "Royal Diamond Collection"}
                             fill
                             priority={index === 0}

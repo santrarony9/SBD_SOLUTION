@@ -63,6 +63,7 @@ export class CartCleanupService {
         if (cart.user.mobile) {
           await this.whatsappService.sendAbandonedCartReminder(
             cart.user.mobile,
+            cart.user.name || 'Valued Customer',
             product.images[0] || '',
             product.name,
             'COMEBACK5',

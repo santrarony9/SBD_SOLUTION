@@ -94,7 +94,8 @@ export class DashboardService {
     // Send WhatsApp
     return this.whatsappService.sendAbandonedCartReminder(
       cart.user.mobile,
-      cart.items[0].product.images[0],
+      cart.user.name || 'Valued Customer',
+      cart.items[0].product.images[0] || '',
       cart.items[0].product.name,
       'VIPNUDGE',
     );

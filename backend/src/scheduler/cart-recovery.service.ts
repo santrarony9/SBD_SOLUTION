@@ -46,6 +46,7 @@ export class CartRecoveryService {
         // WhatsApp Alert for Recovery
         await this.whatsappService.sendAbandonedCartReminder(
           cart.user.mobile,
+          cart.user.name || 'Valued Customer',
           cart.items[0]?.product.images[0] || '', // First product image
           productNames,
           'ROYAL10', // Standard recovery discount

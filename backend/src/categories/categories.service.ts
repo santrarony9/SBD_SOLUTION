@@ -6,28 +6,32 @@ export class CategoriesService {
   constructor(private prisma: PrismaService) {}
 
   async findAll() {
-    return this.prisma.category.findMany({
+    const categories = await this.prisma.category.findMany({
       orderBy: { order: 'asc' },
     });
+    return categories.map(c => this.normalizeUrls(c));
   }
 
   async findOne(id: string) {
-    return this.prisma.category.findUnique({
+    const category = await this.prisma.category.findUnique({
       where: { id },
     });
+    return this.normalizeUrls(category);
   }
 
   async create(data: any) {
-    return this.prisma.category.create({
+    const category = await this.prisma.category.create({
       data,
     });
+    return this.normalizeUrls(category);
   }
 
   async update(id: string, data: any) {
-    return this.prisma.category.update({
+    const category = await this.prisma.category.update({
       where: { id },
       data,
     });
+    return this.normalizeUrls(category);
   }
 
   async remove(id: string) {
@@ -45,5 +49,19 @@ export class CategoriesService {
       }),
     );
     return await this.prisma.$transaction(transaction);
+  }
+
+  private normalizeUrls(category: any) {
+    if (!category) return category;
+    const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
+    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+
+    if (category.image && category.image.startsWith('/uploads')) {
+      category.image = `${cleanBaseUrl}${category.image}`;
+    }
+    if (category.imageUrl && category.imageUrl.startsWith('/uploads')) {
+      category.imageUrl = `${cleanBaseUrl}${category.imageUrl}`;
+    }
+    return category;
   }
 }
