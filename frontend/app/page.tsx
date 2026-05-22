@@ -271,7 +271,10 @@ export default async function Home() {
       {/* 4. Category Discovery Carousels (Horizontal) */}
       {Array.isArray(categories) && categories.length > 0 && categories.map((cat: any) => {
         const catProducts = Array.isArray(allProducts)
-          ? allProducts.filter((p: any) => p.category === cat.slug || p.category?.slug === cat.slug)
+          ? allProducts.filter((p: any) => {
+              const pCat = (typeof p.category === 'string' ? p.category : p.category?.slug || '').toLowerCase();
+              return pCat === cat.slug?.toLowerCase() || pCat === cat.name?.toLowerCase();
+            })
           : [];
         if (catProducts.length === 0) return null;
         return (
