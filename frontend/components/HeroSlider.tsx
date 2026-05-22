@@ -58,8 +58,6 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
     useEffect(() => {
         if (!mounted) return;
 
-        // Simplified filtering: Show all active banners. 
-        // We only filter if a banner is explicitly marked as inactive (handled by backend usually).
         let filtered = banners && Array.isArray(banners) && banners.length > 0 ? banners : [{
             id: 'default',
             imageUrl: '/hero-jewellery.png',
@@ -68,8 +66,21 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
             link: '/shop'
         }];
 
-        // Optional: If you wanted to ONLY show mobile-specific on mobile, you'd do it here.
-        // But for SBD, it's better to show the desktop one than nothing.
+        // Filter based on screen size:
+        if (isMobile) {
+            // Keep banners that have a non-empty mobileImageUrl
+            let mobileBanners = filtered.filter(b => b.mobileImageUrl && b.mobileImageUrl.trim() !== "");
+            if (mobileBanners.length > 0) {
+                filtered = mobileBanners;
+            }
+        } else {
+            // Keep banners that have a non-empty imageUrl
+            let desktopBanners = filtered.filter(b => b.imageUrl && b.imageUrl.trim() !== "");
+            if (desktopBanners.length > 0) {
+                filtered = desktopBanners;
+            }
+        }
+
         setActiveBanners(filtered);
     }, [banners, isMobile, mounted]);
 
@@ -120,7 +131,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
         return <section className="relative h-[100dvh] bg-brand-navy" />;
     }
     return (
-        <section className="relative h-[100dvh] flex items-center justify-center overflow-hidden bg-brand-navy">
+        <section className="relative w-full aspect-[4/5] md:aspect-[16/9] max-h-[100dvh] flex items-center justify-center overflow-hidden bg-brand-navy">
             {/* Background Images Layer */}
             {activeBanners.map((banner, index) => (
                 <div
@@ -259,7 +270,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     </button>
 
                     {/* Dots */}
-                    <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
                         {activeBanners.map((_, idx) => (
                             <button
                                 key={idx}
@@ -271,20 +282,6 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     </div>
                 </>
             )}
-
-            {/* Scroll Indicator */}
-            <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center pointer-events-none">
-                <div className="animate-bounce-slow opacity-80 pointer-events-auto flex justify-center items-center">
-                    <button 
-                        onClick={() => window.scrollTo({ top: window.innerHeight, behavior: 'smooth' })}
-                        className="text-white/60 text-[10px] tracking-[0.4em] uppercase hover:text-brand-gold transition-colors py-2 px-4 shadow-sm"
-                        style={{ textIndent: '0.4em' }} // Push text right to compensate for trailing tracking space
-                        aria-label="Scroll down to explore"
-                    >
-                        Explore
-                    </button>
-                </div>
-            </div>
         </section>
     );
 }
