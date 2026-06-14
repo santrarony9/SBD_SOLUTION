@@ -31,7 +31,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                     {categories[0] && (
                         <Link href={`/shop?category=${categories[0].slug}`} className="group relative w-full md:w-[45%] h-1/3 md:h-full overflow-hidden block">
                             <Image
-                                src={normalizeImageUrl(categories[0].imageUrl || categories[0].image, 'https://images.unsplash.com/photo-1599643478514-4a5202334335?q=80&w=1000&auto=format&fit=crop')}
+                                src={normalizeImageUrl(categories[0].imageUrl || categories[0].image, 'https://res.cloudinary.com/dd2ajeyom/image/upload/v1778314696/products/aj3pvoiddpb6a2cj4em0.jpg')}
                                 alt={categories[0].name}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -88,7 +88,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                             {categories[3] && (
                                 <Link href={`/shop?category=${categories[3].slug}`} className="group relative w-[70%] h-full overflow-hidden block bg-gray-100">
                                     <Image
-                                        src={normalizeImageUrl(categories[3].imageUrl || categories[3].image, 'https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=800&auto=format&fit=crop')}
+                                        src={normalizeImageUrl(categories[3].imageUrl || categories[3].image, 'https://res.cloudinary.com/dd2ajeyom/image/upload/v1772102638/products/ftce81rs7vbc8sq2bvfg.jpg')}
                                         alt={categories[3].name}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105 object-center"
