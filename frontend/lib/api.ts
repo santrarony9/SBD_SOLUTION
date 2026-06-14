@@ -136,9 +136,13 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/p
 
     // Cloudinary Optimization Injection (Saves 80%+ bandwidth)
     if (url.includes('res.cloudinary.com')) {
-        // Only inject if it hasn't been optimized yet
         if (!url.includes('f_auto') && !url.includes('q_auto')) {
-            return url.replace('/upload/', '/upload/f_auto,q_auto/');
+            // Differentiate between video and image uploads
+            if (url.includes('/video/upload/')) {
+                return url.replace('/video/upload/', '/video/upload/q_auto/');
+            } else if (url.includes('/image/upload/')) {
+                return url.replace('/image/upload/', '/image/upload/f_auto,q_auto,c_limit,w_1080/');
+            }
         }
         return url;
     }
