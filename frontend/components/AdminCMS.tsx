@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { PiImage, PiTag, PiTextT, PiTrash, PiPlus, PiCheck, PiX, PiSparkle, PiLayout, PiCards, PiGlobe, PiDownloadSimple, PiVideoCamera } from "react-icons/pi";
-import { fetchAPI, API_URL } from '@/lib/api';
+import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
@@ -667,7 +667,7 @@ export default function AdminCMS() {
 
                                         ) : (
                                             <div className="relative group h-40 rounded-lg overflow-hidden border border-gray-200 bg-black">
-                                                <video src={newVideoReel.videoUrl} className="w-full h-full object-cover opacity-70" autoPlay loop muted playsInline />
+                                                <video src={normalizeImageUrl(newVideoReel.videoUrl)} className="w-full h-full object-cover opacity-70" autoPlay loop muted playsInline />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                     <button onClick={() => setNewVideoReel(prev => ({ ...prev, videoUrl: '' }))} title="Remove Video" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
                                                 </div>
@@ -726,7 +726,7 @@ export default function AdminCMS() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                 {videoReels.map((reel) => (
                                     <div key={reel.id} className="group relative aspect-[9/16] rounded-2xl overflow-hidden border border-gray-200 shadow-sm bg-black">
-                                        <video src={reel.videoUrl} className="w-full h-full object-cover transition-transform duration-700" loop muted playsInline onMouseOver={(e) => e.currentTarget.play()} onMouseOut={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }} />
+                                        <video src={normalizeImageUrl(reel.videoUrl)} className="w-full h-full object-cover transition-transform duration-700" loop muted playsInline onMouseOver={(e) => e.currentTarget.play()} onMouseOut={(e) => { e.currentTarget.pause(); e.currentTarget.currentTime = 0; }} />
                                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/50 to-transparent p-4 flex flex-col justify-end">
                                             <span className="text-brand-gold text-[10px] font-bold uppercase tracking-widest">{reel.tagline || 'REEL'}</span>
                                             <h4 className="text-white font-serif">{reel.title || 'Untitled'}</h4>
@@ -1024,7 +1024,7 @@ export default function AdminCMS() {
                                             </label>
                                         ) : (
                                             <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-                                                <img src={newCategory.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                <img src={normalizeImageUrl(newCategory.imageUrl)} alt="Preview" className="w-full h-full object-cover" />
                                                 <button
                                                     onClick={() => setNewCategory(prev => ({ ...prev, imageUrl: '' }))}
                                                     className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1070,7 +1070,7 @@ export default function AdminCMS() {
                                 {categories.map(cat => (
                                     <div key={cat.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
                                         <img
-                                            src={cat.imageUrl}
+                                            src={normalizeImageUrl(cat.imageUrl)}
                                             alt={cat.name}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                             onError={(e) => {
@@ -1386,9 +1386,9 @@ export default function AdminCMS() {
                                         ) : (
                                             <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
                                                 {newGalleryItem.imageUrl.match(/\.(mp4|webm)$/i) ? (
-                                                    <video src={newGalleryItem.imageUrl} className="w-full h-full object-cover" autoPlay muted loop />
+                                                    <video src={normalizeImageUrl(newGalleryItem.imageUrl)} className="w-full h-full object-cover" autoPlay muted loop />
                                                 ) : (
-                                                    <img src={newGalleryItem.imageUrl} alt="Preview" className="w-full h-full object-cover" />
+                                                    <img src={normalizeImageUrl(newGalleryItem.imageUrl)} alt="Preview" className="w-full h-full object-cover" />
                                                 )}
                                                 <button
                                                     onClick={() => setNewGalleryItem(prev => ({ ...prev, imageUrl: '' }))}
@@ -1448,9 +1448,9 @@ export default function AdminCMS() {
                                 {galleryItems.map(item => (
                                     <div key={item.id} className="group relative aspect-[3/4] rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
                                         {item.imageUrl?.match(/\.(mp4|webm)$/i) ? (
-                                            <video src={item.imageUrl} className="w-full h-full object-cover" muted loop onMouseOver={e => e.currentTarget.play()} onMouseOut={e => e.currentTarget.pause()} />
+                                            <video src={normalizeImageUrl(item.imageUrl)} className="w-full h-full object-cover" muted loop onMouseOver={e => e.currentTarget.play()} onMouseOut={e => e.currentTarget.pause()} />
                                         ) : (
-                                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                            <img src={normalizeImageUrl(item.imageUrl)} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         )}
                                         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                             <p className="text-white text-sm font-serif">{item.title}</p>
@@ -1558,7 +1558,7 @@ export default function AdminCMS() {
                                             </label>
                                         ) : (
                                             <div className="relative group w-full h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
-                                                <img src={newOffer.imageUrl} alt="Offer Preview" className="w-full h-full object-cover" />
+                                                <img src={normalizeImageUrl(newOffer.imageUrl)} alt="Offer Preview" className="w-full h-full object-cover" />
                                                 <button
                                                     onClick={() => setNewOffer(prev => ({ ...prev, imageUrl: '' }))}
                                                     className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -1585,7 +1585,7 @@ export default function AdminCMS() {
 
                                         {offer.imageUrl && (
                                             <div className="absolute inset-0 z-0">
-                                                <img src={offer.imageUrl} alt="" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
+                                                <img src={normalizeImageUrl(offer.imageUrl)} alt="" className="w-full h-full object-cover opacity-10 group-hover:opacity-20 transition-opacity" />
                                                 <div className="absolute inset-0 bg-gradient-to-r from-white via-white/80 to-transparent" />
                                             </div>
                                         )}
@@ -1684,7 +1684,7 @@ export default function AdminCMS() {
                                 {categories.map(cat => (
                                     <div key={cat.id} className="group flex items-center gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all">
                                         <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 bg-gray-50 border border-gray-50">
-                                            <img src={cat.imageUrl} alt={cat.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                            <img src={normalizeImageUrl(cat.imageUrl)} alt={cat.name} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <h4 className="font-serif text-brand-navy truncate leading-tight">{cat.name}</h4>
@@ -1761,7 +1761,7 @@ export default function AdminCMS() {
                                 {priceRanges.map(range => (
                                     <div key={range.id} className="group relative bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-6 hover:shadow-lg transition-all">
                                         <div className="w-20 h-20 rounded-2xl overflow-hidden bg-gray-50 flex-shrink-0">
-                                            <img src={range.imageUrl} alt={range.label} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                                            <img src={normalizeImageUrl(range.imageUrl)} alt={range.label} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                                         </div>
                                         <div className="flex-1">
                                             <h4 className="font-serif text-brand-navy text-lg leading-tight mb-1">{range.label}</h4>
@@ -1877,7 +1877,7 @@ export default function AdminCMS() {
                             <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
                                 {socialPosts.map(post => (
                                     <div key={post.id} className="group relative aspect-square rounded-2xl overflow-hidden border border-gray-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
-                                        <img src={post.imageUrl} alt={post.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                        <img src={normalizeImageUrl(post.imageUrl)} alt={post.caption} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                                         <div className="absolute inset-0 bg-gradient-to-t from-brand-navy/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                                             <p className="text-white text-[10px] font-bold mb-3 truncate">{post.caption}</p>
                                             <button onClick={() => handleDeleteSocialPost(post.id)} className="bg-white/10 backdrop-blur-md text-white p-2 rounded-full hover:bg-red-500 transition-colors border border-white/20 self-end">
@@ -2149,9 +2149,9 @@ export default function AdminCMS() {
                                                 ) : (
                                                     <div className="relative group w-full h-40 rounded-lg overflow-hidden border border-gray-200 shadow-inner bg-gray-50">
                                                         {card.image.match(/\.(mp4|webm)$/i) ? (
-                                                            <video src={card.image} className="w-full h-full object-cover" autoPlay muted loop playsInline />
+                                                            <video src={normalizeImageUrl(card.image)} className="w-full h-full object-cover" autoPlay muted loop playsInline />
                                                         ) : (
-                                                            <img src={card.image} alt={card.title} className="w-full h-full object-cover" />
+                                                            <img src={normalizeImageUrl(card.image)} alt={card.title} className="w-full h-full object-cover" />
                                                         )}
                                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
                                                             <a href={card.image} download target="_blank" rel="noreferrer" title="Download Image" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>

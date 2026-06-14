@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI, API_URL } from '@/lib/api';
+import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import { PiTrash, PiPencil, PiPlus, PiImage } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 
@@ -149,7 +149,7 @@ export default function AdminGallery() {
                 {items.map((item) => (
                     <div key={item.id} className="group relative bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
                         <div className="aspect-[3/4] overflow-hidden relative">
-                            <img src={item.imageUrl} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                            <img src={normalizeImageUrl(item.imageUrl)} alt={item.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                             <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                                 <button
                                     onClick={() => openModal(item)}
@@ -219,7 +219,7 @@ export default function AdminGallery() {
                                         </div>
                                     ) : formData.imageUrl ? (
                                         <div className="relative w-full h-full">
-                                            <img src={formData.imageUrl} className="w-full h-full object-contain" />
+                                            <img src={normalizeImageUrl(formData.imageUrl)} className="w-full h-full object-contain" />
                                             <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                                                 <button
                                                     type="button"

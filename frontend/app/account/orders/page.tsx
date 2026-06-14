@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 import { formatPrice } from '@/lib/utils';
@@ -161,7 +162,7 @@ export default function OrderHistoryPage() {
                                         <div className="w-16 h-20 bg-brand-cream relative overflow-hidden flex-shrink-0 border border-brand-charcoal/5">
                                             {item.product?.images?.[0] ? (
                                                 <Image
-                                                    src={item.product.images[0]}
+                                                    src={normalizeImageUrl(item.product.images[0])}
                                                     alt={item.name}
                                                     fill
                                                     className="object-cover transition-transform duration-700 group-hover/item:scale-110"

@@ -51,8 +51,8 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
                 'X-Client-Version': '1.0.3',
             };
 
-            // Only add no-cache headers if it's not a server-side cached request
-            if (!isServer || !hasRevalidate) {
+            // Only add no-cache headers for client-side (browser) requests
+            if (!isServer) {
                 headers['Cache-Control'] = 'no-cache';
                 headers['Pragma'] = 'no-cache';
             }
@@ -71,9 +71,9 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
                 headers,
             };
 
-            // If we have revalidate, we shouldn't force 'no-store'
+            // Instead of forcing no-store (which breaks static rendering), default to a reasonable 5-min cache if unspecified
             if (!hasRevalidate && isServer) {
-                fetchOptions.cache = 'no-store';
+                fetchOptions.next = { ...fetchOptions.next, revalidate: 300 };
             }
 
             const res = await fetch(fullUrl, fetchOptions);
@@ -129,3 +129,11 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
     return requestPromise;
 }
+
+// Reusable utility to normalize image paths (handles relative paths returned by the CMS)
+export const normalizeImageUrl = (url: string | undefined | null, fallback = '/placeholder.jpg'): string => {
+    if (!url) return fallback;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    if (url.startsWith('/uploads')) return `${API_URL.replace('/api', '')}${url}`;
+    return url;
+};

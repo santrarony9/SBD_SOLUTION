@@ -81,7 +81,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 
   try {
-    const data = await fetchAPI('/store/settings/seo');
+    const data = await fetchAPI('/store/settings/seo', { next: { revalidate: 3600 } });
     if (data && data.value) {
       const seo = typeof data.value === 'string' ? JSON.parse(data.value) : data.value;
       return {
@@ -155,7 +155,7 @@ export default async function RootLayout({
     social: { instagram: "#", facebook: "#", youtube: "#", pinterest: "#" }
   };
   try {
-    const res = await fetchAPI('/store/settings/footer_config');
+    const res = await fetchAPI('/store/settings/footer_config', { next: { revalidate: 3600 } });
     if (res?.value) {
       footerConfig = typeof res.value === 'string' ? JSON.parse(res.value) : res.value;
     }

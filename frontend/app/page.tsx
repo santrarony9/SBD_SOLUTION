@@ -2,7 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import ProductCard from '@/components/ProductCard';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import FlashSale from '@/components/FlashSale';
 import InstagramFeed from '@/components/InstagramFeed';
 import HeroSlider from '@/components/HeroSlider';
@@ -18,13 +18,13 @@ import InfluencerSpotlight from '@/components/InfluencerSpotlight';
 import VideoShowcase from '@/components/VideoShowcase';
 // Removed motion import to fix Server Component render error
 
-export const revalidate = 60; // Revalidate every minute
+export const revalidate = 900; // Revalidate every 15 minutes (cache purged on deploy)
 
 
 // Fetch Featured Products
 async function getFeaturedProducts() {
   try {
-    return await fetchAPI('/products', { next: { revalidate: 300 } });
+    return await fetchAPI('/products', { next: { revalidate: 1800 } });
   } catch (error) {
     console.error("Failed to fetch products", error);
     return [];
@@ -34,7 +34,7 @@ async function getFeaturedProducts() {
 // Fetch Offers
 async function getOffers() {
   try {
-    return await fetchAPI('/offers', { next: { revalidate: 300 } });
+    return await fetchAPI('/offers', { next: { revalidate: 1800 } });
   } catch (error) {
     console.error("Failed to fetch offers", error);
     return [];
@@ -43,7 +43,7 @@ async function getOffers() {
 
 async function getBanners() {
   try {
-    return await fetchAPI('/banners', { next: { revalidate: 300 } });
+    return await fetchAPI('/banners', { next: { revalidate: 1800 } });
   } catch (e) {
     return [];
   }
@@ -51,7 +51,7 @@ async function getBanners() {
 
 async function getVideoReels() {
   try {
-    return await fetchAPI('/video-showcase', { next: { revalidate: 300 } });
+    return await fetchAPI('/video-showcase', { next: { revalidate: 1800 } });
   } catch (e) {
     return [];
   }
@@ -59,7 +59,7 @@ async function getVideoReels() {
 
 async function getHeroText() {
   try {
-    const setting = await fetchAPI('/store/settings/homepage_hero_text', { next: { revalidate: 300 } });
+    const setting = await fetchAPI('/store/settings/homepage_hero_text', { next: { revalidate: 1800 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -75,7 +75,7 @@ async function getHeroText() {
 
 async function getFeaturedReviews() {
   try {
-    return await fetchAPI('/reviews/featured', { next: { revalidate: 300 } });
+    return await fetchAPI('/reviews/featured', { next: { revalidate: 1800 } });
   } catch (e) {
     return [];
   }
@@ -83,7 +83,7 @@ async function getFeaturedReviews() {
 
 async function getSpotlight() {
   try {
-    const res = await fetchAPI('/store/settings/spotlight', { next: { revalidate: 300 } });
+    const res = await fetchAPI('/store/settings/spotlight', { next: { revalidate: 1800 } });
     return res;
   } catch (e) {
     return null;
@@ -92,25 +92,25 @@ async function getSpotlight() {
 
 async function getCategories() {
   try {
-    return await fetchAPI('/categories', { next: { revalidate: 300 } });
+    return await fetchAPI('/categories', { next: { revalidate: 1800 } });
   } catch (e) { return []; }
 }
 
 async function getPriceRanges() {
   try {
-    return await fetchAPI('/marketing/price-ranges', { next: { revalidate: 300 } });
+    return await fetchAPI('/marketing/price-ranges', { next: { revalidate: 1800 } });
   } catch (e) { return []; }
 }
 
 async function getTags() {
   try {
-    return await fetchAPI('/marketing/tags', { next: { revalidate: 300 } });
+    return await fetchAPI('/marketing/tags', { next: { revalidate: 1800 } });
   } catch (e) { return []; }
 }
 
 async function getPromiseCards() {
   try {
-    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards', { next: { revalidate: 300 } });
+    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards', { next: { revalidate: 1800 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -126,7 +126,7 @@ async function getPromiseCards() {
 
 async function getRoyalStandard() {
   try {
-    const setting = await fetchAPI('/store/settings/home_royal_standard', { next: { revalidate: 300 } });
+    const setting = await fetchAPI('/store/settings/home_royal_standard', { next: { revalidate: 1800 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -136,7 +136,7 @@ async function getRoyalStandard() {
 
 async function getBrandStory() {
   try {
-    const setting = await fetchAPI('/store/settings/home_brand_story', { next: { revalidate: 300 } });
+    const setting = await fetchAPI('/store/settings/home_brand_story', { next: { revalidate: 1800 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -146,7 +146,7 @@ async function getBrandStory() {
 
 async function getAuraConfig() {
   try {
-    const setting = await fetchAPI('/store/settings/aura_collection_config', { next: { revalidate: 300 } });
+    const setting = await fetchAPI('/store/settings/aura_collection_config', { next: { revalidate: 1800 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -384,14 +384,14 @@ export default async function Home() {
           <div className="absolute inset-0 z-0">
             {auraConfig.bannerUrl && (
               <img 
-                src={auraConfig.bannerUrl} 
+                src={normalizeImageUrl(auraConfig.bannerUrl)} 
                 alt="Aura Desktop Banner" 
                 className="hidden md:block w-full h-full object-cover opacity-20"
               />
             )}
             {auraConfig.mobileBannerUrl && (
               <img 
-                src={auraConfig.mobileBannerUrl} 
+                src={normalizeImageUrl(auraConfig.mobileBannerUrl)} 
                 alt="Aura Mobile Banner" 
                 className="md:hidden w-full h-full object-cover opacity-30"
               />
@@ -445,7 +445,7 @@ export default async function Home() {
                   {offer.imageUrl ? (
                     <div className="absolute inset-0 z-0">
                       <Image
-                        src={offer.imageUrl}
+                        src={normalizeImageUrl(offer.imageUrl)}
                         alt={offer.title}
                         fill
                         className="object-cover opacity-30 group-hover:opacity-50 transition-all duration-700 grayscale group-hover:grayscale-0"

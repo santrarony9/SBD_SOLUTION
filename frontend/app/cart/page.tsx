@@ -2,6 +2,7 @@
 
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/utils';
+import { normalizeImageUrl } from '@/lib/api';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -64,7 +65,7 @@ export default function CartPage() {
                                     <div className="w-24 h-32 relative overflow-hidden bg-brand-cream/20 flex-shrink-0">
                                         {item.product.images[0] ? (
                                             <Image
-                                                src={item.product.images[0]}
+                                                src={normalizeImageUrl(item.product.images[0])}
                                                 alt={item.product.name}
                                                 fill
                                                 className="object-cover transition-transform duration-700 group-hover:scale-110"

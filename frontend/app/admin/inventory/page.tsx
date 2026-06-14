@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import { PiPackage, PiVault, PiGraph, PiWarning, PiPlus, PiArrowsLeftRight, PiPencilSimple } from 'react-icons/pi';
 import AdminAddProduct from '@/components/AdminAddProduct';
 import { formatPrice } from '@/lib/utils';
@@ -128,7 +128,7 @@ export default function InventoryDashboard() {
                                     <td className="px-6 py-4">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded bg-gray-100 overflow-hidden relative border border-gray-200">
-                                                <img src={product.images?.[0] || product.coverImage || '/placeholder.png'} className="object-cover w-full h-full" alt="" />
+                                                <img src={normalizeImageUrl(product.images?.[0] || product.coverImage || '/placeholder.png')} className="object-cover w-full h-full" alt="" />
                                             </div>
                                             <div>
                                                 <div className="font-bold text-brand-navy">{product.name}</div>

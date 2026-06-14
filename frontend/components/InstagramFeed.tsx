@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { PiInstagramLogo } from "react-icons/pi";
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import SkeletonLoader from './SkeletonLoader';
 
 interface SocialPost {
@@ -81,7 +81,7 @@ export default function InstagramFeed() {
                             style={{ animationDelay: `${i * 100}ms` }}
                         >
                             <Image
-                                src={post.imageUrl}
+                                src={normalizeImageUrl(post.imageUrl)}
                                 alt={post.caption || 'Instagram Post'}
                                 fill
                                 className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"

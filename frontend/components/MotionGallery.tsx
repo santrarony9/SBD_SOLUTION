@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import Link from 'next/link';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import SmartPlaceholder from './SmartPlaceholder';
 
 export default function MotionGallery() {
@@ -133,7 +133,7 @@ export default function MotionGallery() {
                             >
                                 <div className="relative w-full h-full group">
                                     <img
-                                        src={item.imageUrl}
+                                        src={normalizeImageUrl(item.imageUrl)}
                                         alt={item.title}
                                         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />

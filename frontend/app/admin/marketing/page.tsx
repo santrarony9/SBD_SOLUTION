@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
 import { useToast } from '@/context/ToastContext';
 
@@ -275,7 +275,7 @@ export default function MarketingDashboard() {
                             {promiseCards.map((card, idx) => (
                                 <div key={idx} className="border p-4 rounded bg-gray-50 flex flex-col gap-3">
                                     <div className="w-full h-32 bg-gray-200 rounded overflow-hidden relative border">
-                                        <img src={card.image} className="object-contain w-full h-full" alt={`Promise Card ${idx + 1}`} />
+                                        <img src={normalizeImageUrl(card.image)} className="object-contain w-full h-full" alt={`Promise Card ${idx + 1}`} />
                                     </div>
                                     <div>
                                         <label className="block text-[10px] uppercase font-bold text-gray-400 mb-1">Title</label>

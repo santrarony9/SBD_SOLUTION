@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI, API_URL } from '@/lib/api';
+import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import { useToast } from '@/context/ToastContext';
-import { PiDownloadSimple } from 'react-icons/pi';
+import { PiDownloadSimple, PiUploadSimple, PiX } from 'react-icons/pi';
 
 // const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api'; // Removed local definition
 
@@ -353,6 +353,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                             <option value="Rings">Rings</option>
                                             <option value="Necklaces">Necklaces</option>
                                             <option value="Earrings">Earrings</option>
+                                            <option value="Bracelets">Bracelets</option>
                                             <option value="Bangles">Bangles</option>
                                             <option value="Pendants">Pendants</option>
                                             <option value="Nosepin">Nosepin</option>
@@ -469,7 +470,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                         <div key={index} className="aspect-square relative group bg-white border border-gray-100 p-1 rounded-lg shadow-sm transition-all hover:shadow-md">
                                             {tempImages[index] ? (
                                                 <div className="relative w-full h-full overflow-hidden rounded">
-                                                    <img src={tempImages[index]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
+                                                    <img src={normalizeImageUrl(tempImages[index])} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                                                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                                         <button 
                                                             type="button" 
@@ -509,7 +510,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
                                     <div className="aspect-square relative group bg-brand-gold/5 border border-brand-gold/20 p-1 rounded-lg flex flex-col items-center justify-center text-center transition-all hover:shadow-md">
                                         {formData.coverImage ? (
                                             <div className="relative w-full h-full overflow-hidden rounded">
-                                                <img src={formData.coverImage} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
+                                                <img src={normalizeImageUrl(formData.coverImage)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt="" />
                                                 <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                                     <button 
                                                         type="button" 

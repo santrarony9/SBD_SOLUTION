@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from "@/context/CartContext";
 import ProductReviews from "@/components/ProductReviews";
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import TrustBadges from '@/components/TrustBadges';
 import DropHintModal from '@/components/DropHintModal';
 import ConciergeModal from '@/components/ConciergeModal';
@@ -14,12 +14,12 @@ import { PiShoppingBag } from 'react-icons/pi';
 import { useToast } from '@/context/ToastContext';
 import { useCurrency } from '@/context/CurrencyContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, PiHeart } from 'react-icons/pi';
+import { PiCaretRight, PiArrowRight, PiPhoneCall, PiCalendarCheck, PiSealCheck, PiHeart, PiShareNetwork, PiCertificate, PiTruck, PiShieldCheck, PiCaretDown, PiCaretUp, PiChatCircleText, PiInfo } from 'react-icons/pi';
 import JsonLd from "@/components/JsonLd";
 import RecentlyViewed from "@/components/RecentlyViewed";
 import SimilarPriceRange from "@/components/SimilarPriceRange";
 import { useFestive } from '@/context/FestiveContext';
-import { API_URL } from '@/lib/api';
+
 
 
 interface Product {
@@ -316,7 +316,7 @@ export default function ProductDetailPage() {
                                     className="w-full h-full bg-gray-900 relative"
                                 >
                                     <video
-                                        src={product.videoUrl}
+                                        src={normalizeImageUrl(product.videoUrl)}
                                         className="w-full h-full object-contain"
                                         controls
                                         autoPlay

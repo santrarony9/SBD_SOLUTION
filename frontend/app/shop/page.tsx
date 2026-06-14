@@ -1,7 +1,5 @@
 'use client';
 
-export const dynamic = 'force-dynamic';
-
 import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { fetchAPI } from '@/lib/api';
@@ -218,7 +216,7 @@ function ShopContent() {
             {/* Mobile Category Filter Grid (Visible only on mobile/tablet) */}
             <div className="md:hidden mb-6 px-4">
                 <div className="flex flex-wrap gap-2 justify-center max-w-lg mx-auto">
-                    {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
+                    {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Nosepin'].map(cat => (
                         <button
                             key={cat}
                             onClick={() => toggleCategory(cat)}
@@ -247,7 +245,7 @@ function ShopContent() {
                                 Category
                             </h3>
                             <ul className="space-y-4">
-                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
+                                {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Nosepin'].map(cat => (
                                     <li key={cat}>
                                         <label className="group flex items-center cursor-pointer" onClick={() => toggleCategory(cat)}>
                                             <div className={`w-4 h-4 border transition-all duration-300 mr-3 flex items-center justify-center ${selectedCategories.includes(cat.toLowerCase()) ? 'bg-brand-navy border-brand-navy' : 'border-gray-300 group-hover:border-brand-gold'}`}>
@@ -420,7 +418,7 @@ function ShopContent() {
                                 <div>
                                     <h4 className="text-[10px] uppercase tracking-[0.2em] font-black text-brand-gold mb-6 border-b border-brand-gold/10 pb-2">Category</h4>
                                     <div className="grid grid-cols-2 gap-3">
-                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Pendants', 'Nosepin'].map(cat => (
+                                        {['Rings', 'Earrings', 'Necklaces', 'Bracelets', 'Bangles', 'Pendants', 'Nosepin'].map(cat => (
                                             <button
                                                 key={cat}
                                                 onClick={() => toggleCategory(cat)}

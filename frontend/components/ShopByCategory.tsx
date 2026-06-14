@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { normalizeImageUrl } from '@/lib/api';
 
 interface Category {
     id: string;
@@ -30,7 +31,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                     {categories[0] && (
                         <Link href={`/shop?category=${categories[0].slug}`} className="group relative w-full md:w-[45%] h-1/3 md:h-full overflow-hidden block">
                             <Image
-                                src={categories[0].imageUrl || categories[0].image || 'https://images.unsplash.com/photo-1599643478514-4a5202334335?q=80&w=1000&auto=format&fit=crop'}
+                                src={normalizeImageUrl(categories[0].imageUrl || categories[0].image, 'https://images.unsplash.com/photo-1599643478514-4a5202334335?q=80&w=1000&auto=format&fit=crop')}
                                 alt={categories[0].name}
                                 fill
                                 className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -52,7 +53,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                             {categories[1] && (
                                 <Link href={`/shop?category=${categories[1].slug}`} className="group relative w-1/2 h-full overflow-hidden block bg-gray-100">
                                     <Image
-                                        src={categories[1].imageUrl || categories[1].image || 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=800&auto=format&fit=crop'}
+                                        src={normalizeImageUrl(categories[1].imageUrl || categories[1].image, 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?q=80&w=800&auto=format&fit=crop')}
                                         alt={categories[1].name}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -68,7 +69,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                             {categories[2] && (
                                 <Link href={`/shop?category=${categories[2].slug}`} className="group relative w-1/2 h-full overflow-hidden block bg-gray-100">
                                     <Image
-                                        src={categories[2].imageUrl || categories[2].image || 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop'}
+                                        src={normalizeImageUrl(categories[2].imageUrl || categories[2].image, 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?q=80&w=800&auto=format&fit=crop')}
                                         alt={categories[2].name}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
@@ -87,7 +88,7 @@ export default function ShopByCategory({ categories }: ShopByCategoryProps) {
                             {categories[3] && (
                                 <Link href={`/shop?category=${categories[3].slug}`} className="group relative w-[70%] h-full overflow-hidden block bg-gray-100">
                                     <Image
-                                        src={categories[3].imageUrl || categories[3].image || 'https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=800&auto=format&fit=crop'}
+                                        src={normalizeImageUrl(categories[3].imageUrl || categories[3].image, 'https://images.unsplash.com/photo-1605100804763-247f67b2548e?q=80&w=800&auto=format&fit=crop')}
                                         alt={categories[3].name}
                                         fill
                                         className="object-cover transition-transform duration-700 group-hover:scale-105 object-center"

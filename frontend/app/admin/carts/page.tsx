@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { fetchAPI } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 import Image from 'next/image';
 import { useToast } from '@/context/ToastContext';
 
@@ -99,7 +99,7 @@ export default function LiveCartsPage() {
                             {cart.items.map((item: any, i: number) => (
                                 <div key={i} className="w-12 h-12 rounded-full border-2 border-slate-800 bg-slate-700 overflow-hidden relative">
                                     {item.product.images[0] && (
-                                        <Image src={item.product.images[0]} alt="Product" fill className="object-cover" />
+                                        <Image src={normalizeImageUrl(item.product.images[0])} alt="Product" fill className="object-cover" />
                                     )}
                                 </div>
                             ))}

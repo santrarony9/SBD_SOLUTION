@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { fetchAPI, API_URL } from '@/lib/api';
+import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import { PiUploadSimple, PiX } from 'react-icons/pi';
 
 interface ProductFormProps {
@@ -138,7 +138,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
                         </div>
                     ) : (
                         <div className="relative w-full aspect-square md:aspect-video bg-gray-50 rounded-lg overflow-hidden border border-brand-gold/20 group">
-                            <img src={formData.coverImage} alt="Cover Preview" className="w-full h-full object-contain" />
+                            <img src={normalizeImageUrl(formData.coverImage)} alt="Cover Preview" className="w-full h-full object-contain" />
                             <button
                                 type="button"
                                 onClick={() => setFormData(prev => ({ ...prev, coverImage: '' }))}

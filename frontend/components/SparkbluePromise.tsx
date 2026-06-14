@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { PiHammer, PiDiamond, PiCurrencyInr } from "react-icons/pi";
 import { motion, Variants } from 'framer-motion';
+import { normalizeImageUrl } from '@/lib/api';
 
 export interface PromiseCard {
     title: string;
@@ -160,7 +161,7 @@ export default function SparkbluePromise({ cards }: SparkbluePromiseProps) {
                                 <div className="absolute top-[-15%] w-[95%] left-[2.5%] bottom-[calc(0.5rem_+_40px)] sm:bottom-[calc(0.5rem_+_48px)] z-10 flex justify-center items-end pointer-events-none group-hover:pointer-events-auto">
                                     <motion.div whileHover={{ scale: 1.05 }} transition={{ duration: 0.6, ease: "easeOut" }} className="w-full h-full relative origin-bottom">
                                         <Image
-                                            src={card.image}
+                                            src={normalizeImageUrl(card.image)}
                                             alt={card.title}
                                             fill
                                             className="object-contain object-bottom"
