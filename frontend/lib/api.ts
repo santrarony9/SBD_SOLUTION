@@ -144,6 +144,12 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/d
         return finalFallback;
     }
 
+    // Backend API prepends its own domain to /uploads/ paths, but the images
+    // are hosted on the frontend (Vercel). Rewrite to local paths.
+    if (url.includes('api.sparkbluediamond.com/uploads/')) {
+        return url.replace(/https?:\/\/api\.sparkbluediamond\.com/, '');
+    }
+
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
     if (url.startsWith('/uploads')) return url; // Let Vercel serve it directly from public/uploads
     return url;

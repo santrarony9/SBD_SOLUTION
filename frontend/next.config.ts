@@ -17,7 +17,7 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   images: {
     unoptimized: false,
-    minimumCacheTTL: 31536000, // Cache on VPS for 1 year to save Cloudinary bandwidth
+    minimumCacheTTL: 3600, // Cache images for 1 hour
     remotePatterns: [
       {
         protocol: 'https',
