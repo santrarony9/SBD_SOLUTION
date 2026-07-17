@@ -32,9 +32,6 @@ export async function generateMetadata(): Promise<Metadata> {
     keywords: ["luxury jewellery", "diamond rings", "gold necklaces", "certified diamonds", "custom jewellery India"],
     manifest: '/manifest.webmanifest',
     metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://sparkbluediamond.com'),
-    alternates: {
-      canonical: '/',
-    },
     openGraph: {
       title: 'Spark Blue Diamond | Premium Certified Diamonds & Gold Jewellery',
       description: 'Discover timeless elegance with IGI certified diamonds and BIS hallmarked gold.',

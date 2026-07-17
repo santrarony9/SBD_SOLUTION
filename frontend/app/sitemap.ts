@@ -31,9 +31,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     })) : [];
 
-    // Dynamic Products (Limit to 100 for sitemap performance)
+    // Dynamic Products
     const products = await fetchAPI('/products', { next: { revalidate: 43200 } });
-    const productRoutes = Array.isArray(products) ? products.slice(0, 100).map((prod: any) => ({
+    const productRoutes = Array.isArray(products) ? products.map((prod: any) => ({
       url: `${baseUrl}/product/${prod.slug || prod.id}`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
