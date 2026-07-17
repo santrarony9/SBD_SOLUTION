@@ -1,0 +1,79 @@
+[
+  {
+    "id": "6a243bb2a9915313d91151f4",
+    "name": "Rings",
+    "slug": "rings",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 1,
+    "createdAt": "2026-06-06T15:24:34.322Z",
+    "updatedAt": "2026-06-06T15:24:34.322Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151f5",
+    "name": "Necklaces",
+    "slug": "necklaces",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 2,
+    "createdAt": "2026-06-06T15:24:34.422Z",
+    "updatedAt": "2026-06-06T15:24:34.422Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151f6",
+    "name": "Earrings",
+    "slug": "earrings",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 3,
+    "createdAt": "2026-06-06T15:24:34.510Z",
+    "updatedAt": "2026-06-06T15:24:34.510Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151f7",
+    "name": "Bracelets",
+    "slug": "bracelets",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 4,
+    "createdAt": "2026-06-06T15:24:34.599Z",
+    "updatedAt": "2026-06-06T15:24:34.599Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151f8",
+    "name": "Bangles",
+    "slug": "bangles",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 5,
+    "createdAt": "2026-06-06T15:24:34.697Z",
+    "updatedAt": "2026-06-06T15:24:34.697Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151f9",
+    "name": "Pendants",
+    "slug": "pendants",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 6,
+    "createdAt": "2026-06-06T15:24:34.782Z",
+    "updatedAt": "2026-06-06T15:24:34.782Z"
+  },
+  {
+    "id": "6a243bb2a9915313d91151fa",
+    "name": "Nosepin",
+    "slug": "nosepin",
+    "imageUrl": null,
+    "description": null,
+    "isActive": true,
+    "order": 7,
+    "createdAt": "2026-06-06T15:24:34.871Z",
+    "updatedAt": "2026-06-06T15:24:34.871Z"
+  }
+]

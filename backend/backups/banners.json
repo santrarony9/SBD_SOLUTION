@@ -1,0 +1,123 @@
+[
+  {
+    "id": "69a01ecbfb56ebaf372650ea",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1772101317/products/mcrrws2icosyg2ayekkr.png",
+    "link": "",
+    "title": "Vday_offerM",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-02-26T10:22:03.191Z",
+    "updatedAt": "2026-02-26T10:22:03.191Z"
+  },
+  {
+    "id": "69a01edffb56ebaf372650eb",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1772101337/products/xbyyptk2yd9wmdhvyxxb.png",
+    "link": "",
+    "title": "Divyaara_bannerM",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-02-26T10:22:23.670Z",
+    "updatedAt": "2026-02-26T10:22:23.670Z"
+  },
+  {
+    "id": "69d102b145f8f0efa097ef04",
+    "imageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1775305388/products/lbdf0e8w69hiv8stuzyk.png",
+    "mobileImageUrl": "",
+    "link": "",
+    "title": "banner_divyara (2)",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-04-04T12:23:13.385Z",
+    "updatedAt": "2026-04-04T12:23:13.385Z"
+  },
+  {
+    "id": "69f396893e57616dd95f6080",
+    "imageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1777571450/products/kuha7n7pfm0jzd4ukrt1.png",
+    "mobileImageUrl": "",
+    "link": "",
+    "title": "Diva_banner",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-04-30T17:51:05.929Z",
+    "updatedAt": "2026-04-30T17:51:05.929Z"
+  },
+  {
+    "id": "6a0ddb68fbee0878e94b67b7",
+    "imageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293003/products/mjxn9p8spzjgtz7z6a3h.png",
+    "mobileImageUrl": "",
+    "link": "",
+    "title": "Natural_diamond_banner_dsk",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:03:52.435Z",
+    "updatedAt": "2026-05-20T16:03:52.435Z"
+  },
+  {
+    "id": "6a0ddb7bfbee0878e94b67b8",
+    "imageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293043/products/blzyc91cfzxupewok1zo.png",
+    "mobileImageUrl": "",
+    "link": "",
+    "title": "new_offer_hero_dsk",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:04:11.926Z",
+    "updatedAt": "2026-05-20T16:04:11.926Z"
+  },
+  {
+    "id": "6a0ddb94fbee0878e94b67b9",
+    "imageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293064/products/fxcwq59t59exwk9kvtdw.png",
+    "mobileImageUrl": "",
+    "link": "",
+    "title": "9k_goldcollection_dsk",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:04:36.596Z",
+    "updatedAt": "2026-05-20T16:04:36.596Z"
+  },
+  {
+    "id": "6a0ddbe6fbee0878e94b67ba",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293134/products/fndhfaz7n6hzdyrvyoyz.png",
+    "link": "",
+    "title": "Naturaldiamnond_mbl",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:05:58.232Z",
+    "updatedAt": "2026-05-20T16:05:58.232Z"
+  },
+  {
+    "id": "6a0ddbf5fbee0878e94b67bb",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293166/products/hjpo6faezdtowbu0htwv.png",
+    "link": "",
+    "title": "offer_banner_mbl",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:06:13.554Z",
+    "updatedAt": "2026-05-20T16:06:13.554Z"
+  },
+  {
+    "id": "6a0ddc08fbee0878e94b67bc",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293184/products/avkdrqhwr9e2afiqionp.png",
+    "link": "",
+    "title": "diva_hero_mbl",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:06:32.868Z",
+    "updatedAt": "2026-05-20T16:06:32.868Z"
+  },
+  {
+    "id": "6a0ddc19fbee0878e94b67bd",
+    "imageUrl": "",
+    "mobileImageUrl": "https://res.cloudinary.com/dd2ajeyom/image/upload/v1779293203/products/u2clvjtqzhz8ye9lauog.png",
+    "link": "",
+    "title": "9k_mbl_banner",
+    "isActive": true,
+    "order": 0,
+    "createdAt": "2026-05-20T16:06:49.522Z",
+    "updatedAt": "2026-05-20T16:06:49.522Z"
+  }
+]
