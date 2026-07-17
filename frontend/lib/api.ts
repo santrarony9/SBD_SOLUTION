@@ -145,6 +145,6 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/d
     }
 
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('/uploads')) return `${API_URL.replace('/api', '')}${url}`;
+    if (url.startsWith('/uploads')) return url; // Let Vercel serve it directly from public/uploads
     return url;
 };
