@@ -109,6 +109,7 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                     {videos.map((video, index) => {
                         const host = API_URL.replace('/api', '');
                         const fullVideoUrl = video.videoUrl.startsWith('http') ? video.videoUrl : `${host}${video.videoUrl}`;
+                        const isCloudinary = video.videoUrl && video.videoUrl.includes('res.cloudinary.com');
 
                         const CardContent = (
                             <motion.div
@@ -118,15 +119,23 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                                 transition={{ delay: index * 0.1, duration: 0.5 }}
                                 className="relative w-[85vw] md:w-[350px] aspect-[9/16] flex-shrink-0 snap-center rounded-[2rem] overflow-hidden group shadow-xl"
                             >
-                                <video
-                                    src={fullVideoUrl}
-                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                                    autoPlay
-                                    muted
-                                    loop
-                                    playsInline
-                                    crossOrigin="anonymous"
-                                />
+                                {isCloudinary ? (
+                                    <img
+                                        src="/placeholder.jpg"
+                                        alt="Placeholder"
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <video
+                                        src={fullVideoUrl}
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                        autoPlay
+                                        muted
+                                        loop
+                                        playsInline
+                                        crossOrigin="anonymous"
+                                    />
+                                )}
                                 
                                 {/* Gradient Overlay */}
                                 <div className="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-black/80 via-black/30 to-transparent pointer-events-none" />

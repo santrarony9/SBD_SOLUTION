@@ -132,19 +132,16 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 
 // Reusable utility to normalize image paths (handles relative paths returned by the CMS)
 export const normalizeImageUrl = (url: string | undefined | null, fallback = '/placeholder.jpg'): string => {
-    if (!url) return fallback;
+    let finalFallback = fallback;
+    if (finalFallback && finalFallback.includes('res.cloudinary.com')) {
+        finalFallback = '/placeholder.jpg';
+    }
 
-    // Cloudinary Optimization Injection (Saves 80%+ bandwidth)
+    if (!url) return finalFallback;
+
+    // Cloudinary is deactivated, fallback to local placeholder for legacy images
     if (url.includes('res.cloudinary.com')) {
-        if (!url.includes('f_auto') && !url.includes('q_auto')) {
-            // Differentiate between video and image uploads
-            if (url.includes('/video/upload/')) {
-                return url.replace('/video/upload/', '/video/upload/q_auto/');
-            } else if (url.includes('/image/upload/')) {
-                return url.replace('/image/upload/', '/image/upload/f_auto,q_auto,c_limit,w_1080/');
-            }
-        }
-        return url;
+        return finalFallback;
     }
 
     if (url.startsWith('http://') || url.startsWith('https://')) return url;

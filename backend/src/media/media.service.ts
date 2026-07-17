@@ -1,71 +1,57 @@
 import { Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryResponse } from './cloudinary-response';
-import * as streamifier from 'streamifier';
+import * as fs from 'fs/promises';
+import * as path from 'path';
 
 @Injectable()
 export class MediaService {
-  uploadFile(
+  async uploadFile(
     file: Express.Multer.File,
     folder: string = 'products',
   ): Promise<CloudinaryResponse> {
-    return new Promise<CloudinaryResponse>((resolve, reject) => {
-      if (
-        !process.env.CLOUDINARY_CLOUD_NAME ||
-        !process.env.CLOUDINARY_API_KEY ||
-        !process.env.CLOUDINARY_API_SECRET
-      ) {
-        return reject(
-          new Error(
-            'MISSING_CLOUDINARY_KEYS: Check Backend Environment Variables!',
-          ),
-        );
-      }
+    if (!file || !file.buffer) {
+      throw new Error('Invalid file provided to uploadFile');
+    }
 
-      if (!file || !file.buffer) {
-        return reject(new Error('Invalid file provided to uploadFile'));
-      }
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const ext = path.extname(file.originalname) || '.jpg';
+    const filename = `${file.fieldname || 'file'}-${uniqueSuffix}${ext}`;
+    
+    // Use process.cwd() to resolve path from backend root, keeping it in /uploads/
+    const uploadDir = path.join(process.cwd(), 'uploads', folder);
+    
+    // Ensure directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    const filePath = path.join(uploadDir, filename);
+    await fs.writeFile(filePath, file.buffer);
 
-      try {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            folder: folder,
-            resource_type: 'auto', // Important for videos/pdfs
-          },
-          (error, result) => {
-            if (error) {
-              console.error('Cloudinary Upload Error:', error);
-              return reject(error);
-            }
-            resolve(result);
-          },
-        );
-
-        streamifier.createReadStream(file.buffer).pipe(uploadStream);
-      } catch (err) {
-        console.error('Stream/Config Error:', err);
-        reject(err);
-      }
-    });
+    return {
+      secure_url: `/uploads/${folder}/${filename}`,
+      public_id: filename,
+      resource_type: 'auto',
+    };
   }
 
-  uploadBuffer(
+  async uploadBuffer(
     buffer: Buffer,
     folder: string = 'invoices',
   ): Promise<CloudinaryResponse> {
-    return new Promise<CloudinaryResponse>((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: folder,
-          resource_type: 'auto',
-        },
-        (error, result) => {
-          if (error) return reject(error);
-          resolve(result);
-        },
-      );
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const filename = `document-${uniqueSuffix}.pdf`;
 
-      streamifier.createReadStream(buffer).pipe(uploadStream);
-    });
+    const uploadDir = path.join(process.cwd(), 'uploads', folder);
+    
+    // Ensure directory exists
+    await fs.mkdir(uploadDir, { recursive: true });
+    
+    const filePath = path.join(uploadDir, filename);
+    await fs.writeFile(filePath, buffer);
+
+    return {
+      secure_url: `/uploads/${folder}/${filename}`,
+      public_id: filename,
+      resource_type: 'auto',
+    };
   }
 }

@@ -6,15 +6,7 @@ import Link from 'next/link';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import { motion } from 'framer-motion';
 import { useFestive } from '@/context/FestiveContext';
-import { API_URL } from '@/lib/api';
-
-// Helper: normalize image URLs (handles both relative /uploads paths and already-absolute URLs)
-const normalizeImageUrl = (url: string | undefined, fallback: string): string => {
-    if (!url) return fallback;
-    if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('/uploads')) return `${API_URL.replace('/api', '')}${url}`;
-    return url;
-};
+import { API_URL, normalizeImageUrl } from '@/lib/api';
 
 
 interface Banner {
