@@ -121,7 +121,7 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                             >
                                 {isCloudinary ? (
                                     <img
-                                        src="/placeholder.jpg"
+                                        src="/default-jewel.jpg"
                                         alt="Placeholder"
                                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />

@@ -39,8 +39,8 @@ export default function ProductCard({ product }: { product: ProductProps }) {
     let rawDisplayImage = product.image || (product.images && product.images[0]) || null;
     let rawHoverImage = product.coverImage || (product.images && product.images[1]) || null;
 
-    let displayImage = normalizeImageUrl(rawDisplayImage, '/placeholder.jpg');
-    let hoverImage = rawHoverImage ? normalizeImageUrl(rawHoverImage, '/placeholder.jpg') : null;
+    let displayImage = normalizeImageUrl(rawDisplayImage, '/default-jewel.jpg');
+    let hoverImage = rawHoverImage ? normalizeImageUrl(rawHoverImage, '/default-jewel.jpg') : null;
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();

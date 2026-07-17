@@ -131,10 +131,10 @@ export async function fetchAPI(endpoint: string, options: RequestInit = {}) {
 }
 
 // Reusable utility to normalize image paths (handles relative paths returned by the CMS)
-export const normalizeImageUrl = (url: string | undefined | null, fallback = '/placeholder.jpg'): string => {
+export const normalizeImageUrl = (url: string | undefined | null, fallback = '/default-jewel.jpg'): string => {
     let finalFallback = fallback;
     if (finalFallback && finalFallback.includes('res.cloudinary.com')) {
-        finalFallback = '/placeholder.jpg';
+        finalFallback = '/default-jewel.jpg';
     }
 
     if (!url) return finalFallback;
