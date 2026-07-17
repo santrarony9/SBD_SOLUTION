@@ -145,18 +145,20 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/d
         return finalFallback;
     }
 
-    // Backend API prepends its own domain to /uploads/ paths, but the images
-    // are hosted on the frontend (Vercel). Rewrite to local paths so Vercel
-    // serves them from public/uploads/.
+    const API_DOMAIN = API_URL.replace(/\/api\/?$/, '');
+
+    // If it already points to the backend API domain, keep it
     if (url.includes('api.sparkbluediamond.com/uploads/')) {
-        return url.replace(/https?:\/\/api\.sparkbluediamond\.com/, '');
+        return url;
     }
 
     // Any other absolute URL — pass through (e.g. Unsplash)
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
 
-    // Relative /uploads path — Vercel serves from public/uploads
-    if (url.startsWith('/uploads')) return url;
+    // Relative /uploads path — we are using Direct VPS Uploads, so point to the backend VPS
+    if (url.startsWith('/uploads')) {
+        return `${API_DOMAIN}${url}`;
+    }
 
     return url;
 };
