@@ -11,18 +11,23 @@ async function deploy() {
         execSync('npm.cmd run build', { cwd: __dirname, stdio: 'inherit' });
         console.log('Local build complete!');
 
-        console.log('Connecting to VPS...');
+        const vpsPassword = process.env.VPS_PASSWORD;
+        if (!vpsPassword) {
+            console.error('ERROR: VPS_PASSWORD environment variable is not set. Deployment aborted.');
+            process.exit(1);
+        }
+
         // Connect to VPS with increased timeout for slow handshakes
         await ssh.connect({
             host: '160.187.68.243',
             username: 'root',
-            password: 'Bm0y431YQKrf6iI',
+            password: vpsPassword,
             readyTimeout: 60000,
             debug: (msg) => console.log('DEBUG:', msg),
             tryKeyboard: true,
             onKeyboardInteractive: (name, instructions, instructionsLang, prompts, finish) => {
                 if (prompts.length > 0 && prompts[0].prompt.toLowerCase().includes('password')) {
-                    finish(['Bm0y431YQKrf6iI']);
+                    finish([vpsPassword]);
                 } else {
                     finish([]);
                 }

@@ -14,7 +14,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || '*';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.sparkbluediamond.com,https://sparkbluediamond.com';
 let cachedApp: any;
 
 async function bootstrap() {
