@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { PiCaretLeft, PiCaretRight } from 'react-icons/pi';
 import Link from 'next/link';
-import { API_URL } from '@/lib/api';
+import { normalizeImageUrl } from '@/lib/api';
 
 interface VideoReel {
     id: string;
@@ -107,8 +107,7 @@ export default function VideoShowcase({ videos }: VideoShowcaseProps) {
                     style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                     {videos.map((video, index) => {
-                        const host = API_URL.replace('/api', '');
-                        const fullVideoUrl = video.videoUrl.startsWith('http') ? video.videoUrl : `${host}${video.videoUrl}`;
+                        const fullVideoUrl = normalizeImageUrl(video.videoUrl);
                         const isCloudinary = video.videoUrl && video.videoUrl.includes('res.cloudinary.com');
 
                         const CardContent = (

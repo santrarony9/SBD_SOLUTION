@@ -137,7 +137,8 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/d
         finalFallback = '/default-jewel.jpg';
     }
 
-    if (!url) return finalFallback;
+    // Handle null, undefined, empty string, whitespace-only
+    if (!url || url.trim() === '') return finalFallback;
 
     // Cloudinary is deactivated, fallback to local placeholder for legacy images
     if (url.includes('res.cloudinary.com')) {
@@ -145,12 +146,17 @@ export const normalizeImageUrl = (url: string | undefined | null, fallback = '/d
     }
 
     // Backend API prepends its own domain to /uploads/ paths, but the images
-    // are hosted on the frontend (Vercel). Rewrite to local paths.
+    // are hosted on the frontend (Vercel). Rewrite to local paths so Vercel
+    // serves them from public/uploads/.
     if (url.includes('api.sparkbluediamond.com/uploads/')) {
         return url.replace(/https?:\/\/api\.sparkbluediamond\.com/, '');
     }
 
+    // Any other absolute URL — pass through (e.g. Unsplash)
     if (url.startsWith('http://') || url.startsWith('https://')) return url;
-    if (url.startsWith('/uploads')) return url; // Let Vercel serve it directly from public/uploads
+
+    // Relative /uploads path — Vercel serves from public/uploads
+    if (url.startsWith('/uploads')) return url;
+
     return url;
 };

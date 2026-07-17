@@ -16,6 +16,27 @@ interface ShopByCategoryProps {
     categories: Category[];
 }
 
+// Fallback images per category slug — uses representative product photos
+const CATEGORY_FALLBACK_IMAGES: Record<string, string> = {
+    rings: '/uploads/products/hqxrbjrmvzhvj1iec4qb.jpg',
+    necklaces: '/uploads/products/ftce81rs7vbc8sq2bvfg.jpg',
+    earrings: '/uploads/products/boiwpfqgvpkbwm2kfhl3.jpg',
+    bracelets: '/uploads/products/fb04uxgai2msbhzllfiw.jpg',
+    bangles: '/uploads/products/dkk3ceoysgvd7k5shqkh.jpg',
+    pendants: '/uploads/products/es8wy5syzlmfyuo0rbkg.jpg',
+    nosepin: '/uploads/products/vgjox117moy32xqyd75e.jpg',
+};
+
+const getCategoryImage = (cat: Category): string => {
+    // First try database image
+    const dbImage = cat.imageUrl || cat.image;
+    if (dbImage && dbImage.trim() !== '') {
+        return normalizeImageUrl(dbImage, '/default-jewel.jpg');
+    }
+    // Then try slug-based fallback
+    return CATEGORY_FALLBACK_IMAGES[cat.slug] || '/default-jewel.jpg';
+};
+
 export default function ShopByCategory({ categories }: ShopByCategoryProps) {
     return (
         <section className="relative py-16 bg-white overflow-hidden">

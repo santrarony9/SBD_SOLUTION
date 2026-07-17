@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { PiX, PiShoppingBag, PiArrowRight, PiTrash } from 'react-icons/pi';
 import { useCart } from '@/context/CartContext';
 import Image from 'next/image';
-import { API_URL } from '@/lib/api';
+import { normalizeImageUrl } from '@/lib/api';
 
 import Link from 'next/link';
 import { formatPrice } from '@/lib/utils';
@@ -75,7 +75,7 @@ export default function CartDrawer({ isOpen, onClose }: { isOpen: boolean; onClo
                                     <div key={item.id} className="flex gap-4 group">
                                         <div className="relative w-24 h-24 bg-brand-cream/30 rounded-sm overflow-hidden border border-gray-100 flex-shrink-0">
                                             <Image
-                                                src={item.product?.images?.[0]?.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${item.product.images[0]}` : (item.product?.images?.[0] || '/placeholder.jpg')}
+                                                src={normalizeImageUrl(item.product?.images?.[0])}
                                                 alt={item.product?.name || 'Product Image'}
                                                 fill
                                                 className="object-contain p-2 group-hover:scale-110 transition-transform duration-500"
