@@ -170,7 +170,7 @@ export default async function RootLayout({
         <JsonLd data={websiteSchema} />
       </head>
       <body
-        className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900`}
+        className={`${playfair.variable} ${inter.variable} antialiased bg-white text-gray-900 overflow-x-hidden`}
         suppressHydrationWarning
       >
         <div className="scroll-progress" />
