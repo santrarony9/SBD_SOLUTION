@@ -16,7 +16,11 @@ import { GoogleStrategy } from './google.strategy';
     PrismaModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || (() => { throw new Error('JWT_SECRET is not defined in environment variables'); })(),
+      secret:
+        process.env.JWT_SECRET ||
+        (() => {
+          throw new Error('JWT_SECRET is not defined in environment variables');
+        })(),
       signOptions: { expiresIn: '15d' },
     }),
     SmsModule,

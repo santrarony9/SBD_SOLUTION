@@ -222,7 +222,12 @@ export class ChatService {
           { name: { contains: query, mode: 'insensitive' } },
           { description: { contains: query, mode: 'insensitive' } },
           { category: { contains: query, mode: 'insensitive' } },
-          { isYouthTarget: query.toLowerCase().includes('aura') || query.toLowerCase().includes('youth') || query.toLowerCase().includes('9k') }
+          {
+            isYouthTarget:
+              query.toLowerCase().includes('aura') ||
+              query.toLowerCase().includes('youth') ||
+              query.toLowerCase().includes('9k'),
+          },
         ],
         isActive: true,
       },

@@ -72,7 +72,8 @@ export class AuthController {
     const { access_token } = await this.authService.login(user);
 
     // Redirect to frontend with token and user data
-    let frontendUrl = process.env.FRONTEND_URL || 'https://sparkbluediamond.com';
+    let frontendUrl =
+      process.env.FRONTEND_URL || 'https://sparkbluediamond.com';
     if (frontendUrl.includes(',')) {
       frontendUrl = frontendUrl.split(',')[0].trim();
     }

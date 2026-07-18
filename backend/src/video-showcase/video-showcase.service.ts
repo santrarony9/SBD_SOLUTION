@@ -9,7 +9,7 @@ export class VideoShowcaseService {
     const items = await this.prisma.videoShowcase.findMany({
       orderBy: { order: 'asc' },
     });
-    return items.map(item => this.normalizeUrls(item));
+    return items.map((item) => this.normalizeUrls(item));
   }
 
   async create(data: any) {
@@ -35,7 +35,9 @@ export class VideoShowcaseService {
 
   private normalizeUrls(item: any) {
     const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
-    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+    const cleanBaseUrl = baseUrl.endsWith('/api')
+      ? baseUrl.replace('/api', '')
+      : baseUrl;
 
     if (item.videoUrl && item.videoUrl.startsWith('/uploads')) {
       item.videoUrl = `${cleanBaseUrl}${item.videoUrl}`;

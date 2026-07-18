@@ -150,16 +150,14 @@ export class ProductsService {
     }
 
     if (filters?.isYouthTarget !== undefined) {
-      const isTarget = typeof filters.isYouthTarget === 'string'
-        ? filters.isYouthTarget === 'true'
-        : filters.isYouthTarget;
-      
+      const isTarget =
+        typeof filters.isYouthTarget === 'string'
+          ? filters.isYouthTarget === 'true'
+          : filters.isYouthTarget;
+
       if (isTarget) {
         // For Aura collection, show explicitly flagged items OR any 9K items
-        where.OR = [
-          { isYouthTarget: true },
-          { goldPurity: 9 }
-        ];
+        where.OR = [{ isYouthTarget: true }, { goldPurity: 9 }];
       } else {
         // For main collection, exclude explicitly flagged items
         where.isYouthTarget = false;
@@ -174,7 +172,10 @@ export class ProductsService {
       orderBy: { createdAt: 'desc' },
     });
 
-    console.log(`[ProductsService] Found ${products.length} products with filters:`, where);
+    console.log(
+      `[ProductsService] Found ${products.length} products with filters:`,
+      where,
+    );
 
     if (products.length === 0) return [];
 
@@ -216,13 +217,15 @@ export class ProductsService {
       const diamondPricePerCarat =
         diamondRateMap.get(product.diamondClarity) || 0;
 
-      return this.normalizeImageUrls(this.calculatePricing(
-        product,
-        goldPricePer10g,
-        diamondPricePerCarat,
-        charges,
-        makingChargeTiers,
-      ));
+      return this.normalizeImageUrls(
+        this.calculatePricing(
+          product,
+          goldPricePer10g,
+          diamondPricePerCarat,
+          charges,
+          makingChargeTiers,
+        ),
+      );
     });
 
     // 4. Client-side price filtering (since pricing is dynamic)
@@ -291,13 +294,15 @@ export class ProductsService {
       }
     }
 
-    const result = this.normalizeImageUrls(this.calculatePricing(
-      product,
-      goldRate?.pricePer10g || 0,
-      diamondRate?.pricePerCarat || 0,
-      charges,
-      makingChargeTiers,
-    ));
+    const result = this.normalizeImageUrls(
+      this.calculatePricing(
+        product,
+        goldRate?.pricePer10g || 0,
+        diamondRate?.pricePerCarat || 0,
+        charges,
+        makingChargeTiers,
+      ),
+    );
     await this.redis.set(cacheKey, JSON.stringify(result), 600); // 10 mins cache
     return result;
   }
@@ -402,21 +407,23 @@ export class ProductsService {
       return { ...product, pricing: null };
     }
   }
-  
+
   private normalizeImageUrls(product: any) {
     const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
-    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+    const cleanBaseUrl = baseUrl.endsWith('/api')
+      ? baseUrl.replace('/api', '')
+      : baseUrl;
 
     if (product.coverImage && product.coverImage.startsWith('/uploads')) {
       product.coverImage = `${cleanBaseUrl}${product.coverImage}`;
     }
 
     if (product.images && Array.isArray(product.images)) {
-      product.images = product.images.map(img => 
-        img && img.startsWith('/uploads') ? `${cleanBaseUrl}${img}` : img
+      product.images = product.images.map((img) =>
+        img && img.startsWith('/uploads') ? `${cleanBaseUrl}${img}` : img,
       );
     }
-    
+
     if (product.videoUrl && product.videoUrl.startsWith('/uploads')) {
       product.videoUrl = `${cleanBaseUrl}${product.videoUrl}`;
     }

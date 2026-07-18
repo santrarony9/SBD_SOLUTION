@@ -183,8 +183,14 @@ export class WhatsappService {
     });
   }
 
-  async sendTemplateMessage(phone: string, templateId: string, parameters?: any[]) {
-    this.logger.log(`[Stub] Sending WhatsApp template ${templateId} to ${phone}`);
+  async sendTemplateMessage(
+    phone: string,
+    templateId: string,
+    parameters?: any[],
+  ) {
+    this.logger.log(
+      `[Stub] Sending WhatsApp template ${templateId} to ${phone}`,
+    );
     return { success: true, message: 'Stub method executed' };
   }
 

@@ -89,7 +89,12 @@ import { RedisModule } from './redis/redis.module';
     CcavenueModule,
   ],
   controllers: [AppController],
-  providers: [AppService, CartCleanupService, CartRecoveryService, OrderCleanupService],
+  providers: [
+    AppService,
+    CartCleanupService,
+    CartRecoveryService,
+    OrderCleanupService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

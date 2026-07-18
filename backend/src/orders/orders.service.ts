@@ -257,7 +257,9 @@ export class OrdersService {
       };
     } catch (e) {
       console.error('Shipping Failed:', (e as any).message);
-      throw new BadRequestException('Failed to ship order: ' + (e as any).message);
+      throw new BadRequestException(
+        'Failed to ship order: ' + (e as any).message,
+      );
     }
   }
 
@@ -423,10 +425,13 @@ export class OrdersService {
         updatedOrder.id,
         updatedOrder.totalAmount,
       );
-      
+
       // Auto-Push to Shiprocket on Confirmation
       this.pushToShiprocket(updatedOrder.id).catch((e) =>
-        console.error('Shiprocket Auto-Push Failed on Confirmation:', (e as any).message),
+        console.error(
+          'Shiprocket Auto-Push Failed on Confirmation:',
+          e.message,
+        ),
       );
     }
 
@@ -466,7 +471,7 @@ export class OrdersService {
       );
     }
     this.pushToShiprocket(updatedOrder.id).catch((e) =>
-      console.error('Shiprocket Push Failed (Razorpay):', (e as any).message),
+      console.error('Shiprocket Push Failed (Razorpay):', e.message),
     );
 
     return updatedOrder;
@@ -504,7 +509,7 @@ export class OrdersService {
 
     // Push to Shiprocket (if not already)
     this.pushToShiprocket(updatedOrder.id).catch((e) =>
-      console.error('Shiprocket Push Retry:', (e as any).message),
+      console.error('Shiprocket Push Retry:', e.message),
     );
 
     return updatedOrder;
@@ -540,7 +545,7 @@ export class OrdersService {
 
     // Push to Shiprocket
     this.pushToShiprocket(updatedOrder.id).catch((e) =>
-      console.error('Shiprocket Push Retry:', (e as any).message),
+      console.error('Shiprocket Push Retry:', e.message),
     );
 
     return updatedOrder;

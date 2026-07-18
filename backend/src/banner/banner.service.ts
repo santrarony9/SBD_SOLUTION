@@ -9,7 +9,7 @@ export class BannerService {
     const banners = await this.prisma.banner.findMany({
       orderBy: { order: 'asc' },
     });
-    return banners.map(b => this.normalizeUrls(b));
+    return banners.map((b) => this.normalizeUrls(b));
   }
 
   async create(data: any) {
@@ -28,7 +28,9 @@ export class BannerService {
 
   private normalizeUrls(banner: any) {
     const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
-    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+    const cleanBaseUrl = baseUrl.endsWith('/api')
+      ? baseUrl.replace('/api', '')
+      : baseUrl;
 
     if (banner.imageUrl && banner.imageUrl.startsWith('/uploads')) {
       banner.imageUrl = `${cleanBaseUrl}${banner.imageUrl}`;

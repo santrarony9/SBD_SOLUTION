@@ -1154,7 +1154,7 @@ export default function AdminCMS() {
                                                      className="w-full h-full object-cover" 
                                                  />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                                    <a href={newBanner.imageUrl} download target="_blank" rel="noreferrer" title="Download Desktop Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
+
                                                     <button onClick={() => setNewBanner(prev => ({ ...prev, imageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
                                                 </div>
                                             </div>
@@ -1207,7 +1207,7 @@ export default function AdminCMS() {
                                                      className="w-full h-full object-cover" 
                                                  />
                                                 <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                                                    <a href={newBanner.mobileImageUrl} download target="_blank" rel="noreferrer" title="Download Mobile Banner" className="bg-brand-navy text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiDownloadSimple /></a>
+
                                                     <button onClick={() => setNewBanner(prev => ({ ...prev, mobileImageUrl: '' }))} title="Remove Image" className="bg-red-500 text-white p-2 rounded-full hover:scale-110 transition-transform flex items-center justify-center"><PiTrash /></button>
                                                 </div>
                                             </div>
@@ -1282,30 +1282,7 @@ export default function AdminCMS() {
                                                 <p className="text-gray-400 text-[10px] uppercase tracking-widest">{banner.link || 'No destination link'}</p>
                                             </div>
                                             <div className="flex gap-2">
-                                                {banner.imageUrl && (
-                                                    <a
-                                                        href={normalizeImageUrl(banner.imageUrl)}
-                                                        download
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
-                                                        title="Download Desktop Banner"
-                                                    >
-                                                        <PiDownloadSimple size={18} />
-                                                    </a>
-                                                )}
-                                                {banner.mobileImageUrl && (
-                                                    <a
-                                                        href={normalizeImageUrl(banner.mobileImageUrl)}
-                                                        download
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"
-                                                        title="Download Mobile Banner"
-                                                    >
-                                                        <PiDownloadSimple size={18} />
-                                                    </a>
-                                                )}
+
                                                 <button
                                                     onClick={() => handleEditBanner(banner)}
                                                     className="w-10 h-10 flex items-center justify-center bg-gray-50 text-gray-400 rounded-xl hover:bg-brand-navy hover:text-white transition-all border border-gray-100"

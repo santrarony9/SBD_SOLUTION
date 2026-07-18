@@ -9,7 +9,7 @@ export class CategoriesService {
     const categories = await this.prisma.category.findMany({
       orderBy: { order: 'asc' },
     });
-    return categories.map(c => this.normalizeUrls(c));
+    return categories.map((c) => this.normalizeUrls(c));
   }
 
   async findOne(id: string) {
@@ -54,7 +54,9 @@ export class CategoriesService {
   private normalizeUrls(category: any) {
     if (!category) return category;
     const baseUrl = process.env.API_URL || 'https://api.sparkbluediamond.com';
-    const cleanBaseUrl = baseUrl.endsWith('/api') ? baseUrl.replace('/api', '') : baseUrl;
+    const cleanBaseUrl = baseUrl.endsWith('/api')
+      ? baseUrl.replace('/api', '')
+      : baseUrl;
 
     if (category.image && category.image.startsWith('/uploads')) {
       category.image = `${cleanBaseUrl}${category.image}`;

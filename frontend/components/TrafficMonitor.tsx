@@ -22,11 +22,6 @@ export default function TrafficMonitor() {
         setLastUpdated(new Date());
     }, []);
 
-    // Only render if user email is admin@sparkblue.com
-    if (user?.email !== 'admin@sparkblue.com') {
-        return null;
-    }
-
     useEffect(() => {
         // Only fetch if it's the specific admin
         if (user?.email !== 'admin@sparkblue.com') return;
@@ -52,6 +47,10 @@ export default function TrafficMonitor() {
             clearInterval(interval);
         };
     }, [user?.email]);
+
+    if (user?.email !== 'admin@sparkblue.com') {
+        return null;
+    }
 
     if (!metrics) return null;
 

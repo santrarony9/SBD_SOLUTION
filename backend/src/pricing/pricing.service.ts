@@ -5,7 +5,7 @@ import { ApplyOn } from '@prisma/client';
 @Injectable()
 export class PricingService {
   private readonly logger = new Logger(PricingService.name);
-  
+
   // Simple in-memory cache to prevent N+1 DB calls
   private cachedRates: any = null;
   private lastFetch: number = 0;
@@ -15,17 +15,21 @@ export class PricingService {
 
   private async getLatestRates() {
     const now = Date.now();
-    if (this.cachedRates && (now - this.lastFetch < this.CACHE_TTL)) {
+    if (this.cachedRates && now - this.lastFetch < this.CACHE_TTL) {
       return this.cachedRates;
     }
 
     try {
-      const [goldRates, diamondRates, charges, makingTiers] = await Promise.all([
-        this.prisma.goldPrice.findMany({ where: { isActive: true } }),
-        this.prisma.diamondPrice.findMany({ where: { isActive: true } }),
-        this.prisma.charge.findMany({ where: { isActive: true } }),
-        this.prisma.storeSetting.findUnique({ where: { key: 'making_charge_tiers' } }),
-      ]);
+      const [goldRates, diamondRates, charges, makingTiers] = await Promise.all(
+        [
+          this.prisma.goldPrice.findMany({ where: { isActive: true } }),
+          this.prisma.diamondPrice.findMany({ where: { isActive: true } }),
+          this.prisma.charge.findMany({ where: { isActive: true } }),
+          this.prisma.storeSetting.findUnique({
+            where: { key: 'making_charge_tiers' },
+          }),
+        ],
+      );
 
       this.cachedRates = { goldRates, diamondRates, charges, makingTiers };
       this.lastFetch = now;
@@ -33,17 +37,27 @@ export class PricingService {
       return this.cachedRates;
     } catch (error) {
       this.logger.error('Failed to fetch rates for cache', error);
-      return this.cachedRates || { goldRates: [], diamondRates: [], charges: [], makingTiers: null };
+      return (
+        this.cachedRates || {
+          goldRates: [],
+          diamondRates: [],
+          charges: [],
+          makingTiers: null,
+        }
+      );
     }
   }
 
   async calculateProductPrice(product: any) {
     try {
       // 1. Get rates from cache (Prevents 4 DB calls per item)
-      const { goldRates, diamondRates, charges, makingTiers } = await this.getLatestRates();
+      const { goldRates, diamondRates, charges, makingTiers } =
+        await this.getLatestRates();
 
       const goldRate = goldRates.find((p) => p.purity === product.goldPurity);
-      const diamondRate = diamondRates.find((p) => p.clarity === product.diamondClarity);
+      const diamondRate = diamondRates.find(
+        (p) => p.clarity === product.diamondClarity,
+      );
 
       // Defaults if rates missing
       const goldPricePer10g = goldRate?.pricePer10g || 0;
@@ -162,4 +176,3 @@ export class PricingService {
     }
   }
 }
-

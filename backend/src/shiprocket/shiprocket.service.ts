@@ -50,12 +50,15 @@ export class ShiprocketService {
     // Calculate total weight (gold weight + standard 300g packaging)
     let totalWeightKg = 0.3; // Default 300g for the box
     if (orderData.items && orderData.items.length > 0) {
-      const totalProductWeightGrams = orderData.items.reduce((sum: number, item: any) => {
-        const goldW = item.product?.goldWeight || 0;
-        const diamondW = (item.product?.diamondCarat || 0) * 0.2; // 1 carat = 0.2g
-        return sum + ((goldW + diamondW) * item.quantity);
-      }, 0);
-      totalWeightKg += (totalProductWeightGrams / 1000);
+      const totalProductWeightGrams = orderData.items.reduce(
+        (sum: number, item: any) => {
+          const goldW = item.product?.goldWeight || 0;
+          const diamondW = (item.product?.diamondCarat || 0) * 0.2; // 1 carat = 0.2g
+          return sum + (goldW + diamondW) * item.quantity;
+        },
+        0,
+      );
+      totalWeightKg += totalProductWeightGrams / 1000;
     }
 
     // Map our Order to Shiprocket Order Schema
@@ -202,32 +205,37 @@ export class ShiprocketService {
   }
 
   async handleWebhook(payload: any) {
-    this.logger.log(`Shiprocket Webhook Received for AWB: ${payload.awb}, Status: ${payload.current_status}`);
-    
+    this.logger.log(
+      `Shiprocket Webhook Received for AWB: ${payload.awb}, Status: ${payload.current_status}`,
+    );
+
     const statusMap: { [key: string]: string } = {
       'PICKED UP': 'SHIPPED',
       'IN TRANSIT': 'SHIPPED',
       'OUT FOR DELIVERY': 'SHIPPED',
-      'SHIPPED': 'SHIPPED',
-      'DELIVERED': 'DELIVERED',
+      SHIPPED: 'SHIPPED',
+      DELIVERED: 'DELIVERED',
       'RTO IN TRANSIT': 'RETURNED',
       'RTO DELIVERED': 'RETURNED',
-      'RETURNED': 'RETURNED',
-      'CANCELED': 'CANCELLED',
-      'CANCELLED': 'CANCELLED'
+      RETURNED: 'RETURNED',
+      CANCELED: 'CANCELLED',
+      CANCELLED: 'CANCELLED',
     };
 
     const ourStatus = statusMap[payload.current_status?.toUpperCase()];
-    
+
     if (ourStatus) {
       try {
         await (this.prisma as any).order.updateMany({
           where: { awbCode: payload.awb },
-          data: { status: ourStatus }
+          data: { status: ourStatus },
         });
         this.logger.log(`Order status updated to ${ourStatus} via webhook.`);
-      } catch(e: any) {
-        this.logger.error('Failed to update order status via webhook', e.message);
+      } catch (e: any) {
+        this.logger.error(
+          'Failed to update order status via webhook',
+          e.message,
+        );
       }
     }
     return { success: true };

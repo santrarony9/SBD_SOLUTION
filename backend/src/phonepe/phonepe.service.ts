@@ -97,7 +97,10 @@ export class PhonePeService {
         );
       }
     } catch (error) {
-      this.logger.error(`PhonePe Init Error: ${(error as any).message}`, (error as any).stack);
+      this.logger.error(
+        `PhonePe Init Error: ${(error as any).message}`,
+        (error as any).stack,
+      );
       throw new BadRequestException('Payment initiation failed');
     }
   }

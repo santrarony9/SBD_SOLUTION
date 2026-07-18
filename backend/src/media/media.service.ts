@@ -16,13 +16,13 @@ export class MediaService {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname) || '.jpg';
     const filename = `${file.fieldname || 'file'}-${uniqueSuffix}${ext}`;
-    
+
     // Use process.cwd() to resolve path from backend root, keeping it in /uploads/
     const uploadDir = path.join(process.cwd(), 'uploads', folder);
-    
+
     // Ensure directory exists
     await fs.mkdir(uploadDir, { recursive: true });
-    
+
     const filePath = path.join(uploadDir, filename);
     await fs.writeFile(filePath, file.buffer);
 
@@ -41,10 +41,10 @@ export class MediaService {
     const filename = `document-${uniqueSuffix}.pdf`;
 
     const uploadDir = path.join(process.cwd(), 'uploads', folder);
-    
+
     // Ensure directory exists
     await fs.mkdir(uploadDir, { recursive: true });
-    
+
     const filePath = path.join(uploadDir, filename);
     await fs.writeFile(filePath, buffer);
 

@@ -46,7 +46,8 @@ export class ProductsController {
       tag,
       minPrice: minPrice ? Number(minPrice) : undefined,
       maxPrice: maxPrice ? Number(maxPrice) : undefined,
-      isYouthTarget: isYouthTarget !== undefined ? isYouthTarget === 'true' : undefined,
+      isYouthTarget:
+        isYouthTarget !== undefined ? isYouthTarget === 'true' : undefined,
     });
   }
 

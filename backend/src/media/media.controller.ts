@@ -18,9 +18,11 @@ export class MediaController {
   constructor(private readonly mediaService: MediaService) {}
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', {
-    limits: { fileSize: 20 * 1024 * 1024 } // 20MB limit for Multer parsing
-  }))
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit for Multer parsing
+    }),
+  )
   async uploadFile(
     @UploadedFile(
       new ParseFilePipe({
@@ -75,7 +77,6 @@ export class MediaController {
     }
   }
 
-
   @Post('upload-local')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -105,10 +106,10 @@ export class MediaController {
       if (!file) {
         throw new Error('No file uploaded');
       }
-      
+
       // Return the URL that will be accessible via the ServeStatic module config
       const fileUrl = `/uploads/videos/${file.filename}`;
-      
+
       return {
         url: fileUrl,
         public_id: file.filename,

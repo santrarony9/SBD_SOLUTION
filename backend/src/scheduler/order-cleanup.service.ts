@@ -47,7 +47,9 @@ export class OrderCleanupService {
           },
         });
 
-        this.logger.log(`Automatically cancelled unpaid order ${order.id} and restored stock.`);
+        this.logger.log(
+          `Automatically cancelled unpaid order ${order.id} and restored stock.`,
+        );
       } catch (error) {
         this.logger.error(`Failed to cleanup order ${order.id}`, error);
       }

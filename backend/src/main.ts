@@ -14,7 +14,9 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://www.sparkbluediamond.com,https://sparkbluediamond.com';
+const FRONTEND_URL =
+  process.env.FRONTEND_URL ||
+  'https://www.sparkbluediamond.com,https://sparkbluediamond.com';
 let cachedApp: any;
 
 async function bootstrap() {
@@ -28,9 +30,11 @@ async function bootstrap() {
   );
 
   // 1. Security Headers (Restored to stable state)
-  app.use(helmet({
-    crossOriginResourcePolicy: { policy: "cross-origin" },
-  }));
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+    }),
+  );
 
   // Enable trust proxy for Nginx/Cloudflare to correctly identify client IPs
   const adapter = app.getHttpAdapter().getInstance();
@@ -42,28 +46,33 @@ async function bootstrap() {
   app.use(
     rateLimit({
       windowMs: 15 * 60 * 1000,
-      max: 2000, 
-      message: 'Too many requests from this IP, please try again after 15 minutes',
+      max: 2000,
+      message:
+        'Too many requests from this IP, please try again after 15 minutes',
       standardHeaders: true,
       legacyHeaders: false,
       // The validator is strict about trust proxy, but we need it for correct IP detection
-      validate: { trustProxy: false }, 
+      validate: { trustProxy: false },
     }),
   );
 
   app.useGlobalFilters(
     new AllExceptionsFilter(httpAdapterHost, logBufferService),
   );
-  
+
   // Enable global validation with whitelist to strip injected properties
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
-  
+
   app.setGlobalPrefix('api');
 
   // 3. Strict CORS configuration
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || FRONTEND_URL === '*' || FRONTEND_URL.split(',').includes(origin)) {
+      if (
+        !origin ||
+        FRONTEND_URL === '*' ||
+        FRONTEND_URL.split(',').includes(origin)
+      ) {
         callback(null, true);
       } else {
         callback(new Error('Not allowed by CORS'));
