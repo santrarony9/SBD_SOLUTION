@@ -1,9 +1,10 @@
 import { Metadata } from 'next';
 import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
     try {
-        const product = await fetchAPI(`/products/${params.slug}`);
+        const resolvedParams = await params;
+        const product = await fetchAPI(`/products/${resolvedParams.slug}`);
         if (!product || Object.keys(product).length === 0) {
             return { title: 'Product Not Found | Spark Blue Diamond' };
         }
@@ -16,7 +17,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
             title,
             description,
             alternates: {
-                canonical: `/product/${params.slug}`,
+                canonical: `/product/${resolvedParams.slug}`,
             },
             openGraph: {
                 title,
