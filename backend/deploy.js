@@ -11,9 +11,11 @@ async function deploy() {
         execSync('npm.cmd run build', { cwd: __dirname, stdio: 'inherit' });
         console.log('Local build complete!');
 
+        require('dotenv').config();
+        
         const vpsPassword = process.env.VPS_PASSWORD;
         if (!vpsPassword) {
-            console.error('ERROR: VPS_PASSWORD environment variable is not set. Deployment aborted.');
+            console.error('ERROR: VPS_PASSWORD environment variable is not set in your system or .env file. Deployment aborted.');
             process.exit(1);
         }
 

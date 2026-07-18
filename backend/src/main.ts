@@ -28,7 +28,9 @@ async function bootstrap() {
   );
 
   // 1. Security Headers (Restored to stable state)
-  app.use(helmet());
+  app.use(helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  }));
 
   // Enable trust proxy for Nginx/Cloudflare to correctly identify client IPs
   const adapter = app.getHttpAdapter().getInstance();
