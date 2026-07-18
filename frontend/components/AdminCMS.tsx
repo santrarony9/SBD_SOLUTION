@@ -1262,7 +1262,7 @@ export default function AdminCMS() {
                                     <div key={banner.id} className="group relative bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-2xl hover:shadow-brand-navy/10 transition-all duration-700">
                                         <div className="relative aspect-[16/9] overflow-hidden bg-gray-100">
                                             <img
-                                                src={banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png'}
+                                                src={normalizeImageUrl(banner.imageUrl || banner.mobileImageUrl || '/hero-jewellery.png')}
                                                 alt={banner.title}
                                                 className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                                                 onError={(e) => {
@@ -1284,7 +1284,7 @@ export default function AdminCMS() {
                                             <div className="flex gap-2">
                                                 {banner.imageUrl && (
                                                     <a
-                                                        href={banner.imageUrl}
+                                                        href={normalizeImageUrl(banner.imageUrl)}
                                                         download
                                                         target="_blank"
                                                         rel="noreferrer"
@@ -1296,7 +1296,7 @@ export default function AdminCMS() {
                                                 )}
                                                 {banner.mobileImageUrl && (
                                                     <a
-                                                        href={banner.mobileImageUrl}
+                                                        href={normalizeImageUrl(banner.mobileImageUrl)}
                                                         download
                                                         target="_blank"
                                                         rel="noreferrer"
