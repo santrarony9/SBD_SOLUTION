@@ -26,7 +26,7 @@ export class MediaController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // 20MB
-          new FileTypeValidator({ fileType: /image\/(jpeg|png|webp|gif)/ }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp|gif)' }),
         ],
       }),
     )
@@ -54,7 +54,7 @@ export class MediaController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
-          new FileTypeValidator({ fileType: /video\/(mp4|webm|quicktime)/ }),
+          new FileTypeValidator({ fileType: '.(mp4|webm|quicktime|mov)' }),
         ],
       }),
     )
@@ -95,7 +95,7 @@ export class MediaController {
       new ParseFilePipe({
         validators: [
           new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
-          new FileTypeValidator({ fileType: /video\/(mp4|webm|quicktime)/ }),
+          new FileTypeValidator({ fileType: '.(mp4|webm|quicktime|mov)' }),
         ],
       }),
     )
