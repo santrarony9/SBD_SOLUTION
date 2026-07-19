@@ -7,10 +7,10 @@ export default function AboutPage() {
             {/* Header */}
             <section className="relative py-32 text-center text-white overflow-hidden">
                 <div
-                    className="absolute inset-0 bg-cover bg-center fixed-background"
+                    className="absolute inset-0 bg-cover bg-center fixed-background bg-brand-navy"
                     style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1626015099787-8c5029bc4803?q=80&w=2670&auto=format&fit=crop")' }}
                 >
-                    <div className="absolute inset-0 bg-brand-navy/80 mix-blend-multiply"></div>
+                    <div className="absolute inset-0 bg-brand-navy/60"></div>
                 </div>
 
                 <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
