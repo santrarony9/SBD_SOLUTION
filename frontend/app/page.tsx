@@ -227,7 +227,7 @@ export default async function Home() {
         <div
           className="transition-all duration-700"
         >
-          <HeroSlider banners={banners} heroText={heroTitle ? { title: heroTitle, subtitle: heroSubtitle } : (heroText || { title: heroTitle, subtitle: heroSubtitle })} />
+          <HeroSlider banners={banners} heroText={{ title: heroTitle, subtitle: heroSubtitle, showText: heroText?.showText !== undefined ? heroText.showText : false }} />
         </div>
       </div>
 
