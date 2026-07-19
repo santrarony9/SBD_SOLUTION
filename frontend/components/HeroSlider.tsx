@@ -194,20 +194,18 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     </motion.div>
                 )}
 
-                {/* Dynamic Kicker from Banner */}
-                {!isPlaceholder(currentBanner.title) && (
-                    <div className="mb-4 md:mb-6 w-full px-4">
-                        <h2
-                            key={currentIndex} // Re-animate on change
-                            className="text-brand-gold/90 font-serif italic text-sm md:text-xl tracking-[0.2em] md:tracking-[0.3em] uppercase font-medium animate-fade-in-up text-balance"
-                        >
+                {/* Banner Specific Title */}
+                {heroText?.showText && !isPlaceholder(currentBanner?.title) && (
+                    <div className="mb-4 text-brand-gold">
+                        <span className="text-[10px] md:text-xs tracking-[0.3em] font-bold uppercase mb-2 block">{currentBanner.tagline}</span>
+                        <h2 className="text-xl md:text-3xl font-serif text-white tracking-wide">
                             {currentBanner.title}
                         </h2>
                     </div>
                 )}
 
                 {/* Main Hero Text (Static Global Setting) */}
-                {!isPlaceholder(heroText?.title) && (
+                {heroText?.showText && !isPlaceholder(heroText?.title) && (
                     <h1 className="fluid-h1 font-serif text-white mb-6 md:mb-8 leading-tight tracking-tight drop-shadow-lg max-w-5xl text-balance">
                         {heroText?.title?.includes('Eternal') ? (
                             <>
@@ -221,7 +219,7 @@ export default function HeroSlider({ banners, heroText }: HeroSliderProps) {
                     </h1>
                 )}
 
-                {!isPlaceholder(heroText?.subtitle) && (
+                {heroText?.showText && !isPlaceholder(heroText?.subtitle) && (
                     <p className="text-gray-200 max-w-2xl text-sm sm:text-lg md:text-xl mb-8 md:mb-12 font-light tracking-wide leading-relaxed drop-shadow-md px-4">
                         {heroText?.subtitle}
                     </p>

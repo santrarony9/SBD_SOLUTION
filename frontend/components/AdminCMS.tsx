@@ -11,7 +11,7 @@ export default function AdminCMS() {
     const [banners, setBanners] = useState<any[]>([]);
     const [offers, setOffers] = useState<any[]>([]);
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
-    const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false });
+    const [heroText, setHeroText] = useState<{ title: string, subtitle: string, spotlightId?: string, showSpotlight?: boolean, showText?: boolean }>({ title: '', subtitle: '', spotlightId: '', showSpotlight: false, showText: false });
 
     // Headless CMS States
     const [royalStandard, setRoyalStandard] = useState({
@@ -133,7 +133,12 @@ export default function AdminCMS() {
 
             if (heroTextRes.status === 'fulfilled') {
                 const fetchedHeroText = heroTextRes.value;
-                setHeroText(fetchedHeroText?.value ? (typeof fetchedHeroText.value === 'string' ? JSON.parse(fetchedHeroText.value) : fetchedHeroText.value) : { title: 'Elegance is Eternal', subtitle: 'Discover jewellery that transcends time.' });
+                const parsed = fetchedHeroText?.value ? (typeof fetchedHeroText.value === 'string' ? JSON.parse(fetchedHeroText.value) : fetchedHeroText.value) : null;
+                setHeroText({
+                    title: parsed?.title || 'Elegance is Eternal',
+                    subtitle: parsed?.subtitle || 'Discover jewellery that transcends time.',
+                    showText: parsed?.showText !== undefined ? parsed.showText : false
+                });
             }
 
             // Parse Headless CMS Settings
@@ -400,8 +405,8 @@ export default function AdminCMS() {
     // --- Text Actions ---
     const handleUpdateText = async () => {
         try {
-            // Only save title and subtitle for hero text
-            const textData = { title: heroText.title, subtitle: heroText.subtitle };
+            // Only save title, subtitle, and showText for hero text
+            const textData = { title: heroText.title, subtitle: heroText.subtitle, showText: heroText.showText };
             await fetchAPI('/store/settings', {
                 method: 'POST',
                 body: JSON.stringify({ key: 'homepage_hero_text', value: JSON.stringify(textData) })
@@ -1898,6 +1903,15 @@ export default function AdminCMS() {
                                             className="w-full border-b border-gray-200 py-3 text-sm text-gray-600 outline-none focus:border-brand-gold bg-transparent transition-colors h-32 resize-none"
                                             placeholder="A few sentences about your brand story..."
                                         />
+                                    </div>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" className="sr-only peer" checked={heroText.showText} onChange={(e) => setHeroText({ ...heroText, showText: e.target.checked })} />
+                                            <div className="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-gold"></div>
+                                        </label>
+                                        <span className="text-[10px] uppercase font-black tracking-wider text-gray-600">Show Text on Hero Images</span>
                                     </div>
                                 </div>
                                 <div className="mt-6 flex justify-end">
