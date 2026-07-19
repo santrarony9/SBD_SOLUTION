@@ -18,13 +18,13 @@ import InfluencerSpotlight from '@/components/InfluencerSpotlight';
 import VideoShowcase from '@/components/VideoShowcase';
 // Removed motion import to fix Server Component render error
 
-export const revalidate = 900; // Revalidate every 15 minutes (cache purged on deploy)
+export const revalidate = 60; // Revalidate every 60 seconds for fast CMS updates
 
 
 // Fetch Featured Products
 async function getFeaturedProducts() {
   try {
-    return await fetchAPI('/products', { next: { revalidate: 1800 } });
+    return await fetchAPI('/products', { next: { revalidate: 60 } });
   } catch (error) {
     console.error("Failed to fetch products", error);
     return [];
@@ -34,7 +34,7 @@ async function getFeaturedProducts() {
 // Fetch Offers
 async function getOffers() {
   try {
-    return await fetchAPI('/offers', { next: { revalidate: 1800 } });
+    return await fetchAPI('/offers', { next: { revalidate: 60 } });
   } catch (error) {
     console.error("Failed to fetch offers", error);
     return [];
@@ -43,7 +43,7 @@ async function getOffers() {
 
 async function getBanners() {
   try {
-    return await fetchAPI('/banners', { next: { revalidate: 1800 } });
+    return await fetchAPI('/banners', { next: { revalidate: 60 } });
   } catch (e) {
     return [];
   }
@@ -51,7 +51,7 @@ async function getBanners() {
 
 async function getVideoReels() {
   try {
-    return await fetchAPI('/video-showcase', { next: { revalidate: 1800 } });
+    return await fetchAPI('/video-showcase', { next: { revalidate: 60 } });
   } catch (e) {
     return [];
   }
@@ -59,7 +59,7 @@ async function getVideoReels() {
 
 async function getHeroText() {
   try {
-    const setting = await fetchAPI('/store/settings/homepage_hero_text', { next: { revalidate: 1800 } });
+    const setting = await fetchAPI('/store/settings/homepage_hero_text', { next: { revalidate: 60 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -75,7 +75,7 @@ async function getHeroText() {
 
 async function getFeaturedReviews() {
   try {
-    return await fetchAPI('/reviews/featured', { next: { revalidate: 1800 } });
+    return await fetchAPI('/reviews/featured', { next: { revalidate: 60 } });
   } catch (e) {
     return [];
   }
@@ -83,7 +83,7 @@ async function getFeaturedReviews() {
 
 async function getSpotlight() {
   try {
-    const res = await fetchAPI('/store/settings/spotlight', { next: { revalidate: 1800 } });
+    const res = await fetchAPI('/store/settings/spotlight', { next: { revalidate: 60 } });
     return res;
   } catch (e) {
     return null;
@@ -92,25 +92,25 @@ async function getSpotlight() {
 
 async function getCategories() {
   try {
-    return await fetchAPI('/categories', { next: { revalidate: 1800 } });
+    return await fetchAPI('/categories', { next: { revalidate: 60 } });
   } catch (e) { return []; }
 }
 
 async function getPriceRanges() {
   try {
-    return await fetchAPI('/marketing/price-ranges', { next: { revalidate: 1800 } });
+    return await fetchAPI('/marketing/price-ranges', { next: { revalidate: 60 } });
   } catch (e) { return []; }
 }
 
 async function getTags() {
   try {
-    return await fetchAPI('/marketing/tags', { next: { revalidate: 1800 } });
+    return await fetchAPI('/marketing/tags', { next: { revalidate: 60 } });
   } catch (e) { return []; }
 }
 
 async function getPromiseCards() {
   try {
-    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards', { next: { revalidate: 1800 } });
+    const setting = await fetchAPI('/store/settings/sparkblue_promise_cards', { next: { revalidate: 60 } });
     if (!setting?.value) return null;
     try {
       const parsed = typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -126,7 +126,7 @@ async function getPromiseCards() {
 
 async function getRoyalStandard() {
   try {
-    const setting = await fetchAPI('/store/settings/home_royal_standard', { next: { revalidate: 1800 } });
+    const setting = await fetchAPI('/store/settings/home_royal_standard', { next: { revalidate: 60 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -136,7 +136,7 @@ async function getRoyalStandard() {
 
 async function getBrandStory() {
   try {
-    const setting = await fetchAPI('/store/settings/home_brand_story', { next: { revalidate: 1800 } });
+    const setting = await fetchAPI('/store/settings/home_brand_story', { next: { revalidate: 60 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;
@@ -146,7 +146,7 @@ async function getBrandStory() {
 
 async function getAuraConfig() {
   try {
-    const setting = await fetchAPI('/store/settings/aura_collection_config', { next: { revalidate: 1800 } });
+    const setting = await fetchAPI('/store/settings/aura_collection_config', { next: { revalidate: 60 } });
     if (!setting?.value) return null;
     try {
       return typeof setting.value === 'string' ? JSON.parse(setting.value) : setting.value;

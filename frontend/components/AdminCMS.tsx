@@ -77,6 +77,8 @@ export default function AdminCMS() {
 
     useEffect(() => {
         loadContent();
+        // Pre-fetch health so the sidebar dot starts green, not red
+        fetchAPI('/diagnostics').then(data => setHealthData(data)).catch(() => setHealthData({ status: 'OFFLINE' }));
     }, []);
 
     const loadContent = async () => {

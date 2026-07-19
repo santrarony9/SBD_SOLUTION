@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { fetchAPI, API_URL } from '@/lib/api';
+import { fetchAPI, normalizeImageUrl } from '@/lib/api';
 
 import { PiSparkle, PiVideoCamera, PiArrowRight } from "react-icons/pi";
 import Link from 'next/link';
@@ -67,7 +67,7 @@ export default function AuraCollectionPage() {
                 {/* Desktop Banner */}
                 {config?.bannerUrl && (
                     <img 
-                        src={config.bannerUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${config.bannerUrl}` : config.bannerUrl} 
+                        src={normalizeImageUrl(config.bannerUrl)} 
                         className={`${config.mobileBannerUrl ? 'hidden md:block' : 'block'} absolute inset-0 w-full h-full object-cover`} 
                         alt="Aura Collection Desktop" 
                     />
@@ -76,7 +76,7 @@ export default function AuraCollectionPage() {
                 {/* Mobile Banner */}
                 {config?.mobileBannerUrl && (
                     <img 
-                        src={config.mobileBannerUrl.startsWith('/uploads') ? `${API_URL.replace('/api', '')}${config.mobileBannerUrl}` : config.mobileBannerUrl} 
+                        src={normalizeImageUrl(config.mobileBannerUrl)} 
                         className="md:hidden absolute inset-0 w-full h-full object-cover" 
                         alt="Aura Collection Mobile" 
                     />

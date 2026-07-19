@@ -14,4 +14,14 @@ export class AppController {
   getVersion() {
     return { version: '3.0', deployedAt: new Date().toISOString() };
   }
+
+  @Get('health')
+  getHealth() {
+    return {
+      status: 'ok',
+      uptime: process.uptime(),
+      memory: Math.round(process.memoryUsage().heapUsed / 1024 / 1024) + 'MB',
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
