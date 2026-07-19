@@ -51,7 +51,7 @@ async function getBanners() {
 
 async function getVideoReels() {
   try {
-    return await fetchAPI('/video-showcase', { next: { revalidate: 60 } });
+    return await fetchAPI('/video-showcase?bust=1', { next: { revalidate: 60 } });
   } catch (e) {
     return [];
   }
