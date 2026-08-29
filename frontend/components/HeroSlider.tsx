@@ -20,6 +20,7 @@ interface Banner {
 interface HeroText {
     title: string;
     subtitle: string;
+    showText?: boolean;
 }
 
 interface HeroSliderProps {
