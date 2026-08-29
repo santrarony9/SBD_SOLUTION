@@ -246,6 +246,7 @@ export default function AdminDashboard() {
                     <header className="mb-12 flex justify-between items-start">
                         <div>
                             <span className="text-[10px] text-brand-gold tracking-[0.3em] uppercase font-bold mb-2 block">Control Center</span>
+                            {/* FORCE_REBUILD_2026_08_29_18_45 */}
                             <h1 className="text-5xl font-serif text-brand-navy">
                                 {activeTab === 'overview' ? 'Business Pulse' :
                                     activeTab === 'cms' ? 'Home UI Editor' :
