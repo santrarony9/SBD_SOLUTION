@@ -14,6 +14,7 @@ interface Banner {
     imageUrl: string;
     mobileImageUrl?: string;
     title?: string;
+    tagline?: string;
     link?: string;
 }
 
