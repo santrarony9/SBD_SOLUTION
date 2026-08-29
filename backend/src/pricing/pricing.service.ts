@@ -56,7 +56,7 @@ export class PricingService {
 
       const goldRate = goldRates.find((p) => p.purity === product.goldPurity);
       const diamondRate = diamondRates.find(
-        (p) => p.clarity === product.diamondClarity,
+        (p) => p.clarity === product.diamondClarity && p.color === (product.diamondColor || 'EF'),
       );
 
       // Defaults if rates missing

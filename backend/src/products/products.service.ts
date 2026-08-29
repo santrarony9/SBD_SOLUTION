@@ -208,14 +208,14 @@ export class ProductsService {
       goldRates.map((r) => [r.purity, r.pricePer10g]),
     );
     const diamondRateMap = new Map<string, number>(
-      diamondRates.map((r) => [r.clarity, r.pricePerCarat]),
+      diamondRates.map((r) => [`${r.color}_${r.clarity}`, r.pricePerCarat]),
     );
 
     // 3. Enrich products using cached rates
     const enriched = products.map((product) => {
       const goldPricePer10g = goldRateMap.get(product.goldPurity) || 0;
       const diamondPricePerCarat =
-        diamondRateMap.get(product.diamondClarity) || 0;
+        diamondRateMap.get(`${product.diamondColor || 'EF'}_${product.diamondClarity}`) || 0;
 
       return this.normalizeImageUrls(
         this.calculatePricing(
@@ -271,7 +271,7 @@ export class ProductsService {
       where: { purity: product.goldPurity },
     });
     const diamondRate = await this.prisma.diamondPrice.findUnique({
-      where: { clarity: product.diamondClarity },
+      where: { color_clarity: { color: product.diamondColor || 'EF', clarity: product.diamondClarity } },
     });
     const charges = await this.prisma.charge.findMany({
       where: { isActive: true },

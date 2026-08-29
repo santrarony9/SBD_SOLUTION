@@ -95,7 +95,7 @@ export class InventoryService {
     for (const product of products) {
       const goldPrice = goldPrices.find((p) => p.purity === product.goldPurity);
       const diamondPrice = diamondPrices.find(
-        (p) => p.clarity === product.diamondClarity,
+        (p) => p.clarity === product.diamondClarity && p.color === (product.diamondColor || 'EF')
       );
 
       if (goldPrice && diamondPrice) {

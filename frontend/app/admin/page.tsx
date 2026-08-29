@@ -33,6 +33,9 @@ export default function AdminDashboard() {
     ]);
     const [isLoading, setIsLoading] = useState(true);
     const [status, setStatus] = useState<{ message: string, type: 'success' | 'error' } | null>(null);
+    const [customPurities, setCustomPurities] = useState<number[]>([]);
+    const [customClarities, setCustomClarities] = useState<string[]>([]);
+    const [customColors, setCustomColors] = useState<string[]>([]);
 
     // Product Modal State
     const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -87,13 +90,13 @@ export default function AdminDashboard() {
         }
     };
 
-    const updateDiamondPrice = async (clarity: string, price: number) => {
+    const updateDiamondPrice = async (color: string, clarity: string, price: number) => {
         try {
-            await fetchAPI(`/masters/diamond/${clarity}`, {
+            await fetchAPI(`/masters/diamond/${color}/${clarity}`, {
                 method: 'PUT',
                 body: JSON.stringify({ price })
             });
-            setStatus({ message: `Diamond ${clarity} Updated!`, type: 'success' });
+            setStatus({ message: `Diamond ${color} ${clarity} Updated!`, type: 'success' });
             loadMasters();
         } catch (error) {
             setStatus({ message: 'Update Failed', type: 'error' });
@@ -130,6 +133,10 @@ export default function AdminDashboard() {
         const newTiers = makingChargeTiers.map(t => t.id === id ? { ...t, ...updates } : t);
         setMakingChargeTiers(newTiers);
     };
+
+    const allPurities = Array.from(new Set([9, 14, 16, 18, 22, 24, ...goldRates.map(r => r.purity), ...customPurities])).sort((a, b) => a - b);
+    const allClarities = Array.from(new Set(['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1', ...diamondRates.map(r => r.clarity), ...customClarities]));
+    const allColors = Array.from(new Set(['EF', 'FG', 'GH', 'HI', 'IJ', ...diamondRates.map(r => r.color), ...customColors])).sort();
 
     return (
         <AdminGuard>
@@ -273,7 +280,7 @@ export default function AdminDashboard() {
                                     <h3 className="font-serif text-xl">Precious Metal & Stone Value</h3>
                                     <span className="text-[10px] bg-brand-gold text-brand-navy px-3 py-1 rounded-full uppercase tracking-widest font-bold">Live Rates</span>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-0 divide-x divide-gray-100">
+                                <div className="grid grid-cols-1 gap-0 divide-y divide-gray-100">
                                     {/* Gold Sub-table */}
                                     <div className="p-0">
                                         <table className="w-full text-sm">
@@ -284,17 +291,17 @@ export default function AdminDashboard() {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
-                                                {[9, 14, 16, 18, 22, 24].map((purity) => {
+                                                {allPurities.map((purity) => {
                                                     const rate = goldRates.find(r => r.purity === purity);
                                                     return (
                                                         <tr key={purity} className="group hover:bg-brand-cream/30 transition-colors">
-                                                            <td className="px-6 py-4 font-bold text-brand-navy bg-white">{purity}K Gold</td>
-                                                            <td className="px-6 py-4 text-right bg-white">
+                                                            <td className="px-6 py-4 font-bold text-brand-navy bg-white w-1/2">{purity}K Gold</td>
+                                                            <td className="px-6 py-4 text-right bg-white w-1/2">
                                                                 <div className="flex items-center justify-end gap-2 group-hover:scale-105 transition-transform origin-right">
                                                                     <span className="text-gray-400 text-xs font-light">₹</span>
                                                                     <input
                                                                         type="number"
-                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
+                                                                        className={`w-32 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
                                                                             }`}
                                                                         defaultValue={rate?.pricePer10g || 0}
                                                                         disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
@@ -305,40 +312,80 @@ export default function AdminDashboard() {
                                                         </tr>
                                                     );
                                                 })}
+                                                <tr>
+                                                    <td colSpan={2} className="px-6 py-3 bg-gray-50 text-center">
+                                                        <button 
+                                                            onClick={() => {
+                                                                const val = prompt('Enter new Gold Karat (e.g., 20)');
+                                                                if (val && !isNaN(Number(val))) setCustomPurities([...customPurities, Number(val)]);
+                                                            }}
+                                                            className="text-xs text-brand-gold font-bold uppercase tracking-widest hover:text-brand-navy transition-colors">
+                                                            + Add New Purity
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>
                                     {/* Diamond Sub-table */}
-                                    <div className="p-0">
+                                    <div className="p-0 overflow-x-auto">
                                         <table className="w-full text-sm">
                                             <thead>
                                                 <tr className="text-left text-[10px] text-gray-500 uppercase tracking-wider font-bold border-b border-gray-200 bg-gray-50">
-                                                    <th className="px-6 py-3">Diamond Clarity</th>
-                                                    <th className="px-6 py-3 text-right">Price per Carat</th>
+                                                    <th className="px-6 py-3">Clarity \ Color</th>
+                                                    {allColors.map(color => (
+                                                        <th key={color} className="px-6 py-3 text-right">{color}</th>
+                                                    ))}
+                                                    <th className="px-6 py-3 text-right">
+                                                        <button 
+                                                            onClick={() => {
+                                                                const val = prompt('Enter new Diamond Color (e.g., D-E)');
+                                                                if (val) setCustomColors([...customColors, val]);
+                                                            }}
+                                                            className="text-[10px] text-brand-gold font-bold hover:text-brand-navy transition-colors">
+                                                            + Color
+                                                        </button>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-gray-50">
-                                                {['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1'].map((clarity) => {
-                                                    const rate = diamondRates.find(r => r.clarity === clarity);
+                                                {allClarities.map((clarity) => {
                                                     return (
                                                         <tr key={clarity} className="group hover:bg-brand-cream/30 transition-colors">
                                                             <td className="px-6 py-4 font-bold text-brand-navy bg-white">{clarity}</td>
-                                                            <td className="px-6 py-4 text-right bg-white">
-                                                                <div className="flex items-center justify-end gap-2 group-hover:scale-105 transition-transform origin-right">
-                                                                    <span className="text-gray-400 text-xs font-light">₹</span>
-                                                                    <input
-                                                                        type="number"
-                                                                        className={`w-24 bg-gray-50 border border-gray-200 rounded px-2 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''
-                                                                            }`}
-                                                                        defaultValue={rate?.pricePerCarat || 0}
-                                                                        disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
-                                                                        onBlur={(e) => updateDiamondPrice(clarity, Number(e.target.value))}
-                                                                    />
-                                                                </div>
-                                                            </td>
+                                                            {allColors.map((color) => {
+                                                                const rate = diamondRates.find(r => r.clarity === clarity && r.color === color);
+                                                                return (
+                                                                    <td key={color} className="px-2 py-4 text-right bg-white min-w-[100px]">
+                                                                        <div className="flex items-center justify-end gap-1 group-hover:scale-105 transition-transform">
+                                                                            <span className="text-gray-400 text-[10px] font-light">₹</span>
+                                                                            <input
+                                                                                type="number"
+                                                                                className={`w-20 bg-gray-50 border border-gray-200 rounded px-1 py-1 text-right focus:border-brand-gold focus:ring-1 focus:ring-brand-gold outline-none transition-all font-mono font-bold text-brand-charcoal text-xs ${(user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER') ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                                                                defaultValue={rate?.pricePerCarat || 0}
+                                                                                disabled={user?.role !== 'ADMIN' && user?.role !== 'SUPER_ADMIN' && user?.role !== 'PRICE_MANAGER'}
+                                                                                onBlur={(e) => updateDiamondPrice(color, clarity, Number(e.target.value))}
+                                                                            />
+                                                                        </div>
+                                                                    </td>
+                                                                )
+                                                            })}
+                                                            <td className="bg-white"></td>
                                                         </tr>
                                                     );
                                                 })}
+                                                <tr>
+                                                    <td colSpan={allColors.length + 2} className="px-6 py-3 bg-gray-50 text-left">
+                                                        <button 
+                                                            onClick={() => {
+                                                                const val = prompt('Enter new Diamond Clarity (e.g., IF)');
+                                                                if (val) setCustomClarities([...customClarities, val]);
+                                                            }}
+                                                            className="text-xs text-brand-gold font-bold uppercase tracking-widest hover:text-brand-navy transition-colors">
+                                                            + Add New Clarity
+                                                        </button>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </div>

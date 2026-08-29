@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { fetchAPI, API_URL, normalizeImageUrl } from '@/lib/api';
 import { PiUploadSimple, PiX } from 'react-icons/pi';
 
@@ -19,10 +19,38 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
         goldWeight: 0,
         diamondWeight: 0,
         diamondClarity: 'SI1',
+        diamondColor: 'EF',
     });
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
     const [message, setMessage] = useState('');
+    const [purities, setPurities] = useState<number[]>([9, 14, 16, 18, 22, 24]);
+    const [clarities, setClarities] = useState<string[]>(['VVS1', 'VVS2', 'VS1', 'VS2', 'SI1', 'SI2', 'I1']);
+    const [colors, setColors] = useState<string[]>(['EF', 'FG', 'GH', 'HI', 'IJ']);
+
+    useEffect(() => {
+        const fetchMasters = async () => {
+            try {
+                const [gold, diamond] = await Promise.all([
+                    fetchAPI('/masters/gold'),
+                    fetchAPI('/masters/diamond')
+                ]);
+                if (gold) {
+                    const uniqueP = Array.from(new Set(gold.map((g: any) => g.purity))) as number[];
+                    if (uniqueP.length > 0) setPurities(uniqueP.sort((a, b) => a - b));
+                }
+                if (diamond) {
+                    const uniqueCl = Array.from(new Set(diamond.map((d: any) => d.clarity))) as string[];
+                    const uniqueCo = Array.from(new Set(diamond.map((d: any) => d.color))) as string[];
+                    if (uniqueCl.length > 0) setClarities(uniqueCl);
+                    if (uniqueCo.length > 0) setColors(uniqueCo.sort());
+                }
+            } catch (err) {
+                console.error("Failed to load masters", err);
+            }
+        };
+        fetchMasters();
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
@@ -79,7 +107,7 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
             setMessage('Product created successfully!');
             setFormData({
                 name: '', slug: '', description: '', images: '', coverImage: '',
-                goldPurity: 22, goldWeight: 0, diamondWeight: 0, diamondClarity: 'SI1'
+                goldPurity: 22, goldWeight: 0, diamondWeight: 0, diamondClarity: 'SI1', diamondColor: 'EF'
             });
             if (onSuccess) onSuccess();
         } catch (error) {
@@ -156,9 +184,9 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
                 <div className="space-y-1">
                     <label className="text-xs text-gray-500 uppercase tracking-widest block">Gold Purity</label>
                     <select name="goldPurity" value={formData.goldPurity} onChange={handleChange} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-brand-gold bg-transparent">
-                        <option value={24}>24K</option>
-                        <option value={22}>22K</option>
-                        <option value={18}>18K</option>
+                        {purities.map(p => (
+                            <option key={p} value={p}>{p}K</option>
+                        ))}
                     </select>
                 </div>
                 <div className="relative z-0 w-full group">
@@ -166,11 +194,19 @@ export default function ProductForm({ onSuccess }: ProductFormProps) {
                     <label className={labelClasses}>Gold Weight (g)</label>
                 </div>
                 <div className="space-y-1">
+                    <label className="text-xs text-gray-500 uppercase tracking-widest block">Diamond Color</label>
+                    <select name="diamondColor" value={formData.diamondColor || 'EF'} onChange={handleChange} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-brand-gold bg-transparent">
+                        {colors.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className="space-y-1">
                     <label className="text-xs text-gray-500 uppercase tracking-widest block">Diamond Clarity</label>
                     <select name="diamondClarity" value={formData.diamondClarity} onChange={handleChange} className="w-full border-b border-gray-300 py-2 focus:outline-none focus:border-brand-gold bg-transparent">
-                        <option value="VVS1">VVS1</option>
-                        <option value="VS1">VS1</option>
-                        <option value="SI1">SI1</option>
+                        {clarities.map(c => (
+                            <option key={c} value={c}>{c}</option>
+                        ))}
                     </select>
                 </div>
                 <div className="relative z-0 w-full group">

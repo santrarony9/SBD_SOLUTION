@@ -44,8 +44,9 @@ export class MastersController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Put('diamond/:clarity')
+  @Put('diamond/:color/:clarity')
   updateDiamondPrice(
+    @Param('color') color: string,
     @Param('clarity') clarity: string,
     @Body('price') price: number,
     @Request() req: any,
@@ -57,7 +58,7 @@ export class MastersController {
     ) {
       throw new UnauthorizedException('Insufficient permissions');
     }
-    return this.mastersService.updateDiamondPrice(clarity, price);
+    return this.mastersService.updateDiamondPrice(color, clarity, price);
   }
 
   @Get('charges')

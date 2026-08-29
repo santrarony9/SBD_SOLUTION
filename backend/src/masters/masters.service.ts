@@ -28,11 +28,11 @@ export class MastersService {
     return this.prisma.diamondPrice.findMany({ orderBy: { clarity: 'asc' } });
   }
 
-  async updateDiamondPrice(clarity: string, pricePerCarat: number) {
+  async updateDiamondPrice(color: string, clarity: string, pricePerCarat: number) {
     return this.prisma.diamondPrice.upsert({
-      where: { clarity },
+      where: { color_clarity: { color, clarity } },
       update: { pricePerCarat },
-      create: { clarity, pricePerCarat },
+      create: { color, clarity, pricePerCarat },
     });
   }
 

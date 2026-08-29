@@ -107,10 +107,13 @@ model GoldPrice {
 // VVS1, VS1, SI1, etc.
 model DiamondPrice {
   id            String   @id @default(auto()) @map("_id") @db.ObjectId
-  clarity       String   @unique // e.g. "VVS1"
+  color         String   @default("EF") // Added color with default for legacy
+  clarity       String   // Removed unique
   pricePerCarat Float
   isActive      Boolean  @default(true)
   updatedAt     DateTime @updatedAt
+
+  @@unique([color, clarity])
 }
 
 // --------------------------------------
