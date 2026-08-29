@@ -1923,7 +1923,6 @@ export default function AdminCMS() {
                                     </button>
                                 </div>
                             </div>
-                        </div>
                     )}
 
                     {/* SPOTLIGHT SECTION */}
