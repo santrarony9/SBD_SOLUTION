@@ -65,17 +65,27 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
 
-  // 3. Strict CORS configuration
+  // 3. Optimized CORS configuration
+  const allowedOrigins = FRONTEND_URL.split(',').map((u) => u.trim().replace(/\/$/, ''));
+
   app.enableCors({
     origin: (origin, callback) => {
-      if (
-        !origin ||
-        FRONTEND_URL === '*' ||
-        FRONTEND_URL.split(',').includes(origin)
-      ) {
+      if (!origin || FRONTEND_URL === '*' || allowedOrigins.includes('*')) {
+        return callback(null, true);
+      }
+
+      const normalizedOrigin = origin.replace(/\/$/, '');
+      const isAllowed =
+        allowedOrigins.includes(normalizedOrigin) ||
+        normalizedOrigin.endsWith('.sparkbluediamond.com') ||
+        normalizedOrigin === 'https://sparkbluediamond.com' ||
+        normalizedOrigin === 'http://sparkbluediamond.com' ||
+        normalizedOrigin.endsWith('.vercel.app');
+
+      if (isAllowed) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(null, false);
       }
     },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
