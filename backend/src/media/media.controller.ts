@@ -20,22 +20,28 @@ export class MediaController {
   @Post('upload')
   @UseInterceptors(
     FileInterceptor('file', {
-      limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit for Multer parsing
+      limits: { fileSize: 50 * 1024 * 1024 }, // 50MB limit for all uploads
     }),
   )
   async uploadFile(
     @UploadedFile(
       new ParseFilePipe({
         validators: [
-          new MaxFileSizeValidator({ maxSize: 20 * 1024 * 1024 }), // 20MB
-          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp|gif)' }),
+          new MaxFileSizeValidator({ maxSize: 50 * 1024 * 1024 }), // 50MB
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg|webp|gif|mp4|webm|mov|pdf)' }),
         ],
       }),
     )
     file: Express.Multer.File,
   ) {
     try {
-      const result = await this.mediaService.uploadFile(file);
+      // Determine folder based on file type
+      const mimeType = file.mimetype || '';
+      let folder = 'products';
+      if (mimeType.startsWith('video/')) folder = 'videos';
+      else if (mimeType === 'application/pdf') folder = 'certificates';
+
+      const result = await this.mediaService.uploadFile(file, folder);
       return {
         url: result.secure_url,
         public_id: result.public_id,

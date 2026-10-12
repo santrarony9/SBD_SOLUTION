@@ -34,14 +34,20 @@ export default function AdminProductList({ refreshTrigger, onEdit }: { refreshTr
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     const loadProducts = async () => {
+        setIsLoading(true);
         try {
             const data = await fetchAPI('/products');
             if (Array.isArray(data)) {
                 setProducts(data);
                 setFilteredProducts(data);
+            } else {
+                console.error('[AdminProductList] Unexpected API response:', data);
+                setProducts([]);
+                setFilteredProducts([]);
             }
         } catch (error) {
-            console.error("Failed to load products");
+            console.error('[AdminProductList] Failed to load products:', error);
+            showToast('Failed to load products. Please refresh.', 'error');
         } finally {
             setIsLoading(false);
         }

@@ -184,7 +184,7 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             const result = await response.json();
 
             if (!result.url) {
-                throw new Error('Server returned success but no URL. Check Cloudinary config.');
+                throw new Error('Server returned success but no URL. Please try again.');
             }
 
             if (type === 'video') setFormData({ ...formData, videoUrl: result.url });
@@ -288,7 +288,9 @@ export default function AdminAddProduct({ isOpen, onClose, onSuccess, initialDat
             onClose();
             onSuccess();
         } catch (error) {
-            showToast(error instanceof Error ? error.message : 'Failed to save product', 'error');
+            const errorMsg = error instanceof Error ? error.message : 'Failed to save product';
+            console.error('[AdminAddProduct] Save Error:', errorMsg);
+            showToast(errorMsg, 'error');
         } finally {
             setLoading(false);
         }

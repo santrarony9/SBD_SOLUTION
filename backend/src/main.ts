@@ -61,7 +61,7 @@ async function bootstrap() {
   );
 
   // Enable global validation with whitelist to strip injected properties
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: false }));
 
   app.setGlobalPrefix('api');
 

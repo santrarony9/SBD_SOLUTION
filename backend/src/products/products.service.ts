@@ -96,24 +96,66 @@ export class ProductsService {
         data.sku = `SBD-${prefix}-${timestamp}-${random}`;
       }
 
+      // Auto-generate slug if missing
+      if (!data.slug) {
+        data.slug = data.name
+          ? data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now()
+          : 'product-' + Date.now();
+      }
+
+      // Ensure required numeric fields have defaults
+      data.goldPurity = data.goldPurity || 18;
+      data.goldWeight = data.goldWeight || 0;
+      data.diamondCarat = data.diamondCarat || 0;
+      data.diamondClarity = data.diamondClarity || 'SI1';
+
       const product = await this.prisma.product.create({ data });
       await this.redis.delByPattern('products:*');
       return this.normalizeImageUrls(product);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to create product:', error);
-      throw error; // Re-throw to let global filter handle it, but log first
+      if (error.code === 'P2002') {
+        throw new HttpException(
+          `Duplicate entry: A product with this ${error.meta?.target?.join(', ') || 'value'} already exists.`,
+          409,
+        );
+      }
+      if (error.code === 'P2000') {
+        throw new HttpException(
+          `Value too long for field: ${error.meta?.column_name || 'unknown'}`,
+          400,
+        );
+      }
+      throw new HttpException(
+        error.message || 'Failed to create product. Please check all required fields.',
+        error.status || 500,
+      );
     }
   }
 
   async updateProduct(id: string, data: any) {
     // Ensure product exists
     await this.findOne(id);
-    const updated = await this.prisma.product.update({
-      where: { id },
-      data,
-    });
-    await this.redis.delByPattern('products:*');
-    return this.normalizeImageUrls(updated);
+    try {
+      const updated = await this.prisma.product.update({
+        where: { id },
+        data,
+      });
+      await this.redis.delByPattern('products:*');
+      return this.normalizeImageUrls(updated);
+    } catch (error: any) {
+      console.error('Failed to update product:', error);
+      if (error.code === 'P2002') {
+        throw new HttpException(
+          `Duplicate entry: A product with this ${error.meta?.target?.join(', ') || 'value'} already exists.`,
+          409,
+        );
+      }
+      throw new HttpException(
+        error.message || 'Failed to update product.',
+        error.status || 500,
+      );
+    }
   }
 
   async deleteProduct(id: string) {
